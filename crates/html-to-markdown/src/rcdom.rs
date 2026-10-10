@@ -214,6 +214,81 @@ pub struct RcDom {
 
     /// The document's quirks mode.
     pub quirks_mode: Cell<QuirksMode>,
+    node_count: Cell<usize>,
+    max_nodes: usize,
+    max_depth: usize,
+    pub(crate) repair_limit: Cell<Option<crate::types::WarningKind>>,
+}
+
+impl RcDom {
+    pub(crate) fn bounded(max_nodes: usize, max_depth: usize) -> Self {
+        Self {
+            max_nodes,
+            max_depth,
+            ..Self::default()
+        }
+    }
+
+    fn new_node(&self, data: NodeData) -> Handle {
+        self.node_count.set(self.node_count.get().saturating_add(1));
+        if self.node_count.get() > self.max_nodes {
+            self.repair_limit.set(Some(crate::types::WarningKind::TruncatedInput));
+        }
+        Node::new(data)
+    }
+
+    fn subtree_fits_depth(&self, parent: &Handle, children: &[Handle]) -> bool {
+        if self.max_depth == usize::MAX || children.is_empty() {
+            return true;
+        }
+        let mut depth = 0;
+        let mut current = Rc::clone(parent);
+        loop {
+            let previous = current.parent.take();
+            let ancestor = previous.as_ref().and_then(Weak::upgrade);
+            current.parent.set(previous);
+            let Some(ancestor) = ancestor else {
+                break;
+            };
+            depth += 1;
+            if depth > self.max_depth {
+                self.repair_limit
+                    .set(Some(crate::types::WarningKind::DepthLimitExceeded));
+                return false;
+            }
+            current = ancestor;
+        }
+        let mut work: Vec<_> = children.iter().map(|child| (Rc::clone(child), depth + 1)).collect();
+        while let Some((node, depth)) = work.pop() {
+            if depth > self.max_depth {
+                self.repair_limit
+                    .set(Some(crate::types::WarningKind::DepthLimitExceeded));
+                return false;
+            }
+            work.extend(node.children.borrow().iter().map(|child| (Rc::clone(child), depth + 1)));
+        }
+        true
+    }
+
+    fn observe_depth(&self, parent: &Handle) {
+        // ~keep Adoption-agency reparenting changes descendant depths; reading actual parents
+        // ~keep avoids stale cached depths. The walk stops at the fixed repair ceiling (#808).
+        if self.max_depth == usize::MAX {
+            return;
+        }
+        let mut current = Rc::clone(parent);
+        for _ in 0..self.max_depth {
+            let previous = current.parent.take();
+            let ancestor = previous.as_ref().and_then(Weak::upgrade);
+            current.parent.set(previous);
+            let Some(ancestor) = ancestor else {
+                return;
+            };
+            current = ancestor;
+        }
+        self.repair_limit
+            .set(Some(crate::types::WarningKind::DepthLimitExceeded));
+    }
 }
 
 impl TreeSink for RcDom {
@@ -268,11 +343,11 @@ impl TreeSink for RcDom {
     }
 
     fn create_element(&self, name: QualName, attrs: Vec<Attribute>, flags: ElementFlags) -> Handle {
-        Node::new(NodeData::Element {
+        self.new_node(NodeData::Element {
             name,
             attrs: RefCell::new(attrs),
             template_contents: RefCell::new(if flags.template {
-                Some(Node::new(NodeData::Document))
+                Some(self.new_node(NodeData::Document))
             } else {
                 None
             }),
@@ -281,14 +356,20 @@ impl TreeSink for RcDom {
     }
 
     fn create_comment(&self, text: StrTendril) -> Handle {
-        Node::new(NodeData::Comment { contents: text })
+        self.new_node(NodeData::Comment { contents: text })
     }
 
     fn create_pi(&self, target: StrTendril, data: StrTendril) -> Handle {
-        Node::new(NodeData::ProcessingInstruction { target, contents: data })
+        self.new_node(NodeData::ProcessingInstruction { target, contents: data })
     }
 
     fn append(&self, parent: &Handle, child: NodeOrText<Handle>) {
+        self.observe_depth(parent);
+        if let NodeOrText::AppendNode(node) = &child {
+            if !node.children.borrow().is_empty() && !self.subtree_fits_depth(parent, std::slice::from_ref(node)) {
+                return;
+            }
+        }
         if let NodeOrText::AppendText(text) = &child {
             if let Some(h) = parent.children.borrow().last() {
                 if append_to_existing_text(h, text) {
@@ -300,7 +381,7 @@ impl TreeSink for RcDom {
         append(
             parent,
             match child {
-                NodeOrText::AppendText(text) => Node::new(NodeData::Text {
+                NodeOrText::AppendText(text) => self.new_node(NodeData::Text {
                     contents: RefCell::new(text),
                 }),
                 NodeOrText::AppendNode(node) => node,
@@ -311,8 +392,14 @@ impl TreeSink for RcDom {
     fn append_before_sibling(&self, sibling: &Handle, child: NodeOrText<Handle>) {
         let (parent, i) = get_parent_and_index(sibling).expect("append_before_sibling called on node without parent");
 
+        self.observe_depth(&parent);
+        if let NodeOrText::AppendNode(node) = &child {
+            if !node.children.borrow().is_empty() && !self.subtree_fits_depth(&parent, std::slice::from_ref(node)) {
+                return;
+            }
+        }
         let child = match (child, i) {
-            (NodeOrText::AppendText(text), 0) => Node::new(NodeData::Text {
+            (NodeOrText::AppendText(text), 0) => self.new_node(NodeData::Text {
                 contents: RefCell::new(text),
             }),
 
@@ -322,7 +409,7 @@ impl TreeSink for RcDom {
                 if append_to_existing_text(prev, &text) {
                     return;
                 }
-                Node::new(NodeData::Text {
+                self.new_node(NodeData::Text {
                     contents: RefCell::new(text),
                 })
             }
@@ -356,7 +443,7 @@ impl TreeSink for RcDom {
     fn append_doctype_to_document(&self, name: StrTendril, public_id: StrTendril, system_id: StrTendril) {
         append(
             &self.document,
-            Node::new(NodeData::Doctype {
+            self.new_node(NodeData::Doctype {
                 name,
                 public_id,
                 system_id,
@@ -380,6 +467,11 @@ impl TreeSink for RcDom {
     }
 
     fn reparent_children(&self, node: &Handle, new_parent: &Handle) {
+        self.observe_depth(new_parent);
+        // ~keep Moving a subtree can exceed the limit even when its new parent's own depth is safe.
+        if !self.subtree_fits_depth(new_parent, &node.children.borrow()) {
+            return;
+        }
         let mut children = node.children.borrow_mut();
         let mut new_children = new_parent.children.borrow_mut();
         for child in children.iter() {
@@ -414,6 +506,10 @@ impl Default for RcDom {
             document: Node::new(NodeData::Document),
             errors: Default::default(),
             quirks_mode: Cell::new(tree_builder::NoQuirks),
+            node_count: Cell::new(1),
+            max_nodes: usize::MAX,
+            max_depth: usize::MAX,
+            repair_limit: Cell::new(None),
         }
     }
 }
@@ -480,5 +576,41 @@ impl Serialize for SerializableHandle {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod bounded_reparent_tests {
+    use super::*;
+    use html5ever::{local_name, ns};
+
+    #[test]
+    fn bounded_repair_should_detect_descendant_depth_when_reparenting() {
+        let dom = RcDom::bounded(100, 4);
+        let element = || {
+            dom.create_element(
+                QualName::new(None, ns!(html), local_name!(div)),
+                Vec::new(),
+                ElementFlags::default(),
+            )
+        };
+        let mut branch = dom.document.clone();
+        let mut first = None;
+        for _ in 0..4 {
+            let child = element();
+            dom.append(&branch, NodeOrText::AppendNode(child.clone()));
+            first.get_or_insert_with(|| child.clone());
+            branch = child;
+        }
+        let destination = element();
+        dom.append(&dom.document, NodeOrText::AppendNode(destination.clone()));
+        let nested_destination = element();
+        dom.append(&destination, NodeOrText::AppendNode(nested_destination.clone()));
+        assert_eq!(dom.repair_limit.get(), None);
+        dom.reparent_children(&first.expect("source branch"), &nested_destination);
+        assert_eq!(
+            dom.repair_limit.get(),
+            Some(crate::types::WarningKind::DepthLimitExceeded)
+        );
     }
 }

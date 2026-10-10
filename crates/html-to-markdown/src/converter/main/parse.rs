@@ -1,6 +1,6 @@
 use super::preprocess_repaired_html;
 use crate::converter::DomContext;
-use crate::converter::main_helpers::repair_with_html5ever;
+use crate::converter::main_helpers::repair_with_html5ever_bounded;
 use crate::converter::preprocessing_helpers::has_inline_block_misnest;
 use crate::converter::utility::caching::build_dom_context;
 use crate::error::{ConversionError, Result};
@@ -27,7 +27,7 @@ fn parse_html(input: &str) -> std::result::Result<tl::VDom<'_>, tl::ParseError> 
 )]
 pub(super) enum ParseOutcome<'a> {
     Ready { dom: tl::VDom<'a>, dom_ctx: DomContext },
-    Retry(String),
+    Retry(String, Option<crate::types::WarningKind>),
 }
 
 pub(super) fn parse_for_conversion<'a>(
@@ -53,7 +53,7 @@ pub(super) fn parse_for_conversion<'a>(
         return Ok(ParseOutcome::Ready { dom, dom_ctx });
     }
     *attempted_misnest_repair = true;
-    let Some(repaired) = repair_with_html5ever(input) else {
+    let Some((repaired, warning)) = repair_with_html5ever_bounded(input) else {
         tracing::warn!(
             target: "html_to_markdown::convert",
             "block-level element misnested under an inline ancestor; html5ever repair failed, proceeding with original structure"
@@ -64,7 +64,10 @@ pub(super) fn parse_for_conversion<'a>(
         target: "html_to_markdown::convert",
         "misnested HTML elements detected; re-parsed with html5ever repair"
     );
-    Ok(ParseOutcome::Retry(preprocess_repaired_html(&repaired, preserve_menu)))
+    Ok(ParseOutcome::Retry(
+        preprocess_repaired_html(&repaired, preserve_menu),
+        warning,
+    ))
 }
 
 #[cfg(test)]

@@ -16,8 +16,8 @@ use std::collections::HashSet;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{
     collapse_excess_blank_lines, effective_max_depth, extract_head_metadata, format_metadata_frontmatter,
-    has_custom_element_tags, is_inline_element, repair_with_html5ever, strip_trailing_backslash_breaks,
-    trim_line_end_whitespace, trim_trailing_whitespace,
+    has_custom_element_tags, is_inline_element, repair_limit_warning, repair_with_html5ever_bounded,
+    strip_trailing_backslash_breaks, trim_line_end_whitespace, trim_trailing_whitespace,
 };
 use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{is_page_header, should_drop_for_preprocessing};
@@ -77,12 +77,15 @@ pub fn convert_html_impl(
         document_base_href,
     } = parameters;
     let preserve_menu = options.preserve_tags.iter().any(|tag| tag.eq_ignore_ascii_case("menu"));
-    let mut preprocessed = prepare_html(html, preserve_menu);
+    let (mut preprocessed, mut repair_warning) = prepare_html(html, preserve_menu);
     let mut attempted_misnest_repair = false;
     let (dom, dom_ctx) = loop {
         let repaired = match parse_for_conversion(&preprocessed, preserve_menu, &mut attempted_misnest_repair)? {
             ParseOutcome::Ready { dom, dom_ctx } => break (dom, dom_ctx),
-            ParseOutcome::Retry(repaired) => repaired,
+            ParseOutcome::Retry(repaired, warning) => {
+                repair_warning = warning.or(repair_warning);
+                repaired
+            }
         };
         preprocessed = repaired;
     };
@@ -120,15 +123,11 @@ pub fn convert_html_impl(
     apply_exclusions(&dom, options, &mut ctx);
     walk_document(&dom, parser, &mut output, options, &ctx, &dom_ctx);
 
-    tracing::debug!(
-        target: "html_to_markdown::convert",
-        depth_limit_reached = ctx.depth_limit_reached.get(),
-        "dom walk stage complete"
-    );
+    trace_walk_complete(&ctx);
 
     check_visitor_error(&ctx)?;
 
-    let depth_warning = depth_warning(&ctx, options);
+    let depth_warning = depth_warning(&ctx, options).or_else(|| repair_warning.map(repair_limit_warning));
 
     // ~keep Drop ctx before unwrapping the structure collector Rc — ctx holds a cloned Rc
     // ~keep reference to the same collector, and Rc::try_unwrap requires exactly one reference.
@@ -157,6 +156,14 @@ fn trace_parse_complete(dom: &tl::VDom<'_>, input_len: usize) {
         node_count = dom.nodes().len(),
         input_len,
         "html parse stage complete"
+    );
+}
+
+fn trace_walk_complete(ctx: &Context) {
+    tracing::debug!(
+        target: "html_to_markdown::convert",
+        depth_limit_reached = ctx.depth_limit_reached.get(),
+        "dom walk stage complete"
     );
 }
 
@@ -359,12 +366,12 @@ fn document_language_and_direction(
     (language, direction)
 }
 
-fn prepare_html(html: &str, preserve_menu: bool) -> String {
-    let mut preprocessed = preprocess_initial_html(html, preserve_menu);
+fn prepare_html(html: &str, preserve_menu: bool) -> (String, Option<crate::types::WarningKind>) {
+    let preprocessed = preprocess_initial_html(html, preserve_menu);
     if has_custom_element_tags(&preprocessed) {
-        preprocessed = repair_custom_elements(preprocessed, preserve_menu);
+        return repair_custom_elements(preprocessed, preserve_menu);
     }
-    preprocessed
+    (preprocessed, None)
 }
 
 fn preprocess_initial_html(html: &str, preserve_menu: bool) -> String {
@@ -390,19 +397,19 @@ fn preprocess_repaired_html(html: &str, preserve_menu: bool) -> String {
     preprocess_html(&stripped).into_owned()
 }
 
-fn repair_custom_elements(preprocessed: String, preserve_menu: bool) -> String {
-    let Some(repaired) = repair_with_html5ever(&preprocessed) else {
+fn repair_custom_elements(preprocessed: String, preserve_menu: bool) -> (String, Option<crate::types::WarningKind>) {
+    let Some((repaired, warning)) = repair_with_html5ever_bounded(&preprocessed) else {
         tracing::warn!(
             target: "html_to_markdown::convert",
             "custom element tags detected; html5ever repair failed, proceeding with unrepaired markup"
         );
-        return preprocessed;
+        return (preprocessed, None);
     };
     tracing::warn!(
         target: "html_to_markdown::convert",
         "custom element tags detected; re-parsed input with html5ever repair fallback"
     );
-    preprocess_repaired_html(&repaired, preserve_menu)
+    (preprocess_repaired_html(&repaired, preserve_menu), warning)
 }
 
 /// Wrap `output` at the wrap width, leaving the `frontmatter` it starts with as it is.

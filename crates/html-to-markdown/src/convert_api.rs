@@ -89,6 +89,7 @@ struct PreparedConversion<'a> {
     html: Cow<'a, str>,
     effective_base: Option<std::rc::Rc<url::Url>>,
     metadata_base_href: Option<String>,
+    repair_warning: Option<crate::types::WarningKind>,
 }
 
 #[cfg(feature = "metadata")]
@@ -144,8 +145,9 @@ fn prepare_conversion<'a>(html: &'a str, options: &ConversionOptions) -> Result<
     // ~keep Both tiers must see the same repaired tree when head content precedes an
     // ~keep explicit `<head>`; browsers place that content in the implicit head (issue #592).
     let normalized_input = normalize_input(html)?;
-    let normalized_html = crate::converter::repair_head_content_before_explicit_head(normalized_input.as_ref())
-        .map_or(normalized_input, Cow::Owned);
+    let (normalized_html, repair_warning) =
+        crate::converter::repair_head_content_before_explicit_head(normalized_input.as_ref())
+            .map_or((normalized_input, None), |(html, warning)| (Cow::Owned(html), warning));
     let document_base_href = (options.base_url.is_some() || options.extract_metadata)
         .then(|| crate::converter::url_resolve::document_base_href(&normalized_html))
         .flatten();
@@ -163,10 +165,14 @@ fn prepare_conversion<'a>(html: &'a str, options: &ConversionOptions) -> Result<
         html: normalized_html,
         effective_base,
         metadata_base_href,
+        repair_warning,
     })
 }
 
 fn try_tier1(prepared: &PreparedConversion<'_>, options: &ConversionOptions) -> Option<ConversionResult> {
+    if prepared.repair_warning.is_some() {
+        return None;
+    }
     let report = crate::converter::prescan::PrescanReport::default();
     match options.tier_strategy {
         crate::options::TierStrategy::Tier2 => None,
@@ -229,7 +235,11 @@ fn run_tier2(prepared: PreparedConversion<'_>, options: ConversionOptions) -> Re
             return Err(crate::error::ConversionError::Panic(panic_message(&*panic_payload)));
         }
     };
-    finish_conversion(markdown, document, tables, depth_warning, collectors)
+    let mut result = finish_conversion(markdown, document, tables, depth_warning, collectors)?;
+    if let Some(kind) = prepared.repair_warning {
+        result.warnings.push(crate::converter::repair_limit_warning(kind));
+    }
+    Ok(result)
 }
 
 #[cfg(any(feature = "metadata", feature = "inline-images"))]
