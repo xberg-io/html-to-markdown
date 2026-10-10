@@ -619,5 +619,68 @@ fn a_style_value_that_only_looks_like_display_or_white_space_keeps_no_space() {
     ]);
 }
 
+/// A character reference to a line feed, a space or a tab is white space as the literal
+/// character is: the text is read after its references are decoded, so `one&#10;` ends with a
+/// line end before the zero-width space as `one\n` does.
+#[test]
+fn a_line_end_as_a_character_reference_before_a_zero_width_space_is_no_space() {
+    const JOINED: &str = "one\u{200b}two\n";
+    assert_on_both(&[
+        ("<p>one&#10;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&#xA;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&#Xa;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&NewLine;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&#13;&#10;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&#10;&#10;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one\n&#32;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&#32;\n<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&#9;&#10;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&Tab;\n&#x20;<span></span>&#8203;two</p>", JOINED),
+        ("<p>one&#10;<!-- c -->&#8203;two</p>", JOINED),
+        ("<div>one&#10;<span></span>&#8203;two</div>", JOINED),
+        (
+            "<ul><li>one&#10;<span></span>&#8203;two</li></ul>",
+            "- one\u{200b}two\n",
+        ),
+        (
+            "<table><tr><td>one&#10;<span></span>&#8203;two</td></tr></table>",
+            "| one\u{200b}two |\n| ------- |\n",
+        ),
+    ]);
+}
+
+/// An escaped ampersand writes the text of a reference, not the character: `&amp;#10;` shows
+/// `&#10;`. No name that only looks like the reference to a line feed is a line end.
+#[test]
+fn the_text_of_a_line_feed_reference_before_a_zero_width_space_is_kept() {
+    assert_on_both(&[
+        ("<p>one&amp;#10;<span></span>&#8203;two</p>", "one&#10;\u{200b}two\n"),
+        (
+            "<p>one&amp;NewLine;<span></span>&#8203;two</p>",
+            "one&NewLine;\u{200b}two\n",
+        ),
+        ("<p>one&amp;#10;\n<span></span>&#8203;two</p>", "one&#10;\u{200b}two\n"),
+        (
+            "<p>one&NewLines;<span></span>&#8203;two</p>",
+            "one&NewLines;\u{200b}two\n",
+        ),
+        (
+            "<p>one&NEWLINE;<span></span>&#8203;two</p>",
+            "one&NEWLINE;\u{200b}two\n",
+        ),
+        ("<p>one<!-- &#10; --><span></span>&#8203;two</p>", "one\u{200b}two\n"),
+        ("<p>one&#32;<span></span>&#8203;two</p>", "one \u{200b}two\n"),
+        ("<p>one&nbsp;\n<span></span>&#8203;two</p>", "one \u{200b}two\n"),
+        (
+            "<pre>one&#10;<span></span>&#8203;two</pre>",
+            "```\none\n\u{200b}two\n```\n",
+        ),
+        (
+            "<p><code>one&#10;<span></span>&#8203;two</code></p>",
+            "`one \u{200b}two`\n",
+        ),
+    ]);
+}
+
 include!("support/inline_white_space_links.rs");
 include!("support/inline_white_space_blocks.rs");

@@ -95,7 +95,7 @@ impl<'a> Tier1Scanner<'a> {
             inline_follows_comments,
             inline_starts_with_block: (is_inline || inline_follows_comments)
                 && upcoming_inline_starts_with_block(self.bytes, self.pos),
-            line_end_meets_zero_width_space: crate::converter::utility::content::without_trailing_line_end(
+            line_end_meets_zero_width_space: crate::converter::utility::content::without_trailing_line_end_in_source(
                 &self.html[self.text_start..self.pos],
             )
             .is_some()

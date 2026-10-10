@@ -216,6 +216,36 @@ pub fn without_trailing_line_end(text: &str) -> Option<&str> {
     text[kept.len()..].contains('\n').then_some(kept)
 }
 
+/// The source text `raw` without the white space at its end, when that white space holds a
+/// line end and other text is before it. A character reference to white space is white space:
+/// `one&#10;` and `one\n&#32;` end with a line end as `one\n` does.
+///
+/// ~keep Tier-1 holds source text and decodes it when it writes it, so this removes source
+/// ~keep bytes and decodes only the last reference of each turn to read it. The text is never
+/// ~keep decoded twice: `&amp;#10;` is the text `&#10;`, not a line end.
+#[must_use]
+pub fn without_trailing_line_end_in_source(raw: &str) -> Option<&str> {
+    const WHITE_SPACE: [char; 4] = [' ', '\t', '\n', '\r'];
+
+    let mut kept = raw;
+    let mut has_line_end = false;
+    loop {
+        let trimmed = kept.trim_end_matches(WHITE_SPACE);
+        has_line_end |= kept[trimmed.len()..].contains('\n');
+        kept = trimmed;
+        let Some(start) = kept.rfind('&') else {
+            break;
+        };
+        let reference = text::decode_html_entities_cow(&kept[start..]);
+        if reference.is_empty() || !reference.chars().all(|character| WHITE_SPACE.contains(&character)) {
+            break;
+        }
+        has_line_end |= reference.contains('\n');
+        kept = &kept[..start];
+    }
+    (has_line_end && !kept.is_empty()).then_some(kept)
+}
+
 /// Whether an element only wraps its text: it writes no content of its own, so the text after
 /// a line end can start inside it or after it when it is empty.
 #[must_use]
@@ -530,5 +560,56 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
             i -= 1;
         }
         i
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::without_trailing_line_end_in_source;
+
+    #[test]
+    fn a_source_text_that_ends_with_a_line_end_loses_its_trailing_white_space() {
+        for (raw, kept) in [
+            ("one\n", "one"),
+            ("one \t\r\n ", "one"),
+            ("one&#10;", "one"),
+            ("one&#xA;", "one"),
+            ("one&#Xa;", "one"),
+            ("one&NewLine;", "one"),
+            ("one&#13;&#10;", "one"),
+            ("one\n&#32;", "one"),
+            ("one&#32;\n", "one"),
+            ("one&#9;&Tab;&#10; &#x20;", "one"),
+            ("a &amp; b&#10;", "a &amp; b"),
+            ("one&amp;#10;\n", "one&amp;#10;"),
+            ("one&nbsp;\n", "one&nbsp;"),
+            ("one &\n", "one &"),
+            ("é&#10;", "é"),
+        ] {
+            assert_eq!(without_trailing_line_end_in_source(raw), Some(kept), "{raw:?}");
+        }
+    }
+
+    #[test]
+    fn a_source_text_with_no_line_end_at_its_end_or_no_other_text_is_not_changed() {
+        for raw in [
+            "",
+            "one",
+            "one ",
+            "one&#32;",
+            "one&#9;&#13;",
+            "one&amp;#10;",
+            "one&amp;NewLine;",
+            "one&NewLines;",
+            "one&NEWLINE;",
+            "one&#10;two",
+            "one\n&nbsp;",
+            "\n",
+            " \n ",
+            "&#10;",
+            "&#32;&#10;\n",
+        ] {
+            assert_eq!(without_trailing_line_end_in_source(raw), None, "{raw:?}");
+        }
     }
 }

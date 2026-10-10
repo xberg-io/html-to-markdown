@@ -593,17 +593,13 @@ fn escape_emitted_text(dest: &mut String, context: EmittedTextContext) {
     }
 }
 
-/// `raw` without the line end at its end, when `raw` has other content too.
+/// The source text `raw` without the line end at its end, when `raw` has other content too.
 ///
 /// ~keep A line end beside a zero-width space is no white space: the two parts are one word.
-/// ~keep Mirrors Tier-2's `without_line_end_before_zero_width_space`.
+/// ~keep Mirrors Tier-2's `without_line_end_before_zero_width_space`, which reads decoded text:
+/// ~keep a character reference to white space counts here as that white space.
 fn without_line_end_at_zero_width_space(raw: &str) -> &str {
-    let has_content = !raw.bytes().all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'));
-    if has_content {
-        crate::converter::utility::content::without_trailing_line_end(raw).unwrap_or(raw)
-    } else {
-        raw
-    }
+    crate::converter::utility::content::without_trailing_line_end_in_source(raw).unwrap_or(raw)
 }
 
 fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), BailReason> {
