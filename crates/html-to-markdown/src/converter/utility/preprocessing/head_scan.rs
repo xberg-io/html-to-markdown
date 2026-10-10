@@ -65,10 +65,26 @@ impl HeadScan {
     /// ~keep a `<title>`, a `<noscript>` and a `<template>` of the head is their content.
     pub(super) fn after_text(self, text: &[u8]) -> Self {
         match self {
-            Self::Before | Self::In if !text.iter().all(u8::is_ascii_whitespace) => Self::After,
+            Self::Before | Self::In if !is_white_space(text) => Self::After,
             state => state,
         }
     }
+}
+
+/// Whether `text` is HTML white space only, after its character references are decoded.
+///
+/// ~keep A browser decodes a character reference before it decides where the text goes: `&#32;`
+/// ~keep between two elements of the head is a space and stays there, and `&nbsp;` is not white
+/// ~keep space and starts the body. Text with no `&` is read as it is written.
+fn is_white_space(text: &[u8]) -> bool {
+    if !text.contains(&b'&') {
+        return text.iter().all(u8::is_ascii_whitespace);
+    }
+    std::str::from_utf8(text).is_ok_and(|text| {
+        crate::text::decode_html_entities_cow(text)
+            .bytes()
+            .all(|byte| byte.is_ascii_whitespace())
+    })
 }
 
 /// The elements whose start tag does not end the document head: the ones that a browser keeps
@@ -127,6 +143,15 @@ mod tests {
             assert_eq!(state.after_text(b" \n a"), HeadScan::After);
             assert_eq!(state.after_text(b" \t\n\x0c\r"), state);
             assert_eq!(state.after_text(b""), state);
+            assert_eq!(
+                state.after_text(b" &#32;&#x20;&#10;&#9;&Tab;&NewLine;&#13;&#12;\n"),
+                state
+            );
+            assert_eq!(state.after_text(b"&nbsp;"), HeadScan::After);
+            assert_eq!(state.after_text(b"&#160;"), HeadScan::After);
+            assert_eq!(state.after_text(b"&amp;"), HeadScan::After);
+            assert_eq!(state.after_text(b" &zzz; "), HeadScan::After);
+            assert_eq!(state.after_text(b"&"), HeadScan::After);
         }
         for state in [
             HeadScan::InTitle,

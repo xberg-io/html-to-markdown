@@ -232,3 +232,57 @@ fn should_read_a_tag_in_a_noscript_of_the_head_as_its_content() {
     let html = r#"<head><noscript></i><img src="p.png"></noscript><template><p>HEAD</p></template></head><body><p>visible</p>"#;
     assert_none(&wrong_in_the_head(html, "visible\n"));
 }
+
+// ~keep A browser decodes a character reference before it decides where text goes. A reference
+// ~keep for a space, a tab, a line feed, a form feed or a carriage return is white space of the
+// ~keep head, so the `<template>` after it is still metadata. A numeric reference is decoded
+// ~keep with no semicolon too.
+#[test]
+fn should_not_end_the_head_at_a_character_reference_for_white_space() {
+    let mut wrong = Vec::new();
+    for reference in [
+        "&#32;",
+        "&#32",
+        "&#x20;",
+        "&#10;",
+        "&#9;",
+        "&Tab;",
+        "&NewLine;",
+        "&#13;",
+        "&#12;",
+        " &#32;\n&Tab; ",
+    ] {
+        for held in ["<p>HEAD</p>", r#"<meta name="a" content="b">"#] {
+            let html = format!(
+                "<head><title>t</title>{reference}<template>{held}</template></head><body><p>visible</p></body>"
+            );
+            wrong.extend(wrong_in_the_head(&html, &format!("{TITLE}\nvisible\n")));
+        }
+    }
+    assert_none(&wrong);
+}
+
+// ~keep A reference for a character that is not HTML white space is text, and so is a `&` that
+// ~keep starts no reference: `&Tab` with no semicolon is not a reference. Each ends the head, so
+// ~keep `HiddenContent::All` writes the content of the `<template>` after it where it is written.
+#[test]
+fn should_end_the_head_at_a_character_reference_for_other_text() {
+    let mut wrong = Vec::new();
+    for reference in ["&nbsp;", "&#160;", "&amp;", "&#x41;", "&Tab", "&zzz;", "&"] {
+        let html = format!(
+            "<head><title>t</title>{reference}<template><p>BODY</p></template></head><body><p>visible</p></body>"
+        );
+        let unwrapped = format!("<head><title>t</title>{reference}<p>BODY</p></head><body><p>visible</p></body>");
+        for tier in DOM_TIERS {
+            let [drop, reachable, all] = [HiddenContent::Drop, HiddenContent::Reachable, HiddenContent::All]
+                .map(|choice| convert_in(&html, choice, tier));
+            let expected = convert_in(&unwrapped, HiddenContent::Drop, tier);
+            if reachable != drop || all != expected || !all.contains("BODY") {
+                wrong.push(format!(
+                    "{tier:?} {html}\n  drop      {drop:?}\n  reachable {reachable:?}\n  all       {all:?}\n  expected  {expected:?}"
+                ));
+            }
+        }
+    }
+    assert_none(&wrong);
+}
