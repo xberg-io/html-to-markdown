@@ -296,13 +296,15 @@ impl InlineDataMedia {
 /// | An element with the `hidden` attribute, any value (`hidden="until-found"` too) | dropped | kept | kept |
 /// | An element with inline `display: none`, `visibility: hidden` or `font-size: 0` | dropped | kept | kept |
 /// | An element of an inline `<svg>` with `display="none"` or `visibility="hidden"` | dropped | kept | kept |
-/// | A declarative shadow root (`<template shadowrootmode>`) | dropped | kept | kept |
+/// | A declarative shadow root: a `<template>` whose `shadowrootmode` is `open` or `closed` | dropped | kept | kept |
 /// | Any other `<template>`, and `<noscript>` | dropped | dropped | kept |
 /// | `<script>`, `<style>`, comments, the value of `<input type="hidden">` | dropped | dropped | dropped |
 ///
 /// `aria-hidden` is not hidden for this option. It takes an element away from assistive
 /// technology only: a browser still shows the element, so a reader sees its text, and every
-/// choice keeps it.
+/// choice keeps it. One rule is older than this option and does not change with it: for an
+/// inline `<svg aria-hidden="true">` no choice writes the title, the description or the label
+/// of the graphic.
 ///
 /// Every choice also keeps what the converter never treated as hidden: `inert`, a closed
 /// `<details>` or `<dialog>`, `<datalist>` and `<option>` text, and an element hidden by a class
@@ -316,7 +318,9 @@ impl InlineDataMedia {
 /// of a declarative shadow root comes before the other children of its host element. Slots are
 /// not resolved. `All` keeps `<noscript>` content with every preprocessing preset. A `<template>`
 /// or `<noscript>` in the document head holds metadata (`<link>`, `<meta>`, `<style>`), not text
-/// for a reader, and no choice keeps it.
+/// for a reader, and no choice keeps it. A document with no `<head>` tag has a head too: it
+/// starts at the doctype, at the `<html>` tag or at the first metadata element, and it ends
+/// where the body starts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum HiddenContent {
     /// Drop the text a browser does not show at first. Default.
@@ -333,15 +337,26 @@ pub enum HiddenContent {
 impl HiddenContent {
     /// Parse the choice from a string.
     ///
-    /// Accepts "reachable" or "all" or defaults to Drop.
-    /// Input is normalized (lowercased, alphanumeric only).
-    #[must_use]
+    /// Accepts "drop", "reachable" and "all".
+    /// Input is normalized (lowercased, alphanumeric only), so "Reachable" and "ALL" are
+    /// accepted too.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ConversionError::ConfigError`] for any other value, the empty string too. A
+    /// value with a typing error does not become `Drop`: that loses the text that the caller
+    /// asked to keep, with no message.
+    ///
+    /// [`ConversionError::ConfigError`]: crate::error::ConversionError::ConfigError
     #[cfg_attr(alef, alef(skip))]
-    pub fn parse(value: &str) -> Self {
+    pub fn parse(value: &str) -> Result<Self, crate::error::ConversionError> {
         match normalize_token(value).as_str() {
-            "reachable" => Self::Reachable,
-            "all" => Self::All,
-            _ => Self::Drop,
+            "drop" => Ok(Self::Drop),
+            "reachable" => Ok(Self::Reachable),
+            "all" => Ok(Self::All),
+            _ => Err(crate::error::ConversionError::ConfigError(format!(
+                "hidden_content is \"{value}\". Use \"drop\", \"reachable\" or \"all\"."
+            ))),
         }
     }
 }
@@ -419,7 +434,16 @@ mod serde_impls {
     impl_deserialize_from_parse!(UrlEscapeStyle, UrlEscapeStyle::parse);
     impl_deserialize_from_parse!(OutputFormat, OutputFormat::parse);
     impl_deserialize_from_parse!(InlineDataMedia, InlineDataMedia::parse);
-    impl_deserialize_from_parse!(HiddenContent, HiddenContent::parse);
+
+    impl<'de> Deserialize<'de> for HiddenContent {
+        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where
+            D: serde::Deserializer<'de>,
+        {
+            let value = String::deserialize(deserializer)?;
+            Self::parse(&value).map_err(serde::de::Error::custom)
+        }
+    }
 
     impl Serialize for HeadingStyle {
         fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

@@ -609,15 +609,17 @@ fn should_keep_noscript_content_with_every_preprocessing_preset() {
 fn should_write_no_text_for_metadata_in_the_document_head() {
     // ~keep The head holds metadata. A `<noscript>` or `<template>` there holds `<link>`, `<style>`
     // ~keep and `<meta>` elements, which are not text for a reader, with or without scripting.
+    // ~keep Each page has a `<template>` in its body too, which `All` must write: without it the
+    // ~keep loop passes when the option is ignored.
     let inputs = [
-        r#"<html><head><title>t</title><noscript><link rel="stylesheet" href="x.css"><style>.CODE{}</style><meta name="CODE" content="CODE"></noscript></head><body><p>visible</p></body></html>"#,
-        r#"<html><head><title>t</title><template><link rel="stylesheet" href="CODE.css"><meta name="CODE" content="CODE"></template></head><body><p>visible</p></body></html>"#,
+        r#"<html><head><title>t</title><noscript><link rel="stylesheet" href="x.css"><style>.CODE{}</style><meta name="CODE" content="CODE"></noscript></head><body><p>visible</p><template><p>BODY</p></template></body></html>"#,
+        r#"<html><head><title>t</title><template><link rel="stylesheet" href="CODE.css"><meta name="CODE" content="CODE"></template></head><body><p>visible</p><template><p>BODY</p></template></body></html>"#,
     ];
     for html in inputs {
         let [drop, reachable, all] = all_choices(html);
         assert!(drop.ends_with("visible\n") && !drop.contains("CODE"), "{drop:?}");
         assert_eq!(reachable, drop, "{html}");
-        assert_eq!(all, drop, "{html}");
+        assert_eq!(all, format!("{drop}\nBODY\n"), "{html}");
     }
     // ~keep The body starts where the head ends, with or without a body tag.
     for html in [
@@ -868,17 +870,23 @@ fn should_record_kept_content_in_the_document_structure() {
 }
 
 #[test]
-fn should_parse_each_choice_and_fall_back_to_drop() {
+fn should_parse_each_choice_and_refuse_an_unknown_value() {
     for (text, expected) in [
         ("drop", HiddenContent::Drop),
         ("reachable", HiddenContent::Reachable),
         ("Reachable", HiddenContent::Reachable),
         ("all", HiddenContent::All),
         ("ALL", HiddenContent::All),
-        ("", HiddenContent::Drop),
-        ("keep", HiddenContent::Drop),
     ] {
-        assert_eq!(HiddenContent::parse(text), expected, "{text:?}");
+        assert_eq!(HiddenContent::parse(text).ok(), Some(expected), "{text:?}");
+    }
+    // ~keep A value with a typing error is not the default: the caller asked to keep text.
+    for text in ["", "keep", "reachble", "al", "drop all", "none", "true"] {
+        let error = HiddenContent::parse(text).expect_err("an unknown value is refused");
+        assert_eq!(
+            error.to_string(),
+            format!("Invalid configuration: hidden_content is \"{text}\". Use \"drop\", \"reachable\" or \"all\"."),
+        );
     }
 }
 
@@ -898,6 +906,20 @@ fn should_read_and_write_each_choice_as_a_lower_case_word() {
     }
     let options: ConversionOptions = serde_json::from_str("{}").expect("empty options are accepted");
     assert_eq!(options.hidden_content, HiddenContent::Drop);
+    let options: ConversionOptions =
+        serde_json::from_str(r#"{"hidden_content":"Reachable"}"#).expect("the name of the choice is accepted");
+    assert_eq!(options.hidden_content, HiddenContent::Reachable);
+    for unknown in ["reachble", "", "keep"] {
+        let json = format!(r#"{{"hidden_content":"{unknown}"}}"#);
+        let error = serde_json::from_str::<ConversionOptions>(&json).expect_err("an unknown value is refused");
+        let message = error.to_string();
+        assert!(
+            message.contains(&format!(
+                "hidden_content is \"{unknown}\". Use \"drop\", \"reachable\" or \"all\"."
+            )),
+            "{message}"
+        );
+    }
 }
 
 #[test]

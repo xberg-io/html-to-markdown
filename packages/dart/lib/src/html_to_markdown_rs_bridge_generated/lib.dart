@@ -1472,13 +1472,15 @@ enum HeadingStyle {
 /// | An element with the `hidden` attribute, any value (`hidden="until-found"` too) | dropped | kept | kept |
 /// | An element with inline `display: none`, `visibility: hidden` or `font-size: 0` | dropped | kept | kept |
 /// | An element of an inline `<svg>` with `display="none"` or `visibility="hidden"` | dropped | kept | kept |
-/// | A declarative shadow root (`<template shadowrootmode>`) | dropped | kept | kept |
+/// | A declarative shadow root: a `<template>` whose `shadowrootmode` is `open` or `closed` | dropped | kept | kept |
 /// | Any other `<template>`, and `<noscript>` | dropped | dropped | kept |
 /// | `<script>`, `<style>`, comments, the value of `<input type="hidden">` | dropped | dropped | dropped |
 ///
 /// `aria-hidden` is not hidden for this option. It takes an element away from assistive
 /// technology only: a browser still shows the element, so a reader sees its text, and every
-/// choice keeps it.
+/// choice keeps it. One rule is older than this option and does not change with it: for an
+/// inline `<svg aria-hidden="true">` no choice writes the title, the description or the label
+/// of the graphic.
 ///
 /// Every choice also keeps what the converter never treated as hidden: `inert`, a closed
 /// `<details>` or `<dialog>`, `<datalist>` and `<option>` text, and an element hidden by a class
@@ -1492,7 +1494,9 @@ enum HeadingStyle {
 /// of a declarative shadow root comes before the other children of its host element. Slots are
 /// not resolved. `All` keeps `<noscript>` content with every preprocessing preset. A `<template>`
 /// or `<noscript>` in the document head holds metadata (`<link>`, `<meta>`, `<style>`), not text
-/// for a reader, and no choice keeps it.
+/// for a reader, and no choice keeps it. A document with no `<head>` tag has a head too: it
+/// starts at the doctype, at the `<html>` tag or at the first metadata element, and it ends
+/// where the body starts.
 enum HiddenContent {
   /// Drop the text a browser does not show at first. Default.
   drop,

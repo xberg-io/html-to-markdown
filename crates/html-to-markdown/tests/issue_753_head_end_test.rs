@@ -84,12 +84,38 @@ fn wrong_outputs(row: &Kept) -> Vec<String> {
     wrong
 }
 
-/// One line for each output of `html` that is not `expected`, for each choice in every tier.
+/// The paragraph that every page of the head tests has in its body.
+const VISIBLE: &str = "<p>visible</p>";
+
+/// `html` with a `<template>` after its visible paragraph, in the body.
+///
+/// ~keep `HiddenContent::All` must write that template. A test that expects the same output for
+/// ~keep the three choices passes when the option is ignored: the template in the body makes it
+/// ~keep fail then.
+fn with_a_template_in_the_body(html: &str) -> String {
+    assert!(html.contains(VISIBLE), "the page has the visible paragraph: {html}");
+    html.replacen(VISIBLE, "<p>visible</p><template><p>BODY</p></template>", 1)
+}
+
+/// One line for each wrong output of `html`, whose head holds a `<template>` or a `<noscript>`.
+///
+/// ~keep `expected` is the output for `HiddenContent::Drop` and `HiddenContent::Reachable`.
+/// ~keep `HiddenContent::All` writes it too, and after it the template that this function puts
+/// ~keep in the body: nothing from the head.
 fn wrong_in_the_head(html: &str, expected: &str) -> Vec<String> {
+    wrong_in_the_head_in(&tiers(), html, expected)
+}
+
+fn wrong_in_the_head_in(tiers: &[TierStrategy], html: &str, expected: &str) -> Vec<String> {
+    let html = with_a_template_in_the_body(html);
     let mut wrong = Vec::new();
-    for tier in tiers() {
+    for &tier in tiers {
         for choice in [HiddenContent::Drop, HiddenContent::Reachable, HiddenContent::All] {
-            let output = convert_in(html, choice, tier);
+            let output = convert_in(&html, choice, tier);
+            let expected = match choice {
+                HiddenContent::All => format!("{expected}\nBODY\n"),
+                HiddenContent::Drop | HiddenContent::Reachable => expected.to_string(),
+            };
             if output != expected {
                 wrong.push(format!(
                     "{choice:?} {tier:?} {html}\n  wrote    {output:?}\n  expected {expected:?}"
@@ -251,6 +277,11 @@ fn should_not_end_the_head_at_a_character_reference_for_white_space() {
         "&#13;",
         "&#12;",
         " &#32;\n&Tab; ",
+        // ~keep The search for the document head reads a no-break space as white space, and
+        // ~keep this scan has the same rule. A browser ends the head there.
+        "&nbsp;",
+        "&#160;",
+        "&#xA0;",
     ] {
         for held in ["<p>HEAD</p>", r#"<meta name="a" content="b">"#] {
             let html = format!(
@@ -262,13 +293,13 @@ fn should_not_end_the_head_at_a_character_reference_for_white_space() {
     assert_none(&wrong);
 }
 
-// ~keep A reference for a character that is not HTML white space is text, and so is a `&` that
+// ~keep A reference for a character that is not white space is text, and so is a `&` that
 // ~keep starts no reference: `&Tab` with no semicolon is not a reference. Each ends the head, so
 // ~keep `HiddenContent::All` writes the content of the `<template>` after it where it is written.
 #[test]
 fn should_end_the_head_at_a_character_reference_for_other_text() {
     let mut wrong = Vec::new();
-    for reference in ["&nbsp;", "&#160;", "&amp;", "&#x41;", "&Tab", "&zzz;", "&"] {
+    for reference in ["&amp;", "&#65;", "&#x41;", "&Tab", "&zzz;", "&"] {
         let html = format!(
             "<head><title>t</title>{reference}<template><p>BODY</p></template></head><body><p>visible</p></body>"
         );
@@ -285,4 +316,141 @@ fn should_end_the_head_at_a_character_reference_for_other_text() {
         }
     }
     assert_none(&wrong);
+}
+
+/// The tracking pixel that a page holds in a `<noscript>` of its head.
+const PIXEL: &str = r#"<noscript><img src="https://x.test/p.gif" alt="pixel"></noscript>"#;
+
+// ~keep The `<head>` tag is optional. A document with none has a head all the same: a doctype,
+// ~keep an `<html>` tag or an element that only the head holds opens it, and it ends where the
+// ~keep head of a page with the tag ends. For a page with no `<head>` tag the base writes the
+// ~keep title text into the body, and the exact outputs hold that as the base has it.
+#[test]
+fn should_read_a_template_and_a_noscript_of_a_head_with_no_head_tag_as_metadata() {
+    let mut wrong = Vec::new();
+    for (html, expected) in [
+        (
+            format!(r#"<!DOCTYPE html><html><meta charset="utf-8">{PIXEL}<body><p>visible</p></body></html>"#),
+            "visible\n",
+        ),
+        (
+            format!(
+                "<!DOCTYPE html><html><title>t</title>{PIXEL}<template><p>HEAD</p></template><body><p>visible</p></body></html>"
+            ),
+            "t\n\nvisible\n",
+        ),
+        (
+            "<html><template><p>HEAD</p></template><body><p>visible</p></body></html>".to_string(),
+            "visible\n",
+        ),
+        (
+            "<HTML><TEMPLATE><P>HEAD</P></TEMPLATE><BODY><p>visible</p></BODY></HTML>".to_string(),
+            "visible\n",
+        ),
+        (format!("<!doctype html>{PIXEL}<p>visible</p>"), "visible\n"),
+        (
+            format!(r#"<meta charset="utf-8">&#32;&#x20;&Tab;{PIXEL}<p>visible</p>"#),
+            "visible\n",
+        ),
+        (
+            format!(r#"<link rel="icon" href="i.png"><!-- <p> a comment -->{PIXEL}<p>visible</p>"#),
+            "visible\n",
+        ),
+    ] {
+        wrong.extend(wrong_in_the_head_in(&DOM_TIERS, &html, expected));
+    }
+    assert_none(&wrong);
+}
+
+// ~keep A fragment has no head: a `<template>` or a `<noscript>` that nothing of a document
+// ~keep precedes is content, and so is one after an element whose name only starts like the name
+// ~keep of a metadata element.
+#[test]
+fn should_keep_the_first_template_and_noscript_of_a_fragment() {
+    let mut wrong = Vec::new();
+    for (html, unwrapped) in [
+        (
+            "<template><p>BODY</p></template><p>visible</p>",
+            "<p>BODY</p><p>visible</p>",
+        ),
+        (
+            "<noscript><p>BODY</p></noscript><p>visible</p>",
+            "<p>BODY</p><p>visible</p>",
+        ),
+        (
+            " <!-- <html> -->\n<template><p>BODY</p></template><p>visible</p>",
+            " <!-- <html> -->\n<p>BODY</p><p>visible</p>",
+        ),
+        (
+            "<metadata></metadata><template><p>BODY</p></template><p>visible</p>",
+            "<metadata></metadata><p>BODY</p><p>visible</p>",
+        ),
+        (
+            "<head><titles></titles><template><p>BODY</p></template></head><p>visible</p>",
+            "<head><titles></titles><p>BODY</p></head><p>visible</p>",
+        ),
+    ] {
+        wrong.extend(wrong_after_the_head(html, unwrapped));
+    }
+    assert_none(&wrong);
+}
+
+/// One line for each wrong output of `html`, whose `<template>` or `<noscript>` is in the body:
+/// `HiddenContent::All` writes what `unwrapped`, the page with the two tags removed, gives.
+fn wrong_after_the_head(html: &str, unwrapped: &str) -> Vec<String> {
+    let mut wrong = Vec::new();
+    for tier in DOM_TIERS {
+        let [drop, reachable, all] =
+            [HiddenContent::Drop, HiddenContent::Reachable, HiddenContent::All].map(|c| convert_in(html, c, tier));
+        let expected = convert_in(unwrapped, HiddenContent::Drop, tier);
+        if reachable != drop || all != expected || !all.contains("BODY") || drop.contains("BODY") {
+            wrong.push(format!(
+                "{tier:?} {html}\n  drop      {drop:?}\n  reachable {reachable:?}\n  wrote    {all:?}\n  expected  {expected:?}"
+            ));
+        }
+    }
+    wrong
+}
+
+// ~keep A browser reads the end tags of the body, of the document and of a line break in the
+// ~keep head as the first thing after it. Every other end tag there is ignored, and so are the
+// ~keep three in a comment and in a longer name.
+#[test]
+fn should_end_the_head_at_an_end_tag_that_a_browser_reads_as_the_body() {
+    let mut wrong = Vec::new();
+    for end_tag in ["</body>", "</html>", "</br>", "</BODY>", "</body >"] {
+        let html = format!(
+            "<head><title>t</title>{end_tag}<template><p>BODY</p></template></head><body><p>visible</p></body>"
+        );
+        let unwrapped = format!("<head><title>t</title>{end_tag}<p>BODY</p></head><body><p>visible</p></body>");
+        wrong.extend(wrong_after_the_head(&html, &unwrapped));
+    }
+    for ignored in ["</bodys>", "</brx>", "<!-- </body> -->", "</div>"] {
+        let html = format!(
+            "<head><title>t</title>{ignored}<template><p>HEAD</p></template></head><body><p>visible</p></body>"
+        );
+        wrong.extend(wrong_in_the_head(&html, &format!("{TITLE}\nvisible\n")));
+    }
+    assert_none(&wrong);
+}
+
+// ~keep The parser reads `<title/>` as an element with no content, so the head goes on after it
+// ~keep and the body is read. The front matter has no title, as at the base.
+#[test]
+fn should_read_a_title_that_closes_itself_as_empty() {
+    let html = "<head><title/><template><p>HEAD</p></template></head><body><p>visible</p></body>";
+    assert_none(&wrong_in_the_head_in(&DOM_TIERS, html, "---\n---\n\nvisible\n"));
+}
+
+// ~keep After the end tag of the head a browser still puts a `<template>` in the head. It puts a
+// ~keep `<noscript>` there in the body.
+#[test]
+fn should_read_a_template_between_the_head_and_the_body_as_metadata() {
+    let html =
+        "<html><head><title>t</title></head>\n<template><p>HEAD</p></template>\n<body><p>visible</p></body></html>";
+    assert_none(&wrong_in_the_head(html, &format!("{TITLE}\nvisible\n")));
+    assert_none(&wrong_after_the_head(
+        "<html><head><title>t</title></head>\n<noscript><p>BODY</p></noscript>\n<body><p>visible</p></body></html>",
+        "<html><head><title>t</title></head>\n<p>BODY</p>\n<body><p>visible</p></body></html>",
+    ));
 }

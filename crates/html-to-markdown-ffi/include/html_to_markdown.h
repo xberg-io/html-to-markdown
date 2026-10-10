@@ -133,12 +133,21 @@ typedef struct HTMHeadingStyle HTMHeadingStyle;
  * kept |
  * | An element with inline `display: none`, `visibility: hidden` or `font-size: 0` | dropped | kept |
  * kept |
- * | A declarative shadow root (`<template shadowrootmode>`) | dropped | kept | kept |
+ * | An element of an inline `<svg>` with `display="none"` or `visibility="hidden"` | dropped | kept |
+ * kept |
+ * | A declarative shadow root: a `<template>` whose `shadowrootmode` is `open` or `closed` | dropped |
+ * kept | kept |
  * | Any other `<template>`, and `<noscript>` | dropped | dropped | kept |
  * | `<script>`, `<style>`, comments, the value of `<input type="hidden">` | dropped | dropped |
  * dropped |
  *
- * Every choice keeps what the converter never treated as hidden: `aria-hidden`, `inert`, a closed
+ * `aria-hidden` is not hidden for this option. It takes an element away from assistive
+ * technology only: a browser still shows the element, so a reader sees its text, and every
+ * choice keeps it. One rule is older than this option and does not change with it: for an
+ * inline `<svg aria-hidden="true">` no choice writes the title, the description or the label
+ * of the graphic.
+ *
+ * Every choice also keeps what the converter never treated as hidden: `inert`, a closed
  * `<details>` or `<dialog>`, `<datalist>` and `<option>` text, and an element hidden by a class
  * name, a style sheet rule, `opacity`, `content-visibility`, a zero size or an off-screen
  * position. The converter reads the inline `style` attribute only. It does no layout and reads no
@@ -148,7 +157,11 @@ typedef struct HTMHeadingStyle HTMHeadingStyle;
  * `<template>` and `<noscript>` content converts where it is written, as if the two tags were
  * not there: a row in a `<template>` inside a `<table>` is a row of that table, and the content
  * of a declarative shadow root comes before the other children of its host element. Slots are
- * not resolved. `All` keeps `<noscript>` content with every preprocessing preset.
+ * not resolved. `All` keeps `<noscript>` content with every preprocessing preset. A `<template>`
+ * or `<noscript>` in the document head holds metadata (`<link>`, `<meta>`, `<style>`), not text
+ * for a reader, and no choice keeps it. A document with no `<head>` tag has a head too: it
+ * starts at the doctype, at the `<html>` tag or at the first metadata element, and it ends
+ * where the body starts.
  */
 typedef struct HTMHiddenContent HTMHiddenContent;
 /**

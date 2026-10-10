@@ -362,12 +362,14 @@ impl ConvertConfig {
             INLINE_DATA_MEDIA_VALUES,
             InlineDataMedia::parse,
         )?;
-        update.hidden_content = validated_enum(
-            "hidden_content",
-            self.hidden_content.take(),
-            HIDDEN_CONTENT_VALUES,
-            HiddenContent::parse,
-        )?;
+        update.hidden_content = match self.hidden_content.take() {
+            Some(raw) => Some(HiddenContent::parse(&raw).map_err(|_| InvalidEnumValue {
+                field: "hidden_content",
+                value: raw,
+                accepted: HIDDEN_CONTENT_VALUES,
+            })?),
+            None => None,
+        };
         update.include_document_structure = self.include_document_structure.take();
         update.extract_images = self.extract_images.take();
         update.max_image_size = self.max_image_size.take();

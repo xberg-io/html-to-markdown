@@ -11,7 +11,8 @@ mod head;
 
 use head::document_head_search;
 pub use head::{
-    document_head, extract_head_metadata, format_metadata_frontmatter, is_ignorable_before_head, starts_body,
+    document_head, end_tag_starts_body, extract_head_metadata, format_metadata_frontmatter, is_ignorable_before_head,
+    starts_body,
 };
 
 /// Resolve the effective traversal-depth ceiling.

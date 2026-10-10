@@ -403,7 +403,7 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
     let mut last = 0;
     let mut idx = 0;
     let mut tag_ends = TagEndScan::new(bytes);
-    let mut head = HeadScan::Before;
+    let mut head = HeadScan::new();
     let mut text_start = 0;
 
     while idx < bytes.len() {
@@ -411,16 +411,17 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
             break;
         };
         idx += offset;
-        head = head.after_text(bytes.get(text_start..idx).unwrap_or_default());
         let is_end_tag = bytes.get(idx + 1) == Some(&b'/');
         let name_start = idx + 1 + usize::from(is_end_tag);
+        let next_tag_is_html = !is_end_tag && matches_tag_start(bytes, name_start, b"html");
+        head = head.after_text(input.get(text_start..idx).unwrap_or_default(), next_tag_is_html);
         let is_template = matches_tag_start(bytes, name_start, b"template");
         let is_noscript = matches_tag_start(bytes, name_start, b"noscript");
         let is_tag = opens_a_tag(bytes, idx);
         let tag_end = if is_tag { tag_ends.tag_end(idx + 1) } else { None };
         let closes_itself = tag_end.is_some_and(|end| is_self_closing_tag(&bytes[idx..end], b"template"));
         head = head.after_tag(bytes, name_start, is_end_tag, closes_itself);
-        if head != HeadScan::After || (!is_template && !is_noscript) {
+        if !head.in_body() || (!is_template && !is_noscript) {
             // ~keep A comment, a raw-text body and a quoted attribute value can hold text that
             // ~keep looks like one of the two tags. Step over each as one unit.
             // ~keep A raw-text element starts with a tag that ends. For a tag start with no end
@@ -866,9 +867,12 @@ mod tag_ends_tests {
     /// the count of those whose tags the scan removed.
     ///
     /// ~keep The pairs come from a count of start and end tags for each element, which knows
-    /// ~keep nothing of the head.
+    /// ~keep nothing of the head. A page with a tag of the head or with a `<title>` can have a
+    /// ~keep head, with or without the `<head>` tag.
     fn check_the_pairs(pieces: &[Piece], page: &str, choice: HiddenContent) -> (usize, usize) {
-        let has_head = pieces.iter().any(|(text, _)| *text == "<head>");
+        let has_head = pieces
+            .iter()
+            .any(|(text, _)| matches!(*text, "<head>" | "</head>" | "<title>"));
         let removed = removed_pieces(pieces, page, choice);
         let mut open: [Vec<usize>; 2] = [Vec::new(), Vec::new()];
         let (mut pairs, mut removed_pairs) = (0, 0);
