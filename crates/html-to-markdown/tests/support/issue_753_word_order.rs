@@ -203,9 +203,15 @@ fn should_keep_the_text_after_a_template_or_a_noscript_of_every_shape() {
 fn should_write_every_word_of_a_narrower_choice_on_the_recorded_pages() {
     // ~keep A wider choice that loses a word of a narrower one has dropped content that was never
     // ~keep hidden. Markdown from each converter; the generated documents cover the plain format.
+    //
+    // ~keep The Wikipedia pages are not read. They take most of the time of the whole set, and each
+    // ~keep hidden form that they hold (a `<noscript>` in the body, the `hidden` attribute,
+    // ~keep `display: none`) is on a smaller page. The two counts below prove that the pages that
+    // ~keep are read exercise both steps of the order.
     let root = support::corpus_root();
     let mut pages = Vec::new();
     support::collect_html_files(&root, &mut pages);
+    pages.retain(|page| !page.starts_with(root.join("wikipedia")));
     pages.sort();
     let markdown_modes: Vec<Mode> = modes()
         .into_iter()
@@ -213,7 +219,8 @@ fn should_write_every_word_of_a_narrower_choice_on_the_recorded_pages() {
         .collect();
     let mut failures = Vec::new();
     let mut total = 0;
-    let mut wider = 0;
+    let mut reachable_is_wider = 0;
+    let mut all_is_wider = 0;
     for page in &pages {
         let html = std::fs::read_to_string(page).expect("the recorded page is read");
         let name = page.strip_prefix(&root).unwrap_or(page).display().to_string();
@@ -221,7 +228,9 @@ fn should_write_every_word_of_a_narrower_choice_on_the_recorded_pages() {
             let outputs = CHOICES.map(|choice| convert_in(&html, choice, *mode));
             total += 2;
             check_that_no_output_loses_a_word(&mut failures, &format!("{name} {mode:?}"), &outputs);
-            wider += usize::from(words(&outputs[2]).len() > words(&outputs[0]).len());
+            let [drop, reachable, all] = outputs.each_ref().map(|output| words(output).len());
+            reachable_is_wider += usize::from(reachable > drop);
+            all_is_wider += usize::from(all > reachable);
         }
     }
     assert!(
@@ -229,7 +238,14 @@ fn should_write_every_word_of_a_narrower_choice_on_the_recorded_pages() {
         "the recorded pages were not found: {} pages",
         pages.len()
     );
-    assert!(wider >= 20, "`all` writes more than `drop` in only {wider} runs");
+    assert!(
+        reachable_is_wider >= 12,
+        "`reachable` writes more than `drop` in only {reachable_is_wider} runs"
+    );
+    assert!(
+        all_is_wider >= 10,
+        "`all` writes more than `reachable` in only {all_is_wider} runs"
+    );
     report(&failures, total);
 }
 
