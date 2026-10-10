@@ -305,7 +305,7 @@ const CASES: &[Case] = &[
     tier1_case(
         "blank lines at the start and at the end",
         "<pre>\n\na\n\n\n</pre>",
-        "```\na\n```\n",
+        "```\n\na\n```\n",
     ),
     tier1_case(
         "paragraphs keep the empty line of their margin",
@@ -340,9 +340,34 @@ const CASES: &[Case] = &[
     ),
     tier1_case("a block with no content", "<p>x</p><pre></pre><p>y</p>", "x\n\ny\n"),
     tier1_case(
-        "line feeds at the start of the block",
-        "<pre>\n\na\nb\n</pre>",
+        "one line feed at the start of the block is not a line",
+        "<pre>\na\nb\n</pre>",
         "```\na\nb\n```\n",
+    ),
+    tier1_case(
+        "a second line feed at the start of the block is a blank first line",
+        "<pre>\n\na\nb\n</pre>",
+        "```\n\na\nb\n```\n",
+    ),
+    tier1_case(
+        "three line feeds at the start of the block are two blank lines",
+        "<pre>\n\n\na</pre>",
+        "```\n\n\na\n```\n",
+    ),
+    tier1_case(
+        "a blank first line of a block after text in a list item",
+        "<ul><li>t<pre>\n\na\nb\n</pre></li></ul>",
+        "- t\n\n  ```\n\n  a\n  b\n  ```\n",
+    ),
+    case(
+        "a blank first line of a block that starts a list item",
+        "<ul><li><pre>\n\na\nb\n</pre></li></ul>",
+        "- ```\n\n  a\n  b\n  ```\n",
+    ),
+    tier1_case(
+        "a blank first line of a block in a block quote",
+        "<blockquote><pre>\n\na\nb\n</pre></blockquote>",
+        "> ```\n>\n> a\n> b\n> ```\n",
     ),
     tier1_case(
         "a language class on the code element",
@@ -755,17 +780,6 @@ fn should_keep_the_blank_lines_of_a_block_on_the_line_of_a_long_item_number() {
         assert!(actual.starts_with("100. ```\n"), "{tier_strategy:?}: {actual:?}");
         assert!(actual.contains("a\n\n\n"), "{tier_strategy:?}: {actual:?}");
     }
-}
-
-#[test]
-fn should_keep_the_line_feeds_at_the_start_of_a_block_in_strict_white_space_mode() {
-    let options = ConversionOptions {
-        whitespace_mode: WhitespaceMode::Strict,
-        ..options(TierStrategy::Tier2)
-    };
-    let actual = converted("<pre>\n\n\na\n</pre>", Some(options));
-    assert!(actual.starts_with("```\n\n"), "{actual:?}");
-    assert!(actual.ends_with("a\n```\n"), "{actual:?}");
 }
 
 #[test]

@@ -235,7 +235,7 @@ pub fn handle_pre(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
         .map(|offsets| offsets.borrow().clone())
         .unwrap_or_default();
     let segmented = (!offsets.is_empty()).then(|| content.clone());
-    let processed = process_pre_content(content, handler.options.whitespace_mode);
+    let processed = process_pre_content(content);
     #[cfg(feature = "visitor")]
     if let Some(custom_output) = visit_code_block(tag, language.as_deref(), &processed, &handler) {
         handler.output.push_str(&custom_output);
@@ -332,20 +332,16 @@ fn language_from_class(tag: &tl::HTMLTag<'_>) -> Option<String> {
     })
 }
 
-/// The text of a code block: the content of the `pre` without the line feeds at its start.
+/// The text of a code block: the content of the `pre` without the one line feed at its start.
 ///
-/// ~keep Every other character is a character of the code and stays: indentation that all lines
-/// ~keep share, blank lines between lines of code, spaces at a line end (issues #782, #783). The
-/// ~keep fence drops the line feeds at the end. Content that is only white space stays whole,
-/// ~keep and so does all content in strict white space mode.
-pub(in crate::converter) fn process_pre_content(
-    mut content: String,
-    whitespace_mode: crate::options::WhitespaceMode,
-) -> String {
-    if whitespace_mode != crate::options::WhitespaceMode::Strict && !content.trim().is_empty() {
-        let leading = content.len() - content.trim_start_matches('\n').len();
-        content.drain(..leading);
-    }
+/// ~keep An HTML parser drops one line feed right after the `<pre>` tag, so a browser shows a
+/// ~keep second one as a blank first line of the code. Every other character is a character of
+/// ~keep the code and stays: indentation that all lines share, blank lines between lines of code,
+/// ~keep spaces at a line end (issues #782, #783). The fence drops the line feeds at the end.
+/// ~keep The white space mode does not change the rule: it is the rule of the parser.
+pub(in crate::converter) fn process_pre_content(mut content: String) -> String {
+    let leading = usize::from(content.starts_with('\n'));
+    content.drain(..leading);
     content
 }
 
@@ -526,7 +522,9 @@ fn separate_code_block(output: &mut String, context: &Context) {
 }
 
 fn format_indented_code_block(content: &str, output: &mut String) {
+    // ~keep Markdown has no indented code block that starts with a blank line.
     let indented = content
+        .trim_start_matches('\n')
         .lines()
         .map(|line| {
             if line.is_empty() {
