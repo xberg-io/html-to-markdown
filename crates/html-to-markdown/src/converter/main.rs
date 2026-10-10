@@ -248,8 +248,8 @@ fn finalize_output(
     if is_plain_text {
         output = extract_plain_text(dom, parser, options);
     } else {
-        trim_line_end_whitespace(&mut output);
-        collapse_excess_blank_lines(&mut output);
+        trim_line_end_whitespace(&mut output, options.code_block_style);
+        collapse_excess_blank_lines(&mut output, options.code_block_style);
     }
     if options.wrap {
         wrap_after_frontmatter(&output, frontmatter, options)
@@ -907,7 +907,7 @@ fn render_preserved_tag(
 
 #[cfg(feature = "metadata")]
 fn collect_document_attributes(tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context) {
-    if !matches!(tag_name, "html" | "head" | "body") || !ctx.metadata_wants_document {
+    if !matches!(tag_name, "html" | "head" | "body") || !ctx.metadata_wants.document {
         return;
     }
     let Some(collector) = ctx.metadata_collector.as_ref() else {

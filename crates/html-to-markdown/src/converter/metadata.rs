@@ -80,7 +80,7 @@ fn handle_head(node_handle: &NodeHandle, parser: &Parser, output: &mut String, h
     });
 
     #[cfg(feature = "metadata")]
-    if handler.ctx.metadata_wants_structured_data {
+    if handler.ctx.metadata_wants.structured_data {
         collect_json_ld_from_children(&children, parser, handler);
     }
 
@@ -125,8 +125,7 @@ fn collect_json_ld_from_children(children: &tl::Children, parser: &Parser, handl
 
 #[cfg(feature = "metadata")]
 fn json_ld_from_tag(tag: &tl::HTMLTag<'_>, parser: &Parser) -> Option<String> {
-    let type_attr = tag.attributes().get("type").flatten()?;
-    let type_value = type_attr.as_utf8_str();
+    let type_value = crate::converter::utility::attributes::decoded_attribute(tag, "type")?;
     let media_type = type_value
         .split(';')
         .next()
@@ -153,7 +152,7 @@ fn handle_script(node_handle: &NodeHandle, parser: &Parser, _output: &mut String
     };
 
     #[cfg(feature = "metadata")]
-    if ctx.metadata_wants_structured_data
+    if ctx.metadata_wants.structured_data
         && let Some(collector) = ctx.metadata_collector.as_ref()
         && let Some(json) = json_ld_from_tag(tag, parser)
     {

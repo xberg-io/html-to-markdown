@@ -181,11 +181,7 @@ impl<'a> Tier1Scanner<'a> {
             return Ok(());
         }
 
-        // ~keep Tilde fences still require Tier-2; Tier-1 supports indented/backtick pre blocks.
-        if matches!(spec.kind, TagKind::Pre) && self.options.code_block_style == crate::options::CodeBlockStyle::Tildes
-        {
-            return Err(BailReason::Classifier);
-        }
+        self.bail_for_code_rules(spec)?;
 
         let close = parse::find_tag_close(self.bytes, name_end).ok_or(BailReason::LiteralLt { offset: self.pos })?;
 
@@ -231,6 +227,22 @@ impl<'a> Tier1Scanner<'a> {
         Ok(())
     }
 
+    /// Leave to Tier-2 an open tag whose code block rule this scanner does not have.
+    fn bail_for_code_rules(&self, spec: &TagSpec) -> Result<(), BailReason> {
+        // ~keep Tilde fences still require Tier-2; Tier-1 supports indented/backtick pre blocks.
+        if matches!(spec.kind, TagKind::Pre) && self.options.code_block_style == crate::options::CodeBlockStyle::Tildes
+        {
+            return Err(BailReason::Classifier);
+        }
+        // ~keep A link or an image in code writes no marks; Tier-2 knows the rule.
+        if matches!(spec.kind, TagKind::Link | TagKind::Image)
+            && self.state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE)
+        {
+            return Err(BailReason::Classifier);
+        }
+        Ok(())
+    }
+
     fn prepare_open_tag(&mut self, name_lower: &[u8]) -> Result<(), BailReason> {
         // ~keep Only a br or stripped raw-text tag keeps a pending newline join open.
         if !matches!(name_lower, b"br" | b"script" | b"style") {
@@ -260,6 +272,10 @@ impl<'a> Tier1Scanner<'a> {
             .iter()
             .any(|frame| matches!(frame.spec.kind, TagKind::Heading(_)));
         if in_heading {
+            return Err(BailReason::Classifier);
+        }
+        // ~keep A graphic in code writes its text and no marks; Tier-2 knows the rule.
+        if self.state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE) {
             return Err(BailReason::Classifier);
         }
         let tag_open_start = self.pos;
@@ -649,10 +665,8 @@ fn finish_scan(
         emit_close_for_implicit(&mut state, options, &mut table_probes)?;
     }
 
-    crate::converter::main_helpers::trim_line_end_whitespace(&mut state.output);
-    if state.output.contains("\n\n\n") {
-        collapse_excess_blank_lines(&mut state.output);
-    }
+    crate::converter::main_helpers::trim_line_end_whitespace(&mut state.output, options.code_block_style);
+    crate::converter::main_helpers::collapse_excess_blank_lines(&mut state.output, options.code_block_style);
 
     if !state.output.is_empty() {
         let trimmed_end = state.output.trim_end_matches('\n');

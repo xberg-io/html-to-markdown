@@ -951,4 +951,40 @@ fn should_apply_the_choice_from_an_update_and_keep_it_when_the_update_names_anot
     assert_eq!(built.hidden_content, HiddenContent::All);
 }
 
+#[test]
+fn should_write_the_kept_text_of_a_graphic_in_code_without_marks() {
+    let html = "<pre>a <svg><text>shown</text><text display=\"none\">kept</text></svg> b</pre>";
+    let [dropped, reachable, all] = all_choices(html);
+    assert!(dropped.contains("shown") && !dropped.contains("kept"), "{dropped:?}");
+    for output in [&reachable, &all] {
+        assert!(output.contains("shown kept"), "{output:?}");
+    }
+    for output in [&dropped, &reachable, &all] {
+        assert!(!output.contains("![") && !output.contains("data:"), "{output:?}");
+    }
+}
+
+#[test]
+fn should_step_over_a_structured_data_script_that_holds_template_tags() {
+    // ~keep The JSON text names both tags. It is the text of the script and not markup: it must
+    // ~keep not end the head, open a template or close one.
+    let script = r#"<script type="application/ld+json">{"zq":"</head><p>zqtext</p><template></template>"}</script>"#;
+    let in_head = format!(
+        "<html><head>{script}<template><p>headtext</p></template></head>\
+         <body><p>one</p><template><p>bodytext</p></template><p>two</p></body></html>"
+    );
+    let in_template = format!("<p>one</p><template>{script}<p>bodytext</p></template><p>two</p>");
+    for html in [in_head, in_template] {
+        let [dropped, reachable, all] = all_choices(&html);
+        assert_eq!(dropped, reachable, "{html:?}");
+        assert!(!dropped.contains("bodytext"), "{dropped:?}");
+        assert!(all.contains("bodytext"), "{all:?}");
+        for output in [&dropped, &all] {
+            assert!(!output.contains("zq") && !output.contains("headtext"), "{output:?}");
+            let (one, two) = (output.find("one"), output.find("two"));
+            assert!(one.is_some() && one < two, "{output:?}");
+        }
+    }
+}
+
 include!("support/issue_753_word_order.rs");

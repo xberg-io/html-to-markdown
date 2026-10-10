@@ -932,6 +932,31 @@ mod tag_ends_tests {
     }
 
     #[test]
+    fn should_leave_the_end_tag_after_a_template_start_tag_that_closes_itself() {
+        // ~keep The parser reads `<template/>` as an element with no content, so the start tag
+        // ~keep opens nothing and the end tag that follows closes nothing: it stays.
+        for (page, choice, expected) in [
+            (
+                "<p>a</p><template/><p>b</p></template><p>c</p>",
+                HiddenContent::All,
+                "<p>a</p><p>b</p></template><p>c</p>",
+            ),
+            (
+                "<p>a</p><template><p>b</p></template><p>c</p>",
+                HiddenContent::All,
+                "<p>a</p><p>b</p><p>c</p>",
+            ),
+            (
+                "<div><template shadowrootmode=\"open\"><template/></template><p>x</p></template></div>",
+                HiddenContent::Reachable,
+                "<div><template/><p>x</p></template></div>",
+            ),
+        ] {
+            assert_eq!(unwrap_kept_inert_elements(page, choice), expected, "{page:?}");
+        }
+    }
+
+    #[test]
     fn should_give_the_tag_end_that_a_scan_from_each_byte_gives() {
         // ~keep Every page of up to eight bytes over the bytes that the scan tells apart.
         let alphabet = [b'"', b'\'', b'>', b'a'];

@@ -45,13 +45,9 @@ React components are JavaScript functions that return markup:
 
 ```
 function MyButton() {
-
   return (
-
     <button>I'm a button</button>
-
   );
-
 }
 ```
 
@@ -59,19 +55,12 @@ Now that you’ve declared `MyButton`, you can nest it into another component:
 
 ```
 export default function MyApp() {
-
   return (
-
     <div>
-
       <h1>Welcome to my app</h1>
-
       <MyButton />
-
     </div>
-
   );
-
 }
 ```
 
@@ -120,19 +109,12 @@ JSX is stricter than HTML. You have to close tags like `<br />`. Your component 
 
 ```
 function AboutPage() {
-
   return (
-
     <>
-
       <h1>About</h1>
-
       <p>Hello there.<br />How do you do?</p>
-
     </>
-
   );
-
 }
 ```
 
@@ -150,11 +132,8 @@ Then you write the CSS rules for it in a separate CSS file:
 
 ```
 /* In your CSS */
-
 .avatar {
-
   border-radius: 50%;
-
 }
 ```
 
@@ -166,13 +145,9 @@ JSX lets you put markup into JavaScript. Curly braces let you “escape back” 
 
 ```
 return (
-
   <h1>
-
     {user.name}
-
   </h1>
-
 );
 ```
 
@@ -180,15 +155,10 @@ You can also “escape into JavaScript” from JSX attributes, but you have to u
 
 ```
 return (
-
   <img
-
     className="avatar"
-
     src={user.imageUrl}
-
   />
-
 );
 ```
 
@@ -239,25 +209,15 @@ In React, there is no special syntax for writing conditions. Instead, you’ll u
 
 ```
 let content;
-
 if (isLoggedIn) {
-
   content = <AdminPanel />;
-
 } else {
-
   content = <LoginForm />;
-
 }
-
 return (
-
   <div>
-
     {content}
-
   </div>
-
 );
 ```
 
@@ -265,17 +225,11 @@ If you prefer more compact code, you can use the [conditional `?` operator.](htt
 
 ```
 <div>
-
   {isLoggedIn ? (
-
     <AdminPanel />
-
   ) : (
-
     <LoginForm />
-
   )}
-
 </div>
 ```
 
@@ -283,9 +237,7 @@ When you don’t need the `else` branch, you can also use a shorter [logical `&&
 
 ```
 <div>
-
   {isLoggedIn && <AdminPanel />}
-
 </div>
 ```
 
@@ -299,13 +251,9 @@ For example, let’s say you have an array of products:
 
 ```
 const products = [
-
   { title: 'Cabbage', id: 1 },
-
   { title: 'Garlic', id: 2 },
-
   { title: 'Apple', id: 3 },
-
 ];
 ```
 
@@ -313,19 +261,13 @@ Inside your component, use the `map()` function to transform an array of product
 
 ```
 const listItems = products.map(product =>
-
   <li key={product.id}>
-
     {product.title}
-
   </li>
-
 );
 
 return (
-
   <ul>{listItems}</ul>
-
 );
 ```
 
@@ -374,23 +316,15 @@ You can respond to events by declaring *event handler* functions inside your com
 
 ```
 function MyButton() {
-
   function handleClick() {
-
     alert('You clicked me!');
-
   }
 
   return (
-
     <button onClick={handleClick}>
-
       Click me
-
     </button>
-
   );
-
 }
 ```
 
@@ -410,9 +344,7 @@ Now you can declare a *state variable* inside your component:
 
 ```
 function MyButton() {
-
   const [count, setCount] = useState(0);
-
   // ...
 ```
 
@@ -422,25 +354,17 @@ The first time the button is displayed, `count` will be `0` because you passed `
 
 ```
 function MyButton() {
-
   const [count, setCount] = useState(0);
 
   function handleClick() {
-
     setCount(count + 1);
-
   }
 
   return (
-
     <button onClick={handleClick}>
-
       Clicked {count} times
-
     </button>
-
   );
-
 }
 ```
 
@@ -532,35 +456,23 @@ First, *move the state up* from `MyButton` into `MyApp`:
 
 ```
 export default function MyApp() {
-
   const [count, setCount] = useState(0);
 
   function handleClick() {
-
     setCount(count + 1);
-
   }
 
   return (
-
     <div>
-
       <h1>Counters that update separately</h1>
-
       <MyButton />
-
       <MyButton />
-
     </div>
-
   );
-
 }
 
 function MyButton() {
-
   // ... we're moving code from here ...
-
 }
 ```
 
@@ -568,29 +480,19 @@ Then, *pass the state down* from `MyApp` to each `MyButton`, together with the s
 
 ```
 export default function MyApp() {
-
   const [count, setCount] = useState(0);
 
   function handleClick() {
-
     setCount(count + 1);
-
   }
 
   return (
-
     <div>
-
       <h1>Counters that update together</h1>
-
       <MyButton count={count} onClick={handleClick} />
-
       <MyButton count={count} onClick={handleClick} />
-
     </div>
-
   );
-
 }
 ```
 
@@ -600,17 +502,11 @@ Finally, change `MyButton` to *read* the props you have passed from its parent c
 
 ```
 function MyButton({ count, onClick }) {
-
   return (
-
     <button onClick={onClick}>
-
       Clicked {count} times
-
     </button>
-
   );
-
 }
 ```
 
