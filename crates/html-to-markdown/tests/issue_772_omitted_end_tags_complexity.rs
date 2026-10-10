@@ -80,6 +80,21 @@ fn should_convert_blocks_with_no_end_tag_that_nest_in_linear_time() {
 }
 
 #[test]
+fn should_convert_a_page_that_holds_five_hundred_blocks_open_in_linear_time() {
+    // ~keep 500 open blocks stay under the limit of the repair, so the tree builder searches
+    // ~keep all of them for each paragraph: the largest cost for one start tag that the repair
+    // ~keep accepts.
+    let held = "<div>".repeat(500);
+    assert_linear("paragraphs in 500 open blocks", 25_000, 1, |count| {
+        format!("{held}{}", "<p>x ".repeat(count))
+    });
+    // ~keep The blocks after the 500 go past the limit, so the open blocks before them count.
+    assert_linear("a paragraph in each block in 500 open blocks", 3_125, 3, |count| {
+        format!("{held}{}", "<div><p>x ".repeat(count))
+    });
+}
+
+#[test]
 fn should_convert_one_hundred_thousand_paragraphs_with_no_end_tag_in_linear_time() {
     assert_linear("paragraphs with no end tag", 25_000, 1, |count| "<p>x ".repeat(count));
 
