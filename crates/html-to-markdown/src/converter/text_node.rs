@@ -128,6 +128,9 @@ impl TextProcessor<'_, '_, '_> {
             self.output.push_str(value);
             return;
         }
+        if self.at_paragraph_buffer_start() {
+            return;
+        }
         if self.handler.options.whitespace_mode == crate::options::WhitespaceMode::Strict {
             self.emit_strict_whitespace(value, facts.has_double_newline);
             return;
@@ -316,6 +319,11 @@ impl TextProcessor<'_, '_, '_> {
             .then(|| strip_single_leading_line_ending(trimmed_end))
             .flatten()
             .unwrap_or(trimmed_end);
+        let strict = if self.at_paragraph_buffer_start() {
+            strict.trim_start_matches([' ', '\t', '\r', '\n'])
+        } else {
+            strict
+        };
         let options = self.handler.options;
         let output = text::escape(
             strict,
