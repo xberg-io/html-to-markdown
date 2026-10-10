@@ -4,6 +4,7 @@
 //! and empty element detection.
 
 use crate::converter::utility::escaping::is_block_level_name;
+use crate::options::HiddenContent;
 use crate::text;
 use std::borrow::Cow;
 #[cfg(feature = "visitor")]
@@ -148,9 +149,10 @@ pub fn collect_link_label_text(
     children: &[tl::NodeHandle],
     parser: &tl::Parser,
     dom_ctx: &DomContext,
+    hidden_content: HiddenContent,
 ) -> (String, Vec<tl::NodeHandle>, bool) {
     let mut block_nodes = Vec::new();
-    let text = walk_link_text(children, parser, dom_ctx, |handle| {
+    let text = walk_link_text(children, parser, dom_ctx, hidden_content, |handle| {
         block_nodes.push(handle);
         false
     });
@@ -159,8 +161,13 @@ pub fn collect_link_label_text(
 }
 
 /// The text of every descendant of a link, block-level ones included.
-pub fn link_text_content(children: &[tl::NodeHandle], parser: &tl::Parser, dom_ctx: &DomContext) -> String {
-    walk_link_text(children, parser, dom_ctx, |_| true)
+pub fn link_text_content(
+    children: &[tl::NodeHandle],
+    parser: &tl::Parser,
+    dom_ctx: &DomContext,
+    hidden_content: HiddenContent,
+) -> String {
+    walk_link_text(children, parser, dom_ctx, hidden_content, |_| true)
 }
 
 /// The name of a link apart from its content: its `aria-label`, else its `title`. A value of
@@ -187,6 +194,7 @@ fn walk_link_text(
     children: &[tl::NodeHandle],
     parser: &tl::Parser,
     dom_ctx: &DomContext,
+    hidden_content: HiddenContent,
     mut enter_block: impl FnMut(tl::NodeHandle) -> bool,
 ) -> String {
     let mut text = String::new();
@@ -203,7 +211,7 @@ fn walk_link_text(
                 text.push_str(decoded.as_ref());
             }
             tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("svg") => {
-                text.push_str(&crate::converter::media::svg::graphic_text(tag, parser));
+                text.push_str(&crate::converter::media::svg::graphic_text(tag, parser, hidden_content));
             }
             tl::Node::Tag(tag) => {
                 if !node_is_block_level(&handle, parser, dom_ctx) || enter_block(handle) {

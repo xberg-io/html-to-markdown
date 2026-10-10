@@ -1,7 +1,7 @@
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:dfaf03eca6acf6844233aed17bde4f7282aeea1213133a40331becfeb81f2bd2
-Source-Hash: blake3:ee7b42dfe0189be4c8fc402a02da63aad9356731f32835e48c1312669d63bf3b
+Content-Hash: blake3:aa5e038e536fdd1e04c0b930a2950e4024c53de89296e7a2ada0940987f8b8f2
+Source-Hash: blake3:b9cee51f3d06666c206da66a14b6934198ee9cddc674dad38b4d92922d8a304e
 Schema-Version: v1
 -->
 
@@ -89,6 +89,7 @@ html-to-markdown [OPTIONS] [FILE]
 | `--capture-svg`                      | flag                      | off     | Capture inline `<svg>` elements as extracted images. Requires `--extract-inline-images`. |
 | `--no-infer-dimensions`              | flag                      | off     | Skip inferring image width/height from the decoded payload when the HTML omits them. Inference is on by default. Requires `--extract-inline-images`. |
 | `--inline-data-media <CHOICE>`      | `keep`, `alt-text-only`, `drop-element` | `keep` | What to write for an image or media element whose address is a `data:` URL. `keep`: the URL with its payload. `alt-text-only`: the alt text (the title of an inline `<svg>`, the fallback content of `<video>` and `<audio>`). `drop-element`: nothing. A real address on the element wins over the `data:` one. |
+| `--hidden-content <CHOICE>`         | `drop`, `reachable`, `all`              | `drop` | Which text that a browser does not show at first to keep. `drop`: none of it. `reachable`: elements hidden by the `hidden` attribute or an inline style, and declarative shadow roots. `all`: also `<template>` and `<noscript>` content. Scripts and style sheets are never written. |
 
 ## Tables
 
