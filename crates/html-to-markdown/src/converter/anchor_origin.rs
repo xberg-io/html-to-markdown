@@ -430,6 +430,20 @@ mod tests {
     }
 
     #[test]
+    fn should_give_a_tree_when_the_tree_builder_is_past_the_limit_only_between_two_measurements() {
+        // ~keep Start tag 512 is measured with 512 handles. Ten more blocks open and end before
+        // ~keep start tag 576, which is measured with 512 handles again.
+        let page = format!(
+            "{}{}{}{}x",
+            "<br>".repeat(4),
+            "<div>".repeat(518),
+            "</div>".repeat(10),
+            "<br>".repeat(54)
+        );
+        assert!(parse_with_anchor_origins_within_depth(&page).is_some());
+    }
+
+    #[test]
     fn should_give_no_tree_when_elements_that_no_start_tag_names_nest_past_the_limit() {
         // ~keep One `<td>` start tag opens a `tbody`, a `tr` and the cell.
         let cells = format!("{}x", "<table><td>".repeat(300));
