@@ -233,6 +233,8 @@ fn a_line_break_before_an_inline_element_that_starts_with_a_block_stays_a_line_b
         ("<div>one\n<b>x<p>y</p></b></div>", "one **x**\n\n**y**\n"),
         ("<div>one\n<b><i>y</i></b></div>", "one ***y***\n"),
         ("<div>one\n<b>y</b></div>", "one **y**\n"),
+        // ~keep A self-closing element has no content: the block after it is a block of its own.
+        ("<blockquote>one\n<b/><div>y</div></blockquote>", "> one\n>\n> y\n"),
     ]);
     assert_on_full(&[
         ("<div>one\n<a href=\"/y\"><div>y</div></a></div>", "one\n[y](/y)\n"),
