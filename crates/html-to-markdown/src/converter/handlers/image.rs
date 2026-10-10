@@ -71,7 +71,10 @@ pub fn handle_img(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
 // ~keep An absent image has no inline boundary: adjacent normalized whitespace folds once
 // ~keep (#756). Preserve strict whitespace and a preceding space when the next text has none.
 fn collapse_empty_image_boundary(handler: &mut HandlerContext<'_>) {
-    if handler.options.whitespace_mode != crate::options::WhitespaceMode::Normalized || !handler.output.ends_with(' ') {
+    if handler.context.inline_code_links.is_some()
+        || handler.options.whitespace_mode != crate::options::WhitespaceMode::Normalized
+        || !handler.output.ends_with(' ')
+    {
         return;
     }
     let id = handler.node_handle.get_inner();

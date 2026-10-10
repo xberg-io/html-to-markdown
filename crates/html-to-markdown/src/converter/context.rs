@@ -92,6 +92,11 @@ impl DjotRuleLikeText {
     }
 }
 
+pub(super) struct InlineCodeLink {
+    pub(super) range: std::ops::Range<usize>,
+    pub(super) markdown: String,
+}
+
 /// Conversion context that tracks state during HTML to Markdown conversion.
 ///
 /// This context is passed through the recursive tree walker and maintains information
@@ -111,6 +116,8 @@ pub struct Context {
     /// SPAN must split the span in two rather than embed a newline inside the backticks
     /// (issue #487). ~keep
     pub(crate) in_code_block: bool,
+    /// ~keep Link ranges refer to the raw inline-code buffer, before delimiters are emitted (#813).
+    pub(super) inline_code_links: Option<Rc<RefCell<Vec<InlineCodeLink>>>>,
     /// Output offsets of real `<br>` nodes while a table-cell `<pre>` is collected. ~keep
     pub(crate) pre_cell_break_offsets: Option<Rc<RefCell<Vec<usize>>>>,
     /// Current list item counter for ordered lists.
@@ -368,10 +375,10 @@ impl Context {
     pub(crate) fn new(options: &crate::options::ConversionOptions, parameters: ContextParameters) -> Self {
         #[cfg(feature = "metadata")]
         let metadata = metadata_preferences(parameters.metadata_collector.as_ref());
-
         Self {
             in_code: false,
             in_code_block: false,
+            inline_code_links: None,
             pre_cell_break_offsets: None,
             list_counter: 0,
             in_ordered_list: false,

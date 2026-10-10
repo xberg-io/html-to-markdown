@@ -68,6 +68,10 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
         walk_handles_to_output(tag.children().top().iter().copied(), &mut handler);
         return;
     };
+    if handler.context.in_code {
+        emit_code_link(tag, &data, &mut handler);
+        return;
+    }
     if emit_autolink(&data, &mut handler) || emit_heading_link(&data, &mut handler) {
         return;
     }
@@ -85,6 +89,68 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     if data.emit_blocks_separately && emit_deferred {
         walk_handles_to_output(data.deferred.iter().copied(), &mut handler);
     }
+}
+
+fn emit_code_link(tag: &tl::HTMLTag<'_>, data: &LinkData<'_>, handler: &mut HandlerContext<'_>) {
+    let context = Context {
+        inline_code_links: None,
+        ..handler.context.clone()
+    };
+    let raw = collect_code_link_text(data, &context, handler);
+    if let Some(links) = handler.context.inline_code_links.as_ref().filter(|_| {
+        !handler.context.in_code_block && !data.href.is_empty() && !data.href_addr_dropped && !raw.is_empty()
+    }) {
+        let mut label = String::new();
+        crate::converter::handlers::code_block::emit_inline_code(
+            &raw,
+            &mut label,
+            handler.options,
+            handler.node_handle,
+            handler.parser,
+            handler.dom_context,
+        );
+        let mut markdown = String::new();
+        let mut link_handler = HandlerContext::new((
+            handler.node_handle,
+            handler.parser,
+            &mut markdown,
+            handler.options,
+            &context,
+            handler.depth,
+            handler.dom_context,
+        ));
+        emit_link(tag, data, &label, false, &mut link_handler);
+        if !markdown.is_empty() {
+            let start = handler.output.len();
+            handler.output.push_str(&raw);
+            links.borrow_mut().push(crate::converter::context::InlineCodeLink {
+                range: start..handler.output.len(),
+                markdown,
+            });
+        }
+    } else {
+        emit_link(tag, data, &raw, false, handler);
+    }
+    #[cfg(feature = "metadata")]
+    record_link_metadata(tag, data, raw.trim(), handler.context);
+}
+
+fn collect_code_link_text(data: &LinkData<'_>, context: &Context, handler: &HandlerContext<'_>) -> String {
+    let mut raw = String::new();
+    for child in &data.children {
+        walk_node(
+            child,
+            handler.parser,
+            &mut raw,
+            crate::converter::block::container::HandlerContext::new(
+                handler.options,
+                context,
+                handler.depth + 1,
+                handler.dom_context,
+            ),
+        );
+    }
+    raw
 }
 
 struct LinkData<'a> {
@@ -385,7 +451,7 @@ fn emit_link(
 }
 
 fn write_link(output: &mut String, data: &LinkData<'_>, label: &str, options: &ConversionOptions, context: &Context) {
-    if data.href_addr_dropped || data.href.is_empty() {
+    if data.href_addr_dropped || data.href.is_empty() || context.in_code_block {
         output.push_str(label);
         return;
     }
