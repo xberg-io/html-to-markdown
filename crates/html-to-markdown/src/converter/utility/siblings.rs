@@ -295,12 +295,12 @@ fn is_plain_text_wrapper(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> 
 
 /// Whether the `style` attribute of `tag` sets `display` or `white-space`.
 fn tag_sets_display_or_white_space(tag: &tl::HTMLTag) -> bool {
-    use crate::converter::utility::attributes::style_sets_display_or_white_space;
+    use crate::converter::utility::attributes::style_attribute_sets_display_or_white_space;
 
     tag.attributes()
         .get("style")
         .flatten()
-        .is_some_and(|style| style_sets_display_or_white_space(style.as_bytes()))
+        .is_some_and(|style| style_attribute_sets_display_or_white_space(style.as_bytes()))
 }
 
 /// Whether the node `id` is inside an element whose `style` attribute sets `display` or

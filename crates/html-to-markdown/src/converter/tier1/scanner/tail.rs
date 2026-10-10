@@ -545,7 +545,7 @@ fn plain_text_wrapper_open_end(bytes: &[u8], name: &[u8], attributes_start: usiz
 /// Whether the open tag whose attributes are `bytes[attributes_start..close]` has a `style`
 /// attribute that sets `display` or `white-space`.
 fn open_tag_sets_display_or_white_space(bytes: &[u8], attributes_start: usize, close: usize) -> bool {
-    use crate::converter::utility::attributes::style_sets_display_or_white_space;
+    use crate::converter::utility::attributes::style_attribute_sets_display_or_white_space;
 
     // ~keep An attribute name has no letter case in HTML, and Tier-2's parser gives it in lower case.
     // ~keep A browser reads the first of two `style` attributes, so the first decides.
@@ -553,7 +553,7 @@ fn open_tag_sets_display_or_white_space(bytes: &[u8], attributes_start: usize, c
         .iter()
         .find(|(key, _)| key.eq_ignore_ascii_case(b"style"))
         .and_then(|(_, value)| *value)
-        .is_some_and(style_sets_display_or_white_space)
+        .is_some_and(style_attribute_sets_display_or_white_space)
 }
 
 /// Whether an open element of `stack` has a `style` attribute that sets `display` or

@@ -529,5 +529,95 @@ fn the_style_attribute_name_is_read_in_any_letter_case() {
     ]);
 }
 
+/// A `style` value is read after its character references are decoded, as a browser reads it:
+/// `white-space&#58;pre` is `white-space:pre`.
+#[test]
+fn a_style_value_with_character_references_sets_display_or_white_space() {
+    const KEPT: &str = "one \u{200b}two\n";
+    assert_on_both(&[
+        (
+            "<p>one\n<span style=\"white-space&#58;pre\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span style=\"dis&#112;lay:inline-block\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span style=\"display&#x3a;inline-block\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span style=\"display&#X3A;inline-block\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span style=\"display&colon;inline-block\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span STYLE=\"DIS&#80;LAY:INLINE-BLOCK\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span style=\"DISPLAY:INLINE-BLOCK\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span style=\"color:red&#59;display:inline-block\"></span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<p>one\n<span style=\"white-space&#58;pre\">&#8203;two</span></p>",
+            KEPT,
+        ),
+        (
+            "<p><span style=\"display&#58;inline-block\">one\n</span>&#8203;two</p>",
+            KEPT,
+        ),
+        (
+            "<div style=\"white-space&#58;pre\">one\n<!-- c -->\u{200b}two</div>",
+            "one\n\u{200b}two\n",
+        ),
+        (
+            "<table><tr><td>one\n<span style=\"display&#58;inline-block\">&#8203;two</span></td></tr></table>",
+            "| one \u{200b}two |\n| -------- |\n",
+        ),
+    ]);
+}
+
+/// A `style` value that sets neither property after it is decoded changes nothing: a longer
+/// property name, and a reference that the source escapes (`&amp;#58;` is the text `&#58;`).
+#[test]
+fn a_style_value_that_only_looks_like_display_or_white_space_keeps_no_space() {
+    const JOINED: &str = "one\u{200b}two\n";
+    assert_on_both(&[
+        ("<p>one\n<span style=\"display-x:1\"></span>&#8203;two</p>", JOINED),
+        ("<p>one\n<span style=\"display-x&#58;1\"></span>&#8203;two</p>", JOINED),
+        (
+            "<p>one\n<span style=\"white-space&amp;#58;pre\"></span>&#8203;two</p>",
+            JOINED,
+        ),
+        (
+            "<p>one\n<span style=\"display&amp;colon;inline-block\"></span>&#8203;two</p>",
+            JOINED,
+        ),
+        ("<p>one\n<span style=\"color&#58;red\"></span>&#8203;two</p>", JOINED),
+        ("<p>one\n<span style=\"color&#58;red\">&#8203;two</span></p>", JOINED),
+        (
+            "<p>one\n<span title=\"display&#58;block\"></span>&#8203;two</p>",
+            JOINED,
+        ),
+        (
+            "<p>one\n<span style=\"color:red\"></span><!-- style=\"display&#58;block\" -->&#8203;two</p>",
+            JOINED,
+        ),
+        (
+            "<pre>one\n<span style=\"white-space&#58;pre\"></span>&#8203;two</pre>",
+            "```\none\n\u{200b}two\n```\n",
+        ),
+    ]);
+}
+
 include!("support/inline_white_space_links.rs");
 include!("support/inline_white_space_blocks.rs");
