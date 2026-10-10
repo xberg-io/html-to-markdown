@@ -204,8 +204,8 @@ pub enum BailReason {
     /// #583), which this scanner does not track.
     ListItemUnsupportedBlockChild,
 
-    /// A checkbox `<input>` opened inside a list item. Tier-2 writes that item as a task item
-    /// (`- [ ]`), which this scanner does not.
+    /// A checkbox `<input>` opened inside a list item. Tier-2 writes an item that starts with a
+    /// checkbox as a task item (`- [ ]`), which this scanner does not.
     ListItemCheckbox,
 
     /// An `<img>` had an empty (or whitespace-only) `src`, or a `src` that is a

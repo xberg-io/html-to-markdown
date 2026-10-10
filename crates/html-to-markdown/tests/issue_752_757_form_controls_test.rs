@@ -472,6 +472,8 @@ fn should_separate_a_label_that_starts_with_a_control_as_the_control_is() {
             r#"<p>Name<label><input type="hidden" value="t">x</label></p>"#,
             "Namex\n",
         ),
+        // ~keep An inline element at the start of a label is not a control.
+        ("<p>Name<label><span>ok</span></label></p>", "Nameok\n"),
     ] {
         assert_all_paths(html, expected);
     }
@@ -935,6 +937,25 @@ fn should_stop_the_search_for_the_task_checkbox_at_the_depth_limit() {
         "{:?}",
         result.warnings
     );
+}
+
+/// The text of a control is one level below the control for the depth limit.
+#[test]
+fn should_count_a_control_as_one_level_for_the_depth_limit() {
+    for (html, text_level) in [
+        ("<p><button>One</button></p>", 2),
+        ("<p><output>One</output></p>", 2),
+        ("<p><select><option>One</option></select></p>", 3),
+        ("<p><datalist><option>One</option></datalist></p>", 3),
+    ] {
+        for (max_depth, expected) in [(text_level, ""), (text_level + 1, "One\n")] {
+            let limited = ConversionOptions {
+                max_depth: Some(max_depth),
+                ..options(TierStrategy::Tier2)
+            };
+            assert_eq!(markdown(html, limited), expected, "max_depth {max_depth}: {html}");
+        }
+    }
 }
 
 #[test]

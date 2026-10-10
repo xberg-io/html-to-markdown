@@ -60,7 +60,7 @@ fn emit_void(
     state.last_closed_custom_element = false;
     let input_type = (name_lower == b"input").then(|| find_attr(attrs, b"type").unwrap_or_default());
     if input_type.is_some_and(|input_type| input_type.eq_ignore_ascii_case(b"checkbox")) {
-        // ~keep Tier-2 writes the list item that holds a checkbox as a task item (issue #632).
+        // ~keep Tier-2 writes a list item that starts with a checkbox as a task item (issue #632).
         if state
             .stack
             .iter()
