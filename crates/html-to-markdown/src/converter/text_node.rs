@@ -13,7 +13,7 @@ use crate::converter::block::container::HandlerContext;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::content::{
-    NextElement, line_end_before_element, space_is_owed, without_single_line_end,
+    NextElement, line_end_before_element, space_is_owed, without_trailing_line_end,
 };
 use crate::converter::utility::siblings::{
     FollowingContent, br_follows_enclosing_elements, content_starts_with_block, following_sibling_content,
@@ -122,7 +122,8 @@ impl TextProcessor<'_, '_, '_> {
         }
     }
 
-    /// Removes the one line end that `text` ends with when a zero-width space follows it.
+    /// Removes the white space with a line end that `text` ends with when a zero-width space
+    /// follows it.
     ///
     /// ~keep A zero-width space is a place where a line can break, not a space: a browser
     /// ~keep drops the line end beside it, so `long\n<span></span>&#8203;word` is one word.
@@ -130,7 +131,7 @@ impl TextProcessor<'_, '_, '_> {
         if self.handler.ctx.in_code || self.handler.options.whitespace_mode == crate::options::WhitespaceMode::Strict {
             return text;
         }
-        let Some(kept) = without_single_line_end(text.as_ref()) else {
+        let Some(kept) = without_trailing_line_end(text.as_ref()) else {
             return text;
         };
         if !zero_width_space_follows(self.node_handle, self.parser, self.handler.dom_ctx) {

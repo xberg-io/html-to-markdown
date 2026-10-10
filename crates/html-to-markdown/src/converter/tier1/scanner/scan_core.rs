@@ -81,7 +81,9 @@ impl<'a> Tier1Scanner<'a> {
         }
         self.state.start_body(self.text_start);
         let is_inline = upcoming_tag_is_inline(self.bytes, self.pos);
-        // ~keep Only a text with content asks, so a run of comments is read once.
+        // ~keep Only a text with content asks: white space alone takes its own path in
+        // ~keep `flush_text`. A form feed is white space here, so a text of form feeds and
+        // ~keep line ends keeps its line end before the comments.
         let inline_follows_comments = !self.bytes[self.text_start..self.pos]
             .iter()
             .all(u8::is_ascii_whitespace)
@@ -93,7 +95,7 @@ impl<'a> Tier1Scanner<'a> {
             inline_follows_comments,
             inline_starts_with_block: (is_inline || inline_follows_comments)
                 && upcoming_inline_starts_with_block(self.bytes, self.pos),
-            line_end_meets_zero_width_space: crate::converter::utility::content::without_single_line_end(
+            line_end_meets_zero_width_space: crate::converter::utility::content::without_trailing_line_end(
                 &self.html[self.text_start..self.pos],
             )
             .is_some()

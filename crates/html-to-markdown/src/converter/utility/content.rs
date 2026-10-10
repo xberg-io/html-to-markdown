@@ -207,15 +207,15 @@ pub const fn line_end_before_element(in_running_text: bool, next: NextElement) -
     }
 }
 
-/// `text` without its trailing white space, when that white space holds exactly one line end.
+/// `text` without its trailing white space, when that white space holds a line end.
 ///
-/// ~keep The caller removes such a line end before a zero-width space: CSS drops a line end
-/// ~keep beside that character, so the two parts stay one word (`long\n&#8203;word`).
+/// ~keep The caller removes such white space before a zero-width space: CSS makes a run of
+/// ~keep line ends one line end and drops it beside that character, so the two parts stay one
+/// ~keep word (`long\n&#8203;word`, and `long\n\n&#8203;word` too).
 #[must_use]
-pub fn without_single_line_end(text: &str) -> Option<&str> {
+pub fn without_trailing_line_end(text: &str) -> Option<&str> {
     let kept = text.trim_end_matches([' ', '\t', '\n', '\r']);
-    let line_ends = text[kept.len()..].bytes().filter(|byte| *byte == b'\n').count();
-    (line_ends == 1).then_some(kept)
+    text[kept.len()..].contains('\n').then_some(kept)
 }
 
 /// Whether an element only wraps its text: it writes no content of its own, so the text after

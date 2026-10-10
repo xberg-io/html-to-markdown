@@ -3,11 +3,11 @@ struct UpcomingTextSibling {
     is_list: bool,
     is_img: bool,
     is_inline: bool,
-    /// Comments follow the text, and an inline element other than `<br>` opens after them.
+    /// Comments follow the text, and an inline element opens after them.
     inline_follows_comments: bool,
     /// The content of that inline element starts with a block.
     inline_starts_with_block: bool,
-    /// The text ends with one line end and the text after the tag starts with a zero-width space.
+    /// The text ends with a line end and the text after the tag starts with a zero-width space.
     line_end_meets_zero_width_space: bool,
 }
 
@@ -630,7 +630,7 @@ fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), Bail
     // ~keep Mirrors Tier-2's `without_line_end_before_zero_width_space`.
     let has_content = !raw.bytes().all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'));
     let raw = if upcoming.line_end_meets_zero_width_space && has_content && !in_pre && !in_code {
-        crate::converter::utility::content::without_single_line_end(raw).unwrap_or(raw)
+        crate::converter::utility::content::without_trailing_line_end(raw).unwrap_or(raw)
     } else {
         raw
     };

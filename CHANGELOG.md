@@ -163,13 +163,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<ins>`, `<mark>`, `<sub>` and `<sup>`. At the start of a line such an element starts with no
   space: `<div>a<br><sup> x</sup></div>` gave a space and `x` on the second line and gives `x`.
 
-- A line break beside a zero-width space is no space, as in a browser: the zero-width space is a
-  place where a line can break, so the two parts are one word.
-  `<p>one \n <span></span>&#8203;two</p>` gave `one`, a space, the zero-width space and `two`, and
-  gives `one`, the zero-width space and `two`. The line break can be the last content of an
-  element that only wraps text: `<p><span>one\n</span>&#8203;two</p>` gave `one`, a space, the
-  zero-width space and `two`, and gives `one`, the zero-width space and `two`. A space that is not
-  a line break stays, and so does a line break before or in an element with a `style` attribute.
+- A line break is no space when an element or a comment stands between it and a zero-width space,
+  as in a browser: the zero-width space is a place where a line can break, so the two parts are
+  one word. `<p>one \n <span></span>&#8203;two</p>` gave `one`, a space, the zero-width space and
+  `two`, and gives `one`, the zero-width space and `two`. The line break can be the last content
+  of an element that only wraps text: `<p><span>one\n</span>&#8203;two</p>` gave `one`, a space,
+  the zero-width space and `two`, and gives `one`, the zero-width space and `two`. Two or more
+  line breaks are one line break there: `<p>one\n\n<span></span>&#8203;two</p>` gave two
+  paragraphs and gives one word. A space that is not a line break stays, and so does a line break
+  before or in an element with a `style` attribute. A line break directly before the zero-width
+  space in the same text is not changed: `<p>one\n&#8203;two</p>` keeps its line break.
 
 - White space at the start or the end of a link label is one space outside the link. The label is
   written without that white space, and before, the words on its two sides were joined. This
@@ -188,6 +191,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   there. This changes the default output: `x<footer> Logo</footer>` gave `x` and then ` Logo` with
   a space at the start of its line, and gives `x` and then `Logo`. The same holds for an inline
   element at the start: `x<footer><b> Logo</b></footer>` gave ` **Logo**` and gives `**Logo**`.
+
+- The strict white space mode writes what it wrote before these changes.
 
 - The white space after an image, an inline graphic, a video or a form control at the start of a
   document is kept. This changes the default output: `<p><img src="/i.png" alt="alt"> text</p>`

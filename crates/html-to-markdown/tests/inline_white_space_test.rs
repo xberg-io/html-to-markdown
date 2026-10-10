@@ -356,6 +356,49 @@ fn a_line_end_before_a_zero_width_space_is_no_space() {
     ]);
 }
 
+/// A run of line ends is one line end for a browser, so two or more of them before a
+/// zero-width space are no space and no new paragraph: Chrome shows `one`, the zero-width space
+/// and `two` for each input.
+#[test]
+fn a_run_of_line_ends_before_a_zero_width_space_is_no_space() {
+    assert_on_both(&[
+        ("<p>one\n\n<span></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\n \n<span></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\r\n\r\n<span></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\n\n\n<span></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\n\n<!-- c -->\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p><span>one\n\n</span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<div>one\n\n<span></span>\u{200b}two</div>", "one\u{200b}two\n"),
+        ("one\n\n<span></span>\u{200b}two", "one\u{200b}two\n"),
+        (
+            "<ul><li>one\n\n<span></span>\u{200b}two</li></ul>",
+            "- one\u{200b}two\n",
+        ),
+        (
+            "<blockquote>one\n\n<span></span>\u{200b}two</blockquote>",
+            "> one\u{200b}two\n",
+        ),
+        ("<h2>one\n\n<span></span>\u{200b}two</h2>", "## one\u{200b}two\n"),
+        (
+            "<table><tr><td>one\n\n<span></span>\u{200b}two</td></tr></table>",
+            "| one\u{200b}two |\n| ------- |\n",
+        ),
+    ]);
+}
+
+/// A text of a form feed and a line end is white space for the fast converter, so the comment
+/// scan does not run for it and the line end stays a line end.
+///
+/// ~keep This row pins the output of the base on the fast converter, where the two converters
+/// ~keep differ: the full converter writes `one*y*`, the form feed and `**two**`. Chrome shows
+/// ~keep `oney`, the form feed, a space and `two`; Markdown shows the line end as that space.
+#[test]
+fn a_text_of_a_form_feed_and_a_line_end_keeps_its_line_end_before_a_comment() {
+    let html = "<div>one<i>y</i>\u{c}\n<!-- c --><b>two</b></div>";
+    let written = tier1::run(html, &PrescanReport::default(), &tier_options());
+    assert_eq!(written.as_deref().ok(), Some("one*y*\u{c}\n**two**\n"));
+}
+
 /// A space that is not a line end stays beside a zero-width space, and so does a line end
 /// that content of its own separates from that character.
 #[test]
@@ -562,6 +605,54 @@ fn a_link_label_gets_no_space_that_the_source_does_not_have() {
     ]);
 }
 
+/// A label of white space only has no ends, so no space goes outside the link. The full
+/// converter writes the address as the label, the fast converter an empty label.
+///
+/// ~keep These rows pin the output of the base, not the output of a browser: a browser shows
+/// ~keep the white space of such a link as a space between the two words.
+#[test]
+fn a_link_label_of_white_space_only_puts_no_space_outside_the_link() {
+    let cases = [
+        (
+            "<p>Press<a href=\"/p\"> </a>now</p>",
+            "Press[/p](/p)now\n",
+            "Press[](/p)now\n",
+        ),
+        (
+            "<p>Press <a href=\"/p\"> </a>.</p>",
+            "Press [/p](/p).\n",
+            "Press [](/p).\n",
+        ),
+        (
+            "<p>Press<a href=\"/p\">&nbsp;</a>now</p>",
+            "Press[/p](/p)now\n",
+            "Press[](/p)now\n",
+        ),
+    ];
+    for (html, full, fast) in cases {
+        assert_eq!(tier2(html), full, "full converter: {html:?}");
+        assert_eq!(convert_with(html, None), full, "default options: {html:?}");
+        let written = tier1::run(html, &PrescanReport::default(), &tier_options());
+        assert_eq!(written.as_deref().ok(), Some(fast), "fast converter: {html:?}");
+    }
+}
+
+/// The white space at the start of a link label is no space at the start of the document, also
+/// when the marks of another element stand before the link.
+#[test]
+fn white_space_at_the_start_of_a_link_label_is_no_space_at_the_start_of_the_document() {
+    assert_on_both(&[
+        (
+            "<p><b><a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"> </a></b></p>",
+            "**[![Go](/i.png)](/p)**\n",
+        ),
+        (
+            "<p><em><a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"> </a></em></p>",
+            "*[![Go](/i.png)](/p)*\n",
+        ),
+    ]);
+}
+
 /// The white space at the end of a label is one space before a period too: a browser shows
 /// `Press Go .` for the first input and `Press Go.` for the second.
 #[test]
@@ -611,6 +702,8 @@ fn white_space_at_an_end_of_a_link_label_is_not_moved_in_a_code_span() {
             "<p><code>Press <a href=\"/p\">Go </a> now</code></p>",
             "`Press [Go](/p) now`\n",
         ),
+        // ~keep This row pins the output of the base, not the output of a browser, which shows
+        // ~keep `Press Go now`: a label space is not moved in a code span.
         (
             "<p><code>Press<a href=\"/p\"> Go </a>now</code></p>",
             "`Press[Go](/p)now`\n",

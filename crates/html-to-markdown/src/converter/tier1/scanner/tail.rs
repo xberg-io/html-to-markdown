@@ -449,11 +449,12 @@ fn upcoming_inline_starts_with_block(bytes: &[u8], lt_pos: usize) -> bool {
     }
 }
 
-/// Whether an inline element other than `<br>` opens after the comments at `bytes[lt_pos]`,
-/// with only white space between them.
+/// Whether an inline element opens after the comments at `bytes[lt_pos]`, with only white
+/// space between them.
 ///
 /// ~keep Tier-2 asks its tree for the next element (`DomContext::next_tag_id`), and the tree
-/// ~keep passes comments and white space. A `<br>` keeps the path it has without a comment.
+/// ~keep passes comments and white space. A `<br>` is inline here as it is without a comment
+/// ~keep (`upcoming_tag_is_inline`): the line break removes the white space before it.
 fn inline_follows_comments(bytes: &[u8], lt_pos: usize) -> bool {
     let mut pos = lt_pos;
     while bytes.get(pos..).is_some_and(|rest| rest.starts_with(b"<!--")) {
@@ -463,7 +464,7 @@ fn inline_follows_comments(bytes: &[u8], lt_pos: usize) -> bool {
         pos = parse::skip_ws(bytes, after);
     }
     let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
-    pos != lt_pos && upcoming_open_tag_name(bytes, pos, &mut name_buf).is_some_and(|name| name != b"br" && is_inline_tag(name))
+    pos != lt_pos && upcoming_open_tag_name(bytes, pos, &mut name_buf).is_some_and(is_inline_tag)
 }
 
 /// Whether the text that follows the markup at `bytes[lt_pos]` starts with a zero-width space.
