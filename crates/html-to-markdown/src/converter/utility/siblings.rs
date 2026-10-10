@@ -60,6 +60,23 @@ pub fn previous_content_block<'a>(
     parser: &tl::Parser,
     dom_ctx: &'a DomContext,
 ) -> Option<&'a str> {
+    previous_content_block_through(
+        node_handle,
+        parser,
+        dom_ctx,
+        crate::converter::main_helpers::is_inline_element,
+    )
+}
+
+/// [`previous_content_block`], where the walk looks only into the elements that `looks_into`
+/// accepts. Any other element that is no block ends the walk: no block is found.
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn previous_content_block_through<'a>(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    dom_ctx: &'a DomContext,
+    looks_into: fn(&str) -> bool,
+) -> Option<&'a str> {
     let id = node_handle.get_inner();
     let siblings = match dom_ctx.parent_of(id) {
         Some(parent_id) => match dom_ctx.children_of(parent_id) {
@@ -79,7 +96,7 @@ pub fn previous_content_block<'a>(
                 if crate::converter::utility::content::is_block_level_element(&info.name) {
                     return Some(info.name.as_str());
                 }
-                if !crate::converter::main_helpers::is_inline_element(&info.name) {
+                if !looks_into(&info.name) {
                     return None;
                 }
                 match dom_ctx.children_of(sibling.get_inner()) {

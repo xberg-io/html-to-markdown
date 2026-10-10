@@ -160,6 +160,13 @@ pub const fn keeps_source_white_space(
     ctx.in_code || matches!(options.whitespace_mode, crate::options::WhitespaceMode::Strict)
 }
 
+/// Whether an inline element is code (`<code>`, `<kbd>`, `<samp>`): its content is written with
+/// [`keeps_source_white_space`], so a rule for running text does not look into it either.
+#[must_use]
+pub fn is_inline_code(tag_name: &str) -> bool {
+    matches!(tag_name, "code" | "kbd" | "samp")
+}
+
 /// The element that follows a line end of the source.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum NextElement {

@@ -402,6 +402,26 @@ fn the_text_of_an_image_beside_a_block_in_a_link_is_a_word_of_its_own() {
 }
 
 #[test]
+fn a_block_in_code_in_a_heading_is_no_block_boundary() {
+    assert_on_both(&[
+        ("<h1>one<code><hr></code>two</h1>", "# one`---`two\n"),
+        ("<h1>one\n<code><hr></code>two</h1>", "# one `---`two\n"),
+        ("<h1>one<code><hr></code> two</h1>", "# one`---` two\n"),
+        (
+            "<blockquote><h2>one<code><hr></code>two</h2></blockquote>",
+            "> ## one`---`two\n",
+        ),
+    ]);
+    assert_on_full(&[("<h1>one<code><p>y</p></code>two</h1>", "# one`y`two\n")]);
+    assert_eq!(tier2("<h1>one<kbd><hr></kbd>two</h1>"), "# one`---`two\n");
+    // ~keep In a link label the space beside such code is older than the rule: it stays.
+    assert_eq!(
+        tier2("<h2><a href=\"/h\">one<code><hr></code>two</a></h2>"),
+        "## [one `--- ` two](/h)\n"
+    );
+}
+
+#[test]
 fn blocks_inside_a_heading_or_a_cell_are_separate_words() {
     assert_on_both(&[
         ("<h2><p>a</p><p>b</p></h2>", "## a b\n"),
