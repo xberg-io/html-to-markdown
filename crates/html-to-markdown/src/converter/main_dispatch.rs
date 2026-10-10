@@ -18,6 +18,12 @@ pub(super) fn dispatch_tag<'a>(
     output: &mut String,
     handler: HandlerContext<'a>,
 ) -> bool {
+    // ~keep Inline-code link ranges belong to this buffer. Container handlers must not
+    // ~keep collect children in detached buffers or insert block markup around those ranges (#813).
+    if handler.ctx.inline_code_links.is_some() && !code_collection_handler(tag_name) {
+        crate::converter::block::container::handle_passthrough(node_handle, parser, output, handler);
+        return false;
+    }
     let mut dispatcher = TagDispatcher {
         tag_name,
         node_handle,
@@ -37,6 +43,37 @@ pub(super) fn dispatch_tag<'a>(
     }
     dispatcher.dispatch_fallback();
     false
+}
+
+fn code_collection_handler(tag_name: &str) -> bool {
+    matches!(
+        tag_name,
+        "a" | "br"
+            | "img"
+            | "code"
+            | "kbd"
+            | "samp"
+            | "strong"
+            | "b"
+            | "em"
+            | "i"
+            | "mark"
+            | "del"
+            | "s"
+            | "strike"
+            | "ins"
+            | "u"
+            | "small"
+            | "sub"
+            | "sup"
+            | "var"
+            | "dfn"
+            | "abbr"
+            | "span"
+            | "q"
+            | "template"
+            | "noscript"
+    )
 }
 
 impl TagDispatcher<'_, '_> {
@@ -152,6 +189,14 @@ impl TagDispatcher<'_, '_> {
                 self.output,
                 handler,
             ),
+            "td" | "th" | "tr" | "thead" | "tbody" | "tfoot" if !handler.ctx.in_table_cell => {
+                crate::converter::block::container::handle_passthrough(
+                    self.node_handle,
+                    self.parser,
+                    self.output,
+                    handler,
+                );
+            }
             "wbr" | "thead" | "tbody" | "tfoot" | "tr" | "th" | "td" | "source" => {
                 crate::converter::block::container::handle_noop();
             }
