@@ -62,13 +62,17 @@ pub fn handle_blockquote(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
 ///
 /// ~keep Only a code block keeps its indentation at the start of the container. Text that starts
 /// ~keep with spaces (strict white space mode) is not code and loses them.
+///
+/// ~keep `pub` (not `pub(crate)`, which clippy's `redundant_pub_crate` flags here since
+/// ~keep `handlers::blockquote` is itself only `pub` within the crate): the description of a
+/// ~keep definition list in `list/definition.rs` trims its content by the same rule.
 pub fn container_content<'p, 'a, 'c>(
     tag: &'p tl::HTMLTag<'a>,
     parser: &'p tl::Parser<'a>,
     content: &'c str,
     style: crate::options::CodeBlockStyle,
 ) -> &'c str {
-    let kept = crate::converter::main_helpers::quote_content_range(content, style);
+    let kept = crate::converter::code_scan::quote_content_range(content, style);
     let start = if starts_with_code_block(tag, parser) {
         kept.start
     } else {
@@ -316,7 +320,7 @@ fn emit_quote_lines(
     style: crate::options::CodeBlockStyle,
     output: &mut String,
 ) {
-    let mut code = crate::converter::main_helpers::CodeScan::new(style, content);
+    let mut code = crate::converter::code_scan::CodeScan::new(style, content);
     // ~keep Every physical quote line needs the list continuation indent to remain in the item (#13).
     for (index, line) in content.lines().enumerate() {
         if (index > 0 || continuation) && indent.is_some() {

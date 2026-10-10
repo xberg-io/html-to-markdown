@@ -91,6 +91,7 @@
 
 mod anchor_origin;
 pub mod block;
+mod code_scan;
 pub mod context;
 pub mod dom_context;
 pub mod form;

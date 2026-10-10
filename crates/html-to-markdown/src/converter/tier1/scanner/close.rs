@@ -286,7 +286,7 @@ fn close_blockquote_in_cell(state: &mut Tier1State, frame: &OpenTag, br_in_table
 fn prepare_blockquote_content(content: &str, style: crate::options::CodeBlockStyle) -> String {
     let mut content = content.to_owned();
     crate::converter::main_helpers::trim_trailing_whitespace(&mut content);
-    let leading_len = crate::converter::main_helpers::quote_content_range(&content, style).start;
+    let leading_len = crate::converter::code_scan::quote_content_range(&content, style).start;
     content.replace_range(0..leading_len, "");
     content
 }

@@ -181,18 +181,7 @@ impl<'a> Tier1Scanner<'a> {
             return Ok(());
         }
 
-        // ~keep Tilde fences still require Tier-2; Tier-1 supports indented/backtick pre blocks.
-        if matches!(spec.kind, TagKind::Pre) && self.options.code_block_style == crate::options::CodeBlockStyle::Tildes
-        {
-            return Err(BailReason::Classifier);
-        }
-
-        // ~keep A link or an image in code writes no marks; Tier-2 knows the rule.
-        if matches!(spec.kind, TagKind::Link | TagKind::Image)
-            && self.state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE)
-        {
-            return Err(BailReason::Classifier);
-        }
+        self.bail_for_code_rules(spec)?;
 
         let close = parse::find_tag_close(self.bytes, name_end).ok_or(BailReason::LiteralLt { offset: self.pos })?;
 
@@ -235,6 +224,22 @@ impl<'a> Tier1Scanner<'a> {
         apply_open_escape_ctx(&mut self.state, spec);
 
         self.text_start = self.pos;
+        Ok(())
+    }
+
+    /// Leave to Tier-2 an open tag whose code block rule this scanner does not have.
+    fn bail_for_code_rules(&self, spec: &TagSpec) -> Result<(), BailReason> {
+        // ~keep Tilde fences still require Tier-2; Tier-1 supports indented/backtick pre blocks.
+        if matches!(spec.kind, TagKind::Pre) && self.options.code_block_style == crate::options::CodeBlockStyle::Tildes
+        {
+            return Err(BailReason::Classifier);
+        }
+        // ~keep A link or an image in code writes no marks; Tier-2 knows the rule.
+        if matches!(spec.kind, TagKind::Link | TagKind::Image)
+            && self.state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE)
+        {
+            return Err(BailReason::Classifier);
+        }
         Ok(())
     }
 

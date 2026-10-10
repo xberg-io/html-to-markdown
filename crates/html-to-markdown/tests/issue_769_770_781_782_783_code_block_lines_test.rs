@@ -560,6 +560,20 @@ fn should_not_read_text_that_starts_with_spaces_in_a_block_quote_as_code() {
 }
 
 #[test]
+fn should_not_read_text_before_a_code_block_in_a_block_quote_as_code() {
+    for tier_strategy in tiers() {
+        let options = ConversionOptions {
+            whitespace_mode: WhitespaceMode::Strict,
+            code_block_style: CodeBlockStyle::Indented,
+            ..options(tier_strategy)
+        };
+        let actual = converted("<blockquote>      text<pre>a\n</pre></blockquote>", Some(options));
+        assert_eq!(actual.lines().next(), Some("> text"), "{tier_strategy:?}: {actual:?}");
+        assert_eq!(actual.lines().last(), Some(">     a"), "{tier_strategy:?}: {actual:?}");
+    }
+}
+
+#[test]
 fn should_keep_the_first_line_of_an_indented_code_block_in_a_definition() {
     assert_style(
         CodeBlockStyle::Indented,

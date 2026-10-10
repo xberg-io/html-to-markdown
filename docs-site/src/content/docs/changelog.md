@@ -50,8 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
 - A code block keeps the indentation that all its lines share. The converter removed it since the
   fix for [#134](https://github.com/xberg-io/html-to-markdown/issues/134):
-  `<pre>  a = 1\n    b = 2\n</pre>` wrote `a = 1`, `  b = 2` and now writes `  a = 1`, `    b = 2`, as the
-  page shows it. Blank lines at the start and at the end of a block are dropped. In a list item one
+  `<pre>  a = 1\n    b = 2\n</pre>` wrote the lines `"a = 1\n  b = 2"` and now writes
+  `"  a = 1\n    b = 2"`, as the page shows it. Blank lines at the start and at the end of a block are dropped. In a list item one
   blank line at the end stayed and is now dropped too: the middle item of
   `<ul><li>a</li><li><pre><code>b\n\n\n</code></pre></li><li>c</li></ul>` wrote the fence, `b`, a blank
   line and the fence, and now writes the fence, `b` and the fence. A code block in a table cell is
@@ -133,14 +133,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its first line. Without them a Markdown reader takes the code for a paragraph:
   `<blockquote><pre>a\nb\n</pre></blockquote>` wrote `> a`, `>     b` and now writes `>     a`,
   `>     b`. With that style the blank lines and the spaces at the end of a line of code also stay, at
-  the top level, in a block quote and in a list item: `<pre>a   \n\n\nb\n</pre>` wrote `    a  `, one
-  blank line, `    b` and now writes `    a   `, two blank lines, `    b`
+  the top level, in a block quote and in a list item: `<pre>a   \n\n\nb\n</pre>` wrote
+  `"    a  \n\n    b"` and now writes `"    a   \n\n\n    b"`
   ([#799](https://github.com/xberg-io/html-to-markdown/issues/799)).
 - With `code_block_style = indented`, a code block that starts the description of a definition list
   keeps the four spaces of its first line, and a blank line goes between the term and the code:
-  the full converter wrote `t`, `a`, `    b` for `<dl><dt>t</dt><dd><pre>a\nb\n</pre></dd></dl>`, and
-  the full and fast converters now write `t`, a blank line, `    a`, `    b`. The spaces at the end of
-  the last line of that code stay too
+  the full converter wrote `"t\na\n    b"` for `<dl><dt>t</dt><dd><pre>a\nb\n</pre></dd></dl>`, and
+  the full and fast converters now write `"t\n\n    a\n    b"`. The spaces at the end of the last
+  line of that code stay too
   ([#799](https://github.com/xberg-io/html-to-markdown/issues/799)).
 
 ## [3.17.2] - 2026-10-06
