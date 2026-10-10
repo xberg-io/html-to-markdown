@@ -217,6 +217,14 @@ fn prepare_open_state(
     name_lower: &[u8],
     options: &ConversionOptions,
 ) -> Result<(), BailReason> {
+    if std::mem::take(&mut state.last_closed_list)
+        && matches!(spec.kind, TagKind::Pre)
+        && options.code_block_style == crate::options::CodeBlockStyle::Indented
+        && !state.in_table_cell()
+    {
+        state.ensure_blank_line();
+        push_list_item_continuation_lines(state, "<!-- -->\n\n");
+    }
     state.last_closed_custom_element = false;
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {

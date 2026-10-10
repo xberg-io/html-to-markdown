@@ -621,7 +621,7 @@ fn finish_scan(
 
     crate::converter::main_helpers::trim_line_end_whitespace(&mut state.output);
     if state.output.contains("\n\n\n") {
-        collapse_excess_blank_lines(&mut state.output);
+        crate::converter::main_helpers::collapse_excess_blank_lines(&mut state.output, options.code_block_style);
     }
 
     if !state.output.is_empty() {

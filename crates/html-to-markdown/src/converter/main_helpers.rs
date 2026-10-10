@@ -179,21 +179,25 @@ pub const fn hard_break_marker(options: &ConversionOptions) -> &'static str {
 /// markdownlint's MD012 rule forbids multiple consecutive blank lines, so the
 /// final emission is normalized here. This intentionally preserves single
 /// blank lines (`\n\n`) — only runs of three or more newlines are collapsed.
-pub fn collapse_excess_blank_lines(output: &mut String) {
+pub fn collapse_excess_blank_lines(output: &mut String, style: crate::options::CodeBlockStyle) {
     if !output.contains("\n\n\n") {
         return;
     }
+    // ~keep CommonMark 4.4 preserves interior blank lines as code, including after a list boundary (#801).
+    let code_lines = (style == crate::options::CodeBlockStyle::Indented)
+        .then(|| crate::converter::code_scan::indented_code_lines(output));
     let mut cleaned = String::with_capacity(output.len());
     let mut consecutive = 0usize;
-    for ch in output.chars() {
-        if ch == '\n' {
+    for (index, line) in output.split_inclusive('\n').enumerate() {
+        let content = line.strip_suffix('\n').unwrap_or(line);
+        if !content.is_empty() || code_lines.as_ref().is_some_and(|lines| lines[index]) {
+            consecutive = 1;
+            cleaned.push_str(line);
+        } else {
             consecutive += 1;
             if consecutive <= 2 {
-                cleaned.push(ch);
+                cleaned.push_str(line);
             }
-        } else {
-            consecutive = 0;
-            cleaned.push(ch);
         }
     }
     *output = cleaned;

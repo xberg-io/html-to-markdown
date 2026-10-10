@@ -621,6 +621,9 @@ fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), Bail
         return Ok(());
     }
 
+    if raw.chars().any(|c| !c.is_whitespace() || c == '\u{c}') {
+        state.last_closed_list = false;
+    }
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
     let in_code = state.escape_ctx.contains(EscapeCtx::CODE);
 

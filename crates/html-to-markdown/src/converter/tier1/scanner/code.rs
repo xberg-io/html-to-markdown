@@ -458,6 +458,7 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
         let end = dest.trim_end().len();
         state.last_ordered_list_end = Some(end);
     }
+    state.last_closed_list = true;
 }
 
 fn close_list_item(state: &mut Tier1State, frame: &OpenTag) -> Result<(), BailReason> {

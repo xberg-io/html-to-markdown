@@ -249,7 +249,7 @@ fn finalize_output(
         output = extract_plain_text(dom, parser, options);
     } else {
         trim_line_end_whitespace(&mut output);
-        collapse_excess_blank_lines(&mut output);
+        collapse_excess_blank_lines(&mut output, options.code_block_style);
     }
     if options.wrap {
         wrap_after_frontmatter(&output, frontmatter, options)
