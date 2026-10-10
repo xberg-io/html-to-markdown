@@ -96,6 +96,7 @@ aov1 <- aov(effort~dose, data=vitamin_male_blue)
 summary(aov1)
 
 ```
+
                  Df Sum Sq Mean Sq F value Pr(>F)   
 
  dose          2 2943.5  1471.8   349.9 <2e-16
