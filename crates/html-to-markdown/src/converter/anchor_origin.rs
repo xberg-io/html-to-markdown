@@ -322,6 +322,7 @@ mod tests {
     use super::*;
     use crate::rcdom::SerializableHandle;
     use html5ever::serialize::{SerializeOpts, serialize};
+    use std::fmt::Write as _;
 
     fn repaired(html: &str) -> String {
         let dom = parse_with_anchor_origins(html).expect("a tree");
@@ -373,6 +374,37 @@ mod tests {
         assert!(parse_with_anchor_origins(&format!("<table>{}", nested(600))).is_none());
         let closed = format!("{}x{}", "<div>".repeat(400), "</div>".repeat(400));
         assert!(parse_with_anchor_origins(&closed.repeat(4)).is_some());
+    }
+
+    #[test]
+    fn should_give_a_tree_at_the_limit_and_none_one_element_past_it() {
+        // ~keep The tree builder also holds the document, `html`, `body` and the `head` it
+        // ~keep remembers. A `<br>` is a start tag that leaves nothing open, so start tag 512 is
+        // ~keep measured with 512 handles in the first page and 513 in the second.
+        let page = |breaks: usize, blocks: usize| format!("{}{}x", "<br>".repeat(breaks), "<div>".repeat(blocks));
+        assert!(parse_with_anchor_origins(&page(4, 508)).is_some());
+        assert!(parse_with_anchor_origins(&page(3, 509)).is_none());
+    }
+
+    #[test]
+    fn should_give_no_tree_when_elements_that_no_start_tag_names_nest_past_the_limit() {
+        // ~keep One `<td>` start tag opens a `tbody`, a `tr` and the cell.
+        let cells = format!("{}x", "<table><td>".repeat(300));
+        assert!(parse_with_anchor_origins(&cells).is_none());
+        let foreign = format!("<svg>{}<text>x", "<g>".repeat(600));
+        assert!(parse_with_anchor_origins(&foreign).is_none());
+        let math = format!("<math>{}<mi>x", "<mrow>".repeat(600));
+        assert!(parse_with_anchor_origins(&math).is_none());
+        let templates = format!("{}x", "<template>".repeat(600));
+        assert!(parse_with_anchor_origins(&templates).is_none());
+        // ~keep Each `<b>` with its own attribute is held twice: open, and as a formatting
+        // ~keep element that the tree builder opens again in the next paragraph.
+        let mut formatting = String::from("<p>");
+        for number in 0..300 {
+            write!(formatting, "<b id='b{number}'>").expect("write to a string");
+        }
+        formatting.push('x');
+        assert!(parse_with_anchor_origins(&formatting).is_none());
     }
 
     #[test]
