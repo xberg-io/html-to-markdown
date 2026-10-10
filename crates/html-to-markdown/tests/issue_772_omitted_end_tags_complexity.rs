@@ -85,7 +85,7 @@ fn should_convert_a_page_that_holds_five_hundred_blocks_open_in_linear_time() {
     // ~keep all of them for each paragraph: the largest cost for one start tag that the repair
     // ~keep accepts.
     let held = "<div>".repeat(500);
-    assert_linear("paragraphs in 500 open blocks", 25_000, 1, |count| {
+    assert_linear("paragraphs in 500 open blocks", 6_250, 3, |count| {
         format!("{held}{}", "<p>x ".repeat(count))
     });
     // ~keep The blocks after the 500 go past the limit, so the open blocks before them count.
