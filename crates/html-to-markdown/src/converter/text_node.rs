@@ -12,12 +12,14 @@ use std::borrow::Cow;
 use crate::converter::block::container::HandlerContext;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
-use crate::converter::utility::content::{NextElement, line_end_before_element, without_trailing_line_end};
+use crate::converter::utility::content::{
+    NextElement, ZERO_WIDTH_SPACE, line_end_before_element, without_trailing_line_end,
+};
 use crate::converter::utility::siblings::{
     FollowingContent, br_follows_enclosing_elements, content_starts_with_block, following_sibling_content,
     get_next_sibling_tag, get_previous_sibling_tag, next_sibling_is_inline_tag, zero_width_space_follows,
 };
-use crate::converter::utility::white_space::space_is_owed;
+use crate::converter::utility::white_space::{TextClass, classify_text, space_is_owed};
 use crate::text;
 #[cfg(feature = "visitor")]
 use crate::visitor::EMPTY_ATTRS;
@@ -96,7 +98,7 @@ impl TextProcessor<'_, '_, '_> {
         if self.handler.options.strip_newlines && (decoded.contains('\r') || decoded.contains('\n')) {
             decoded = Cow::Owned(decoded.replace(['\r', '\n'], " "));
         }
-        if decoded.trim().is_empty() {
+        if matches!(classify_text(&decoded), TextClass::WhiteSpaceOnly(_)) {
             let output_start = self.output.len();
             self.emit_whitespace(decoded.as_ref(), &facts);
             if crate::converter::structure_capture::is_text_capture_active(self.handler.ctx) {
@@ -132,7 +134,11 @@ impl TextProcessor<'_, '_, '_> {
         let Some(kept) = without_trailing_line_end(text.as_ref()) else {
             return text;
         };
-        if !zero_width_space_follows(self.node_handle, self.parser, self.handler.dom_ctx) {
+        // ~keep The segment break goes when a zero-width space is on either side of it: the
+        // ~keep last character of this text, or the first character after it.
+        if !kept.ends_with(ZERO_WIDTH_SPACE)
+            && !zero_width_space_follows(self.node_handle, self.parser, self.handler.dom_ctx)
+        {
             return text;
         }
         Cow::Owned(kept.to_string())
@@ -368,9 +374,15 @@ impl TextProcessor<'_, '_, '_> {
     ) -> ProcessedText {
         let has_double_newline = value.contains("\n\n") || value.contains("\r\n\r\n");
         let trailing_single_newline = value.ends_with('\n') && !value.ends_with("\n\n") && !value.ends_with("\r\n\r\n");
+        // ~keep The edges and the core are decided by the rule of running text: a no-break
+        // ~keep space is a character, so a text of one is a word, not white space.
+        let TextClass::Text { prefix, core, .. } = classify_text(value) else {
+            return ProcessedText::same(String::new(), capture_semantic);
+        };
+        let prefix = if prefix.is_some() { " " } else { "" };
         let normalized = text::normalize_whitespace_cow(value);
-        let (prefix, suffix, _) = text::chomp(normalized.as_ref());
-        let core = text::normalize_block_whitespace_cow(value.trim());
+        let (_, suffix, _) = text::chomp(normalized.as_ref());
+        let core = text::normalize_block_whitespace_cow(core);
         let mut output = String::with_capacity(prefix.len() + core.len() + suffix.len() + 2);
         let mut semantic = capture_semantic.then(|| String::with_capacity(output.capacity()));
         if !self.skip_prefix(prefix, was_fresh) && !prefix.is_empty() {

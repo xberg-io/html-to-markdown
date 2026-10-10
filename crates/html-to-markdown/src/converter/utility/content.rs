@@ -202,7 +202,7 @@ pub const fn line_end_before_element(in_running_text: bool, next: NextElement) -
 /// ~keep word (`long\n&#8203;word`, and `long\n\n&#8203;word` too).
 #[must_use]
 pub fn without_trailing_line_end(text: &str) -> Option<&str> {
-    let kept = text.trim_end_matches([' ', '\t', '\n', '\r']);
+    let kept = text.trim_end_matches(crate::converter::utility::white_space::is_collapsible);
     text[kept.len()..].contains('\n').then_some(kept)
 }
 
