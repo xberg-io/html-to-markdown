@@ -88,7 +88,10 @@ impl TextProcessor<'_, '_, '_> {
         if self.handler.options.strip_newlines && (decoded.contains('\r') || decoded.contains('\n')) {
             decoded = Cow::Owned(decoded.replace(['\r', '\n'], " "));
         }
-        if decoded.trim().is_empty() {
+        if decoded
+            .trim_matches(|c: char| c.is_whitespace() && c != '\u{c}')
+            .is_empty()
+        {
             let output_start = self.output.len();
             self.emit_whitespace(decoded.as_ref(), &facts);
             if crate::converter::structure_capture::is_text_capture_active(self.handler.ctx) {
@@ -350,7 +353,8 @@ impl TextProcessor<'_, '_, '_> {
         let trailing_single_newline = value.ends_with('\n') && !value.ends_with("\n\n") && !value.ends_with("\r\n\r\n");
         let normalized = text::normalize_whitespace_cow(value);
         let (prefix, suffix, _) = text::chomp(normalized.as_ref());
-        let core = text::normalize_block_whitespace_cow(value.trim());
+        let core =
+            text::normalize_block_whitespace_cow(value.trim_matches(|c: char| c.is_whitespace() && c != '\u{c}'));
         let mut output = String::with_capacity(prefix.len() + core.len() + suffix.len() + 2);
         let mut semantic = capture_semantic.then(|| String::with_capacity(output.capacity()));
         if !self.skip_prefix(prefix, was_fresh) && !prefix.is_empty() {
@@ -374,6 +378,11 @@ impl TextProcessor<'_, '_, '_> {
             output.push_str(suffix);
             if let Some(semantic) = semantic.as_mut() {
                 semantic.push_str(suffix);
+            }
+        } else if trailing_single_newline && value.contains('\u{c}') {
+            output.push(' ');
+            if let Some(semantic) = semantic.as_mut() {
+                semantic.push(' ');
             }
         } else if trailing_single_newline {
             let output_end = output.len();

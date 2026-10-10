@@ -21,16 +21,16 @@ fn markdown(html: &str, tier_strategy: TierStrategy, newline_style: NewlineStyle
 
 #[test]
 fn should_fold_non_ascii_whitespace_after_a_hard_break_in_every_tier() {
-    for html in [
-        "<div>a<br>&#12;b</div>",
-        "<div>a<br>\u{c}b</div>",
-        "<div>a<br>&#x3000;b</div>",
-        "<div>a<br>\u{3000}b</div>",
+    for (html, expected) in [
+        ("<div>a<br>&#12;b</div>", "a  \n\u{c}b\n"),
+        ("<div>a<br>\u{c}b</div>", "a  \n\u{c}b\n"),
+        ("<div>a<br>&#x3000;b</div>", "a  \nb\n"),
+        ("<div>a<br>\u{3000}b</div>", "a  \nb\n"),
     ] {
         for tier_strategy in [TierStrategy::Tier1, TierStrategy::Tier2, TierStrategy::Auto] {
             assert_eq!(
                 markdown(html, tier_strategy, NewlineStyle::Spaces),
-                "a  \nb\n",
+                expected,
                 "{tier_strategy:?}: {html:?}"
             );
         }

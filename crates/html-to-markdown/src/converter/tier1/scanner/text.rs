@@ -16,9 +16,8 @@ struct TextFlush<'a> {
 }
 
 const UNICODE_WS_ENTITIES: &[&str] = &[
-    "&#12;", "&#x0c;", "&#x0C;", "&#xC;", "&nbsp;", "&#160;", "&#xa0;", "&#xA0;", "&ensp;", "&#8194;", "&#x2002;",
-    "&emsp;", "&#8195;", "&#x2003;", "&thinsp;", "&#8201;", "&#x2009;", "&hairsp;", "&#8202;", "&#x200a;", "&#x200A;",
-    "&#12288;", "&#x3000;",
+    "&nbsp;", "&#160;", "&#xa0;", "&#xA0;", "&ensp;", "&#8194;", "&#x2002;", "&emsp;", "&#8195;", "&#x2003;",
+    "&thinsp;", "&#8201;", "&#x2009;", "&hairsp;", "&#8202;", "&#x200a;", "&#x200A;", "&#12288;", "&#x3000;",
 ];
 
 fn handle_structural_text(state: &mut Tier1State, raw: &str, br_in_tables: bool) -> Result<bool, BailReason> {
@@ -77,7 +76,7 @@ fn normalize_unicode_whitespace(raw: &str, verbatim: bool) -> std::borrow::Cow<'
 }
 
 const fn is_non_ascii_whitespace(character: char) -> bool {
-    character.is_whitespace() && !matches!(character, ' ' | '\t' | '\n' | '\r')
+    character.is_whitespace() && !matches!(character, ' ' | '\t' | '\n' | '\r' | '\u{c}')
 }
 
 #[derive(Clone, Copy)]
@@ -415,6 +414,11 @@ fn chomp_normal_text(state: &Tier1State, raw: &str, next_tag_is_span: bool) -> O
     }
     let prefix = if leading_len > 0 { " " } else { "" };
     let (suffix, ends_in_newline_join) = trailing_text_suffix(state, trailing, next_tag_is_span);
+    let (suffix, ends_in_newline_join) = if raw.contains('\u{c}') && suffix == "\n" {
+        (" ", false)
+    } else {
+        (suffix, ends_in_newline_join)
+    };
     Some((
         format!("{prefix}{}{suffix}", &raw[leading_len..trimmed_len]),
         ends_in_newline_join,
