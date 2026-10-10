@@ -324,15 +324,23 @@ fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool 
 
 /// Writes the white space that the content of a link starts with as one space before the link,
 /// when a space is owed there (issue #800).
+///
+/// ~keep A code span keeps the white space of its text, so there the space of a label is not
+/// ~keep written a second time. A `<pre>` block shows the label as it is written and keeps it.
 fn push_space_before_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
-    if edge_spaces.0 {
+    if edge_spaces.0 && !in_code_span(handler.context) {
         push_inline_prefix(handler.output, " ");
     }
 }
 
+/// Whether the link is in a code span: in code, and not in a `<pre>` block.
+const fn in_code_span(context: &Context) -> bool {
+    context.in_code && !context.in_code_block
+}
+
 /// Writes the white space that the content of a link ends with as one space after the link.
 fn push_space_after_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
-    if edge_spaces.1 {
+    if edge_spaces.1 && !in_code_span(handler.context) {
         append_inline_suffix(
             handler.output,
             " ",

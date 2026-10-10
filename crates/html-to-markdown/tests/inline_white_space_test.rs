@@ -572,6 +572,79 @@ fn white_space_at_the_end_of_a_link_label_is_one_space_before_a_period() {
     ]);
 }
 
+/// A heading and a table cell cannot hold a line break, so a `<br>` is a space there. At an end
+/// of a link label that space is white space of the label: one space outside the link.
+#[test]
+fn a_line_break_at_an_end_of_a_link_label_is_one_space_outside_the_link_in_a_heading_or_a_cell() {
+    assert_on_both(&[
+        ("<h2>Press<a href=\"/p\">Go<br></a>now</h2>", "## Press[Go](/p) now\n"),
+        ("<h2>Press <a href=\"/p\">Go<br></a>.</h2>", "## Press [Go](/p) .\n"),
+        ("<h2>Press<a href=\"/p\"><br>Go</a>now</h2>", "## Press [Go](/p)now\n"),
+        (
+            "<table><tr><td>Press<a href=\"/p\">Go<br></a>now</td></tr></table>",
+            "| Press[Go](/p) now |\n| ----------------- |\n",
+        ),
+        (
+            "<table><tr><td>Press <a href=\"/p\">Go<br></a>.</td></tr></table>",
+            "| Press [Go](/p) . |\n| ---------------- |\n",
+        ),
+        (
+            "<table><tr><th>Press<a href=\"/p\">Go<br></a>now</th></tr><tr><td>c</td></tr></table>",
+            "| Press[Go](/p) now |\n| ----------------- |\n| c                 |\n",
+        ),
+        // ~keep Nothing is owed at the end of the heading or the cell, or where a space is written.
+        ("<h2><a href=\"/p\">Go<br></a></h2>", "## [Go](/p)\n"),
+        ("<h2>Press <a href=\"/p\">Go<br></a> now</h2>", "## Press [Go](/p) now\n"),
+    ]);
+}
+
+/// A code span keeps the white space of its text. The white space at an end of a link label is
+/// not written a second time outside the link there. A `<pre>` block keeps it, as a browser does.
+#[test]
+fn white_space_at_an_end_of_a_link_label_is_not_moved_in_a_code_span() {
+    assert_on_both(&[
+        (
+            "<p><code>Press <a href=\"/p\"> Go </a> now</code></p>",
+            "`Press [Go](/p) now`\n",
+        ),
+        (
+            "<p><code>Press <a href=\"/p\">Go </a> now</code></p>",
+            "`Press [Go](/p) now`\n",
+        ),
+        (
+            "<p><code>Press<a href=\"/p\"> Go </a>now</code></p>",
+            "`Press[Go](/p)now`\n",
+        ),
+        ("<p><code><a href=\"/p\"> Go </a></code></p>", "`[Go](/p)`\n"),
+        (
+            "<p><code><a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"> </a></code></p>",
+            "`[![Go](/i.png)](/p)`\n",
+        ),
+        (
+            "<p><kbd>Press <a href=\"/p\"> Go </a> now</kbd></p>",
+            "`Press [Go](/p) now`\n",
+        ),
+        // ~keep A link with no address is running text of the span, with its white space.
+        ("<p><code>Press<a>Go </a>now</code></p>", "`PressGo now`\n"),
+        // ~keep A `<pre>` block shows the label as it is written.
+        (
+            "<pre>Press<a href=\"/p\"> Go </a>now</pre>",
+            "```\nPress [Go](/p) now\n```\n",
+        ),
+    ]);
+}
+
+/// A block in marks in a heading is a word of its own: one space after the closing marks. The
+/// fast converter gives this input to the full one.
+#[test]
+fn a_block_in_marks_in_a_heading_is_a_word_of_its_own() {
+    assert_on_full(&[
+        ("<h2>one\n<b><p>y</p></b>two</h2>", "## one **y** two\n"),
+        ("<h2>one <i><div>y</div></i>two</h2>", "## one *y* two\n"),
+    ]);
+    assert_on_both(&[("<h2>one <b>y</b>two</h2>", "## one **y**two\n")]);
+}
+
 /// A sectioning element (`<footer>`, `<section>`, `<article>`, `<aside>`, `<header>`, `<main>`)
 /// is a block. The white space that a link label starts with is no space at the start of that
 /// block, whatever lies between the element and the link.

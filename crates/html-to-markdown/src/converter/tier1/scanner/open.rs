@@ -252,6 +252,18 @@ fn prepare_open_state(
     if is_link_block && state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link)) {
         return Err(BailReason::Classifier);
     }
+    // ~keep A block inside marks inside a heading (`<h2>one<b><p>y</p></b>two</h2>`): Tier-2
+    // ~keep writes the block boundary as one space after the closing marks (issue #751). This
+    // ~keep scanner closes the marks before it knows what follows, so it leaves the page to Tier-2.
+    let in_marks = |frame: &OpenTag| {
+        matches!(
+            frame.spec.kind,
+            TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted
+        )
+    };
+    if is_link_block && state.escape_ctx.contains(EscapeCtx::HEADING) && state.stack.iter().any(in_marks) {
+        return Err(BailReason::Classifier);
+    }
     Ok(())
 }
 
