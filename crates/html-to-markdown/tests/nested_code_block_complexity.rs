@@ -1,10 +1,11 @@
 #![allow(missing_docs)]
 #![cfg(feature = "testkit")]
 
-//! An indented code block deep in block quotes must not cost the square of the depth.
+//! A code block deep in block quotes must not cost the square of the depth.
 //!
 //! Each block quote read every line of its content twice to learn which lines are indented code.
 //! A code block that is `n` quotes deep was read `2n` times, each time through more quote markers.
+//! With a fenced style each block quote read the markers of every line to find the fences.
 //! The library converts untrusted HTML, so such growth is a denial-of-service vector.
 //!
 //! The bound is on the growth between two depths, not on a time: twice the depth may take at
@@ -68,30 +69,43 @@ fn page(shape: Shape, depth: usize) -> String {
     html
 }
 
+/// The white space that `style` writes before each line of code, after the marker of a quote.
+const fn code_indent(style: CodeBlockStyle) -> &'static str {
+    match style {
+        CodeBlockStyle::Indented => "    ",
+        CodeBlockStyle::Backticks | CodeBlockStyle::Tildes => "",
+    }
+}
+
 /// ~keep A page that is not written as its shape says measures nothing.
-fn assert_shape(shape: Shape, depth: usize, output: &str) {
+fn assert_shape(shape: Shape, depth: usize, style: CodeBlockStyle, output: &str) {
+    let indent = code_indent(style);
     match shape {
         Shape::CodeBlock => {}
         Shape::LastLineEndsInSpaces => assert!(
-            output.contains("     end = 1  \n"),
+            output.contains(&format!(" {indent}end = 1  \n")),
             "the last line of the code keeps its spaces"
         ),
         Shape::LineOfSpacesInEachQuote => assert_eq!(
-            output.lines().filter(|line| line.ends_with(">       ")).count(),
+            output
+                .lines()
+                .filter(|line| line.ends_with(&format!("> {indent}  ")))
+                .count(),
             depth,
             "each quote keeps its line of spaces"
         ),
     }
 }
 
-fn fastest_convert(shape: Shape, depth: usize, tier_strategy: TierStrategy) -> Duration {
+fn fastest_convert(shape: Shape, depth: usize, style: CodeBlockStyle, tier_strategy: TierStrategy) -> Duration {
     let html = &page(shape, depth);
     let options = ConversionOptions {
         extract_metadata: false,
-        code_block_style: CodeBlockStyle::Indented,
+        code_block_style: style,
         tier_strategy,
         ..ConversionOptions::default()
     };
+    let code_line = format!(" {}value = 1", code_indent(style));
     (0..REPEATS_PER_SAMPLE)
         .map(|_| {
             let start = Instant::now();
@@ -102,11 +116,11 @@ fn fastest_convert(shape: Shape, depth: usize, tier_strategy: TierStrategy) -> D
             let elapsed = start.elapsed();
             // ~keep A conversion that stops at the depth limit is fast and proves nothing.
             assert_eq!(
-                output.lines().filter(|line| line.contains("     value = 1")).count(),
+                output.lines().filter(|line| line.contains(&code_line)).count(),
                 CODE_LINES,
-                "every line of the code is indented code in the output"
+                "every line of the code is a line of code in the output"
             );
-            assert_shape(shape, depth, &output);
+            assert_shape(shape, depth, style, &output);
             elapsed
         })
         .min()
@@ -114,23 +128,42 @@ fn fastest_convert(shape: Shape, depth: usize, tier_strategy: TierStrategy) -> D
 }
 
 /// The doubling ratios of one converter for one shape, or a description of why they look quadratic.
-fn measure(shape: Shape, tier_strategy: TierStrategy) -> Result<(), String> {
+fn measure(shape: Shape, style: CodeBlockStyle, tier_strategy: TierStrategy) -> Result<(), String> {
     let seconds: Vec<f64> = DEPTHS
         .into_iter()
-        .map(|depth| fastest_convert(shape, depth, tier_strategy).as_secs_f64().max(1e-6))
+        .map(|depth| {
+            fastest_convert(shape, depth, style, tier_strategy)
+                .as_secs_f64()
+                .max(1e-6)
+        })
         .collect();
     let ratios: Vec<f64> = seconds.windows(2).map(|pair| pair[1] / pair[0]).collect();
     if ratios.iter().all(|ratio| *ratio < MAX_DOUBLING_RATIO) {
         return Ok(());
     }
     Err(format!(
-        "{shape:?}, {tier_strategy:?}: depths {DEPTHS:?} took {seconds:.4?} seconds, ratios {ratios:.2?}; \
+        "{shape:?}, {style:?}, {tier_strategy:?}: depths {DEPTHS:?} took {seconds:.4?} seconds, ratios {ratios:.2?}; \
          expected under {MAX_DOUBLING_RATIO}x for each doubling"
     ))
 }
 
+/// ~keep One measurement at a time: a second one on another thread changes both.
+static ONE_MEASUREMENT: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
 #[test]
 fn an_indented_code_block_in_nested_block_quotes_scales_linearly_in_both_tiers() {
+    assert_linear_growth(CodeBlockStyle::Indented);
+}
+
+#[test]
+fn a_fenced_code_block_in_nested_block_quotes_scales_linearly_in_both_tiers() {
+    assert_linear_growth(CodeBlockStyle::Backticks);
+}
+
+fn assert_linear_growth(style: CodeBlockStyle) {
+    let _alone = ONE_MEASUREMENT
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
     // ~keep Every shape is measured on both converters before the test fails, so one red run
     // ~keep names each slow pair.
     let mut slow = Vec::new();
@@ -138,7 +171,7 @@ fn an_indented_code_block_in_nested_block_quotes_scales_linearly_in_both_tiers()
         for tier_strategy in [TierStrategy::Tier1, TierStrategy::Tier2] {
             let mut failures = Vec::with_capacity(MAX_MEASUREMENT_ATTEMPTS);
             for attempt in 1..=MAX_MEASUREMENT_ATTEMPTS {
-                match measure(shape, tier_strategy) {
+                match measure(shape, style, tier_strategy) {
                     Ok(()) => break,
                     Err(reason) => failures.push(format!("attempt {attempt}: {reason}")),
                 }

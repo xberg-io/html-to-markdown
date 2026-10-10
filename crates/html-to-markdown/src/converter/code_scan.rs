@@ -114,10 +114,12 @@ impl<'a> CodeScan<'a> {
             }),
             CodeBlockStyle::Backticks => Self::Fenced(FenceScan {
                 fence: b'`',
+                quotes,
                 open: None,
             }),
             CodeBlockStyle::Tildes => Self::Fenced(FenceScan {
                 fence: b'~',
+                quotes,
                 open: None,
             }),
         }
@@ -148,6 +150,7 @@ impl<'a> CodeScan<'a> {
 pub struct FenceScan {
     /// The fence character of the configured style.
     fence: u8,
+    quotes: QuoteLines,
     open: Option<(u8, usize)>,
 }
 
@@ -156,10 +159,17 @@ impl FenceScan {
     ///
     /// ~keep A fence is longer than every run of its character in the code, so no line of code
     /// ~keep closes it. A block quote and a list item put their prefix before every line.
+    ///
+    /// ~keep With [`QuoteLines::Kept`] a line of a quote at the left margin is not read while no
+    /// ~keep block is open: that quote closed every block it opened. A read of its markers, at
+    /// ~keep each level of nested quotes, costs the square of the depth.
     fn is_code(&mut self, line: &str) -> bool {
         use crate::converter::utility::escaping::code_fence;
 
         let Some((marker, length)) = self.open else {
+            if self.quotes == QuoteLines::Kept && line.starts_with('>') {
+                return false;
+            }
             self.open = code_fence(after_container_markers(line)).filter(|(marker, _)| *marker == self.fence);
             return false;
         };
@@ -661,5 +671,28 @@ mod tests {
         }
         // The fences were passed, and the scan still knows that the block is closed.
         assert_eq!(answers, "-1-0");
+    }
+
+    #[test]
+    fn should_not_read_the_fences_of_a_quote_that_closed_its_own_code_blocks() {
+        let answers = |mut scan: CodeScan<'_>, markdown: &str| -> String {
+            markdown
+                .split('\n')
+                .map(|line| if scan.is_code(line) { '1' } else { '0' })
+                .collect()
+        };
+        for (style, fence) in [(CodeBlockStyle::Backticks, "```"), (CodeBlockStyle::Tildes, "~~~")] {
+            // The code block of a quote, then a code block of this level with a line of spaces.
+            let content = format!("> {fence}\n> a\n> {fence}\n  \n{fence}\n  \n> b\n{fence}\n  ");
+            assert_eq!(
+                answers(CodeScan::of_quote_content(style, &content), &content),
+                "000001100"
+            );
+            // A read of every line gives the same answers after the quote, and reads the quote.
+            assert_eq!(answers(CodeScan::new(style, &content), &content), "010001100");
+            // A quote line that is not at the left margin is read: it can be code of a list item.
+            let item = format!("- a\n  > {fence}\n  >   \n  > {fence}\n  ");
+            assert_eq!(answers(CodeScan::of_quote_content(style, &item), &item), "00100");
+        }
     }
 }
