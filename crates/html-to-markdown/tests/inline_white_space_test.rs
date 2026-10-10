@@ -944,6 +944,19 @@ fn white_space_at_an_end_of_a_short_quotation_is_one_space_outside_the_marks() {
     ]);
 }
 
+/// In a code span the white space at the ends of a short quotation is not moved out of the marks:
+/// the quotation is written as before that rule, as a link in a code span is. A browser shows no
+/// space outside the marks that the source does not have: `Press" Go "now` and `Press " Go " now`.
+#[test]
+fn white_space_at_an_end_of_a_short_quotation_is_not_moved_in_a_code_span() {
+    assert_on_full(&[
+        ("<p><code><q> Go </q></code></p>", "`\"Go\"`\n"),
+        ("<p><code>Press<q> Go </q>now</code></p>", "`Press\"Go\"now`\n"),
+        ("<p><code>Press <q> Go </q> now</code></p>", "`Press \"Go\" now`\n"),
+        ("<p><code>Press <q> Go </q>.</code></p>", "`Press \"Go\".`\n"),
+    ]);
+}
+
 /// A line break at the end of a short quotation is kept: a browser shows `now.` on a new line.
 #[test]
 fn a_line_break_at_the_end_of_a_short_quotation_is_kept() {

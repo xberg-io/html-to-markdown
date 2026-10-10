@@ -184,8 +184,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Press <https://e.org/>now.` and gives `Press <https://e.org/> now.`) and for a no-break space
   at an end of the label. A short quotation follows the rule of the other inline elements:
   `<p>Press <q>Go </q>now.</p>` gave `Press "Go"now.` and gives `Press "Go" now.`, and a line
-  break at the end of a quotation is kept. A link in a code span is written as before. With no
-  white space in the source the output has none
+  break at the end of a quotation is kept. A link or a short quotation in a code span is written
+  as before. With no white space in the source the output has none
   ([#800](https://github.com/xberg-io/html-to-markdown/issues/800)).
 
 - A `<footer>`, a `<section>`, an `<article>`, an `<aside>`, a `<header>` and a `<main>` start with
