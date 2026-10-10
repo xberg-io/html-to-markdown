@@ -136,7 +136,6 @@ fn should_write_a_rule_inside_the_other_marker_wrappers_as_text_in_the_line() {
         ("<div><del>a<hr>c</del></div>", "~~a --- c~~"),
         ("<div><s>a<hr>c</s></div>", "~~a --- c~~"),
         ("<div><strike>a<hr>c</strike></div>", "~~a --- c~~"),
-        ("<div><ins>a<hr>c</ins></div>", "a\n\n---\n\nc"),
         ("<div><mark>a<hr>c</mark></div>", "==a --- c=="),
         ("<div><var>a<hr>c</var></div>", "*a --- c*"),
         ("<div><dfn>a<hr>c</dfn></div>", "*a --- c*"),
@@ -187,6 +186,7 @@ fn should_keep_a_rule_outside_markers_on_its_own_line() {
     let cases = [
         ("<div><span>a<hr>c</span></div>", "a\n\n---\n\nc"),
         ("<div><u>a<hr>c</u></div>", "a\n\n---\n\nc"),
+        ("<div><ins>a<hr>c</ins></div>", "a\n\n---\n\nc"),
         ("<div><sub>a<hr>c</sub></div>", "a\n\n---\n\nc"),
         ("<p>a<hr>c</p>", "a\n\n---\n\nc"),
         ("<dl><dt>t</dt><dd><hr></dd></dl>", "t\n\n---"),

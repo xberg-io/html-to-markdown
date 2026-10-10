@@ -15,6 +15,7 @@ use crate::converter::inline::link::{MarkdownLink, append_markdown_link};
 use crate::converter::main_helpers::tag_name_eq;
 use crate::converter::media::MediaContext;
 use crate::converter::media::first_address;
+use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -22,7 +23,7 @@ use crate::options::{ConversionOptions, InlineDataMedia};
 /// ~keep Keep media destinations out of page text; use an authored title or the element kind.
 fn append_media_src_link(output: &mut String, src: &str, tag: &HTMLTag, options: &ConversionOptions, ctx: &Context) {
     let title = crate::converter::utility::attributes::decoded_attribute(tag, "title");
-    let name = tag.name().as_utf8_str();
+    let name = normalized_tag_name(tag.name().as_utf8_str());
     let label = title
         .as_deref()
         .filter(|label| !label.trim().is_empty())

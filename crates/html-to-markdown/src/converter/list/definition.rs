@@ -249,12 +249,12 @@ pub fn handle_dd(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
         return;
     }
 
-    if !ctx.in_table_cell && !ctx.in_list_item {
-        output.truncate(output.trim_end_matches([' ', '\t']).len());
-    }
     if ctx.convert_as_inline {
         output.push_str(&trimmed);
     } else {
+        if !ctx.in_table_cell && !ctx.in_list_item {
+            output.truncate(output.trim_end_matches([' ', '\t']).len());
+        }
         crate::converter::block::horizontal_rule::separate_leading_rule(output, &trimmed, ctx);
         output.push_str(&trimmed);
         output.push_str("\n\n");
