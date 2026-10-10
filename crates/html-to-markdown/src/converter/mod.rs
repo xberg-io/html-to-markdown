@@ -104,6 +104,8 @@ mod main_dispatch;
 mod main_helpers;
 pub mod media;
 mod metadata;
+#[cfg(all(test, feature = "metadata"))]
+mod metadata_preferences_tests;
 pub mod plain_text;
 pub mod preprocessing_helpers;
 pub mod prescan;

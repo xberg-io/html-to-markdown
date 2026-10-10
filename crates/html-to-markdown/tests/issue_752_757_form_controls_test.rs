@@ -361,6 +361,16 @@ fn should_separate_a_control_in_a_line_that_goes_on_after_it() {
     }
 }
 
+/// In a heading the line goes on after a button. An input between the button and the next word
+/// writes no text, so the button is separated from that word.
+#[test]
+fn should_read_past_an_input_to_the_word_after_a_button() {
+    for input in [r#"type="checkbox""#, r#"type="hidden""#, r#"type="text""#] {
+        let controls = format!("aaa<button>Xone</button><input {input}>bbb");
+        assert_all_paths(&format!("<h1>{controls}</h1>"), "# aaa Xone bbb\n");
+    }
+}
+
 /// A button, an output, a meter and a progress bar end their line only where a block holds
 /// them. In an inline element a browser keeps them in the line, so the text after the element
 /// is a word of the same line.
