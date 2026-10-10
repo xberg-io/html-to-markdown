@@ -73,14 +73,15 @@ impl Tracer for HandleCount {
 
 /// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it,
 /// marks each `<tbody>` and `<colgroup>` start tag, records whether an `<html>` start tag, a
-/// `<table>` start tag and a `<body>` start tag that opens the body went by, and stops
+/// start tag of a table or of one of those two parts, and a `<body>` start tag that opens the
+/// body went by, and stops
 /// forwarding when the tree builder holds more than `max_open_elements` elements open.
 struct AnchorOriginStamper {
     inner: TreeBuilder<Handle, RcDom>,
     next_origin: Cell<u32>,
     saw_html_tag: Cell<bool>,
     saw_body_tag: Cell<bool>,
-    saw_table_tag: Cell<bool>,
+    saw_table_part: Cell<bool>,
     max_open_elements: Option<usize>,
     start_tags: Cell<usize>,
     too_deep: Cell<bool>,
@@ -111,8 +112,14 @@ impl AnchorOriginStamper {
             // ~keep builder copies its attributes to the body it implied. That body is still
             // ~keep one that no start tag asked for.
             "body" if !self.has_body() => self.saw_body_tag.set(true),
-            "table" => self.saw_table_tag.set(true),
-            "tbody" | "colgroup" => set_private_attr(tag, AUTHORED_ATTR, StrTendril::new()),
+            "table" => self.saw_table_part.set(true),
+            // ~keep The mark is given with no knowledge of where the tag is, and SVG and MathML
+            // ~keep keep an element of this name with no table. The walk that takes the mark
+            // ~keep off must run for each page that got one.
+            "tbody" | "colgroup" => {
+                self.saw_table_part.set(true);
+                set_private_attr(tag, AUTHORED_ATTR, StrTendril::new());
+            }
             "a" => self.stamp_anchor(tag),
             _ => {}
         }
@@ -208,7 +215,7 @@ fn build_tree(html: &str, max_open_elements: Option<usize>) -> (RcDom, bool) {
             next_origin: Cell::new(0),
             saw_html_tag: Cell::new(false),
             saw_body_tag: Cell::new(false),
-            saw_table_tag: Cell::new(false),
+            saw_table_part: Cell::new(false),
             max_open_elements,
             start_tags: Cell::new(0),
             too_deep: Cell::new(false),
@@ -222,11 +229,12 @@ fn build_tree(html: &str, max_open_elements: Option<usize>) -> (RcDom, bool) {
     let too_deep = tokenizer.sink.too_deep.get();
     let saw_html_tag = tokenizer.sink.saw_html_tag.get();
     let saw_body_tag = tokenizer.sink.saw_body_tag.get();
-    let saw_table_tag = tokenizer.sink.saw_table_tag.get();
+    let saw_table_part = tokenizer.sink.saw_table_part.get();
     let dom = TreeSink::finish(tokenizer.sink.inner.sink);
     unwrap_implied_wrappers(&dom.document, saw_html_tag, saw_body_tag);
-    // ~keep Only a table gets a `<tbody>` or a `<colgroup>`, so a page with no table skips the walk.
-    if saw_table_tag {
+    // ~keep Only a table gets a `<tbody>` or a `<colgroup>` that no start tag asked for, and only
+    // ~keep such a start tag gets the mark, so a page with none of the three tags skips the walk.
+    if saw_table_part {
         unwrap_implied_table_parts(&dom.document);
     }
     (dom, too_deep)
@@ -489,6 +497,15 @@ mod tests {
         assert_eq!(
             body("<table><tbody data-h2m-authored=x><tr><td>one</table>"),
             "<table><tbody><tr><td>one</td></tr></tbody></table>"
+        );
+    }
+
+    #[test]
+    fn should_never_leak_the_mark_of_a_tbody_or_a_colgroup_in_a_page_with_no_table() {
+        assert_eq!(body("<svg><tbody>x</tbody></svg>"), "<svg><tbody>x</tbody></svg>");
+        assert_eq!(
+            body("<math><colgroup></colgroup></math>"),
+            "<math><colgroup></colgroup></math>"
         );
     }
 

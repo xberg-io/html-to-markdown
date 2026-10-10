@@ -322,7 +322,7 @@ impl TreeSink for BaseRecordingDom {
 const PARSE_PIECE: usize = 4096;
 
 /// Whether `bytes` holds `<` followed by `name` in any case.
-pub fn has_start_tag(bytes: &[u8], name: &[u8]) -> bool {
+fn has_start_tag(bytes: &[u8], name: &[u8]) -> bool {
     memchr::memchr_iter(b'<', bytes).any(|at| {
         bytes
             .get(at + 1..at + 1 + name.len())

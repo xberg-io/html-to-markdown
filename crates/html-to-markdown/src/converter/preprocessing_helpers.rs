@@ -230,6 +230,53 @@ fn has_end_tag(tag: &tl::HTMLTag<'_>) -> bool {
         .is_some_and(|raw| raw.ends_with(b"</"))
 }
 
+/// Elements whose content is no markup of the document for the HTML tree builder: it reads the
+/// content as text, or keeps it out of the document (`template`). `tl` makes an element of
+/// each tag that is written there.
+///
+/// ~keep `noframes`, `iframe` and `noscript` hold text too, and are not in the list: the second
+/// ~keep parse of `<noframes><frameset></noframes><p>one</p>` gives no output where the first
+/// ~keep gives `one`, and for the other two it gives the output of the first parse.
+const NO_DOCUMENT_MARKUP: [&[u8]; 7] = [
+    b"template",
+    b"textarea",
+    b"title",
+    b"script",
+    b"style",
+    b"xmp",
+    b"noembed",
+];
+
+/// True when the first parse holds a `frameset` element that the HTML tree builder also makes.
+///
+/// ~keep The name is compared in full and in any case, and a comment is not an element, so
+/// ~keep `<framesetter>` and `<!-- <frameset> -->` do not count. The walk does not go into the
+/// ~keep elements of [`NO_DOCUMENT_MARKUP`], and it stops at the first `frameset`, so each node
+/// ~keep is read at most once. Call it only for a page that is already known to need the
+/// ~keep second parse: it reads every element of a page with no `frameset`.
+pub fn has_frameset_element(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
+    let mut stack = dom_ctx.root_children.clone();
+    while let Some(handle) = stack.pop() {
+        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+            continue;
+        };
+        let name = tag.name().as_bytes();
+        if name.eq_ignore_ascii_case(b"frameset") {
+            return true;
+        }
+        if NO_DOCUMENT_MARKUP
+            .iter()
+            .any(|skipped| name.eq_ignore_ascii_case(skipped))
+        {
+            continue;
+        }
+        if let Some(children) = dom_ctx.children_of(handle.get_inner()) {
+            stack.extend(children.iter().copied());
+        }
+    }
+    false
+}
+
 /// True if `child`, as a direct child of a `<table>` element, is content that a
 /// spec-compliant HTML5 parser would foster-parent (non-whitespace text) or
 /// restructure (an element outside the small set valid directly under `<table>`)
@@ -456,4 +503,66 @@ fn element_has_noise_hint(tag: &tl::HTMLTag) -> bool {
     ];
 
     attribute_matches_any(tag, "class", NOISE_KEYWORDS) || attribute_matches_any(tag, "id", NOISE_KEYWORDS)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::has_frameset_element;
+    use crate::converter::utility::caching::build_dom_context;
+
+    fn holds_frameset(html: &str) -> bool {
+        let dom = tl::parse(html, tl::ParserOptions::default()).expect("parse");
+        has_frameset_element(&build_dom_context(&dom, dom.parser(), html.len()), dom.parser())
+    }
+
+    #[test]
+    fn should_find_a_frameset_element_in_any_case_and_at_any_depth() {
+        for html in [
+            "<frameset><frame></frameset>",
+            "<FRAMESET><FRAME></FRAMESET>",
+            "<FrameSet></FrameSet>",
+            "<html><head><title>t</title></head><frameset><frame></frameset></html>",
+            "<p>one</p><div><frameset></frameset></div>",
+            "<textarea>a</textarea><frameset></frameset>",
+        ] {
+            assert!(holds_frameset(html), "{html:?}");
+        }
+    }
+
+    #[test]
+    fn should_count_a_frameset_in_noframes_iframe_and_noscript() {
+        for html in [
+            "<noframes><frameset></noframes><p>one</p>",
+            "<iframe><frameset></iframe><p>one</p>",
+            "<noscript><frameset></noscript><p>one</p>",
+        ] {
+            assert!(holds_frameset(html), "{html:?}");
+        }
+    }
+
+    #[test]
+    fn should_find_no_frameset_in_a_comment_an_attribute_or_a_longer_name() {
+        for html in [
+            "<!-- <frameset> --><p>one</p>",
+            "<framesetter></framesetter>",
+            "<frame></frame><frames></frames>",
+            "<div title=\"<frameset>\">one</div>",
+            "<p>frameset</p>",
+            "",
+        ] {
+            assert!(!holds_frameset(html), "{html:?}");
+        }
+    }
+
+    #[test]
+    fn should_find_no_frameset_where_the_tree_builder_reads_text_or_a_template() {
+        for name in [
+            "template", "textarea", "title", "script", "style", "xmp", "noembed", "TEXTAREA",
+        ] {
+            let html = format!("<{name}><frameset></frameset></{name}><p>one</p>");
+            assert!(!holds_frameset(&html), "{html:?}");
+            let nested = format!("<{name}><b><frameset></frameset></b></{name}>");
+            assert!(!holds_frameset(&nested), "{nested:?}");
+        }
+    }
 }

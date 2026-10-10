@@ -1,8 +1,7 @@
 use super::preprocess_repaired_html;
 use crate::converter::DomContext;
 use crate::converter::main_helpers::{repair_with_html5ever, repair_with_html5ever_within_depth};
-use crate::converter::preprocessing_helpers::{has_inline_block_misnest, has_omitted_end_tag};
-use crate::converter::url_resolve::has_start_tag;
+use crate::converter::preprocessing_helpers::{has_frameset_element, has_inline_block_misnest, has_omitted_end_tag};
 use crate::converter::utility::caching::build_dom_context;
 use crate::error::{ConversionError, Result};
 
@@ -54,8 +53,9 @@ pub(super) fn parse_for_conversion<'a>(
     }
     // ~keep In a frameset document the tree builder drops the text after `</frameset>`, which
     // ~keep the first parse keeps. `tl` also leaves a `<frame>` open, so such a page looks like
-    // ~keep one with no end tag when every end tag is written. It keeps the first parse.
-    let omitted_end_tag = has_omitted_end_tag(&dom_ctx, parser) && !has_start_tag(input.as_bytes(), b"frameset");
+    // ~keep one with no end tag when every end tag is written. It keeps the first parse. Only a
+    // ~keep page that looks so is searched for a `frameset` element.
+    let omitted_end_tag = has_omitted_end_tag(&dom_ctx, parser) && !has_frameset_element(&dom_ctx, parser);
     if !omitted_end_tag && !has_inline_block_misnest(&dom_ctx, parser) {
         return Ok(ParseOutcome::Ready { dom, dom_ctx });
     }
@@ -133,6 +133,19 @@ mod tests {
 
         assert_eq!(content.as_deref(), Some("one\n\ntail\n"));
         assert_eq!(calls, 2);
+    }
+
+    #[test]
+    fn should_parse_twice_when_only_a_comment_or_a_longer_tag_name_holds_the_word_frameset() {
+        for html in [
+            "<!-- <frameset> --><div><p>one</div>tail",
+            "<framesetter></framesetter><div><p>one</div>tail",
+        ] {
+            let (calls, content) = parse_calls_for(html);
+
+            assert_eq!(content.as_deref(), Some("one\n\ntail\n"), "{html:?}");
+            assert_eq!(calls, 2, "{html:?}");
+        }
     }
 
     #[test]

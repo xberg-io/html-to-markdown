@@ -541,7 +541,7 @@ fn a_body_start_tag_after_content_keeps_the_header_in_front_of_it() {
 
 /// ~keep In a frameset document the HTML tree builder drops everything after `</frameset>` and
 /// ~keep everything in the frameset but a `<noframes>`. The converter wrote that text before
-/// ~keep issue #772, so a page that writes a `<frameset>` start tag does not take the second
+/// ~keep issue #772, so a page that has a `frameset` element does not take the second
 /// ~keep parse. Each expected string is the output before issue #772, not the tree of a browser.
 #[test]
 fn a_frameset_page_keeps_the_text_that_the_tree_builder_drops() {
@@ -551,6 +551,7 @@ fn a_frameset_page_keeps_the_text_that_the_tree_builder_drops() {
             "one\n\ntail\n",
         ),
         ("<frameset><frame></frameset>tail", "tail\n"),
+        ("<FRAMESET><FRAME></FRAMESET>tail", "tail\n"),
         ("<frameset></frameset><div><p>one</p></div><p>tail</p>", "one\n\ntail\n"),
         (
             "<frameset><frame><noframes><p>one</p></noframes></frameset><div><p>two</p></div>tail",
@@ -568,9 +569,54 @@ fn a_frameset_page_with_an_omitted_end_tag_converts_as_before() {
     for (html, expected) in [
         ("<frameset><frame></frameset><div><p>one</div>tail", "onetail\n"),
         ("<frameset></frameset><div><p>one</div>tail", "onetail\n"),
+        ("<FRAMESET><FRAME></FRAMESET><div><p>one</div>tail", "onetail\n"),
         (
             "<frameset><frame><noframes><p>one</noframes></frameset><div><p>two</div>tail",
             "one\n\ntwotail\n",
+        ),
+    ] {
+        assert_default_and_tier2(html, expected);
+    }
+}
+
+/// ~keep Only a `frameset` element makes a frameset document. The name in a comment, in an
+/// ~keep attribute value, in the text of a `<textarea>` or of a script, or as the start of a
+/// ~keep longer tag name makes none, so the omitted end tag of such a page is repaired.
+#[test]
+fn text_that_names_a_frameset_does_not_stop_the_repair() {
+    for (html, expected) in [
+        ("<!-- <frameset> --><div><p>one</div>tail", "one\n\ntail\n"),
+        ("<framesetter></framesetter><div><p>one</div>tail", "one\n\ntail\n"),
+        ("<div title=\"<frameset>\"><p>one</div>tail", "one\n\ntail\n"),
+        (
+            "<script>var s = \"<frameset>\";</script><div><p>one</div>tail",
+            "one\n\ntail\n",
+        ),
+        (
+            "<textarea><frameset></textarea><div><p>one</div>tail",
+            "<frameset>\n\none\n\ntail\n",
+        ),
+    ] {
+        assert_default_and_tier2(html, expected);
+    }
+}
+
+/// ~keep An SVG or a `MathML` element named `tbody` or `colgroup` is no part of a table. The
+/// ~keep private mark that the repair gives each such start tag must not reach the output.
+#[test]
+fn a_table_part_name_outside_a_table_keeps_no_private_mark() {
+    for (html, expected) in [
+        (
+            "<svg><tbody>x</tbody></svg><div><p>one</div>tail",
+            "![](data:image/svg+xml;base64,PHN2Zz48dGJvZHk+eDwvdGJvZHk+PC9zdmc+)\n\none\n\ntail\n",
+        ),
+        (
+            "<svg><colgroup></colgroup><text>t</text></svg><div><p>one</div>tail",
+            "![t](data:image/svg+xml;base64,PHN2Zz48Y29sZ3JvdXAgLz48dGV4dD50PC90ZXh0Pjwvc3ZnPg==)\n\none\n\ntail\n",
+        ),
+        (
+            "<math><tbody>x</tbody></math><div><p>one</div>tail",
+            "<!-- MathML: <math><tbody>x</tbody></math> --> x\n\none\n\ntail\n",
         ),
     ] {
         assert_default_and_tier2(html, expected);
