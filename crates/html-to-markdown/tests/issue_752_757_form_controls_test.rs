@@ -520,18 +520,18 @@ fn should_look_for_the_task_checkbox_only_before_the_first_content_of_an_item() 
 
 #[test]
 fn should_read_the_first_role_of_a_checkbox() {
-    for (html, expected) in [
-        (
-            r#"<p>a <input type="checkbox" role="presentation button" checked> b</p>"#,
-            "a  b\n",
-        ),
-        (
-            r#"<p>a <input type="checkbox" role="MenuItemCheckbox" checked> b</p>"#,
-            "a b\n",
-        ),
-        (r#"<p>a <input type="checkbox" role="" checked> b</p>"#, "a b\n"),
+    // ~keep Only a table cell shows the answer: a checkbox writes its state there.
+    for (role, expected) in [
+        ("presentation button", "| h |\n| --- |\n|   |\n"),
+        ("MenuItemCheckbox", "| h   |\n| --- |\n| [x] |\n"),
+        ("", "| h   |\n| --- |\n| [x] |\n"),
     ] {
-        assert_all_paths(html, expected);
+        let html = format!(
+            r#"<table><tr><th>h</th></tr><tr><td><input type="checkbox" role="{role}" checked></td></tr></table>"#
+        );
+        assert_all_paths(&html, expected);
+        let html = format!(r#"<p>a <input type="checkbox" role="{role}" checked> b</p>"#);
+        assert_all_paths(&html, "a b\n");
     }
 }
 
@@ -651,18 +651,6 @@ fn should_write_nothing_for_a_checkbox_outside_a_task_item() {
             "<p>Agree<input type=\"checkbox\">to the terms</p>",
             "Agreeto the terms\n",
         ),
-        (
-            r#"<table><tr><th>Feature</th><th>Done</th></tr><tr><td>Search</td><td><input type="checkbox" checked disabled></td></tr></table>"#,
-            "| Feature | Done |\n| ------- | ---- |\n| Search  | [x]  |\n",
-        ),
-        (
-            r#"<table><tr><th><input type="checkbox"></th><th>Name</th></tr><tr><td><input type="checkbox" checked></td><td>Bob</td></tr></table>"#,
-            "| [ ] | Name |\n| --- | ---- |\n| [x] | Bob  |\n",
-        ),
-        (
-            r#"<table><tr><th>A</th><th>B</th></tr><tr><td><input type="checkbox"> one</td><td>two <input type="checkbox" checked></td></tr></table>"#,
-            "| A   | B   |\n| --- | --- |\n| one | two |\n",
-        ),
         (r#"<h2><input type="checkbox" checked> Title</h2>"#, "## Title\n"),
         (
             r#"<a href="/u"><input type="checkbox" checked> label</a>"#,
@@ -703,6 +691,13 @@ fn should_write_nothing_for_a_checkbox_that_has_the_role_of_a_button() {
         (
             r#"<ul><li><input type="checkbox" role="button"> Menu</li></ul>"#,
             "- Menu\n",
+        ),
+        // ~keep The white space on both sides of a checkbox that writes nothing is one space.
+        (r#"<p>a <input type="checkbox" role="button"> b</p>"#, "a b\n"),
+        (r#"<p>a <input type="checkbox"><!-- c --> b</p>"#, "a b\n"),
+        (
+            r#"<pre>a <input type="checkbox" role="button"> b</pre>"#,
+            "```\na  b\n```\n",
         ),
         (
             r#"<table><tr><td><input type="checkbox" role="button"></td></tr></table>"#,

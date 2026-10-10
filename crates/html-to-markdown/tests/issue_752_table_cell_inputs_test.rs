@@ -76,6 +76,99 @@ fn should_write_the_checkbox_state_in_the_grid_of_a_table() {
     assert_eq!(cells, ["[ ]", "Name", "[x]", "Bob"]);
 }
 
+/// Asserts that the table with the header `h` and the one body cell `cell` writes `text` in
+/// that cell.
+fn assert_one_cell(cell: &str, text: &str) {
+    let width = text.len().max(1);
+    let rule = "-".repeat(width.max(3));
+    assert_all_converters(
+        &format!("<table><tr><th>h</th></tr><tr>{cell}</tr></table>"),
+        &format!("| {:<width$} |\n| {rule} |\n| {text:<width$} |\n", "h"),
+    );
+}
+
+#[test]
+fn should_write_the_checkbox_state_in_a_table_cell_that_holds_only_inputs() {
+    for (html, expected) in [
+        (
+            r#"<table><tr><th>Feature</th><th>Done</th></tr><tr><td>Search</td><td><input type="checkbox" checked disabled></td></tr></table>"#,
+            "| Feature | Done |\n| ------- | ---- |\n| Search  | [x]  |\n",
+        ),
+        (
+            r#"<table><tr><th><input type="checkbox"></th><th>Name</th></tr><tr><td><input type="checkbox" checked></td><td>Bob</td></tr></table>"#,
+            "| [ ] | Name |\n| --- | ---- |\n| [x] | Bob  |\n",
+        ),
+        (
+            r#"<table><tr><th>A</th><th>B</th></tr><tr><td><input type="checkbox"> one</td><td>two <input type="checkbox" checked></td></tr></table>"#,
+            "| A   | B   |\n| --- | --- |\n| one | two |\n",
+        ),
+    ] {
+        assert_all_converters(html, expected);
+    }
+}
+
+#[test]
+fn should_write_the_checkbox_state_in_a_table_cell_that_holds_only_wrapped_inputs() {
+    for (cell, expected) in [
+        (r#"<td><label><input type="checkbox" checked></label></td>"#, "[x]"),
+        (r#"<td><span><input type="checkbox"></span></td>"#, "[ ]"),
+        (
+            r#"<td><label><input type="checkbox"></label><span><input type="checkbox" checked></span></td>"#,
+            "[ ][x]",
+        ),
+        (
+            r#"<td><label><input type="hidden" name="a"><input type="checkbox" checked></label></td>"#,
+            "[x]",
+        ),
+        (
+            r#"<td><div><label><span><input type="checkbox" checked></span></label></div></td>"#,
+            "[x]",
+        ),
+        (r#"<td><b></b> <label> <input type="checkbox"> </label></td>"#, "[ ]"),
+        // ~keep A character reference for white space is white space.
+        (r#"<td><input type="checkbox" checked>&#32;</td>"#, "[x]"),
+        (
+            r#"<td><span>&#x20;<input type="checkbox" checked>&nbsp;</span></td>"#,
+            "[x]",
+        ),
+    ] {
+        assert_one_cell(cell, expected);
+    }
+    for (html, expected) in [
+        (
+            r#"<table><tr><th>h</th><th>k</th></tr><tr><td><label><input type="checkbox" checked></label></td><td>v</td></tr></table>"#,
+            "| h   | k |\n| --- | --- |\n| [x] | v |\n",
+        ),
+        (
+            r#"<table><tr><td><span><input type="checkbox"></span></td></tr></table>"#,
+            "| [ ] |\n| --- |\n",
+        ),
+        (
+            r#"<table><tr><th><label><input type="checkbox"></label></th><th>n</th></tr><tr><td>x</td><td>y</td></tr></table>"#,
+            "| [ ] | n |\n| --- | --- |\n| x   | y |\n",
+        ),
+    ] {
+        assert_all_converters(html, expected);
+    }
+}
+
+#[test]
+fn should_write_only_the_text_of_a_table_cell_that_holds_a_wrapped_checkbox_beside_text() {
+    for (cell, expected) in [
+        (r#"<td><label><input type="checkbox" checked> Bob</label></td>"#, "Bob"),
+        (r#"<td><label><input type="checkbox"></label> Bob</td>"#, "Bob"),
+        (r#"<td><span><input type="checkbox"></span><b>Bob</b></td>"#, "**Bob**"),
+        (
+            r#"<td><span><input type="checkbox"></span><img src="i.png" alt="pic"></td>"#,
+            "![pic](i.png)",
+        ),
+        // ~keep A radio button writes nothing, with a wrapper or without one.
+        (r#"<td><label><input type="radio" checked></label></td>"#, ""),
+    ] {
+        assert_one_cell(cell, expected);
+    }
+}
+
 #[test]
 fn should_write_no_checkbox_state_in_an_element_that_is_not_a_table_cell() {
     assert_all_converters(

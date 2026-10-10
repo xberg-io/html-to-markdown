@@ -24,8 +24,17 @@ const CHECKBOX: &str = "<input type=\"checkbox\">";
 
 /// One input for each place where a control asks a question about its siblings: its name, the
 /// source for `size` controls, and a text that the output has `count` times.
-fn shapes(size: usize) -> [(&'static str, String, &'static str, usize); 6] {
+fn shapes(size: usize) -> [(&'static str, String, &'static str, usize); 7] {
     [
+        (
+            "checkboxes in labels alone in a table cell",
+            format!(
+                "<table><tr><th>State</th></tr><tr><td>{}</td></tr></table>",
+                format!("<label><span>{CHECKBOX}</span></label>").repeat(size)
+            ),
+            "[ ]",
+            size,
+        ),
         (
             "checkboxes alone in a table cell",
             format!(

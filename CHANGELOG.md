@@ -12,11 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A checkbox outside a task list item writes nothing.
   `<p>Agree <input type="checkbox"> to the terms</p>` gave `Agree [ ] to the terms` and now gives
   `Agree to the terms`. Bracket pairs in running text are link syntax: `[x](optional)` rendered as
-  a link. A table cell that holds only inputs keeps its task brackets: `| [x] |`. A list item is a
+  a link. A table cell that holds only inputs keeps its task brackets: `| [x] |`. A label or a
+  `span` around the checkbox of such a cell does not change that. A list item is a
   task item only when the checkbox is its first content:
   `<li>Text <input type="checkbox"> more</li>` gave `- [ ] Text  more` and now gives `- Text more`.
   The menu switch of many themes, a checkbox before its label, no longer writes `[ ]`
   ([#757](https://github.com/xberg-io/html-to-markdown/issues/757)).
+- A button, an output, a meter, a progress bar or a text area is a word of its own in running
+  text, also when the source glues it to a word:
+  `<p>Please re<button>load</button>ed the page</p>` gave `Please reload` and now gives
+  `Please re load`. The line still ends after the control
+  ([#752](https://github.com/xberg-io/html-to-markdown/issues/752)).
 - A link whose content gives no text is labelled with the name of the link: its `aria-label`,
   then its `title`. Before, the label was the address of the link. This changes the default
   output for every such link, with or without a graphic:
@@ -43,9 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The options of a select list are separate words instead of one joined word, and a button, an
-  output, a meter, a progress bar or a text area is a word of its own in running text. A select
-  list with the options `Quickstart`, `Installation` and `Ruby 101` gave
+- The options of a select list are separate words instead of one joined word. A select list
+  with the options `Quickstart`, `Installation` and `Ruby 101` gave
   `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`; a label, a
   select list and a text area in one form gave `NameOneTwoarea words` and now give
   `Name One Two area words`. Both converters give the same text for output, meter and progress

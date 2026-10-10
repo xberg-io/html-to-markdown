@@ -333,14 +333,19 @@ fn starts_with_control(tag: &tl::HTMLTag, parser: &tl::Parser, dom_ctx: &crate::
     }
 }
 
+/// Whether the `type` of the input `tag` is `checkbox`.
+fn has_checkbox_type(tag: &tl::HTMLTag) -> bool {
+    tag.attributes()
+        .get("type")
+        .flatten()
+        .is_some_and(|value| value.as_utf8_str().eq_ignore_ascii_case("checkbox"))
+}
+
 /// The checked state of `tag` when it is a checkbox a reader sees as one. An input whose `role`
 /// names another role is not one: `role="button"` marks the switch of a menu.
 pub fn checkbox_state(tag: &tl::HTMLTag) -> Option<bool> {
     let attributes = tag.attributes();
-    let is_checkbox = attributes
-        .get("type")
-        .flatten()
-        .is_some_and(|value| value.as_utf8_str().eq_ignore_ascii_case("checkbox"));
+    let is_checkbox = has_checkbox_type(tag);
     let has_other_role = attributes.get("role").flatten().is_some_and(|role| {
         role.as_utf8_str().split_ascii_whitespace().next().is_some_and(|first| {
             !["checkbox", "switch", "menuitemcheckbox"]
@@ -366,15 +371,18 @@ fn emit_input(
     let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
-    let Some(checked) = checkbox_state(tag) else {
+    if !has_checkbox_type(tag) {
         return;
-    };
+    }
     let id = node_handle.get_inner();
-    if ctx.in_cell_of_inputs {
-        output.push_str(if checked { "[x]" } else { "[ ]" });
-    } else if !ctx.in_code && output.ends_with(' ') && super::spacing::white_space_follows(id, parser, dom_ctx) {
-        // ~keep The white space on both sides of the checkbox is one space between two words.
-        output.pop();
+    match checkbox_state(tag) {
+        Some(checked) if ctx.in_cell_of_inputs => output.push_str(if checked { "[x]" } else { "[ ]" }),
+        // ~keep The white space on both sides of a checkbox that writes nothing is one space
+        // ~keep between two words. A checkbox with the role of a button writes nothing too.
+        _ if !ctx.in_code && output.ends_with(' ') && super::spacing::white_space_follows(id, parser, dom_ctx) => {
+            output.pop();
+        }
+        _ => {}
     }
 }
 

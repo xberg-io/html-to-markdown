@@ -220,9 +220,7 @@ fn visit_content_node(
 ) {
     match handle.get(parser) {
         Some(tl::Node::Raw(bytes)) => {
-            let raw = bytes.as_utf8_str();
-            let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
-            if !decoded.trim().is_empty() {
+            if crate::converter::form::spacing::text_is_content(bytes.as_utf8_str().as_ref()) {
                 if let Some((_, acc)) = acc_stack.last_mut() {
                     acc.has_text = true;
                 }
@@ -251,7 +249,7 @@ fn apply_tag_content(tag_name: &str, tag: &tl::HTMLTag, acc: Option<&mut TableCo
         "a" => acc.link_count += 1,
         "caption" => acc.has_caption = true,
         "th" => acc.has_header = true,
-        "img" | "graphic" if tag.attributes().get("src").is_some() || tag.attributes().get("alt").is_some() => {
+        "img" | "graphic" if crate::converter::form::spacing::image_is_content(tag_name, tag) => {
             acc.has_text = true;
         }
         "input" if crate::converter::form::elements::checkbox_state(tag).is_some() => {
