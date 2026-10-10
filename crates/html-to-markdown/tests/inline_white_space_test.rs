@@ -1,7 +1,7 @@
 #![allow(missing_docs)]
 #![cfg(feature = "testkit")]
 
-//! White space between inline content (issues #751, #762, #778, #795, #800, #803): white space in
+//! White space between inline content (issues #751, #762, #778, #795, #803): white space in
 //! the source is one space in the output, no white space is no space, and a block boundary inside
 //! a link label or a heading separates words. Every input runs on both converters.
 

@@ -262,7 +262,8 @@ pub fn handle_q(
             }
         }
 
-        if content.trim().is_empty() {
+        let trimmed = content.trim();
+        if trimmed.is_empty() {
             // ~keep issue #481: `<q>` wraps in quotes, which a whitespace-only body has
             // ~keep nothing to wrap -- but the body is still the word separator the source
             // ~keep wrote, and dropping it outright joined the words either side together.
@@ -271,21 +272,9 @@ pub fn handle_q(
             }
             return;
         }
-        // ~keep The white space at the two ends of the quotation is white space between two
-        // ~keep words: it is one space outside the marks, as for every inline element (#800).
-        // ~keep The strict mode and code write the marks around the trimmed content and nothing
-        // ~keep outside them, as for a link label there.
-        let keeps_source = crate::converter::utility::content::keeps_source_white_space(handler.options, handler.ctx);
-        let (prefix, suffix, trimmed) = if keeps_source {
-            ("", "", content.trim())
-        } else {
-            chomp_inline(&content)
-        };
-        crate::converter::utility::content::push_inline_prefix(output, prefix, handler.options, handler.ctx);
         output.push('"');
         output.push_str(trimmed);
         output.push('"');
-        crate::converter::append_inline_suffix(output, suffix, true, node_handle, parser, handler.dom_ctx);
     }
 }
 

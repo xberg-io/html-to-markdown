@@ -116,10 +116,8 @@ fn should_still_inline_a_div_only_anchor() {
 fn should_not_change_the_nested_sibling_anchor_repair_output() {
     // ~keep Issue #479 control: html5ever's adoption agency splits this into two sibling
     // ~keep anchors. No `<table>` is involved, so #490's new branch must not touch it.
-    // ~keep Chrome 155 shows `Outer Inner` for this input: the space at the end of the first
-    // ~keep label stays between the two links (issue #800).
     let html = r#"<a href="/o">Outer <a href="/i">Inner</a></a>"#;
-    assert_eq!(content(html), "[Outer](/o) [Inner](/i)\n");
+    assert_eq!(content(html), "[Outer](/o)[Inner](/i)\n");
 }
 
 #[test]

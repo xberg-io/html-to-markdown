@@ -11,136 +11,154 @@ fn the_space_after_a_link_without_text_is_kept() {
     ]);
 }
 
-/// A link label is written without the white space at its two ends. That white space is still
-/// white space between two words: it is one space outside the link (issue #800).
+/// Each row is `(html, the full converter, the fast converter)`, with `None` for the fast
+/// converter when it gives the input to the full one.
+fn assert_written_as_before(cases: &[(&str, &str, Option<&str>)]) {
+    for &(html, full, fast) in cases {
+        assert_eq!(tier2(html), full, "full converter: {html:?}");
+        assert_eq!(convert_with(html, None), full, "default options: {html:?}");
+        let written = tier1::run(html, &PrescanReport::default(), &tier_options());
+        assert_eq!(written.as_deref().ok(), fast, "fast converter: {html:?}");
+    }
+}
+
+/// The white space at an end of a link label is not written: the words on the two sides are
+/// joined (issue #800, open). Each row is the output of each converter before the rules of this
+/// file, not the output of a browser, which shows a space there.
 #[test]
-fn white_space_at_an_end_of_a_link_label_is_one_space_outside_the_link() {
-    assert_on_both(&[
-        ("<p>Press <a href=\"/p\">Go </a>now.</p>", "Press [Go](/p) now.\n"),
-        ("<p>Press<a href=\"/p\"> Go</a> now.</p>", "Press [Go](/p) now.\n"),
-        ("<p>Press<a href=\"/p\"> Go </a>now.</p>", "Press [Go](/p) now.\n"),
-        ("<p>Press <a href=\"/p\">Go\n</a>now.</p>", "Press [Go](/p) now.\n"),
-        ("<p>Press<a href=\"/p\">\nGo</a> now.</p>", "Press [Go](/p) now.\n"),
-        ("<p>Press <a href=\"/p\">Go\t</a>now.</p>", "Press [Go](/p) now.\n"),
-        ("<p>Press <a href=\"/p\">Go </a> now.</p>", "Press [Go](/p) now.\n"),
-        ("<p>Press <a href=\"/p\"> Go</a> now.</p>", "Press [Go](/p) now.\n"),
+fn white_space_at_an_end_of_a_link_label_is_written_as_before() {
+    assert_written_as_before(&[
         (
-            "<p>Press <a href=\"/p\" title=\"t\">Go </a>now.</p>",
-            "Press [Go](/p \"t\") now.\n",
+            "<p>Press <a href=\"/p\">Go </a>now.</p>",
+            "Press [Go](/p)now.\n",
+            Some("Press [Go](/p)now.\n"),
         ),
-        ("Press <a href=\"/p\">Go </a>now.", "Press [Go](/p) now.\n"),
-        ("Press<a href=\"/p\"> Go</a> now.", "Press [Go](/p) now.\n"),
-        ("<div>Press <a href=\"/p\">Go </a>now.</div>", "Press [Go](/p) now.\n"),
         (
-            "<ul><li>Press <a href=\"/p\">Go </a>now.</li></ul>",
-            "- Press [Go](/p) now.\n",
+            "<p>Press<a href=\"/p\"> Go</a> now.</p>",
+            "Press[Go](/p) now.\n",
+            Some("Press[Go](/p) now.\n"),
+        ),
+        (
+            "<p>Press<a href=\"/p\"> Go </a>now.</p>",
+            "Press[Go](/p)now.\n",
+            Some("Press[Go](/p)now.\n"),
+        ),
+        (
+            "<p>Press <a href=\"/p\">Go\n</a>now.</p>",
+            "Press [Go](/p)now.\n",
+            Some("Press [Go](/p)now.\n"),
+        ),
+        (
+            "<h2>Press <a href=\"/p\">Go </a>now.</h2>",
+            "## Press [Go](/p)now.\n",
+            Some("## Press [Go](/p)now.\n"),
         ),
         (
             "<ul><li>Press<a href=\"/p\"> Go</a> now.</li></ul>",
-            "- Press [Go](/p) now.\n",
-        ),
-        ("<h2>Press <a href=\"/p\">Go </a>now.</h2>", "## Press [Go](/p) now.\n"),
-        (
-            "<blockquote><p>Press <a href=\"/p\">Go </a>now.</p></blockquote>",
-            "> Press [Go](/p) now.\n",
-        ),
-        (
-            "<table><tr><th>h</th></tr><tr><td>Press <a href=\"/p\">Go </a>now.</td></tr></table>",
-            "| h                   |\n| ------------------- |\n| Press [Go](/p) now. |\n",
-        ),
-        (
-            "<table><tr><th>h</th></tr><tr><td>Press<a href=\"/p\"> Go</a> now.</td></tr></table>",
-            "| h                   |\n| ------------------- |\n| Press [Go](/p) now. |\n",
+            "- Press[Go](/p) now.\n",
+            Some("- Press[Go](/p) now.\n"),
         ),
         (
             "<p><a href=\"/a\">one </a><a href=\"/b\">two</a></p>",
-            "[one](/a) [two](/b)\n",
+            "[one](/a)[two](/b)\n",
+            Some("[one](/a)[two](/b)\n"),
         ),
-        (
-            "<p><a href=\"/a\">one</a><a href=\"/b\"> two</a></p>",
-            "[one](/a) [two](/b)\n",
-        ),
-        ("<p><a href=\"/a\">one </a><b>two</b></p>", "[one](/a) **two**\n"),
         (
             "<p>Press <a href=\"/p\"><b>Go </b></a>now.</p>",
-            "Press [**Go**](/p) now.\n",
-        ),
-        (
-            "<p>Press<a href=\"/p\"><b> Go</b></a> now.</p>",
-            "Press [**Go**](/p) now.\n",
-        ),
-        (
-            "<p>Press <a href=\"/p\"><span>Go </span></a>now.</p>",
-            "Press [Go](/p) now.\n",
-        ),
-        (
-            "<p>Press <a href=\"https://e.org/\">https://e.org/ </a>now.</p>",
-            "Press <https://e.org/> now.\n",
-        ),
-        (
-            "<p>Press <a href=\"/p\"><img src=\"/i.png\" alt=\"Go\"> </a>now.</p>",
-            "Press [![Go](/i.png)](/p) now.\n",
-        ),
-        (
-            "<p>Press<a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"></a> now.</p>",
-            "Press [![Go](/i.png)](/p) now.\n",
-        ),
-        ("<p>Press <a>Go </a>now.</p>", "Press Go now.\n"),
-        ("<p>Press<a> Go</a> now.</p>", "Press Go now.\n"),
-        ("<p>Press<a> Go </a>now.</p>", "Press Go now.\n"),
-        ("<p>Press <a href=\"/p\">Go&nbsp;</a>now.</p>", "Press [Go](/p) now.\n"),
-        (
-            "<p>Press<a href=\"https://e.org/\"> https://e.org/</a> now.</p>",
-            "Press <https://e.org/> now.\n",
-        ),
-        (
-            "<p>Press<a href=\"/p\">\n<img src=\"/i.png\" alt=\"Go\"></a> now.</p>",
-            "Press [![Go](/i.png)](/p) now.\n",
-        ),
-        (
-            "<p>Press<a href=\"/p\"><span> Go</span></a> now.</p>",
-            "Press [Go](/p) now.\n",
+            "Press [**Go**](/p)now.\n",
+            Some("Press [**Go**](/p)now.\n"),
         ),
         (
             "<p>Press <b><a href=\"/p\">Go </a></b>now.</p>",
-            "Press **[Go](/p)** now.\n",
+            "Press **[Go](/p)**now.\n",
+            Some("Press **[Go](/p)**now.\n"),
+        ),
+        (
+            "<p>Press <a href=\"/p\">Go&nbsp;</a>now.</p>",
+            "Press [Go](/p)now.\n",
+            Some("Press [Go](/p)now.\n"),
+        ),
+        (
+            "<p>Press <a href=\"/p\">Go </a>.</p>",
+            "Press [Go](/p).\n",
+            Some("Press [Go](/p).\n"),
         ),
     ]);
 }
 
-/// The white space at an end of a label is no space at the start or the end of a line, and a
-/// label with no white space at its ends gets no space.
+/// The same for a link around an image, an autolink, a line break at an end of a label and a
+/// short quotation (issue #800, open): each row is the output of each converter before the rules
+/// of this file.
 #[test]
-fn a_link_label_gets_no_space_that_the_source_does_not_have() {
-    assert_on_both(&[
-        ("<p>Press<a href=\"/p\">Go</a>now.</p>", "Press[Go](/p)now.\n"),
-        ("<p>Press <a href=\"/p\">Go </a></p>", "Press [Go](/p)\n"),
-        ("<p><a href=\"/p\"> Go</a> now.</p>", "[Go](/p) now.\n"),
-        ("<a href=\"/p\"> Go</a> now.", "[Go](/p) now.\n"),
-        ("<ul><li><a href=\"/p\"> Go </a></li></ul>", "- [Go](/p)\n"),
+fn white_space_at_an_end_of_an_image_link_an_autolink_or_a_short_quotation_is_written_as_before() {
+    assert_written_as_before(&[
+        // ~keep A link around an image.
         (
-            "<p>Press<a href=\"/p\"><img src=\"/i.png\" alt=\"Go\"></a>now.</p>",
-            "Press[![Go](/i.png)](/p)now.\n",
-        ),
-        ("<p>Press<a>Go</a>now.</p>", "PressGonow.\n"),
-        ("<p>x</p><p><a href=\"/p\"> Go</a> now.</p>", "x\n\n[Go](/p) now.\n"),
-        ("<h2><a href=\"/p\"> Go </a></h2>", "## [Go](/p)\n"),
-        (
-            "<table><tr><th>h</th></tr><tr><td><a href=\"/p\"> Go </a>now.</td></tr></table>",
-            "| h             |\n| ------------- |\n| [Go](/p) now. |\n",
+            "<p>Press <a href=\"/p\"><img src=\"/i.png\" alt=\"Go\"> </a>now.</p>",
+            "Press [![Go](/i.png)](/p)now.\n",
+            Some("Press [![Go](/i.png)](/p)now.\n"),
         ),
         (
-            "<p><a href=\"https://e.org/\"> https://e.org/</a> now.</p>",
-            "<https://e.org/> now.\n",
+            "<p>Press<a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"></a> now.</p>",
+            "Press[![Go](/i.png)](/p) now.\n",
+            Some("Press[![Go](/i.png)](/p) now.\n"),
+        ),
+        // ~keep An autolink.
+        (
+            "<p>Press <a href=\"https://e.org/\">https://e.org/ </a>now.</p>",
+            "Press <https://e.org/>now.\n",
+            Some("Press <https://e.org/>now.\n"),
         ),
         (
-            "<div><a href=\"https://e.org/\"> https://e.org/</a> now.</div>",
-            "<https://e.org/> now.\n",
+            "<p>Press<a href=\"https://e.org/\"> https://e.org/</a> now.</p>",
+            "Press<https://e.org/> now.\n",
+            Some("Press<https://e.org/> now.\n"),
         ),
-        // ~keep A line break at an end of the label is no white space.
-        ("<p>Press<a href=\"/p\"><br>Go</a> now.</p>", "Press[  \nGo](/p) now.\n"),
-        ("<p>Press <a href=\"/p\">Go<br></a>now.</p>", "Press [Go  \n](/p)now.\n"),
+        // ~keep A line break at an end of a label in a heading and in a table cell.
+        (
+            "<h2>Press<a href=\"/p\">Go<br></a>now</h2>",
+            "## Press[Go](/p)now\n",
+            Some("## Press[Go](/p)now\n"),
+        ),
+        (
+            "<h2>Press<a href=\"/p\"><br>Go</a>now</h2>",
+            "## Press[Go](/p)now\n",
+            Some("## Press[Go](/p)now\n"),
+        ),
+        (
+            "<table><tr><td>Press<a href=\"/p\">Go<br></a>now</td></tr></table>",
+            "| Press[Go](/p)now |\n| ---------------- |\n",
+            Some("| Press[Go](/p)now |\n| ---------------- |\n"),
+        ),
+        // ~keep A short quotation. The fast converter does not write its marks.
+        ("<p>Press <q>Go </q>now.</p>", "Press \"Go\"now.\n", None),
+        ("<p>Press<q> Go</q> now.</p>", "Press\"Go\" now.\n", None),
+        ("<p>Press<q> Go </q>now.</p>", "Press\"Go\"now.\n", None),
+        ("<p>Press <q>Go<br></q>now.</p>", "Press \"Go\"now.\n", None),
     ]);
+}
+
+/// A link with no address is running text. The full converter keeps the white space at the ends
+/// of its text, and the fast converter does not (issue #800, open): each row is the output of
+/// each converter before the rules of this file. The last row is a link with an address: the
+/// fast converter keeps the white space that bold text starts with in the label, in a paragraph
+/// and in a sectioning element, and the full converter does not.
+#[test]
+fn white_space_at_an_end_of_a_link_with_no_address_is_written_as_before() {
+    let cases = [
+        ("<p>Press <a>Go </a>now.</p>", "Press Go now.\n", "Press Gonow.\n"),
+        ("<p>Press<a> Go</a> now.</p>", "Press Go now.\n", "PressGo now.\n"),
+        (
+            "x<footer><a href=\"/x\"><b> Logo</b></a></footer>",
+            "x\n\n[**Logo**](/x)\n",
+            "x\n\n[ **Logo**](/x)\n",
+        ),
+    ];
+    for (html, full, fast) in cases {
+        assert_eq!(tier2(html), full, "full converter: {html:?}");
+        let written = tier1::run(html, &PrescanReport::default(), &tier_options());
+        assert_eq!(written.as_deref().ok(), Some(fast), "fast converter: {html:?}");
+    }
 }
 
 /// A label of white space only has no ends, so no space goes outside the link. The full
@@ -173,61 +191,6 @@ fn a_link_label_of_white_space_only_puts_no_space_outside_the_link() {
         let written = tier1::run(html, &PrescanReport::default(), &tier_options());
         assert_eq!(written.as_deref().ok(), Some(fast), "fast converter: {html:?}");
     }
-}
-
-/// The white space at the start of a link label is no space at the start of the document, also
-/// when the marks of another element stand before the link.
-#[test]
-fn white_space_at_the_start_of_a_link_label_is_no_space_at_the_start_of_the_document() {
-    assert_on_both(&[
-        (
-            "<p><b><a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"> </a></b></p>",
-            "**[![Go](/i.png)](/p)**\n",
-        ),
-        (
-            "<p><em><a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"> </a></em></p>",
-            "*[![Go](/i.png)](/p)*\n",
-        ),
-    ]);
-}
-
-/// The white space at the end of a label is one space before a period too: a browser shows
-/// `Press Go .` for the first input and `Press Go.` for the second.
-#[test]
-fn white_space_at_the_end_of_a_link_label_is_one_space_before_a_period() {
-    assert_on_both(&[
-        ("<p>Press <a href=\"/p\">Go </a>.</p>", "Press [Go](/p) .\n"),
-        ("<p>Press <a href=\"/p\">Go</a>.</p>", "Press [Go](/p).\n"),
-    ]);
-}
-
-/// A heading and a table cell cannot hold a line break, so a `<br>` is a space there. At an end
-/// of a link label that space is white space of the label: one space outside the link.
-#[test]
-fn a_line_break_at_an_end_of_a_link_label_is_one_space_outside_the_link_in_a_heading_or_a_cell() {
-    assert_on_both(&[
-        ("<h2>Press<a href=\"/p\">Go<br></a>now</h2>", "## Press[Go](/p) now\n"),
-        ("<h2>Press <a href=\"/p\">Go<br></a>.</h2>", "## Press [Go](/p) .\n"),
-        ("<h2>Press<a href=\"/p\"><br>Go</a>now</h2>", "## Press [Go](/p)now\n"),
-        (
-            "<table><tr><td>Press<a href=\"/p\">Go<br></a>now</td></tr></table>",
-            "| Press[Go](/p) now |\n| ----------------- |\n",
-        ),
-        (
-            "<table><tr><td>Press <a href=\"/p\">Go<br></a>.</td></tr></table>",
-            "| Press [Go](/p) . |\n| ---------------- |\n",
-        ),
-        (
-            "<table><tr><th>Press<a href=\"/p\">Go<br></a>now</th></tr><tr><td>c</td></tr></table>",
-            "| Press[Go](/p) now |\n| ----------------- |\n| c                 |\n",
-        ),
-        // ~keep Nothing is owed at the end of the heading or the cell, or where a space is written.
-        ("<h2><a href=\"/p\">Go<br></a></h2>", "## [Go](/p)\n"),
-        (
-            "<h2>Press <a href=\"/p\">Go<br></a> now</h2>",
-            "## Press [Go](/p) now\n",
-        ),
-    ]);
 }
 
 /// A code span keeps the white space of its text. The white space at an end of a link label is
@@ -356,10 +319,6 @@ fn white_space_at_the_start_of_a_link_label_is_no_space_at_the_start_of_a_sectio
             "x\n\n**[Logo](/x)**\n",
         ),
         (
-            "x<footer><a href=\"/x\"><b> Logo</b></a></footer>",
-            "x\n\n[**Logo**](/x)\n",
-        ),
-        (
             "x<footer><a href=\"/x\">\nLogo</a></footer><footer><a href=\"/y\">\nTwo</a></footer>",
             "x\n\n[Logo](/x)\n\n[Two](/y)\n",
         ),
@@ -382,30 +341,6 @@ fn white_space_at_the_start_of_a_link_label_is_no_space_at_the_start_of_a_sectio
             "- [Logo](/x)\n",
         ),
         ("x<footer><div><q> Logo</q></div></footer>", "x\n\n\"Logo\"\n"),
-    ]);
-}
-
-/// The space is owed where the link is not the start of the sectioning element, and the white
-/// space at the end of a label is no space at the end of the element.
-#[test]
-fn a_link_label_in_a_sectioning_element_keeps_the_space_between_two_words() {
-    assert_on_both(&[
-        (
-            "x<footer><div>one<a href=\"/x\">\nLogo</a></div></footer>",
-            "x\n\none [Logo](/x)\n",
-        ),
-        (
-            "x<section><a href=\"/x\">one </a><a href=\"/y\"> two </a></section><p>y</p>",
-            "x\n\n[one](/x) [two](/y)\n\ny\n",
-        ),
-        (
-            "x<footer><a href=\"/x\">Logo </a></footer><p>y</p>",
-            "x\n\n[Logo](/x)\n\ny\n",
-        ),
-        (
-            "x<footer><a href=\"/x\">Logo </a><div>y</div></footer>",
-            "x\n\n[Logo](/x)\n\ny\n",
-        ),
     ]);
 }
 
@@ -485,23 +420,6 @@ fn the_strict_mode_writes_what_it_wrote_before_the_rules_of_running_text() {
     assert!(wrong.is_empty(), "{} wrong:\n{}", wrong.len(), wrong.join("\n"));
 }
 
-/// A short quotation is written without the white space at its two ends too, and that white
-/// space is one space outside the quotation marks. The fast converter does not write these marks.
-#[test]
-fn white_space_at_an_end_of_a_short_quotation_is_one_space_outside_the_marks() {
-    assert_on_full(&[
-        ("<p>Press <q>Go </q>now.</p>", "Press \"Go\" now.\n"),
-        ("<p>Press<q> Go</q> now.</p>", "Press \"Go\" now.\n"),
-        ("<p>Press<q> Go </q>now.</p>", "Press \"Go\" now.\n"),
-        ("<p>Press <q>Go </q> now.</p>", "Press \"Go\" now.\n"),
-        ("<p>Press <q> Go</q>now.</p>", "Press \"Go\"now.\n"),
-        ("<p>Press<q>Go</q>now.</p>", "Press\"Go\"now.\n"),
-        ("<p>Press <q>Go </q></p>", "Press \"Go\"\n"),
-        ("<ul><li>Press <q>Go </q>now.</li></ul>", "- Press \"Go\" now.\n"),
-        ("<p>Press <b><q>Go </q></b>now.</p>", "Press **\"Go\"** now.\n"),
-    ]);
-}
-
 /// In a code span the white space at the ends of a short quotation is not moved out of the marks:
 /// the quotation is written as before that rule, as a link in a code span is. A browser shows no
 /// space outside the marks that the source does not have: `Press" Go "now` and `Press " Go " now`.
@@ -513,19 +431,6 @@ fn white_space_at_an_end_of_a_short_quotation_is_not_moved_in_a_code_span() {
         ("<p><code>Press <q> Go </q> now</code></p>", "`Press \"Go\" now`\n"),
         ("<p><code>Press <q> Go </q>.</code></p>", "`Press \"Go\".`\n"),
     ]);
-}
-
-/// A line break at the end of a short quotation is kept: a browser shows `now.` on a new line.
-#[test]
-fn a_line_break_at_the_end_of_a_short_quotation_is_kept() {
-    assert_on_full(&[("<p>Press <q>Go<br></q>now.</p>", "Press \"Go\"  \nnow.\n")]);
-}
-
-/// A browser writes the closing mark of a short quotation after the line end, so the line end is
-/// a space before a zero-width space: it shows `one`, a space, then the zero-width space.
-#[test]
-fn the_space_after_a_short_quotation_is_kept_before_a_zero_width_space() {
-    assert_on_full(&[("<p><q>one\n</q>\u{200b}two</p>", "\"one\" \u{200b}two\n")]);
 }
 
 /// A no-break space beside a space in a link label is one space, on both converters.

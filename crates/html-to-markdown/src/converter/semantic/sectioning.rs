@@ -87,9 +87,8 @@ pub fn handle(
 ///
 /// ~keep White space at the start of a block is no space. The children are written into a
 /// ~keep buffer of their own, so nothing before them shows that the block starts there: text
-/// ~keep and inline elements write the space that they start with, and a link writes the space
-/// ~keep that its label starts with (issue #800). Two spaces or more are an indent (a code
-/// ~keep block), and the strict mode and code keep all white space.
+/// ~keep and inline elements write the space that they start with. Two spaces or more are an
+/// ~keep indent (a code block), and the strict mode and code keep all white space.
 fn without_leading_space<'content>(
     content: &'content str,
     options: &crate::options::ConversionOptions,
