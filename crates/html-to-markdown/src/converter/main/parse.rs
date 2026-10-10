@@ -156,7 +156,7 @@ mod tests {
         let html = format!("{}x", "<table><td>".repeat(300));
         let (calls, content) = parse_calls_for(&html);
 
-        assert_eq!(content.as_deref(), Some("|  |\n| --- |\n"));
+        assert_eq!(content.as_deref(), Some("|   |\n| --- |\n\n|  |\n| --- |\n"));
         assert_eq!(calls, 2);
     }
 

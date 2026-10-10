@@ -14,9 +14,9 @@
 //! tree builder therefore marks the authored element and each of its clones with the same id,
 //! and the split can be undone on the repaired tree before it is serialized. ~keep
 //!
-//! The same token sink records whether the input wrote a `<body>` start tag, which the tree
-//! also no longer shows, and can give the repair up when the tree builder nests too deep: see
-//! [`parse_with_anchor_origins_within_depth`]. ~keep
+//! The same token sink records whether the input wrote an `<html>` and a `<body>` start tag,
+//! which the tree also no longer shows, and can give the repair up when the tree builder nests
+//! too deep: see [`parse_with_anchor_origins_within_depth`]. ~keep
 
 use std::cell::Cell;
 use std::collections::BTreeMap;
@@ -69,11 +69,12 @@ impl Tracer for HandleCount {
 }
 
 /// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it,
-/// records whether a `<body>` start tag went by, and stops forwarding when the tree builder
-/// holds more than `max_open_elements` elements open.
+/// records whether an `<html>` and a `<body>` start tag went by, and stops forwarding when the
+/// tree builder holds more than `max_open_elements` elements open.
 struct AnchorOriginStamper {
     inner: TreeBuilder<Handle, RcDom>,
     next_origin: Cell<u32>,
+    saw_html_tag: Cell<bool>,
     saw_body_tag: Cell<bool>,
     max_open_elements: Option<usize>,
     start_tags: Cell<usize>,
@@ -99,12 +100,15 @@ impl AnchorOriginStamper {
         if tag.kind != TagKind::StartTag {
             return;
         }
-        if &*tag.name == "body" {
-            self.saw_body_tag.set(true);
+        match &*tag.name {
+            "html" => self.saw_html_tag.set(true),
+            "body" => self.saw_body_tag.set(true),
+            "a" => self.stamp_anchor(tag),
+            _ => {}
         }
-        if &*tag.name != "a" {
-            return;
-        }
+    }
+
+    fn stamp_anchor(&self, tag: &mut Tag) {
         // ~keep Input may already carry the private attribute; it must never survive as an
         // ~keep origin claim, so it is dropped before the genuine stamp is added.
         tag.attrs.retain(|attribute| &*attribute.name.local != ORIGIN_ATTR);
@@ -150,10 +154,12 @@ impl TokenSink for AnchorOriginStamper {
 /// `Tokenizer<TreeBuilder<..>>` and leaves no room for a sink between the two. The input is
 /// already a `str`, so nothing the `TendrilSink` driver adds (UTF-8 decoding) is lost.
 ///
-/// ~keep The tree builder gives every document a `<body>`. Input with no `<body>` start tag is a
-/// ~keep fragment, and rules that ask "is this element in the body of a page" (the page header
-/// ~keep rule) must still see a fragment after the repair, so the body that no tag asked for is
-/// ~keep unwrapped and its children become children of `<html>`.
+/// ~keep The tree builder gives every document an `<html>` and a `<body>`. Each one that no
+/// ~keep start tag asked for is unwrapped, so the tree is no deeper than the input wrote it:
+/// ~keep the depth limit of the converter counts every level, and a page must not reach it
+/// ~keep sooner because it was repaired. Input with no `<body>` start tag is also a fragment,
+/// ~keep and rules that ask "is this element in the body of a page" (the page header rule) must
+/// ~keep still see a fragment after the repair.
 pub fn parse_with_anchor_origins(html: &str) -> RcDom {
     build_tree(html, None).0
 }
@@ -176,6 +182,7 @@ fn build_tree(html: &str, max_open_elements: Option<usize>) -> (RcDom, bool) {
         AnchorOriginStamper {
             inner: tree_builder,
             next_origin: Cell::new(0),
+            saw_html_tag: Cell::new(false),
             saw_body_tag: Cell::new(false),
             max_open_elements,
             start_tags: Cell::new(0),
@@ -188,18 +195,24 @@ fn build_tree(html: &str, max_open_elements: Option<usize>) -> (RcDom, bool) {
     while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
     tokenizer.end();
     let too_deep = tokenizer.sink.too_deep.get();
+    let saw_html_tag = tokenizer.sink.saw_html_tag.get();
     let saw_body_tag = tokenizer.sink.saw_body_tag.get();
     let dom = TreeSink::finish(tokenizer.sink.inner.sink);
-    if !saw_body_tag {
-        unwrap_implied_body(&dom.document);
-    }
+    unwrap_implied_wrappers(&dom.document, saw_html_tag, saw_body_tag);
     (dom, too_deep)
 }
 
-/// Replace the `<body>` of `document` with its children.
-fn unwrap_implied_body(document: &Handle) {
-    if let Some(body) = child_element(document, "html").and_then(|html| child_element(&html, "body")) {
+/// Replace the `<body>` and then the `<html>` of `document` with its children, each one only
+/// when the input wrote no start tag for it.
+fn unwrap_implied_wrappers(document: &Handle, saw_html_tag: bool, saw_body_tag: bool) {
+    let Some(html) = child_element(document, "html") else {
+        return;
+    };
+    if !saw_body_tag && let Some(body) = child_element(&html, "body") {
         unwrap_element(&body);
+    }
+    if !saw_html_tag {
+        unwrap_element(&html);
     }
 }
 
@@ -354,20 +367,18 @@ mod tests {
 
     fn body(html: &str) -> String {
         let out = repaired(html);
-        out.trim_start_matches("<html><head></head>")
-            .trim_end_matches("</html>")
-            .to_string()
+        out.trim_start_matches("<head></head>").to_string()
     }
 
     #[test]
     fn should_give_no_body_element_to_input_with_no_body_start_tag() {
         assert_eq!(
             repaired("<header>h</header><div><p>one</div>tail"),
-            "<html><head></head><header>h</header><div><p>one</p></div>tail</html>"
+            "<head></head><header>h</header><div><p>one</p></div>tail"
         );
         assert_eq!(
             repaired("<title>T</title><p>one<!-- <body> --><p>two"),
-            "<html><head><title>T</title></head><p>one<!-- <body> --></p><p>two</p></html>"
+            "<head><title>T</title></head><p>one<!-- <body> --></p><p>two</p>"
         );
     }
 
@@ -376,6 +387,23 @@ mod tests {
         assert_eq!(
             repaired("<html><header>h</header><div><p>one</div>tail"),
             "<html><head></head><header>h</header><div><p>one</p></div>tail</html>"
+        );
+    }
+
+    #[test]
+    fn should_give_no_html_element_to_input_with_no_html_start_tag() {
+        assert_eq!(
+            repaired("<!doctype html><div><p>one</div>tail"),
+            "<!DOCTYPE html><head></head><div><p>one</p></div>tail"
+        );
+        assert_eq!(repaired("<body><p>one"), "<head></head><body><p>one</p></body>");
+    }
+
+    #[test]
+    fn should_keep_the_html_element_when_the_input_has_an_html_start_tag() {
+        assert_eq!(
+            repaired("<p>one<HTML lang=en><p>two"),
+            "<html lang=\"en\"><head></head><p>one</p><p>two</p></html>"
         );
     }
 
@@ -435,11 +463,11 @@ mod tests {
     fn should_keep_the_body_element_when_the_input_has_a_body_start_tag() {
         assert_eq!(
             repaired("<body><header>h</header><p>one"),
-            "<html><head></head><body><header>h</header><p>one</p></body></html>"
+            "<head></head><body><header>h</header><p>one</p></body>"
         );
         assert_eq!(
             repaired("<p>one<BODY class=late><p>two"),
-            "<html><head></head><body class=\"late\"><p>one</p><p>two</p></body></html>"
+            "<head></head><body class=\"late\"><p>one</p><p>two</p></body>"
         );
     }
 

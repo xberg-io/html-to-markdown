@@ -382,26 +382,100 @@ fn a_page_that_nests_past_the_limit_is_still_cut_and_reports_it() {
     }
 }
 
+/// The content and the number of depth warnings on the default route and on tier 2.
+fn content_and_depth_warnings(html: &str) -> [(Option<String>, usize); 2] {
+    let default = convert(html, None).expect("conversion must succeed");
+    [default, convert_with(html, TierStrategy::Tier2)].map(|result| {
+        let depth_warnings = result
+            .warnings
+            .iter()
+            .filter(|warning| matches!(warning.kind, WarningKind::DepthLimitExceeded))
+            .count();
+        assert_eq!(depth_warnings, result.warnings.len(), "warnings: {:?}", result.warnings);
+        (result.content, depth_warnings)
+    })
+}
+
+#[test]
+fn the_deepest_fragment_that_converts_still_converts_with_an_omitted_end_tag() {
+    // ~keep The second parse must not make the tree deeper than the input wrote it: the tree
+    // ~keep builder gives every document an `<html>` and a `<body>`, and the depth limit counts
+    // ~keep each level. The outputs are those of 3.17.2.
+    let nested = |depth: usize| format!("{}<p>x", "<div>".repeat(depth));
+    for (content, depth_warnings) in content_and_depth_warnings(&nested(62)) {
+        assert_eq!(content.as_deref(), Some("x\n"));
+        assert_eq!(depth_warnings, 0);
+    }
+    for (content, depth_warnings) in content_and_depth_warnings(&nested(63)) {
+        assert_eq!(content.as_deref(), Some(""));
+        assert_eq!(depth_warnings, 1);
+    }
+}
+
+#[test]
+fn a_list_that_nests_past_the_limit_keeps_every_bullet_above_the_limit() {
+    // ~keep The output of 3.17.2: one empty bullet for each of the 32 lists above the limit.
+    let bullets: Vec<&str> = ["-", "*", "+"].into_iter().cycle().take(32).collect();
+    let expected = format!("{}\n", bullets.join(" "));
+    let html = format!("{}x", "<ul><li>".repeat(100));
+    for (content, depth_warnings) in content_and_depth_warnings(&html) {
+        assert_eq!(content.as_deref(), Some(expected.as_str()));
+        assert_eq!(depth_warnings, 1);
+    }
+}
+
+#[test]
+fn an_omitted_end_tag_leaves_the_depth_limit_where_the_page_with_every_end_tag_has_it() {
+    for document_start in ["", "<body>", "<html>", "<html><body>", "<!doctype html>"] {
+        let mut converted_depths = 0;
+        for depth in 54..=68 {
+            let open = "<div>".repeat(depth);
+            let close = "</div>".repeat(depth);
+            let closed = content_and_depth_warnings(&format!("{document_start}{open}<p>x</p>{close}"));
+            converted_depths += usize::from(closed[0].1 == 0);
+            for omitted in [
+                format!("{document_start}{open}<p>x"),
+                format!("{document_start}{open}<p>x{close}"),
+            ] {
+                assert_eq!(
+                    content_and_depth_warnings(&omitted),
+                    closed,
+                    "{document_start:?} at depth {depth}: {:?}",
+                    &omitted[omitted.len() - 12..]
+                );
+            }
+        }
+        // ~keep The range holds the limit: some depths convert and some are cut.
+        assert!(
+            (1..15).contains(&converted_depths),
+            "{document_start:?}: {converted_depths}"
+        );
+    }
+}
+
 #[test]
 fn a_deep_page_that_took_the_second_parse_before_keeps_its_text_and_its_warning() {
     // ~keep A cell with no row and a custom element asked for the second parse before issue
     // ~keep #772, and the first parse hides such a cell. The limit on the second parse for an
-    // ~keep omitted end tag must not apply to them. The outputs are those of 3.17.2.
+    // ~keep omitted end tag must not apply to them. The text and the warning are those of
+    // ~keep 3.17.2. The empty tables at the limit are not: the repaired tree has no `<html>` and
+    // ~keep no `<body>` that the input did not write, so the limit cuts it two levels later.
     let open = "<table><td>".repeat(400);
     let close = "</td></table>".repeat(400);
     let pages = [
         (
             format!("<table><td>one<table><td>two{open}x"),
-            "one\n\ntwo\n\n|  |\n| --- |\n",
+            "one\n\ntwo\n\n|   |\n| --- |\n\n|  |\n| --- |\n",
         ),
         (
             format!("<table><td>one{open}x{close}</td></table><p>tail</p>"),
-            "one\n\n|  |\n| --- |\n\ntail\n",
+            "one\n\n|   |\n| --- |\n\n|  |\n| --- |\n\ntail\n",
         ),
         (
             format!("<x-note>note</x-note>{open}x{close}<p>tail</p>"),
-            "note\n\n|  |\n| --- |\n\ntail\n",
+            "note\n\n|   |\n| --- |\n\n|  |\n| --- |\n\ntail\n",
         ),
+        (format!("<x-note><p>one</x-note>{open}x"), "one\n\n|  |\n| --- |\n"),
     ];
     for (html, expected) in &pages {
         let default = convert(html, None).expect("conversion must succeed");
