@@ -468,7 +468,7 @@ fn visit_link(
 
 #[cfg(feature = "metadata")]
 fn record_link_metadata(tag: &tl::HTMLTag<'_>, data: &LinkData<'_>, label: &str, context: &Context) {
-    if !context.metadata_wants_links {
+    if !context.metadata_wants.links {
         return;
     }
     let Some(collector) = context.metadata_collector.as_ref() else {

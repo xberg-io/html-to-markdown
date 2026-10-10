@@ -40,13 +40,15 @@ pub struct ContextParameters {
     pub own_page: crate::converter::url_resolve::OwnPage,
 }
 
+/// The kinds of metadata the collector asks for, read once when the context is made.
 #[cfg(feature = "metadata")]
-struct MetadataPreferences {
-    document: bool,
-    headers: bool,
-    links: bool,
-    images: bool,
-    structured_data: bool,
+#[derive(Clone, Copy)]
+pub struct MetadataPreferences {
+    pub(crate) document: bool,
+    pub(crate) headers: bool,
+    pub(crate) links: bool,
+    pub(crate) images: bool,
+    pub(crate) structured_data: bool,
 }
 
 #[cfg(feature = "metadata")]
@@ -307,15 +309,8 @@ pub struct Context {
     /// Shared collector for metadata when enabled.
     pub(crate) metadata_collector: Option<crate::metadata::MetadataCollectorHandle>,
     #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_document: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_headers: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_links: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_images: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_structured_data: bool,
+    /// The kinds of metadata the collector asks for; all false without a collector.
+    pub(crate) metadata_wants: MetadataPreferences,
     #[cfg(feature = "visitor")]
     /// Optional visitor for custom HTML traversal callbacks.
     pub(crate) visitor: Option<crate::visitor::VisitorHandle>,
@@ -430,15 +425,7 @@ impl Context {
             #[cfg(feature = "metadata")]
             metadata_collector: parameters.metadata_collector,
             #[cfg(feature = "metadata")]
-            metadata_wants_document: metadata.document,
-            #[cfg(feature = "metadata")]
-            metadata_wants_headers: metadata.headers,
-            #[cfg(feature = "metadata")]
-            metadata_wants_links: metadata.links,
-            #[cfg(feature = "metadata")]
-            metadata_wants_images: metadata.images,
-            #[cfg(feature = "metadata")]
-            metadata_wants_structured_data: metadata.structured_data,
+            metadata_wants: metadata,
             #[cfg(feature = "visitor")]
             visitor: parameters.visitor,
             #[cfg(feature = "visitor")]

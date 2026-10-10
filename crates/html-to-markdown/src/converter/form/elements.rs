@@ -317,7 +317,7 @@ pub fn handle_label(
 }
 
 /// Whether the first content of `tag` separates the label from the text before it: a control
-/// that writes text of its own, or an input a reader sees with white space after it.
+/// that writes text of its own, or an input with white space after it.
 fn starts_with_control(tag: &tl::HTMLTag, parser: &tl::Parser, dom_ctx: &crate::converter::DomContext) -> bool {
     let first = tag.children().top().iter().find_map(|child| match child.get(parser)? {
         tl::Node::Raw(raw) if raw.as_utf8_str().trim().is_empty() => None,
@@ -328,18 +328,9 @@ fn starts_with_control(tag: &tl::HTMLTag, parser: &tl::Parser, dom_ctx: &crate::
         return false;
     };
     match crate::converter::utility::content::normalized_tag_name(control.name().as_utf8_str()).as_ref() {
-        "input" => {
-            !is_hidden_input(control) && super::spacing::white_space_follows(handle.get_inner(), parser, dom_ctx)
-        }
+        "input" => super::spacing::white_space_follows(handle.get_inner(), parser, dom_ctx),
         name => super::spacing::writes_own_text(name),
     }
-}
-
-fn is_hidden_input(tag: &tl::HTMLTag) -> bool {
-    tag.attributes()
-        .get("type")
-        .flatten()
-        .is_some_and(|value| value.as_utf8_str().eq_ignore_ascii_case("hidden"))
 }
 
 /// The checked state of `tag` when it is a checkbox a reader sees as one. An input whose `role`

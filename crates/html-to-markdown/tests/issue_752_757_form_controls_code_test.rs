@@ -136,6 +136,11 @@ fn should_keep_the_space_between_a_word_and_a_checkbox_before_a_word() {
 }
 
 #[test]
+fn should_keep_the_space_after_a_hidden_input_at_the_start_of_a_label() {
+    assert_in_both_modes("<p>a<label><input type=\"hidden\"> x</label></p>", "a x\n");
+}
+
+#[test]
 fn should_write_no_checkbox_state_in_a_cell_that_holds_another_element() {
     assert_in_both_modes(
         "<table><tr><th>h</th></tr><tr><td><input type=\"checkbox\"><span>x</span></td></tr></table>",

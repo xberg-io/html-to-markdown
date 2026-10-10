@@ -892,7 +892,7 @@ fn render_preserved_tag(
 
 #[cfg(feature = "metadata")]
 fn collect_document_attributes(tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context) {
-    if !matches!(tag_name, "html" | "head" | "body") || !ctx.metadata_wants_document {
+    if !matches!(tag_name, "html" | "head" | "body") || !ctx.metadata_wants.document {
         return;
     }
     let Some(collector) = ctx.metadata_collector.as_ref() else {
