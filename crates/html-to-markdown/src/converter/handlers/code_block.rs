@@ -78,14 +78,15 @@ fn min_safe_code_span_delimiter_length(content: &str) -> usize {
 /// - Invoking visitor callbacks when the visitor feature is enabled
 /// - Generating appropriate markdown output with proper escaping
 pub fn handle_code(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
+    if handler.context.code_element_is_transparent() {
+        let context = handler.context;
+        walk_children_to_output(tag, context, &mut handler);
+        return;
+    }
     let code_ctx = Context {
         in_code: true,
         ..handler.context.clone()
     };
-    if handler.context.in_code {
-        walk_children_to_output(tag, &code_ctx, &mut handler);
-        return;
-    }
     let mut content = String::with_capacity(32);
     walk_children(tag, &mut content, &code_ctx, &handler);
     // ~keep An all-whitespace body is a real code span, not an empty element (#481).

@@ -14,12 +14,10 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::block::heading::{find_single_heading_child, heading_allows_inline_images, push_heading};
 use crate::converter::dom_context::DomContext;
-use crate::converter::handlers::image::image_is_link_label;
 use crate::converter::inline::HandlerContext;
 use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_context, has_uri_scheme};
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
-use crate::converter::media::svg::graphic_is_written_as_image;
 use crate::converter::utility::content::{
     collect_link_label_text, link_accessible_name, link_text_content, node_is_block_level, normalize_link_label,
     normalized_tag_name,
@@ -78,7 +76,11 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
         let text_start = handler.output.len();
         walk_handles_to_output(data.children.iter().copied(), &mut handler);
         let text = handler.output.split_off(text_start);
-        if data.is_shown_to_visitor_in_code(&text, &handler) {
+        #[cfg(feature = "visitor")]
+        let is_shown = handler.context.has_observer() && data.is_shown_to_visitor_in_code(&text, &handler);
+        #[cfg(not(feature = "visitor"))]
+        let is_shown = false;
+        if is_shown {
             emit_link(tag, &data, &text, false, &mut handler);
         } else {
             handler.output.push_str(&text);
@@ -154,33 +156,27 @@ impl<'a> LinkData<'a> {
     /// ~keep The calls are those of a link outside code, which makes none for a link in the
     /// ~keep `<address>` form, for a link around one heading, and for a link that is left out (see
     /// ~keep `is_dropped`). A highlighter writes one empty anchor into its own page for each line
-    /// ~keep of code. An image writes nothing in code, so the link asks its own content whether
-    /// ~keep it holds a label that code does not show (`holds_label_hidden_in_code`): a link with
-    /// ~keep such a label is not left out, and a heading with such a text makes a heading link.
+    /// ~keep of code. An image writes nothing in code, so a link whose text is empty there asks
+    /// ~keep what its content writes outside code (`outside_code`): a link with a label there is
+    /// ~keep not left out, and a heading with a text there makes a heading link.
+    #[cfg(feature = "visitor")]
     fn is_shown_to_visitor_in_code(&self, text: &str, handler: &HandlerContext<'_>) -> bool {
         if self.is_autolink(handler.options) {
             return false;
         }
-        let heading = find_single_heading_child(*handler.node_handle, handler.parser)
-            .filter(|_| !self.href_addr_dropped)
-            .and_then(|(_, heading_handle)| Some((heading_handle, heading_context(heading_handle, handler)?)));
-        if let Some((heading_handle, heading_context)) = heading {
-            if !text.trim().is_empty() || holds_label_hidden_in_code(&[heading_handle], &heading_context, handler) {
+        let heading =
+            find_single_heading_child(*handler.node_handle, handler.parser).filter(|_| !self.href_addr_dropped);
+        if let Some((_, heading_handle)) = heading {
+            let writes_text = |outside: &HandlerContext<'_>| {
+                heading_link_text(heading_handle, outside).is_some_and(|written| !written.trim().is_empty())
+            };
+            if !text.trim().is_empty() || outside_code(handler, writes_text) {
                 return false;
             }
         }
         let mut label = normalize_link_label(text);
         apply_label_fallbacks(self, &mut label, handler);
-        if !self.is_dropped(&label, handler) {
-            return true;
-        }
-        // ~keep Outside code a block child makes the label inline, and a table is not in it.
-        let (label_nodes, is_merged) = if self.emit_blocks_separately {
-            (&self.inline_children, false)
-        } else {
-            (&self.children, self.saw_block)
-        };
-        holds_label_hidden_in_code(label_nodes, &label_context(self, handler, is_merged), handler)
+        !self.is_dropped(&label, handler) || outside_code(handler, |outside| !build_label(self, outside).is_empty())
     }
 
     fn new(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Option<Self> {
@@ -235,26 +231,48 @@ impl<'a> LinkData<'a> {
     }
 }
 
-/// Whether `nodes` write a label outside code that code does not show, where `context` is the
-/// context they are written with outside code: an image that is a label there, a graphic that is
-/// written as an image, or a link to another page.
+/// What `ask` answers for the link of `handler` when that link is outside code: `ask` gets a
+/// handler that writes as outside code and that nothing observes (see
+/// `Context::unobserved_outside_code`).
 ///
-/// ~keep A pure question to the content of one link, asked where that link is handled: no state
-/// ~keep is shared between a link and a link inside it.
-fn holds_label_hidden_in_code(nodes: &[tl::NodeHandle], context: &Context, handler: &HandlerContext<'_>) -> bool {
-    let (parser, dom_context, options) = (handler.parser, handler.dom_context, handler.options);
-    let writes_hidden_label = |name: &str, tag: &tl::HTMLTag<'_>, handle: &tl::NodeHandle| match name {
-        "img" => image_is_link_label(tag, handle, parser, dom_context, options, context),
-        "svg" => graphic_is_written_as_image(options, context),
-        "a" => is_link_to_other_page(tag, handle, handler),
-        _ => false,
-    };
-    nodes
-        .iter()
-        .any(|node| subtree_has_tag(node, parser, dom_context, &writes_hidden_label))
+/// ~keep The answer comes from the functions that write a link outside code, run once more on
+/// ~keep the content of this link. No second set of rules says what a label is, so a rule of the
+/// ~keep traversal (a stripped tag, an excluded node, a preset) cannot be missing from the answer.
+/// ~keep No state is shared between a link and a link inside it.
+#[cfg(feature = "visitor")]
+fn outside_code<T>(handler: &HandlerContext<'_>, ask: impl FnOnce(&HandlerContext<'_>) -> T) -> T {
+    let context = handler.context.unobserved_outside_code();
+    let mut unused = String::new();
+    ask(&HandlerContext {
+        node_handle: handler.node_handle,
+        parser: handler.parser,
+        output: &mut unused,
+        options: handler.options,
+        context: &context,
+        depth: handler.depth,
+        dom_context: handler.dom_context,
+    })
 }
 
-/// The context that the one heading of a link is written with outside code.
+/// The text that the one heading of a link writes with the context of `handler`.
+fn heading_link_text(heading_handle: tl::NodeHandle, handler: &HandlerContext<'_>) -> Option<String> {
+    let heading_context = heading_context(heading_handle, handler)?;
+    let mut heading_text = String::new();
+    walk_node(
+        &heading_handle,
+        handler.parser,
+        &mut heading_text,
+        crate::converter::block::container::HandlerContext::new(
+            handler.options,
+            &heading_context,
+            handler.depth + 1,
+            handler.dom_context,
+        ),
+    );
+    Some(heading_text)
+}
+
+/// The context that the one heading of a link is written with.
 fn heading_context(heading_handle: tl::NodeHandle, handler: &HandlerContext<'_>) -> Option<Context> {
     let tl::Node::Tag(heading_tag) = heading_handle.get(handler.parser)? else {
         return None;
@@ -269,21 +287,6 @@ fn heading_context(heading_handle: tl::NodeHandle, handler: &HandlerContext<'_>)
         ),
         ..handler.context.clone()
     })
-}
-
-/// Whether `tag` is a link that writes its marks outside code also when it has no label: a link
-/// with an address that is kept and that does not point into its own page.
-#[allow(clippy::trivially_copy_pass_by_ref)]
-fn is_link_to_other_page(tag: &tl::HTMLTag<'_>, handle: &tl::NodeHandle, handler: &HandlerContext<'_>) -> bool {
-    let Some(raw_href) = crate::converter::utility::attributes::decoded_attribute(tag, "href") else {
-        return false;
-    };
-    let resolved = handler
-        .context
-        .resolve_url(&raw_href, handle, handler.parser, handler.dom_context);
-    let href = resolved.as_deref().unwrap_or(&raw_href);
-    !handler.context.own_page.holds(&raw_href, href)
-        && inline_data_treatment(handler.options.inline_data_media, href) == InlineDataMedia::Keep
 }
 
 fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool {
@@ -307,21 +310,9 @@ fn emit_heading_link(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> b
     let Some((level, heading_handle)) = find_single_heading_child(*handler.node_handle, handler.parser) else {
         return false;
     };
-    let Some(heading_context) = heading_context(heading_handle, handler) else {
+    let Some(heading_text) = heading_link_text(heading_handle, handler) else {
         return false;
     };
-    let mut heading_text = String::new();
-    walk_node(
-        &heading_handle,
-        handler.parser,
-        &mut heading_text,
-        crate::converter::block::container::HandlerContext::new(
-            handler.options,
-            &heading_context,
-            handler.depth + 1,
-            handler.dom_context,
-        ),
-    );
     let heading_text = heading_text.trim();
     if heading_text.is_empty() {
         return false;
@@ -663,39 +654,29 @@ fn should_defer_table_blocks(
 ) -> bool {
     (!ctx.convert_as_inline || ctx.in_layout_cell)
         && !ctx.in_heading
-        && deferred
-            .iter()
-            .any(|handle| subtree_has_tag(handle, parser, dom_ctx, &|name, _, _| name == "table"))
+        && deferred.iter().any(|handle| subtree_has_table(handle, parser, dom_ctx))
 }
 
-/// Short-circuiting DFS: does `handle`'s subtree (itself or any descendant) contain an element
-/// that `wanted` accepts by its name, its tag and its handle?
+/// Short-circuiting DFS: does `handle`'s subtree (itself or any descendant) contain a
+/// `<table>`?
 ///
-/// ~keep Asked for a `<table>` only against a deferred block child of an `<a>` (issue #490), and
-/// ~keep for a label that code does not show only against the content of a link in code, so the
-/// ~keep cost is paid only there, and the walk stops at the first element found regardless of
-/// ~keep subtree size.
+/// ~keep Checked only against a deferred block child of an `<a>` (issue #490), so the cost
+/// ~keep is paid only when the anchor actually has a block child, and the walk stops at the
+/// ~keep first `<table>` found regardless of subtree size.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn subtree_has_tag(
-    handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    dom_ctx: &DomContext,
-    wanted: &dyn Fn(&str, &tl::HTMLTag<'_>, &tl::NodeHandle) -> bool,
-) -> bool {
+fn subtree_has_table(handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
     let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
         return false;
     };
-    if wanted(&normalized_tag_name(tag.name().as_utf8_str()), tag, handle) {
+    if normalized_tag_name(tag.name().as_utf8_str()) == "table" {
         return true;
     }
     if let Some(children) = dom_ctx.children_of(handle.get_inner()) {
-        children
-            .iter()
-            .any(|child| subtree_has_tag(child, parser, dom_ctx, wanted))
+        children.iter().any(|child| subtree_has_table(child, parser, dom_ctx))
     } else {
         tag.children()
             .top()
             .iter()
-            .any(|child| subtree_has_tag(child, parser, dom_ctx, wanted))
+            .any(|child| subtree_has_table(child, parser, dom_ctx))
     }
 }

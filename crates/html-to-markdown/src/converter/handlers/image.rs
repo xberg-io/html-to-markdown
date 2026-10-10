@@ -65,77 +65,15 @@ pub fn handle_img(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
     record_image_structure(&data, inline_data, handler.context);
 }
 
-/// The address of the image before it is resolved: its own, or with any choice but
-/// [`InlineDataMedia::Keep`] that of a `<source>` of its `<picture>` when its own is a `data:` URL.
-#[allow(clippy::trivially_copy_pass_by_ref)]
-fn effective_src<'a>(
-    tag: &'a tl::HTMLTag<'a>,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    dom_context: &DomContext,
-    inline_data_media: InlineDataMedia,
-) -> Cow<'a, str> {
-    let skip_inline_data = inline_data_media != InlineDataMedia::Keep;
-    let effective_src = resolve_effective_src(tag, skip_inline_data);
-    if skip_inline_data && is_inline_data(&effective_src) {
-        if let Some(source_src) = picture_source_src(node_handle, parser, dom_context) {
-            return Cow::Owned(source_src);
-        }
-    }
-    effective_src
-}
-
-/// Whether the image is the label of a link around it, where `label_context` is the context of
-/// that label: not when images are skipped, not when the image is removed, not when it is written
-/// as an empty alt text.
-///
-/// ~keep A link in code asks this, because an image writes nothing in code.
-#[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn image_is_link_label(
-    tag: &tl::HTMLTag<'_>,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    dom_context: &DomContext,
-    options: &crate::options::ConversionOptions,
-    label_context: &Context,
-) -> bool {
-    let src = effective_src(tag, node_handle, parser, dom_context, options.inline_data_media);
-    let inline_data = crate::converter::media::inline_data_treatment(options.inline_data_media, &src);
-    let has_alt = decoded_attribute(tag, "alt").is_some_and(|alt| !alt.is_empty());
-    !options.skip_images
-        && inline_data != InlineDataMedia::DropElement
-        && (has_alt || !uses_alt_text(label_context, inline_data))
-}
-
-/// Whether the image is written as its alt text alone in `context`.
-///
-/// ~keep #492: `|| ctx.link_allow_inline_images` is purely additive relative to the
-/// ~keep pre-#492 expression -- it can only turn an image ON, never off, because
-/// ~keep `link_allow_inline_images` is `false` whenever "a" is absent from
-/// ~keep `keep_inline_images_in` (its only source, `handlers/link.rs`). So callers who
-/// ~keep never set the option see byte-identical output. Deliberately NOT mirrored with
-/// ~keep the heading pattern's negative clause (`|| (in_link && !link_allow)`): the no-`<p>`
-/// ~keep control already renders an image through the inline branch with
-/// ~keep `convert_as_inline == false`, so the answer is `false` there today and
-/// ~keep the image survives -- a negative term would delete it, which is a real regression.
-fn uses_alt_text(context: &Context, inline_data: InlineDataMedia) -> bool {
-    let keep_as_markdown = (context.in_heading && context.heading_allow_inline_images)
-        || context.cell_allow_inline_images
-        || context.link_allow_inline_images;
-    inline_data == InlineDataMedia::AltTextOnly
-        || (!keep_as_markdown
-            && (context.convert_as_inline || (context.in_heading && !context.heading_allow_inline_images)))
-}
-
 fn image_data<'a>(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> ImageData<'a> {
     let src = {
-        let effective_src = effective_src(
-            tag,
-            handler.node_handle,
-            handler.parser,
-            handler.dom_context,
-            handler.options.inline_data_media,
-        );
+        let skip_inline_data = handler.options.inline_data_media != InlineDataMedia::Keep;
+        let mut effective_src = resolve_effective_src(tag, skip_inline_data);
+        if skip_inline_data && is_inline_data(&effective_src) {
+            if let Some(source_src) = picture_source_src(handler.node_handle, handler.parser, handler.dom_context) {
+                effective_src = Cow::Owned(source_src);
+            }
+        }
         let base_resolved =
             handler
                 .context
@@ -207,6 +145,23 @@ fn render_image(
     inline_data: InlineDataMedia,
     handler: &HandlerContext<'_>,
 ) -> Option<String> {
+    // ~keep #492: `|| ctx.link_allow_inline_images` is purely additive relative to the
+    // ~keep pre-#492 expression -- it can only turn an image ON, never off, because
+    // ~keep `link_allow_inline_images` is `false` whenever "a" is absent from
+    // ~keep `keep_inline_images_in` (its only source, `handlers/link.rs`). So callers who
+    // ~keep never set the option see byte-identical output. Deliberately NOT mirrored with
+    // ~keep the heading pattern's negative clause (`|| (in_link && !link_allow)`): the no-`<p>`
+    // ~keep control already renders an image through the inline branch with
+    // ~keep `convert_as_inline == false`, so `should_use_alt_text` is `false` there today and
+    // ~keep the image survives -- a negative term would delete it, which is a real regression.
+    let context = handler.context;
+    let keep_as_markdown = (context.in_heading && context.heading_allow_inline_images)
+        || context.cell_allow_inline_images
+        || context.link_allow_inline_images;
+
+    let should_use_alt_text = inline_data == InlineDataMedia::AltTextOnly
+        || (!keep_as_markdown
+            && (context.convert_as_inline || (context.in_heading && !context.heading_allow_inline_images)));
     #[cfg(feature = "visitor")]
     if let std::ops::ControlFlow::Break(result) = visit_image(tag, data, handler) {
         return result;
@@ -216,7 +171,6 @@ fn render_image(
     if handler.context.in_code {
         return None;
     }
-    let should_use_alt_text = uses_alt_text(handler.context, inline_data);
     render_image_default(data, inline_data, should_use_alt_text, handler)
 }
 

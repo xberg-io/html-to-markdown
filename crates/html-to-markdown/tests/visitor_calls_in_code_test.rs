@@ -215,6 +215,53 @@ const CASES: &[(&str, &str, &[&str])] = &[
         "<pre><a href=\"/h\"><h2></h2></a>x</pre>",
         &["link /h", "code_block"],
     ),
+    (
+        "a link in `code` in a link, around an image",
+        "<pre><a href=\"#x1\"><code><a href=\"#x2\"><code><img src=\"i.png\"></code></a></code></a>z</pre>",
+        &["image i.png", "link #x2", "link #x1", "code_block"],
+    ),
+    (
+        "four links, each in `code` in the link around it, around an image",
+        "<pre><a href=\"#x1\"><code><a href=\"#x2\"><code><a href=\"#x3\"><code><a href=\"#x4\"><code><img src=\"i.png\"></code></a></code></a></code></a></code></a>z</pre>",
+        &[
+            "image i.png",
+            "link #x4",
+            "link #x3",
+            "link #x2",
+            "link #x1",
+            "code_block",
+        ],
+    ),
+    (
+        "a link in `kbd` in a link, around an image",
+        "<pre><a href=\"#x1\"><kbd><a href=\"#x2\"><kbd><img src=\"i.png\"></kbd></a></kbd></a>z</pre>",
+        &["image i.png", "link #x2", "link #x1", "code_block"],
+    ),
+    (
+        "a link in `samp` in a link, around an image",
+        "<pre><a href=\"#x1\"><samp><a href=\"#x2\"><samp><img src=\"i.png\"></samp></a></samp></a>z</pre>",
+        &["image i.png", "link #x2", "link #x1", "code_block"],
+    ),
+    (
+        "a link into its own page around a line break in `code`",
+        "<pre><a href=\"#x\"><code><br></code></a>z</pre>",
+        &["code_block"],
+    ),
+    (
+        "a link into its own page around a space in `kbd`, in a code span",
+        "<p>t <code><a href=\"#x\"><kbd> </kbd></a>z</code></p>",
+        &["code_inline"],
+    ),
+    (
+        "a link into its own page around two line breaks in `samp`",
+        "<pre><code><a href=\"#x\"><samp><br><br></samp></a>z</code></pre>",
+        &["code_block"],
+    ),
+    (
+        "a link into its own page around a no-break space in `code`, in a code span",
+        "<p>t <code><a href=\"#x\"><code>&nbsp;</code></a>z</code></p>",
+        &["code_inline"],
+    ),
 ];
 
 #[test]
@@ -401,6 +448,60 @@ fn a_visitor_gets_the_same_calls_for_a_link_around_an_image_in_code_as_before() 
         "{} of {} rows differ:\n{}",
         failures.len(),
         IMAGE_LINK_CASES.len(),
+        failures.join("\n")
+    );
+}
+
+/// How an option takes a node out of the page.
+#[derive(Debug, Clone, Copy)]
+enum Removed {
+    /// `strip_tags` names the tag: the element goes, its content stays.
+    Stripped(&'static str),
+    /// `exclude_selectors` names the tag: the element goes with its content.
+    Excluded(&'static str),
+}
+
+/// Each row: a name, the node that an option removes, the calls in order for
+/// [`FILTERED_LABEL_PAGE`]. The calls are those of a run before code wrote a link as its text.
+const FILTERED_LABEL_CASES: &[(&str, Removed, &[&str])] = &[
+    ("the image is stripped", Removed::Stripped("img"), &["code_block"]),
+    ("the image is excluded", Removed::Excluded("img"), &["code_block"]),
+    (
+        "the wrapper of the image is excluded",
+        Removed::Excluded("span"),
+        &["code_block"],
+    ),
+    (
+        "the wrapper of the image is stripped",
+        Removed::Stripped("span"),
+        &["image i.png", "link #x", "code_block"],
+    ),
+];
+
+const FILTERED_LABEL_PAGE: &str = "<pre><a href=\"#x\"><span><img src=\"i.png\"></span></a>z</pre>";
+
+#[test]
+fn a_link_in_code_whose_image_the_options_remove_gets_the_same_calls_as_before() {
+    let mut failures = Vec::new();
+    for (name, removed, expected) in FILTERED_LABEL_CASES {
+        let mut options = ConversionOptions::default();
+        match removed {
+            Removed::Stripped(tag) => options.strip_tags.push((*tag).to_string()),
+            Removed::Excluded(selector) => options.exclude_selectors.push((*selector).to_string()),
+        }
+        let (seen, content) = record_with(FILTERED_LABEL_PAGE, options);
+        if seen.calls != *expected {
+            failures.push(format!(
+                "{name}: calls {:?}, expected {expected:?}; output {content:?}",
+                seen.calls
+            ));
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} of {} rows differ:\n{}",
+        failures.len(),
+        FILTERED_LABEL_CASES.len(),
         failures.join("\n")
     );
 }
