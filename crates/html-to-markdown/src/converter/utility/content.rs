@@ -122,16 +122,6 @@ pub fn get_text_content(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_c
     dom_ctx.text_content(*node_handle, parser)
 }
 
-/// Whether white space of the source owes one space at the end of `written`. Both converters
-/// ask here before they write the space of a text or of an inline element.
-///
-/// ~keep White space collapses as in CSS: a space after a space is the same run, whatever
-/// ~keep element boundary lies between the two, and the start of a line keeps none.
-#[must_use]
-pub fn space_is_owed(written: &str) -> bool {
-    !written.ends_with([' ', '\n'])
-}
-
 /// Writes the white space that an inline element starts with (`prefix` of [`chomp_inline`])
 /// before the marks of the element, when a space is owed there.
 ///
@@ -144,7 +134,7 @@ pub fn push_inline_prefix(
     options: &crate::options::ConversionOptions,
     ctx: &crate::converter::context::Context,
 ) {
-    if keeps_source_white_space(options, ctx) || space_is_owed(output) {
+    if keeps_source_white_space(options, ctx) || crate::converter::utility::white_space::space_is_owed(output) {
         output.push_str(prefix);
     }
 }

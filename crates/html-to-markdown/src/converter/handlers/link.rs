@@ -176,7 +176,10 @@ impl<'a> LinkData<'a> {
         }
         let mut label = normalize_link_label(text);
         apply_label_fallbacks(self, &mut label, handler);
-        !self.is_dropped(&label, handler) || outside_code(handler, |outside| !build_label(self, outside).is_empty())
+        !self.is_dropped(&label, handler)
+            || outside_code(handler, |outside| {
+                !normalize_link_label(&build_label_content(self, outside)).is_empty()
+            })
     }
 
     fn new(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Option<Self> {

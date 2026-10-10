@@ -12,9 +12,8 @@ use std::borrow::Cow;
 use crate::converter::block::container::HandlerContext;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
-use crate::converter::utility::content::{
-    NextElement, line_end_before_element, space_is_owed, without_trailing_line_end,
-};
+use crate::converter::utility::content::{NextElement, line_end_before_element, without_trailing_line_end};
+use crate::converter::utility::white_space::space_is_owed;
 use crate::converter::utility::siblings::{
     FollowingContent, br_follows_enclosing_elements, content_starts_with_block, following_sibling_content,
     get_next_sibling_tag, get_previous_sibling_tag, next_sibling_is_inline_tag, zero_width_space_follows,
