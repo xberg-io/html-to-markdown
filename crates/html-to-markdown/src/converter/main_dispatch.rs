@@ -26,6 +26,15 @@ pub(super) fn dispatch_tag<'a>(
         output,
         handler,
     };
+    if handler.ctx.in_heading
+        && matches!(
+            tag_name,
+            "p" | "section" | "article" | "nav" | "aside" | "header" | "footer" | "main"
+        )
+    {
+        dispatcher.dispatch_div_like();
+        return false;
+    }
     if dispatcher.dispatch_inline() || dispatcher.dispatch_blocks() {
         return false;
     }
