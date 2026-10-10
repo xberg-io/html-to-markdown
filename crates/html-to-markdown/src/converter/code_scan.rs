@@ -6,22 +6,38 @@
 use crate::options::CodeBlockStyle;
 
 /// Follows the code blocks of finished Markdown, one line at a time.
-pub enum CodeScan {
+pub enum CodeScan<'a> {
     /// The style writes fenced code blocks.
     Fenced(FenceScan),
-    /// The style writes indented code blocks: whether each line is code, in the order of the lines.
-    Indented(std::vec::IntoIter<bool>),
+    /// The style writes indented code blocks.
+    Indented(IndentedScan<'a>),
 }
 
-impl CodeScan {
+/// Follows the indented code blocks of finished Markdown, one line at a time.
+///
+/// ~keep The lines are read when the first answer is asked for. A block quote asks only about a
+/// ~keep line of white space, so most quotes read nothing: a read of the whole content at each
+/// ~keep level of nested quotes costs the square of the depth.
+pub struct IndentedScan<'a> {
+    output: &'a str,
+    /// Whether each line is code, in the order of the lines.
+    lines: Option<Vec<bool>>,
+    next: usize,
+}
+
+impl<'a> CodeScan<'a> {
     /// A scan of `output` for the code blocks that `style` writes.
     ///
     /// ~keep Only the configured style opens a block. A line of indented code that looks like a
     /// ~keep fence opens nothing, and neither does a line of tildes in a document whose fences are
     /// ~keep backticks.
-    pub fn new(style: CodeBlockStyle, output: &str) -> Self {
+    pub const fn new(style: CodeBlockStyle, output: &'a str) -> Self {
         match style {
-            CodeBlockStyle::Indented => Self::Indented(indented_code_lines(output).into_iter()),
+            CodeBlockStyle::Indented => Self::Indented(IndentedScan {
+                output,
+                lines: None,
+                next: 0,
+            }),
             CodeBlockStyle::Backticks => Self::Fenced(FenceScan {
                 fence: b'`',
                 open: None,
@@ -37,7 +53,27 @@ impl CodeScan {
     pub fn is_code(&mut self, line: &str) -> bool {
         match self {
             Self::Fenced(fences) => fences.is_code(line),
-            Self::Indented(lines) => lines.next().unwrap_or(false),
+            Self::Indented(scan) => {
+                let output = scan.output;
+                let is_code = scan
+                    .lines
+                    .get_or_insert_with(|| indented_code_lines(output))
+                    .get(scan.next)
+                    .copied()
+                    .unwrap_or(false);
+                scan.next += 1;
+                is_code
+            }
+        }
+    }
+
+    /// Go past `line`, the next line of the output, when the caller does not need the answer.
+    pub fn pass(&mut self, line: &str) {
+        match self {
+            Self::Fenced(fences) => {
+                fences.is_code(line);
+            }
+            Self::Indented(scan) => scan.next += 1,
         }
     }
 }
@@ -265,17 +301,50 @@ fn indented_code_lines(output: &str) -> Vec<bool> {
 /// ~keep With the indented style the indentation of a first line of code stays, and so does the
 /// ~keep line end of a last line of code: without its four columns the line is running text.
 pub fn quote_content_range(content: &str, style: CodeBlockStyle) -> std::ops::Range<usize> {
+    let start = quote_content_start(content, style);
+    start..quote_content_end(content, style).max(start)
+}
+
+/// Where the content of a block quote starts: at its first character that is not white space, or
+/// at the start of that line when the line is indented code.
+///
+/// ~keep No line before the first one opens a list item or a paragraph, so the line alone says
+/// ~keep whether it is code. The lines after it are not read.
+pub fn quote_content_start(content: &str, style: CodeBlockStyle) -> usize {
     let start = content.len() - content.trim_start().len();
-    let end = content.trim_end().len();
-    if style != CodeBlockStyle::Indented || start >= end {
-        return start..end.max(start);
+    if style != CodeBlockStyle::Indented {
+        return start;
     }
     let first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
+    let line_end = content[start..].find('\n').map_or(content.len(), |index| start + index);
+    if indented_code_lines(&content[first_line..line_end]) == [true] {
+        first_line
+    } else {
+        start
+    }
+}
+
+/// Where the content of a block quote ends: after its last character that is not white space, or
+/// at the end of that line when the line is indented code.
+///
+/// ~keep Only white space at the end of the last line depends on the answer. Without it the lines
+/// ~keep are not read.
+fn quote_content_end(content: &str, style: CodeBlockStyle) -> usize {
+    let end = content.trim_end().len();
+    if style != CodeBlockStyle::Indented || end == 0 {
+        return end;
+    }
     let last_line = content[end..].find('\n').map_or(content.len(), |index| end + index);
-    let code = indented_code_lines(&content[first_line..last_line]);
-    let start = if code.first() == Some(&true) { first_line } else { start };
-    let end = if code.last() == Some(&true) { last_line } else { end };
-    start..end
+    if last_line == end {
+        return end;
+    }
+    let start = content.len() - content.trim_start().len();
+    let first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
+    if indented_code_lines(&content[first_line..last_line]).last() == Some(&true) {
+        last_line
+    } else {
+        end
+    }
 }
 
 #[cfg(test)]
@@ -352,5 +421,84 @@ mod tests {
         assert_eq!(quote_content_range("\n  a  \n", indented), 3..4);
         assert_eq!(quote_content_range("  \n", indented), 3..3);
         assert_eq!(quote_content_range("    a\n", CodeBlockStyle::Backticks), 4..5);
+    }
+
+    /// The range that a read of every line of `content` gives.
+    fn range_from_every_line(content: &str) -> std::ops::Range<usize> {
+        let start = content.len() - content.trim_start().len();
+        let end = content.trim_end().len();
+        if start >= end {
+            return start..end.max(start);
+        }
+        let first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
+        let last_line = content[end..].find('\n').map_or(content.len(), |index| end + index);
+        let code = indented_code_lines(&content[first_line..last_line]);
+        let start = if code.first() == Some(&true) { first_line } else { start };
+        let end = if code.last() == Some(&true) { last_line } else { end };
+        start..end
+    }
+
+    #[test]
+    fn should_trim_the_content_of_a_container_as_a_read_of_every_line_does() {
+        let cases = [
+            ("", 0..0),
+            (" \n\t\n", 4..4),
+            ("\n    a\n\n    b  \n\n", 1..15),
+            ("\n    a\n\nb  \n\n", 1..9),
+            ("  a\n\n    b  \n", 2..12),
+            ("  a\n    b  \n", 2..9),
+            ("- a\n\n      b \t\n", 0..14),
+            ("- a\n\n    b  \n", 0..10),
+            (">     a  \n> b\n", 0..13),
+            ("> b\n>\n>     a  \n", 0..15),
+            ("\n\n\ta\n\tb\t\n", 2..8),
+            ("    a  ", 0..7),
+            ("a  ", 0..1),
+        ];
+        for (content, expected) in cases {
+            let range = quote_content_range(content, CodeBlockStyle::Indented);
+            assert_eq!(range, expected, "{content:?}");
+            assert_eq!(range, range_from_every_line(content), "{content:?}");
+            assert_eq!(
+                quote_content_start(content, CodeBlockStyle::Indented),
+                range.start,
+                "{content:?}"
+            );
+        }
+        // A fenced style has no indented code: the white space at both ends goes.
+        assert_eq!(quote_content_range("\n    a  \n", CodeBlockStyle::Tildes), 5..6);
+        assert_eq!(quote_content_start("\n    a  \n", CodeBlockStyle::Backticks), 5);
+    }
+
+    #[test]
+    fn should_answer_for_the_next_line_after_lines_that_were_passed() {
+        let markdown = "a\n\n    b\n      \n    c\nd";
+        let mut scan = CodeScan::new(CodeBlockStyle::Indented, markdown);
+        let mut answers = String::new();
+        for (index, line) in markdown.split('\n').enumerate() {
+            if index < 2 || index == 4 {
+                scan.pass(line);
+                answers.push('-');
+            } else {
+                answers.push(if scan.is_code(line) { '1' } else { '0' });
+            }
+        }
+        assert_eq!(answers, "--11-0");
+        // A line past the end of the output is not code.
+        assert!(!scan.is_code(""));
+
+        let fenced = "```\n  \n```\n  ";
+        let mut scan = CodeScan::new(CodeBlockStyle::Backticks, fenced);
+        let mut answers = String::new();
+        for (index, line) in fenced.split('\n').enumerate() {
+            if index % 2 == 0 {
+                scan.pass(line);
+                answers.push('-');
+            } else {
+                answers.push(if scan.is_code(line) { '1' } else { '0' });
+            }
+        }
+        // The fences were passed, and the scan still knows that the block is closed.
+        assert_eq!(answers, "-1-0");
     }
 }

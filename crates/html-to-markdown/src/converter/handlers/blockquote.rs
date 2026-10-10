@@ -328,9 +328,15 @@ fn emit_quote_lines(
         }
         // ~keep A blank line of the quote is the marker alone: a line of code keeps its line end,
         // ~keep so no later pass removes a space written here. A line of code that is only
-        // ~keep white space keeps that white space.
-        let is_code = code.is_code(line);
-        if line.is_empty() || (!is_code && line.trim().is_empty()) {
+        // ~keep white space keeps that white space. Only such a line asks whether it is code.
+        let is_space = !line.is_empty() && line.trim().is_empty();
+        let is_code = if is_space {
+            code.is_code(line)
+        } else {
+            code.pass(line);
+            false
+        };
+        if line.is_empty() || (is_space && !is_code) {
             output.push('>');
         } else {
             output.push_str("> ");
