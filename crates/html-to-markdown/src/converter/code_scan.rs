@@ -445,9 +445,6 @@ fn quote_content_end(content: &str, style: CodeBlockStyle, quotes: QuoteLines) -
         if indented_code_lines(line, QuoteLines::Read) != [true] {
             return end;
         }
-        if line.trim_start_matches([' ', '\t']).starts_with('>') {
-            return last_line;
-        }
         // ~keep A line of a quote at the left margin closes every list item and every paragraph:
         // ~keep the read starts after the last one.
         if let Some(quote) = content[..line_start].rfind("\n>") {

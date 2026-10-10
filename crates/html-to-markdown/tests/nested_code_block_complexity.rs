@@ -160,6 +160,92 @@ fn a_fenced_code_block_in_nested_block_quotes_scales_linearly_in_both_tiers() {
     assert_linear_growth(CodeBlockStyle::Backticks);
 }
 
+/// ~keep Enough quotes that the reads of their lines outweigh the fixed cost of a conversion.
+const SIBLINGS: [usize; 3] = [500, 1000, 2000];
+
+/// One block quote that holds `count` block quotes, each with a short code block, and after each
+/// of them a code block of its own with a line of spaces.
+///
+/// ~keep The outer quote asks about each line of spaces, so it reads its lines once for each
+/// ~keep inner quote: the lines between two lines of its inner quotes. A read that starts at the
+/// ~keep first line, or that goes on to the last one, costs the square of the count.
+fn fastest_convert_of_siblings(count: usize, style: CodeBlockStyle, tier_strategy: TierStrategy) -> Duration {
+    let html = &format!(
+        "<blockquote>{}</blockquote>",
+        "<blockquote><pre>value = 1</pre></blockquote><pre>a\n  \nb</pre>".repeat(count)
+    );
+    let options = ConversionOptions {
+        extract_metadata: false,
+        code_block_style: style,
+        tier_strategy,
+        ..ConversionOptions::default()
+    };
+    let code_line = format!("> > {}value = 1", code_indent(style));
+    let line_of_spaces = format!("> {}  ", code_indent(style));
+    (0..REPEATS_PER_SAMPLE)
+        .map(|_| {
+            let start = Instant::now();
+            let output = convert(std::hint::black_box(html), Some(options.clone()))
+                .expect("conversion must succeed")
+                .content
+                .unwrap_or_default();
+            let elapsed = start.elapsed();
+            assert_eq!(
+                output.lines().filter(|line| *line == code_line).count(),
+                count,
+                "every inner quote holds its line of code"
+            );
+            // ~keep Without the lines of spaces the outer quote asks nothing and reads nothing.
+            assert_eq!(
+                output.lines().filter(|line| *line == line_of_spaces).count(),
+                count,
+                "the outer quote keeps each line of spaces"
+            );
+            elapsed
+        })
+        .min()
+        .expect("at least one run")
+}
+
+#[test]
+fn code_blocks_in_sibling_block_quotes_scale_linearly_in_both_tiers() {
+    let _alone = ONE_MEASUREMENT
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    let mut slow = Vec::new();
+    for style in [CodeBlockStyle::Indented, CodeBlockStyle::Backticks] {
+        for tier_strategy in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let mut failures = Vec::with_capacity(MAX_MEASUREMENT_ATTEMPTS);
+            for attempt in 1..=MAX_MEASUREMENT_ATTEMPTS {
+                let seconds: Vec<f64> = SIBLINGS
+                    .into_iter()
+                    .map(|count| {
+                        fastest_convert_of_siblings(count, style, tier_strategy)
+                            .as_secs_f64()
+                            .max(1e-6)
+                    })
+                    .collect();
+                let ratios: Vec<f64> = seconds.windows(2).map(|pair| pair[1] / pair[0]).collect();
+                if ratios.iter().all(|ratio| *ratio < MAX_DOUBLING_RATIO) {
+                    break;
+                }
+                failures.push(format!(
+                    "attempt {attempt}: {style:?}, {tier_strategy:?}: {SIBLINGS:?} quotes took {seconds:.4?} seconds, \
+                     ratios {ratios:.2?}; expected under {MAX_DOUBLING_RATIO}x for each doubling"
+                ));
+            }
+            if failures.len() == MAX_MEASUREMENT_ATTEMPTS {
+                slow.extend(failures);
+            }
+        }
+    }
+    assert!(
+        slow.is_empty(),
+        "the time grew faster than the count of quotes on every attempt:\n{}",
+        slow.join("\n")
+    );
+}
+
 fn assert_linear_growth(style: CodeBlockStyle) {
     let _alone = ONE_MEASUREMENT
         .lock()
