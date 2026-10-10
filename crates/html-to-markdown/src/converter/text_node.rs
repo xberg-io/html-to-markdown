@@ -539,7 +539,9 @@ pub fn push_running_text(output: &mut String, final_text: &str, site: TextSite<'
 
 fn push_processed_text(output: &mut String, final_text: &str, site: TextSite<'_>) {
     let ctx = site.ctx;
-    if !ctx.in_list_item {
+    // ~keep Code is verbatim. The handler of the code block adds the indent of the list item to
+    // ~keep every line of the finished block, so a blank line in the code starts no paragraph here.
+    if !ctx.in_list_item || ctx.in_code {
         output.push_str(final_text);
         return;
     }

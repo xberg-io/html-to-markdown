@@ -456,7 +456,7 @@ fn dispatch_close(
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
         TagKind::Heading(n) => close_heading(state, frame, n, false, options)?,
-        TagKind::Blockquote => close_blockquote(state, frame, options.br_in_tables),
+        TagKind::Blockquote => close_blockquote(state, frame, options),
         TagKind::Pre => close_pre(state, frame, options),
         TagKind::Strong if suppress_close_marker(state, EscapeCtx::STRONG, true) => {}
         TagKind::Strong => close_inline_marker(state, frame, "**")?,
@@ -468,7 +468,7 @@ fn dispatch_close(
         TagKind::Inserted => close_inline_marker(state, frame, "==")?,
         TagKind::Code => close_code(state, frame, matches!(name_lower, b"kbd" | b"samp"), options)?,
         TagKind::Link => close_link(state, frame, options)?,
-        TagKind::List(ListKind::Definition) => close_dl(state, frame),
+        TagKind::List(ListKind::Definition) => close_dl(state, frame, options),
         TagKind::List(kind) => close_list(state, kind),
         TagKind::ListItem => close_list_item(state, frame)?,
         TagKind::DefinitionTerm => close_dt(state),
@@ -531,7 +531,7 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag, name_lower: &[
         // separator either.
         return;
     }
-    if state.in_table_cell() {
+    if state.in_table_cell() || start_line_in_pre(state, name_lower) {
         return;
     }
     let buf = state.cell_or_output_mut();

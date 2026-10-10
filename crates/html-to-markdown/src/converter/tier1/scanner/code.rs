@@ -121,28 +121,10 @@ fn format_inline_code_segment(buf: &mut String, content: &str) {
     }
 }
 
-/// Compute the length of the longest consecutive run of `` ` `` in `content`.
-///
-/// ~keep Mirrors `converter::handlers::code_block::longest_consecutive_run`
-/// (see the shared-helper note on `MIN_FENCE_LENGTH` above).
-fn longest_consecutive_backtick_run(content: &str) -> usize {
-    content
-        .chars()
-        .fold((0usize, 0usize), |(max, current), c| {
-            if c == '`' {
-                let next = current + 1;
-                (max.max(next), next)
-            } else {
-                (max, 0)
-            }
-        })
-        .0
-}
-
 /// Smallest backtick-run length (starting at 1) that does not occur as a run inside `content`.
 ///
 /// ~keep Mirrors `converter::handlers::code_block::min_safe_code_span_delimiter_length`
-/// byte-for-byte (see the shared-helper note on `MIN_FENCE_LENGTH` above). CommonMark
+/// byte-for-byte. CommonMark
 /// closes an inline code span at the next backtick string of the *same* length as the
 /// opener (6.1), so `longest_run + 1` unconditionally over-escapes: content `` `` `` (a
 /// single length-2 run, no length-1 run) is valid with a single backtick delimiter.
@@ -583,7 +565,7 @@ fn close_dd(state: &mut Tier1State) {
     }
 }
 
-fn close_dl(state: &mut Tier1State, frame: &OpenTag) {
+fn close_dl(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) {
     if state.in_table_cell() {
         return;
     }
@@ -593,9 +575,13 @@ fn close_dl(state: &mut Tier1State, frame: &OpenTag) {
     if buf.len() <= frame.content_start {
         return;
     }
+    // ~keep A last line of indented code keeps its line end, as in Tier-2: the spaces are code.
+    let content_start = clamp_to_char_boundary(buf, frame.content_start);
+    let kept_end = content_start
+        + crate::converter::code_scan::quote_content_range(&buf[content_start..], options.code_block_style).end;
     // ~keep Tier-2 trims the dl's accumulated content, so any trailing whitespace
     // from the last dt/dd close should collapse to a single "\n\n" separator.
-    while buf.len() > frame.content_start {
+    while buf.len() > frame.content_start.max(kept_end) {
         let last = buf.as_bytes()[buf.len() - 1];
         if matches!(last, b' ' | b'\t' | b'\n' | b'\r') {
             buf.pop();

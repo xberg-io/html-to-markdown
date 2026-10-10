@@ -33,6 +33,7 @@ In the formula above the interaction effect is, of course, *dose*gender*type*. T
 ```
                                   Df Sum Sq Mean Sq F value   Pr(>F)
 
+
 dose:gender:type   2    187    93.4  22.367 3.81e-10
 ```
 
@@ -66,13 +67,13 @@ summary(aov2)
 The results of the analyses are shown below (we have only retained the lines with the interaction effects).
 
 ```
-               Df Sum Sq Mean Sq F value   Pr(>F)   
+                Df Sum Sq Mean Sq F value   Pr(>F)   
 
-dose:type     2    249   124.7   28.42 3.57e-12            
+ dose:type     2    249   124.7   28.42 3.57e-12            
 
-                   Df Sum Sq Mean Sq F value   Pr(>F)   
+                    Df Sum Sq Mean Sq F value   Pr(>F)   
 
-dose:type     2  137.2    68.6   17.31 6.74e-08
+ dose:type     2  137.2    68.6   17.31 6.74e-08
 ```
 
 We can notice that both simple second-order interaction effects are significant (p<0.01). So we are dealing with a combined influence of the factors dose and type of employee in both male and female groups. In this situation, we have to examine the *simple main effects* for each factor. This is what we are going to do in the next section.
@@ -95,15 +96,17 @@ aov1 <- aov(effort~dose, data=vitamin_male_blue)
 summary(aov1)
 
 ```
-                Df Sum Sq Mean Sq F value Pr(>F)   
 
-dose          2 2943.5  1471.8   349.9 <2e-16
+                 Df Sum Sq Mean Sq F value Pr(>F)   
+
+ dose          2 2943.5  1471.8   349.9 <2e-16
 ```
 
 The simple main effect for the factor dose on this group is statistically significant (p<0.01). In other words, there is a significant difference between placebo, low dose and high dose levels within the male – blue collar employees category, regarding the resistance to effort. To find out how big the differences are, we use the *TuckeyHSD* function to compute the test with the same name.
 
 ```
 TukeyHSD(aov1)
+
 
                                               diff        lwr       upr   p adj
 
@@ -126,6 +129,7 @@ dose 2 399.6 199.81 45.57 <2e-16
 
 ```
 TukeyHSD(aov1)
+
 
                                             diff        lwr       upr     p adj
 

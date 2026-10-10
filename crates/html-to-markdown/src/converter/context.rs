@@ -317,6 +317,10 @@ pub struct Context {
     #[cfg(feature = "visitor")]
     /// Stores the first visitor error encountered during traversal.
     pub(crate) visitor_error: Rc<RefCell<Option<String>>>,
+    #[cfg(feature = "visitor")]
+    /// When `true`, the visitor of this context is not the visitor of the caller: the walk is
+    /// one that [`Self::unobserved_outside_code`] started, and nothing it writes or calls is seen.
+    pub(crate) is_unobserved: bool,
     /// Optional structure collector for building a [`crate::types::DocumentStructure`].
     ///
     /// Populated when `options.include_document_structure == true`.
@@ -430,6 +434,8 @@ impl Context {
             visitor: parameters.visitor,
             #[cfg(feature = "visitor")]
             visitor_error: Rc::new(RefCell::new(None)),
+            #[cfg(feature = "visitor")]
+            is_unobserved: false,
             structure_collector: parameters.structure_collector,
             reference_collector: parameters.reference_collector,
             skip_visitor_hooks: false,
@@ -498,6 +504,78 @@ impl Context {
                 in_cell_of_inputs,
                 ..self.clone()
             })
+        }
+    }
+
+    /// Whether the visitor of the caller sees this walk.
+    ///
+    /// ~keep A link in code asks what its content writes outside code only when this holds. In
+    /// ~keep an unobserved walk no answer reaches the caller's visitor, so no link there starts
+    /// ~keep an unobserved walk of its own: a link in `<code>` in a link in `<code>` cost twice
+    /// ~keep the walks at each level before.
+    #[cfg(feature = "visitor")]
+    pub(crate) fn has_observer(&self) -> bool {
+        self.visitor.is_some() && !self.is_unobserved
+    }
+
+    /// Whether a `code`, `kbd` or `samp` element writes its content and nothing of its own in
+    /// this walk: it starts no code and adds no code marks.
+    ///
+    /// ~keep A code element in code is such an element. An unobserved walk answers what the
+    /// ~keep content of a link in code writes outside code, so it stays outside code to its end,
+    /// ~keep and a code element in it is still an element in code. When the element started code,
+    /// ~keep an image in it wrote nothing and the link lost its call. When the element wrote code
+    /// ~keep marks, a line break or a space in it was a label and the link got a call.
+    #[cfg(feature = "visitor")]
+    pub(crate) const fn code_element_is_transparent(&self) -> bool {
+        self.in_code || self.is_unobserved
+    }
+
+    /// Whether a `code`, `kbd` or `samp` element writes its content and nothing of its own in
+    /// this walk: a code element in code is such an element.
+    #[cfg(not(feature = "visitor"))]
+    pub(crate) const fn code_element_is_transparent(&self) -> bool {
+        self.in_code
+    }
+
+    /// A copy of this context that writes as outside code and that nothing observes: its visitor
+    /// continues at every call and records nothing, it has no collector, and it shares no flag,
+    /// counter or list state with this context.
+    ///
+    /// ~keep A link in code asks its content what that content writes outside code. The answer
+    /// ~keep comes from the normal traversal with this copy, so every rule of the traversal holds
+    /// ~keep for the answer: a stripped tag, an excluded node, a preset, skipped images. The copy
+    /// ~keep keeps a visitor because the traversal applies a preset only when it has none.
+    #[cfg(feature = "visitor")]
+    pub(crate) fn unobserved_outside_code(&self) -> Self {
+        #[derive(Debug)]
+        struct ContinuesEverywhere;
+        impl crate::visitor::HtmlVisitor for ContinuesEverywhere {}
+
+        Self {
+            in_code: false,
+            in_code_block: false,
+            pre_cell_break_offsets: None,
+            previous_marker: crate::converter::list::utils::PreviousMarker::default(),
+            last_list: crate::converter::list::utils::LastList::default(),
+            item_lines: crate::converter::list::utils::ItemLineScan::default(),
+            first_writer: None,
+            djot_rule_like_text: None,
+            at_fresh_block_start: Rc::new(Cell::new(self.at_fresh_block_start.get())),
+            depth_limit_reached: Rc::new(Cell::new(self.depth_limit_reached.get())),
+            inline_data_replaced: Rc::new(Cell::new(false)),
+            #[cfg(feature = "inline-images")]
+            inline_collector: None,
+            #[cfg(feature = "metadata")]
+            metadata_collector: None,
+            visitor: self.visitor.as_ref().map(|_| -> crate::visitor::VisitorHandle {
+                std::sync::Arc::new(std::sync::Mutex::new(ContinuesEverywhere))
+            }),
+            visitor_error: Rc::new(RefCell::new(None)),
+            is_unobserved: true,
+            structure_collector: None,
+            reference_collector: None,
+            ..self.clone()
         }
     }
 

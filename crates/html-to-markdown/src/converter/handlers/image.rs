@@ -166,6 +166,11 @@ fn render_image(
     if let std::ops::ControlFlow::Break(result) = visit_image(tag, data, handler) {
         return result;
     }
+    // ~keep Code shows every character as text, and a browser shows no text for an image. Only
+    // ~keep what a visitor writes for the image is written in code.
+    if handler.context.in_code {
+        return None;
+    }
     render_image_default(data, inline_data, should_use_alt_text, handler)
 }
 
