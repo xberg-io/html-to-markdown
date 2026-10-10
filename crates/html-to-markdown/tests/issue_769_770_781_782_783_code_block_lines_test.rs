@@ -12,7 +12,8 @@ struct Case {
     name: &'static str,
     html: &'static str,
     expected: &'static str,
-    /// Tier-1 renders this input without a fallback to Tier-2.
+    /// Tier-1 renders this input without a fallback to Tier-2. Only the test kit can ask Tier-1.
+    #[cfg(feature = "testkit")]
     tier1_renders: bool,
 }
 
@@ -21,6 +22,7 @@ const fn case(name: &'static str, html: &'static str, expected: &'static str) ->
         name,
         html,
         expected,
+        #[cfg(feature = "testkit")]
         tier1_renders: false,
     }
 }
@@ -30,6 +32,7 @@ const fn tier1_case(name: &'static str, html: &'static str, expected: &'static s
         name,
         html,
         expected,
+        #[cfg(feature = "testkit")]
         tier1_renders: true,
     }
 }
@@ -861,11 +864,7 @@ fn should_keep_a_link_of_a_code_block_in_the_metadata() {
 fn should_keep_the_break_between_line_elements_of_a_code_block_in_a_table_cell() {
     let html = "<table><tr><th>h</th></tr><tr><td><pre><div>a</div><div>b</div></pre></td></tr></table>";
     let mut outputs = Vec::new();
-    for tier_strategy in [
-        TierStrategy::Tier2,
-        #[cfg(feature = "testkit")]
-        TierStrategy::Tier1,
-    ] {
+    for tier_strategy in tiers() {
         let options = ConversionOptions {
             br_in_tables: true,
             ..options(tier_strategy)

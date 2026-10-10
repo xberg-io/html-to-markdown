@@ -51,7 +51,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A code block keeps the indentation that all its lines share. The converter removed it since the
   fix for [#134](https://github.com/xberg-io/html-to-markdown/issues/134):
   `<pre>  a = 1\n    b = 2\n</pre>` wrote `a = 1`, `  b = 2` and now writes `  a = 1`, `    b = 2`, as the
-  page shows it. Blank lines at the start and at the end of a block are still dropped
+  page shows it. Blank lines at the start and at the end of a block are dropped. In a list item one
+  blank line at the end stayed and is now dropped too: the middle item of
+  `<ul><li>a</li><li><pre><code>b\n\n\n</code></pre></li><li>c</li></ul>` wrote the fence, `b`, a blank
+  line and the fence, and now writes the fence, `b` and the fence. A code block in a table cell is
+  still one code span and does not keep that indentation
   ([#782](https://github.com/xberg-io/html-to-markdown/issues/782)).
 - A link, an image, highlighted text and an abbreviation inside a code block or a code span write
   their text and no Markdown marks, because code shows every character as text:

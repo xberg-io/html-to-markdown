@@ -62,7 +62,7 @@ pub fn handle_blockquote(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
 ///
 /// ~keep Only a code block keeps its indentation at the start of the container. Text that starts
 /// ~keep with spaces (strict white space mode) is not code and loses them.
-pub(crate) fn container_content<'p, 'a, 'c>(
+pub fn container_content<'p, 'a, 'c>(
     tag: &'p tl::HTMLTag<'a>,
     parser: &'p tl::Parser<'a>,
     content: &'c str,
