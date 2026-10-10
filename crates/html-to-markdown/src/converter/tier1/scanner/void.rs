@@ -70,13 +70,6 @@ fn emit_void(
         }
         return Err(BailReason::InlineMarkerNotReproduced);
     }
-    // ~keep Tier-2 keeps the words on both sides of a visible input apart. After white space
-    // ~keep or at a line start it writes nothing, whatever follows.
-    if input_type.is_some_and(|input_type| !input_type.eq_ignore_ascii_case(b"hidden"))
-        && crate::converter::form::spacing::needs_space_before(state.cell_or_output_mut())
-    {
-        return Err(BailReason::FormControl);
-    }
     // ~keep Closes the "just emitted an <img>" window too (see
     // `Tier1State::last_emitted_was_img`); the `TagKind::Image` arm below
     // re-sets it to true after this reset runs.

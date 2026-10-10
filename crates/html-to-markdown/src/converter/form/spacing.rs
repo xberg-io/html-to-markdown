@@ -88,26 +88,54 @@ pub fn separate_from_next_text(
     }
 }
 
+/// The siblings of node `id` that follow it in the source.
+fn siblings_after(id: u32, dom_ctx: &DomContext) -> &[tl::NodeHandle] {
+    let siblings = match dom_ctx.parent_of(id) {
+        Some(parent_id) => dom_ctx.children_of(parent_id),
+        None => Some(&dom_ctx.root_children),
+    };
+    siblings
+        .zip(dom_ctx.sibling_index(id))
+        .and_then(|(siblings, position)| siblings.get(position + 1..))
+        .unwrap_or_default()
+}
+
+/// Whether the source has white space right after node `id`.
+pub fn white_space_follows(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    siblings_after(id, dom_ctx)
+        .first()
+        .and_then(|next| next.get(parser))
+        .is_some_and(|next| matches!(next, tl::Node::Raw(raw) if raw.as_utf8_str().starts_with(char::is_whitespace)))
+}
+
+/// Whether node `id` is in a table cell that holds only inputs and white space.
+pub fn in_cell_of_inputs(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    let Some(parent_id) = dom_ctx.parent_of(id) else {
+        return false;
+    };
+    matches!(dom_ctx.parent_tag_name(id, parser), Some("td" | "th"))
+        && dom_ctx.children_of(parent_id).is_some_and(|children| {
+            children.iter().all(|child| match child.get(parser) {
+                Some(tl::Node::Raw(raw)) => raw.as_utf8_str().trim().is_empty(),
+                Some(tl::Node::Tag(_)) => dom_ctx.tag_name_for(*child, parser).as_deref() == Some("input"),
+                _ => true,
+            })
+        })
+}
+
 /// Whether the content after node `id` in its block starts with a word.
 fn word_follows(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
     let mut budget = MAX_LOOKAHEAD_NODES;
     loop {
-        let parent = dom_ctx.parent_of(id);
-        let siblings = match parent {
-            Some(parent_id) => dom_ctx.children_of(parent_id),
-            None => Some(&dom_ctx.root_children),
-        };
-        let Some(siblings) = siblings else { return false };
-        let Some(position) = dom_ctx.sibling_index(id) else {
-            return false;
-        };
-        for sibling in siblings.iter().skip(position + 1) {
+        for sibling in siblings_after(id, dom_ctx) {
             if let Some(starts_with_word) = leading_word(*sibling, parser, dom_ctx, &mut budget) {
                 return starts_with_word;
             }
         }
         // ~keep The line ends with a block.
-        let Some(parent_id) = parent else { return false };
+        let Some(parent_id) = dom_ctx.parent_of(id) else {
+            return false;
+        };
         if !line_goes_on_after_parent(id, parser, dom_ctx) {
             return false;
         }
@@ -129,10 +157,8 @@ fn leading_word(handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContex
         tl::Node::Tag(tag) => {
             let name = dom_ctx.tag_name_for(handle, parser)?;
             match name.as_ref() {
-                // ~keep An input that writes nothing is not in the way; a checkbox separates
-                // ~keep itself from the text before it.
-                "input" => super::elements::checkbox_state(tag).map(|_| false),
-                "script" | "style" | "template" | "noscript" => None,
+                // ~keep An input writes no text, so it is not in the way.
+                "input" | "script" | "style" | "template" | "noscript" => None,
                 "br" => Some(false),
                 "img" => Some(true),
                 // ~keep An element that writes nothing (an empty button, an empty span) is not in

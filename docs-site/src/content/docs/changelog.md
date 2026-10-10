@@ -11,13 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- A checkbox outside a task list item now writes its state as one character, `☐` or `☑`, instead of
-  task brackets. `<p>Agree <input type="checkbox"> to the terms</p>` gave `Agree [ ] to the terms`
-  and now gives `Agree ☐ to the terms`; a table cell that gave `| [x] |` now gives `| ☑ |`. Bracket
-  pairs in running text are link syntax: `[x](optional)` rendered as a link. A list item is a task
-  item only when the checkbox is its first content: `<li>Text <input type="checkbox"> more</li>` gave
-  `- [ ] Text  more` and now gives `- Text ☐ more`. A checkbox with the role of a button, the menu
-  switch of many themes, writes nothing
+- A checkbox outside a task list item writes nothing.
+  `<p>Agree <input type="checkbox"> to the terms</p>` gave `Agree [ ] to the terms` and now gives
+  `Agree to the terms`. Bracket pairs in running text are link syntax: `[x](optional)` rendered as
+  a link. A table cell that holds only inputs keeps its task brackets: `| [x] |`. A list item is a
+  task item only when the checkbox is its first content:
+  `<li>Text <input type="checkbox"> more</li>` gave `- [ ] Text  more` and now gives `- Text more`.
+  The menu switch of many themes, a checkbox before its label, no longer writes `[ ]`
   ([#757](https://github.com/xberg-io/html-to-markdown/issues/757)).
 - A link whose content gives no text is labelled with the name of the link: its `aria-label`,
   then its `title`. Before, the label was the address of the link. This changes the default
@@ -45,16 +45,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The options of a select list and the texts of neighbouring form controls are separated by one
-  space instead of joined into one word. A select list with the options `Quickstart`, `Installation`
-  and `Ruby 101` gave `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`;
-  a label, a select list and a text area in one form gave `NameOneTwoarea words` and now give
+- The options of a select list are separate words instead of one joined word, and a button, an
+  output, a meter, a progress bar or a text area is a word of its own in running text. A select
+  list with the options `Quickstart`, `Installation` and `Ruby 101` gave
+  `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`; a label, a
+  select list and a text area in one form gave `NameOneTwoarea words` and now give
   `Name One Two area words`. Both converters give the same text for output, meter and progress
-  elements. A button, an output, a meter, a progress bar or a text area in an inline element (a
-  label, a span, bold text, a custom element) stays in its line, as a browser shows it:
-  `<label><button>One</button></label>items` gave `Oneitems` and now gives `One items`, and
-  `<span><button>One</button></span>items` gave `One`, a blank line and `items`, and now gives
-  `One items`. A block that holds such a control still ends the line after it
+  elements. Such a control in an inline element (a label, a span, bold text, a custom element)
+  stays in its line, as a browser shows it: `<label><button>One</button></label>items` gave
+  `Oneitems` and now gives `One items`, and `<span><button>One</button></span>items` gave `One`, a
+  blank line and `items`, and now gives `One items`. A block that holds such a control still ends
+  the line after it. An input writes no text and adds no space: `<p>Name<input>Mail</p>` gives
+  `NameMail`. Inside `pre` and code, a button, an output, a meter, a progress bar or a text area
+  adds no space: `<pre>before<button>Go</button>after</pre>` gives `beforeGoafter`. A select list
+  there keeps its options as separate words
   ([#752](https://github.com/xberg-io/html-to-markdown/issues/752)).
 - The `label` attribute of an option group is no longer written. It is not text of the page: a
   browser shows it only inside the open list. A select list with the groups `Getting Started`

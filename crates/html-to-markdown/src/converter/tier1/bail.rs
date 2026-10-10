@@ -290,9 +290,8 @@ pub enum BailReason {
     InlineMarkerNotReproduced,
 
     /// A form control whose text Tier-2 separates from the text around it: `<select>`,
-    /// `<option>`, `<optgroup>`, `<datalist>`, an `<input>` that is not `type="hidden"` right
-    /// after text, and a `<button>`, `<output>`, `<meter>` or `<progress>` in a heading, a
-    /// summary, a caption, a link or an inline element. The space after such a control depends
+    /// `<option>`, `<optgroup>`, `<datalist>`, and a `<button>`, `<output>`, `<meter>` or `<progress>` in a
+    /// heading, a summary, a caption, a link, an inline element or code. The space after such a control depends
     /// on the text that follows it, which this scanner has not read yet.
     FormControl,
 

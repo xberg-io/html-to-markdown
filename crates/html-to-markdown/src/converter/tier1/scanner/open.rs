@@ -323,8 +323,12 @@ fn emit_open_kind(
 
 /// ~keep Button: nothing on open. `close_button` writes the space before its text and
 /// ~keep the `\n\n` after it, as Tier-2 `handle_button` does. In a line that goes on
-/// ~keep after the control, Tier-2 reads the text that follows it instead.
+/// ~keep after the control, Tier-2 reads the text that follows it instead. In code Tier-2
+/// ~keep writes neither.
 fn open_button(state: &Tier1State) -> Result<(), BailReason> {
+    if state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE) {
+        return Err(BailReason::FormControl);
+    }
     let in_inline_container = state.stack.iter().any(|frame| {
         matches!(
             frame.spec.kind,

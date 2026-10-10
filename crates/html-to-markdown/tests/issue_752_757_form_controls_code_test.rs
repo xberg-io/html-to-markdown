@@ -62,22 +62,28 @@ fn assert_in_both_modes(html: &str, expected: &str) {
 }
 
 #[test]
-fn should_keep_a_control_without_text_between_two_words_of_a_code_block() {
+fn should_add_no_space_for_a_control_without_text_in_code() {
     assert_in_both_modes(
         "<pre>before<input type=\"text\" value=\"typed\">after</pre>",
-        "```\nbefore after\n```\n",
+        "```\nbeforeafter\n```\n",
+    );
+    assert_in_both_modes(
+        "<p>See <code>before<input>after</code> and <kbd>a<input type=\"radio\">b</kbd> and <samp>a<input>b</samp></p>",
+        "See `beforeafter` and `ab` and `ab`\n",
     );
 }
 
 #[test]
-fn should_write_a_button_in_code_as_a_word_of_its_own() {
+fn should_write_the_text_of_a_button_in_code_as_the_source_has_it() {
     assert_in_both_modes(
         "<pre>before<span><button>Go</button></span>after</pre>",
-        "```\nbefore Go after\n```\n",
+        "```\nbeforeGoafter\n```\n",
     );
+    assert_in_both_modes("<pre>before<button>Go</button>after</pre>", "```\nbeforeGoafter\n```\n");
+    assert_in_both_modes("<pre>a <output>42</output> b</pre>", "```\na 42 b\n```\n");
     assert_in_both_modes(
         "<p>See <code>before<button>Go</button>after</code> here</p>",
-        "See `before Go after` here\n",
+        "See `beforeGoafter` here\n",
     );
 }
 
@@ -92,24 +98,28 @@ fn should_separate_the_options_of_a_select_list_in_code() {
         "```\nbefore\nOne Two\nafter\n```\n",
     );
     assert_in_both_modes(
+        "<pre>if (x) {\n  a<select>\n<option>One</option>\n<option>Two</option>\n</select>b;\n}</pre>",
+        "```\nif (x) {\n  a\nOne\nTwo\nb;\n}\n```\n",
+    );
+    assert_in_both_modes(
         &format!("<p>See <code>before{SELECT}after</code> here</p>"),
         "See `before One Two after` here\n",
     );
 }
 
 #[test]
-fn should_write_a_checkbox_in_code_as_one_character() {
+fn should_write_nothing_for_a_checkbox_in_code() {
     assert_in_both_modes(
         "<pre>before<input type=\"checkbox\">after</pre>",
-        "```\nbefore ☐ after\n```\n",
+        "```\nbeforeafter\n```\n",
     );
     assert_in_both_modes(
         "<pre>before<input type=\"checkbox\" checked>after</pre>",
-        "```\nbefore ☑ after\n```\n",
+        "```\nbeforeafter\n```\n",
     );
     assert_in_both_modes(
         "<p>See <code>before<input type=\"checkbox\">after</code> here</p>",
-        "See `before ☐ after` here\n",
+        "See `beforeafter` here\n",
     );
 }
 
@@ -126,14 +136,15 @@ fn should_not_write_the_label_of_an_option_group_in_code() {
 }
 
 #[test]
-fn should_separate_a_control_in_strict_white_space_mode() {
+fn should_write_a_control_in_strict_white_space_mode_as_in_the_default_mode() {
     for (html, expected) in [
         (
             "<p>before<input type=\"text\" value=\"typed\">after</p>",
-            "before after\n",
+            "beforeafter\n",
         ),
         (&*format!("<p>before{SELECT}after</p>"), "before One Two after\n"),
-        ("<p>before<input type=\"checkbox\">after</p>", "before ☐ after\n"),
+        ("<p>before<input type=\"checkbox\">after</p>", "beforeafter\n"),
+        ("<p>before <input type=\"checkbox\"> after</p>", "before after\n"),
         (&*format!("<p>before{OPTION_GROUP}after</p>"), "before One Two after\n"),
     ] {
         assert_in_mode(html, expected, WhitespaceMode::Strict);

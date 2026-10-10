@@ -223,8 +223,13 @@ fn should_separate_the_text_of_the_controls_of_a_form() {
             "<form>\n  <label for=\"n\">Name</label>\n  <input id=\"n\">\n  <select>\n    <option>One</option>\n    <option>Two</option>\n  </select>\n  <textarea>area words</textarea>\n  <button>Send</button>\n</form>",
             "Name One Two area words\n\nSend\n",
         ),
+        // ~keep An input writes no text, so it adds no space: a browser shows these labels as one word.
         (
             r#"<label for="n">Name</label><input id="n"><label for="m">Mail</label><input id="m">"#,
+            "NameMail\n",
+        ),
+        (
+            "<label for=\"n\">Name</label>\n<input id=\"n\">\n<label for=\"m\">Mail</label>\n<input id=\"m\">",
             "Name Mail\n",
         ),
         (
@@ -332,7 +337,7 @@ fn should_read_the_text_after_a_control_through_what_writes_nothing() {
         ),
         (
             r#"<p><input type="checkbox"><img src="i.png" alt="pic"></p>"#,
-            "☐ ![pic](i.png)\n",
+            "![pic](i.png)\n",
         ),
         (
             "<select><option>One</option> <option>Two</option></select>",
@@ -403,8 +408,12 @@ fn should_keep_a_control_in_an_inline_element_in_its_line() {
                 .replace("</c>", &format!("</{control}>"));
             assert_all_paths(&html, expected);
         }
-        // ~keep In a code span and in a link label the control is written as a select list is.
-        for wrapper in ["<code>|</code>", r#"<a href="/u">|</a>"#] {
+        // ~keep In a link label the control is written as a select list is. In a code span it is
+        // ~keep written as its text is: code adds no space.
+        for (wrapper, same_as) in [
+            ("<code>|</code>", "One"),
+            (r#"<a href="/u">|</a>"#, "<select><option>One</option></select>"),
+        ] {
             for shape in [
                 "|items",
                 "| items",
@@ -414,9 +423,9 @@ fn should_keep_a_control_in_an_inline_element_in_its_line() {
                 "||",
             ] {
                 let line_end = wrapper.replace('|', &format!("<{control}>One</{control}>"));
-                let list = wrapper.replace('|', "<select><option>One</option></select>");
                 let html = shape.replace('|', &line_end);
-                let expected = markdown(&shape.replace('|', &list), options(TierStrategy::Tier2));
+                let reference = shape.replace('|', &wrapper.replace('|', same_as));
+                let expected = markdown(&reference, options(TierStrategy::Tier2));
                 assert!(expected.contains("One"), "{expected:?}");
                 assert_all_paths(&html, &expected);
             }
@@ -457,17 +466,16 @@ fn should_hand_a_control_in_an_inline_element_to_the_full_converter() {
 #[test]
 fn should_separate_a_label_that_starts_with_a_control_as_the_control_is() {
     for (html, expected) in [
-        (
-            r#"<p>Name<label> <input type="checkbox"> ok</label></p>"#,
-            "Name ☐ ok\n",
-        ),
+        (r#"<p>Name<label> <input type="checkbox"> ok</label></p>"#, "Name ok\n"),
         (
             "<p>Name<label><!-- c --><select><option>One</option></select></label></p>",
             "Name One\n",
         ),
         ("<p>Name<label><input> Mail</label></p>", "Name Mail\n"),
+        // ~keep An input adds no space where the source has none.
+        ("<p>Name<label><input>Mail</label></p>", "NameMail\n"),
         // ~keep A label that starts with text, or with an input nobody sees, is text.
-        (r#"<p>Name<label>x<input type="checkbox"></label></p>"#, "Namex ☐\n"),
+        (r#"<p>Name<label>x<input type="checkbox"></label></p>"#, "Namex\n"),
         (
             r#"<p>Name<label><input type="hidden" value="t">x</label></p>"#,
             "Namex\n",
@@ -498,12 +506,12 @@ fn should_look_for_the_task_checkbox_only_before_the_first_content_of_an_item() 
         (r#"<ul><li><p><input type="checkbox"> a</p></li></ul>"#, "- [ ] a\n"),
         (
             r#"<ul><li><span>x</span><input type="checkbox"> a</li></ul>"#,
-            "- x ☐ a\n",
+            "- x a\n",
         ),
-        (r#"<ul><li><hr><input type="checkbox"> a</li></ul>"#, "- ___\n\n  ☐ a\n"),
+        (r#"<ul><li><hr><input type="checkbox"> a</li></ul>"#, "- ___\n\n  a\n"),
         (
             r#"<ul><li><ul><li>x</li></ul><input type="checkbox"> a</li></ul>"#,
-            "- * x\n\n  ☐ a\n",
+            "- * x\n\n  a\n",
         ),
     ] {
         assert_all_paths(html, expected);
@@ -519,9 +527,9 @@ fn should_read_the_first_role_of_a_checkbox() {
         ),
         (
             r#"<p>a <input type="checkbox" role="MenuItemCheckbox" checked> b</p>"#,
-            "a ☑ b\n",
+            "a b\n",
         ),
-        (r#"<p>a <input type="checkbox" role="" checked> b</p>"#, "a ☑ b\n"),
+        (r#"<p>a <input type="checkbox" role="" checked> b</p>"#, "a b\n"),
     ] {
         assert_all_paths(html, expected);
     }
@@ -560,17 +568,18 @@ fn should_hand_a_control_with_separated_text_to_the_full_converter() {
         "<option>One</option>",
         r#"<optgroup label="Fruit"></optgroup>"#,
         "<datalist><option>One</option></datalist>",
-        "<p>Name<input>Mail</p>",
-        r#"<p>Name<input type="text">Mail</p>"#,
         "<h2>Total<output>42</output>.</h2>",
         "<h2>Go<button>now</button>then</h2>",
     ] {
         let result = fast_converter(html);
         assert!(matches!(result, Err(BailReason::FormControl)), "{html}: {result:?}");
     }
-    // ~keep An input after white space, at a line start or of the hidden type writes nothing in
-    // ~keep both converters, so the fast converter keeps the input.
+    // ~keep An input writes nothing and adds no space in both converters, so the fast converter
+    // ~keep keeps the input.
     for (html, expected) in [
+        ("<p>Name<input>Mail</p>", "NameMail\n"),
+        (r#"<p>Name<input type="text" value="typed">Mail</p>"#, "NameMail\n"),
+        (r#"<p>Name<input type="radio" checked>Mail</p>"#, "NameMail\n"),
         ("<p>Name <input> Mail</p>", "Name  Mail\n"),
         ("<p><input>Mail</p>", "Mail\n"),
         (r#"<p>a<input type="hidden" value="t">b</p>"#, "ab\n"),
@@ -607,19 +616,16 @@ fn should_write_task_brackets_only_for_a_list_item_that_starts_with_a_checkbox()
         // ~keep item, are controls in the text.
         (
             r#"<ul><li><input type="checkbox"> a <input type="checkbox" checked> b</li></ul>"#,
-            "- [ ] a ☑ b\n",
+            "- [ ] a b\n",
         ),
         (
             r#"<ul><li>Text <input type="checkbox"> more</li></ul>"#,
-            "- Text ☐ more\n",
+            "- Text more\n",
         ),
-        (
-            r#"<ul><li>Text <input type="checkbox" checked></li></ul>"#,
-            "- Text ☑\n",
-        ),
+        (r#"<ul><li>Text <input type="checkbox" checked></li></ul>"#, "- Text\n"),
         (
             r#"<ul><li><img src="i.png" alt="pic"><input type="checkbox" checked> shown</li></ul>"#,
-            "- ![pic](i.png) ☑ shown\n",
+            "- ![pic](i.png) shown\n",
         ),
     ] {
         assert_all_paths(html, expected);
@@ -627,55 +633,60 @@ fn should_write_task_brackets_only_for_a_list_item_that_starts_with_a_checkbox()
 }
 
 #[test]
-fn should_write_the_state_of_a_checkbox_outside_a_task_item_as_one_character() {
+fn should_write_nothing_for_a_checkbox_outside_a_task_item() {
     for (html, expected) in [
         (
             r#"<p>Agree <input type="checkbox" name="a"> to the terms</p>"#,
-            "Agree ☐ to the terms\n",
+            "Agree to the terms\n",
         ),
         (
             r#"<input type="checkbox" id="nav-toggle"><label for="nav-toggle">Menu</label><p>text</p>"#,
-            "☐ Menu\n\ntext\n",
+            "Menu\n\ntext\n",
+        ),
+        (
+            "<input type=\"checkbox\" id=\"nav-toggle\">\n<label for=\"nav-toggle\">Menu</label>\n<p>text</p>",
+            "Menu\n\ntext\n",
+        ),
+        (
+            "<p>Agree<input type=\"checkbox\">to the terms</p>",
+            "Agreeto the terms\n",
         ),
         (
             r#"<table><tr><th>Feature</th><th>Done</th></tr><tr><td>Search</td><td><input type="checkbox" checked disabled></td></tr></table>"#,
-            "| Feature | Done |\n| ------- | ---- |\n| Search  | ☑    |\n",
+            "| Feature | Done |\n| ------- | ---- |\n| Search  | [x]  |\n",
         ),
         (
             r#"<table><tr><th><input type="checkbox"></th><th>Name</th></tr><tr><td><input type="checkbox" checked></td><td>Bob</td></tr></table>"#,
-            "| ☐ | Name |\n| --- | ---- |\n| ☑ | Bob  |\n",
+            "| [ ] | Name |\n| --- | ---- |\n| [x] | Bob  |\n",
         ),
         (
             r#"<table><tr><th>A</th><th>B</th></tr><tr><td><input type="checkbox"> one</td><td>two <input type="checkbox" checked></td></tr></table>"#,
-            "| A     | B     |\n| ----- | ----- |\n| ☐ one | two ☑ |\n",
+            "| A   | B   |\n| --- | --- |\n| one | two |\n",
         ),
-        (r#"<h2><input type="checkbox" checked> Title</h2>"#, "## ☑ Title\n"),
+        (r#"<h2><input type="checkbox" checked> Title</h2>"#, "## Title\n"),
         (
             r#"<a href="/u"><input type="checkbox" checked> label</a>"#,
-            "[☑ label](/u)\n",
+            "[label](/u)\n",
         ),
         (
             r#"<label><input type="checkbox" checked> Remember me</label>"#,
-            "☑ Remember me\n",
+            "Remember me\n",
         ),
         (
             r#"<label for="c">Remember me</label><input type="checkbox" id="c">"#,
-            "Remember me ☐\n",
+            "Remember me\n",
         ),
-        (r#"<p><input type="checkbox"> starts</p>"#, "☐ starts\n"),
-        (r#"<p>a <INPUT TYPE="CHECKBOX" CHECKED> b</p>"#, "a ☑ b\n"),
-        (
-            r#"<p><input type="checkbox"><input type="checkbox" checked></p>"#,
-            "☐ ☑\n",
-        ),
+        (r#"<p><input type="checkbox"> starts</p>"#, "starts\n"),
+        (r#"<p>a <INPUT TYPE="CHECKBOX" CHECKED> b</p>"#, "a b\n"),
+        (r#"<p><input type="checkbox"><input type="checkbox" checked></p>"#, ""),
         (
             r#"<blockquote><input type="checkbox"> quoted</blockquote>"#,
-            "> ☐ quoted\n",
+            "> quoted\n",
         ),
-        (r#"<p>a <input type="checkbox" disabled checked> b</p>"#, "a ☑ b\n"),
+        (r#"<p>a <input type="checkbox" disabled checked> b</p>"#, "a b\n"),
         (
             r#"<p>Dark mode<input type="checkbox" role="switch" checked>.</p>"#,
-            "Dark mode ☑.\n",
+            "Dark mode.\n",
         ),
     ] {
         assert_all_paths(html, expected);
@@ -689,11 +700,6 @@ fn should_write_nothing_for_a_checkbox_that_has_the_role_of_a_button() {
             r#"<input type="checkbox" id="m" role="button" aria-haspopup="true" aria-label="Main menu"><label for="m">Main menu</label>"#,
             "Main menu\n",
         ),
-        // ~keep The same checkbox with no role shows that the role is what removes it.
-        (
-            r#"<input type="checkbox" id="m" aria-haspopup="true" aria-label="Main menu"><label for="m">Main menu</label>"#,
-            "☐ Main menu\n",
-        ),
         (
             r#"<ul><li><input type="checkbox" role="button"> Menu</li></ul>"#,
             "- Menu\n",
@@ -704,7 +710,7 @@ fn should_write_nothing_for_a_checkbox_that_has_the_role_of_a_button() {
         ),
         (
             r#"<table><tr><td><input type="checkbox" role="checkbox"></td></tr></table>"#,
-            "| ☐ |\n| --- |\n",
+            "| [ ] |\n| --- |\n",
         ),
     ] {
         assert_all_paths(html, expected);
@@ -714,22 +720,22 @@ fn should_write_nothing_for_a_checkbox_that_has_the_role_of_a_button() {
 #[test]
 fn should_not_turn_a_checkbox_into_a_link() {
     // ~keep With brackets each of these rendered as a link: `[x](optional)` and `[x]` beside
-    // ~keep a `[x]:` definition.
+    // ~keep a `[x]:` definition. A checkbox beside text writes nothing.
     for (html, expected, rendered_text) in [
         (
             r#"<p><input type="checkbox" checked>(optional)</p>"#,
-            "☑ (optional)\n",
-            "<p>☑ (optional)</p>\n",
+            "(optional)\n",
+            "<p>(optional)</p>\n",
         ),
         (
             r#"<p><input type="checkbox" checked> on</p><p>[x]: /target</p>"#,
-            "☑ on\n\n[x]: /target\n",
-            "<p>☑ on</p>\n",
+            "on\n\n[x]: /target\n",
+            "<p>on</p>\n",
         ),
         (
             r#"<table><tr><th>Done</th></tr><tr><td><input type="checkbox" checked>(late)</td></tr></table>"#,
-            "| Done     |\n| -------- |\n| ☑ (late) |\n",
-            "<table>\n<thead>\n<tr>\n<th>Done</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>☑ (late)</td>\n</tr>\n</tbody>\n</table>\n",
+            "| Done   |\n| ------ |\n| (late) |\n",
+            "<table>\n<thead>\n<tr>\n<th>Done</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>(late)</td>\n</tr>\n</tbody>\n</table>\n",
         ),
     ] {
         assert_all_paths(html, expected);
@@ -756,12 +762,9 @@ fn should_read_past_an_element_that_writes_nothing_to_the_text_after_a_control()
             r#"<p><select><option>One</option></select><script type="application/ld+json">{"a":1}</script>items</p>"#,
             "One items\n",
         ),
-        (r#"<p><input type="checkbox"><button></button>items</p>"#, "☐ items\n"),
-        (
-            r#"<p><input type="checkbox"><textarea></textarea>items</p>"#,
-            "☐ items\n",
-        ),
-        (r#"<p><input type="checkbox"><select></select>items</p>"#, "☐ items\n"),
+        (r#"<p><input type="checkbox"><button></button>items</p>"#, "items\n"),
+        (r#"<p><input type="checkbox"><textarea></textarea>items</p>"#, "items\n"),
+        (r#"<p><input type="checkbox"><select></select>items</p>"#, "items\n"),
         (
             "<p><select><option>One</option></select><my-tag>items</my-tag></p>",
             "One items\n",
@@ -782,7 +785,7 @@ fn should_separate_a_control_in_a_custom_element_from_the_text_after_the_element
             "<p><my-tag><select><option>One</option></select></my-tag>items</p>",
             "One items\n",
         ),
-        (r#"<p><my-tag><input type="checkbox"></my-tag>items</p>"#, "☐ items\n"),
+        (r#"<p><my-tag><input type="checkbox"></my-tag>items</p>"#, "items\n"),
         (
             "<p><x-a><x-b><select><option>One</option></select></x-b></x-a>items</p>",
             "One items\n",
@@ -858,12 +861,6 @@ fn should_end_the_line_of_a_control_at_a_block_parent() {
         "<table><tr><th>h</th></tr><tr><td><pre><select><option>One</option></select></pre>items</td></tr></table>",
         "| h           |\n| ----------- |\n| `One` items |\n",
     );
-    // ~keep A checkbox separates itself from the text before it. A space from the control before
-    // ~keep it would be inside the code span.
-    assert_all_paths(
-        r#"<p><code><select><option>One</option></select></code><input type="checkbox">items</p>"#,
-        "`One` ☐ items\n",
-    );
     // ~keep In a heading a block is written in the line. The text of a control in the block is
     // ~keep separated from the text after the block as plain text in that block is.
     for block in ["p", "section", "form"] {
@@ -882,7 +879,10 @@ fn should_end_the_line_of_a_control_at_a_block_parent() {
 #[test]
 fn should_stop_the_search_for_the_text_after_a_control_at_the_node_limit() {
     for (empty_elements, expected) in [(10, "a b\n"), (200, "ab\n")] {
-        let html = format!("<p>a<input>{}b</p>", "<span></span>".repeat(empty_elements));
+        let html = format!(
+            "<p><select><option>a</option></select>{}b</p>",
+            "<span></span>".repeat(empty_elements)
+        );
         assert_all_paths(&html, expected);
     }
 }
@@ -982,5 +982,4 @@ fn should_write_no_checkbox_for_the_menu_switches_of_a_saved_wikipedia_page() {
     let output = markdown(&html, keep_everything);
     assert!(output.contains("Main menu"), "the menu labels are in the output");
     assert_eq!(output.matches("[ ]").count(), 0, "task brackets");
-    assert_eq!(output.matches(['☐', '☑']).count(), 0, "checkbox characters");
 }

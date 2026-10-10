@@ -305,7 +305,8 @@ pub fn handle_label(
             // ~keep In the label's own buffer a control at its start has no text before it.
             let start = ControlStart::new(output);
             output.push_str(trimmed);
-            if starts_with_control(tag, parser) {
+            // ~keep In code the text of a control is written as the source has it.
+            if !ctx.in_code && starts_with_control(tag, parser, dom_ctx) {
                 start.finish(output);
             }
             if rendered.ends_with([' ', '\t']) {
@@ -315,18 +316,21 @@ pub fn handle_label(
     }
 }
 
-/// Whether the first content of `tag` is a form control that a reader sees.
-fn starts_with_control(tag: &tl::HTMLTag, parser: &tl::Parser) -> bool {
+/// Whether the first content of `tag` separates the label from the text before it: a control
+/// that writes text of its own, or an input a reader sees with white space after it.
+fn starts_with_control(tag: &tl::HTMLTag, parser: &tl::Parser, dom_ctx: &crate::converter::DomContext) -> bool {
     let first = tag.children().top().iter().find_map(|child| match child.get(parser)? {
         tl::Node::Raw(raw) if raw.as_utf8_str().trim().is_empty() => None,
         tl::Node::Comment(_) => None,
-        node => Some(node),
+        node => Some((*child, node)),
     });
-    let Some(tl::Node::Tag(control)) = first else {
+    let Some((handle, tl::Node::Tag(control))) = first else {
         return false;
     };
     match crate::converter::utility::content::normalized_tag_name(control.name().as_utf8_str()).as_ref() {
-        "input" => !is_hidden_input(control),
+        "input" => {
+            !is_hidden_input(control) && super::spacing::white_space_follows(handle.get_inner(), parser, dom_ctx)
+        }
         name => super::spacing::writes_own_text(name),
     }
 }
@@ -356,11 +360,11 @@ pub fn checkbox_state(tag: &tl::HTMLTag) -> Option<bool> {
     (is_checkbox && !has_other_role).then(|| attributes.get("checked").is_some())
 }
 
-/// Writes what a reader sees of an input: the state of a checkbox as one character, and the
-/// space that keeps the words on both sides of the control apart.
+/// Writes what a reader sees of an input. An input is a control, not text: it writes nothing and
+/// adds no space. A checkbox is the content of a table cell that holds nothing else, so it writes
+/// its state there.
 ///
-/// ~keep The task marker `[ ]` belongs to a list item (`list/item.rs`). Anywhere else a bracket
-/// ~keep pair is link syntax: `[x](note)` and `[x]` beside a `[x]:` definition render as links.
+/// ~keep The task marker `[ ]` of a list item belongs to `list/item.rs`.
 fn emit_input(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
@@ -371,17 +375,16 @@ fn emit_input(
     let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
-    if is_hidden_input(tag) {
+    let Some(checked) = checkbox_state(tag) else {
         return;
+    };
+    let id = node_handle.get_inner();
+    if super::spacing::in_cell_of_inputs(id, parser, dom_ctx) {
+        output.push_str(if checked { "[x]" } else { "[ ]" });
+    } else if !ctx.in_code && output.ends_with(' ') && super::spacing::white_space_follows(id, parser, dom_ctx) {
+        // ~keep The white space on both sides of the checkbox is one space between two words.
+        output.pop();
     }
-    if let Some(checked) = checkbox_state(tag) {
-        let start = ControlStart::new(output);
-        output.push(if checked { '☑' } else { '☐' });
-        start.finish(output);
-        // ~keep The character is content: white space after it is not the start of the document.
-        ctx.at_fresh_block_start.set(false);
-    }
-    separate_from_next_text(output, *node_handle, parser, dom_ctx);
 }
 
 /// Handles the `<input>` element.
@@ -488,7 +491,9 @@ fn write_line_end_control(
             crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
         );
     }
-    if !start.finish(output) {
+    // ~keep In code the text of a control is written as the source has it: no space is added
+    // ~keep and the line does not end.
+    if ctx.in_code || !start.finish(output) {
         return;
     }
     if ctx.convert_as_inline || line_goes_on_after_parent(node_handle.get_inner(), parser, dom_ctx) {
@@ -544,6 +549,8 @@ pub fn handle_option_list(
         if trimmed.is_empty() {
             return;
         }
+        // ~keep In code the white space around the options is text of the source.
+        let trimmed = if ctx.in_code { rendered.as_str() } else { trimmed };
         let start = ControlStart::new(output);
         output.push_str(trimmed);
         start.finish(output);
