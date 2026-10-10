@@ -170,11 +170,86 @@ fn should_write_only_the_text_of_a_table_cell_that_holds_a_wrapped_checkbox_besi
 }
 
 #[test]
-fn should_write_no_checkbox_state_in_an_element_that_is_not_a_table_cell() {
-    assert_all_converters(
-        r#"<table><tr><th>Done</th><th>Name</th></tr><row><cell><input type="checkbox" checked></cell><cell>Bob</cell></row></table>"#,
-        "| Done | Name |\n| ---- | ---- |\n|      | Bob  |\n",
-    );
+fn should_write_only_the_content_of_a_table_cell_that_holds_a_checkbox_beside_content() {
+    for (cell, expected) in [
+        // ~keep A rule and a link are content of a table without text of their own.
+        (r"<td><input type=checkbox checked><hr></td>", "---"),
+        (r#"<td><input type=checkbox checked><a href="/a"></a></td>"#, "[](/a)"),
+        (r#"<td><label><input type="checkbox" checked></label><hr></td>"#, "---"),
+        (r#"<td><input type="checkbox"><span><hr></span></td>"#, "---"),
+        (
+            r#"<td><label><input type="checkbox" checked></label><label><a href="/a"></a></label></td>"#,
+            "[](/a)",
+        ),
+        (
+            r#"<td><input type="checkbox" checked><a href="/a">t</a></td>"#,
+            "[t](/a)",
+        ),
+        (
+            r#"<td><input type="checkbox" checked><select><option>A</option></select></td>"#,
+            "A",
+        ),
+        (r#"<td><input type="checkbox" checked><button>B</button></td>"#, "B"),
+        (r#"<td><input type="checkbox" checked><textarea>T</textarea></td>"#, "T"),
+        // ~keep A character reference for a letter is text.
+        (r#"<td><input type="checkbox" checked>&#x41;</td>"#, "A"),
+    ] {
+        assert_one_cell(cell, expected);
+    }
+    let nested = r#"<table><tr><th>h</th></tr><tr><td><input type="checkbox" checked><table><tr><td>in</td></tr></table></td></tr></table>"#;
+    for tier_strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let content = result(nested, options(tier_strategy)).content.unwrap_or_default();
+        assert!(content.contains("in") && !content.contains("[x]"), "{content}");
+    }
+}
+
+#[test]
+fn should_write_the_checkbox_state_in_a_table_cell_that_holds_a_checkbox_beside_no_content() {
+    for (cell, expected) in [
+        (r#"<td><input type="checkbox" checked><!-- c --></td>"#, "[x]"),
+        (r#"<td><!-- <hr> --><label><input type="checkbox"></label></td>"#, "[ ]"),
+        (r#"<td><input type="checkbox" checked>&nbsp;</td>"#, "[x]"),
+        (r#"<td><input type="checkbox" checked>&#160;</td>"#, "[x]"),
+        (r#"<td><input type="checkbox" checked>&#xA0;</td>"#, "[x]"),
+        (r#"<td><input type="checkbox" checked><button></button></td>"#, "[x]"),
+        // ~keep A line break is content of a table only under `br_in_tables`.
+        (r#"<td><input type="checkbox" checked><br></td>"#, "[x]"),
+    ] {
+        assert_one_cell(cell, expected);
+    }
+}
+
+#[test]
+fn should_write_only_the_line_break_of_a_table_cell_under_br_in_tables() {
+    let table = |cell: &str| format!("<table><tr><th>h</th></tr><tr><td>{cell}</td></tr></table>");
+    for tier_strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let convert_cell = |cell: &str| {
+            let options = ConversionOptions {
+                br_in_tables: true,
+                ..options(tier_strategy)
+            };
+            result(&table(cell), options).content.unwrap_or_default()
+        };
+        let with_checkbox = convert_cell(r#"<input type="checkbox" checked><br>"#);
+        assert!(with_checkbox.contains("<br>"), "{with_checkbox}");
+        assert_eq!(with_checkbox, convert_cell("<br>"), "{tier_strategy:?}");
+    }
+}
+
+#[test]
+fn should_write_the_checkbox_state_in_a_cell_element_that_holds_only_inputs() {
+    for (html, expected) in [
+        (
+            r#"<table><tr><th>Done</th><th>Name</th></tr><row><cell><input type="checkbox" checked></cell><cell>Bob</cell></row></table>"#,
+            "| Done | Name |\n| ---- | ---- |\n| [x]  | Bob  |\n",
+        ),
+        (
+            r#"<table><tr><th>Done</th><th>Name</th></tr><row><cell><input type="checkbox" checked> x</cell><cell>Bob</cell></row></table>"#,
+            "| Done | Name |\n| ---- | ---- |\n| x    | Bob  |\n",
+        ),
+    ] {
+        assert_all_converters(html, expected);
+    }
 }
 
 #[cfg(feature = "visitor")]

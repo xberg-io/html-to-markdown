@@ -476,7 +476,7 @@ impl Context {
         }
     }
 
-    /// The context for the children of the table cell `cell_id`: `self` with the answer to
+    /// The context for the children of the table cell `cell_handle`: `self` with the answer to
     /// "does this cell hold only inputs" for that cell.
     ///
     /// ~keep Each walk of a cell's children takes its context from here, so the cell is read one
@@ -484,11 +484,13 @@ impl Context {
     /// ~keep between its cells: this copies it only for a cell whose answer differs.
     pub(crate) fn for_cell(
         &self,
-        cell_id: u32,
+        cell_handle: tl::NodeHandle,
         parser: &tl::Parser,
         dom_ctx: &crate::converter::DomContext,
+        br_in_tables: bool,
     ) -> std::borrow::Cow<'_, Self> {
-        let in_cell_of_inputs = crate::converter::form::spacing::cell_holds_only_inputs(cell_id, parser, dom_ctx);
+        let in_cell_of_inputs =
+            crate::converter::block::table::scanner::cell_holds_only_inputs(cell_handle, parser, dom_ctx, br_in_tables);
         if in_cell_of_inputs == self.in_cell_of_inputs {
             std::borrow::Cow::Borrowed(self)
         } else {

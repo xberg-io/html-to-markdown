@@ -109,54 +109,6 @@ pub fn white_space_follows(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -
         .is_some_and(|next| matches!(next, tl::Node::Raw(raw) if raw.as_utf8_str().starts_with(char::is_whitespace)))
 }
 
-/// Whether the text `raw` of the source is content of a table: it has a character that is not
-/// white space. A character reference for white space is white space.
-///
-/// ~keep The scan of a table and `cell_holds_only_inputs` both ask this function and
-/// ~keep `image_is_content`, so "the table has content" and "the cell holds only inputs" agree.
-pub fn text_is_content(raw: &str) -> bool {
-    !crate::text::decode_html_entities_cow(raw).trim().is_empty()
-}
-
-/// Whether `tag` is an image that is content of a table.
-pub fn image_is_content(tag_name: &str, tag: &tl::HTMLTag) -> bool {
-    matches!(tag_name, "img" | "graphic")
-        && (tag.attributes().get("src").is_some() || tag.attributes().get("alt").is_some())
-}
-
-/// Whether node `cell_id` is a table cell that holds only inputs and white space. An element
-/// around an input (a label, a `span`, a `div`) with no text and no image of its own does not
-/// change the answer.
-///
-/// ~keep This reads the subtree of the cell, so a cell asks it one time for each walk of its
-/// ~keep children, where the walk opens the cell: `Context::for_cell`, and the two walks that
-/// ~keep build the context of a cell themselves (the table grid and a layout cell). A control
-/// ~keep reads the answer from its context. The walk stops at a table or a cell inside the cell,
-/// ~keep so nested tables are not read one time for each level.
-pub fn cell_holds_only_inputs(cell_id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
-    if !dom_ctx
-        .tag_info(cell_id, parser)
-        .is_some_and(|info| matches!(info.name.as_str(), "td" | "th"))
-    {
-        return false;
-    }
-    let mut pending: Vec<tl::NodeHandle> = Vec::new();
-    pending.extend(dom_ctx.children_of(cell_id).into_iter().flatten().copied());
-    while let Some(handle) = pending.pop() {
-        match handle.get(parser) {
-            Some(tl::Node::Raw(raw)) if text_is_content(raw.as_utf8_str().as_ref()) => return false,
-            Some(tl::Node::Tag(tag)) => match dom_ctx.tag_name_for(handle, parser).as_deref() {
-                Some("input") => {}
-                Some("table" | "td" | "th") => return false,
-                Some(name) if image_is_content(name, tag) => return false,
-                _ => pending.extend(tag.children().top().iter().copied()),
-            },
-            _ => {}
-        }
-    }
-    true
-}
-
 /// Whether the content after node `id` in its block starts with a word.
 fn word_follows(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
     let mut budget = MAX_LOOKAHEAD_NODES;
