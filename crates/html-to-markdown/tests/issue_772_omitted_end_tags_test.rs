@@ -541,8 +541,8 @@ fn a_body_start_tag_after_content_keeps_the_header_in_front_of_it() {
 
 /// ~keep In a frameset document the HTML tree builder drops everything after `</frameset>` and
 /// ~keep everything in the frameset but a `<noframes>`. The converter wrote that text before
-/// ~keep issue #772, so a page that has a `frameset` element does not take the second
-/// ~keep parse. Each expected string is the output before issue #772, not the tree of a browser.
+/// ~keep issue #772, and a second parse that would lose text is not used. Each expected
+/// ~keep string is the output before issue #772, not the tree of a browser.
 #[test]
 fn a_frameset_page_keeps_the_text_that_the_tree_builder_drops() {
     for (html, expected) in [
@@ -574,17 +574,118 @@ fn a_frameset_page_with_an_omitted_end_tag_converts_as_before() {
             "<frameset><frame><noframes><p>one</noframes></frameset><div><p>two</div>tail",
             "one\n\ntwotail\n",
         ),
+        (
+            "<svg><foreignObject><frameset></frameset></foreignObject></svg><div><p>one</div>tail",
+            "![](data:image/svg+xml;base64,PHN2Zz48Zm9yZWlnbm9iamVjdD48ZnJhbWVzZXQgLz48L2ZvcmVpZ25vYmplY3Q+PC9zdmc+)\n\nonetail\n",
+        ),
+        (
+            "<math><mtext><frameset></frameset></mtext></math><div><p>one</div>tail",
+            "onetail\n",
+        ),
+        (
+            "<div><frameset><frame></frameset></div><div><p>one</div>tail",
+            "onetail\n",
+        ),
     ] {
         assert_default_and_tier2(html, expected);
     }
 }
 
-/// ~keep Only a `frameset` element makes a frameset document. The name in a comment, in an
-/// ~keep attribute value, in the text of a `<textarea>` or of a script, or as the start of a
-/// ~keep longer tag name makes none, so the omitted end tag of such a page is repaired.
+/// ~keep The tree builder moves a `<noframes>` that starts a page into the head and keeps its
+/// ~keep content as text. The first parser reads that content as elements, so the repaired
+/// ~keep page comes back with the text of the page in the head, where the converter writes
+/// ~keep none of it. Such a repair is not used: the page converts as before issue #772.
 #[test]
-fn text_that_names_a_frameset_does_not_stop_the_repair() {
+fn a_page_whose_text_the_second_parse_moves_into_the_head_keeps_its_text() {
     for (html, expected) in [
+        ("<noframes><div></noframes><div><p>one</p></div>tail", "one\n\ntail\n"),
+        (
+            "<noframes><frameset></noframes><div><p>one</p></div>tail",
+            "one\n\ntail\n",
+        ),
+        ("<noframes><frameset></noframes><div><p>one</div>tail", "onetail\n"),
+        (
+            "<noframes>a <b>x</b></noframes><div><p>one</div>tail",
+            "a **x**\n\nonetail\n",
+        ),
+    ] {
+        assert_default_and_tier2(html, expected);
+    }
+}
+
+/// ~keep Not covered by issue #772: the first parser reads the rest of the page as the content
+/// ~keep of the `<iframe>` or of the `<noscript>`, before and after the repair, and the
+/// ~keep converter writes no text of either element.
+#[test]
+fn a_page_in_an_open_iframe_or_noscript_converts_as_before() {
+    for html in [
+        "<iframe><frameset></iframe><div><p>one</div>tail",
+        "<iframe><frameset></iframe><div><p>one</p></div>tail",
+        "<noscript><frameset></noscript><div><p>one</div>tail",
+        "<noscript><frameset></noscript><div><p>one</p></div>tail",
+    ] {
+        assert_default_and_tier2(html, "");
+    }
+}
+
+/// ~keep The tree builder decodes a character reference and writes the character back, so the
+/// ~keep text is counted with every reference decoded: a page with references keeps the repair.
+#[test]
+fn a_page_with_character_references_is_repaired() {
+    assert_default_and_tier2(
+        "<div><p>R&amp;D &copy 2020 &#169;&#xA9; &notit; a&nbsp;b</div>tail",
+        "R&D © 2020 ©© ¬it; a b\n\ntail\n",
+    );
+}
+
+/// ~keep The tree builder moves a `<title>` that starts a page into the head. The converter
+/// ~keep writes the text of a `title` only as metadata, so that move loses no text.
+#[test]
+fn a_page_that_starts_with_a_title_is_repaired() {
+    let html = "<TITLE>My page</TITLE><div><p>one</div>tail<!-- <frameset> -->";
+    let default = convert(html, None).expect("conversion must succeed");
+    assert_eq!(
+        default.content.as_deref(),
+        Some("---\ntitle: My page\n---\n\none\n\ntail\n")
+    );
+    let tier2 = convert_with(html, TierStrategy::Tier2);
+    assert_eq!(tier2.content.as_deref(), Some("one\n\ntail\n"));
+}
+
+/// ~keep A `<frameset>` start tag makes a frameset document only while the body has no
+/// ~keep content, and never in SVG or in `MathML`. The name in a comment, in an attribute
+/// ~keep value, in the text of a `<textarea>`, of a script or of a `<noframes>` in the body,
+/// ~keep or as the start of a longer tag name makes none either. The repair loses no text of
+/// ~keep such a page, so its omitted end tag is repaired.
+#[test]
+fn a_frameset_tag_that_makes_no_frameset_document_does_not_stop_the_repair() {
+    for (html, expected) in [
+        (
+            "<svg><frameset></frameset></svg><div><p>one</div>tail",
+            "![](data:image/svg+xml;base64,PHN2Zz48ZnJhbWVzZXQgLz48L3N2Zz4=)\n\none\n\ntail\n",
+        ),
+        (
+            "<math><frameset></frameset></math><div><p>one</div>tail",
+            "one\n\ntail\n",
+        ),
+        (
+            "<p>x</p><frameset></frameset><div><p>one</div>tail",
+            "x\n\none\n\ntail\n",
+        ),
+        (
+            "<div>lead</div><frameset><frame></frameset><div><p>one</div>tail",
+            "lead\n\none\n\ntail\n",
+        ),
+        ("<body><frameset></frameset><div><p>one</div>tail", "one\n\ntail\n"),
+        (
+            "<p>x</p><noframes><frameset></noframes><div><p>one</div>tail",
+            "x\n\none\n\ntail\n",
+        ),
+        (
+            "<template><frameset></frameset></template><div><p>one</div>tail",
+            "one\n\ntail\n",
+        ),
+        ("<xmp><frameset></xmp><div><p>one</div>tail", "one\n\ntail\n"),
         ("<!-- <frameset> --><div><p>one</div>tail", "one\n\ntail\n"),
         ("<framesetter></framesetter><div><p>one</div>tail", "one\n\ntail\n"),
         ("<div title=\"<frameset>\"><p>one</div>tail", "one\n\ntail\n"),

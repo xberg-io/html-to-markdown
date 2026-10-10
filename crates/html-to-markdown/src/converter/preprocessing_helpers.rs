@@ -5,8 +5,11 @@
 
 use crate::converter::dom_context::{DomContext, TagInfo};
 use crate::converter::main_helpers::{is_ascii_whitespace_only, is_inline_element};
+use crate::converter::metadata::is_body_content_in_head;
 use crate::converter::utility::attributes::{attribute_matches_any, element_has_navigation_hint};
+use crate::converter::utility::content::normalized_tag_name;
 use crate::options::ConversionOptions;
+use crate::text::decode_html_entities_cow;
 
 /// Check if an inline ancestor element is allowed to contain block-level elements.
 pub fn inline_ancestor_allows_block(tag_name: &str) -> bool {
@@ -230,51 +233,70 @@ fn has_end_tag(tag: &tl::HTMLTag<'_>) -> bool {
         .is_some_and(|raw| raw.ends_with(b"</"))
 }
 
-/// Elements whose content is no markup of the document for the HTML tree builder: it reads the
-/// content as text, or keeps it out of the document (`template`). `tl` makes an element of
-/// each tag that is written there.
+/// The count of characters that are not ASCII white space in the text nodes of `dom` that the
+/// converter can write, with every character reference decoded.
 ///
-/// ~keep `noframes`, `iframe` and `noscript` hold text too, and are not in the list: the second
-/// ~keep parse of `<noframes><frameset></noframes><p>one</p>` gives no output where the first
-/// ~keep gives `one`, and for the other two it gives the output of the first parse.
-const NO_DOCUMENT_MARKUP: [&[u8]; 7] = [
-    b"template",
-    b"textarea",
-    b"title",
-    b"script",
-    b"style",
-    b"xmp",
-    b"noembed",
-];
-
-/// True when the first parse holds a `frameset` element that the HTML tree builder also makes.
-///
-/// ~keep The name is compared in full and in any case, and a comment is not an element, so
-/// ~keep `<framesetter>` and `<!-- <frameset> -->` do not count. The walk does not go into the
-/// ~keep elements of [`NO_DOCUMENT_MARKUP`], and it stops at the first `frameset`, so each node
-/// ~keep is read at most once. Call it only for a page that is already known to need the
-/// ~keep second parse: it reads every element of a page with no `frameset`.
-pub fn has_frameset_element(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
-    let mut stack = dom_ctx.root_children.clone();
+/// ~keep The measure that decides whether a second parse lost text. It is taken the same way
+/// ~keep on the page as written and on the page as the tree builder wrote it back, so only a
+/// ~keep difference between the two pages changes it. A parse can drop text, keep it or move
+/// ~keep it, and cannot put other text in its place, so a page that lost text has a smaller
+/// ~keep count. A no-break space counts on both pages, written as a character or as `&nbsp;`.
+pub fn readable_text_len(dom: &tl::VDom<'_>) -> usize {
+    let parser = dom.parser();
+    let mut total = 0;
+    let mut stack = dom.children().to_vec();
     while let Some(handle) = stack.pop() {
-        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
-            continue;
-        };
-        let name = tag.name().as_bytes();
-        if name.eq_ignore_ascii_case(b"frameset") {
-            return true;
-        }
-        if NO_DOCUMENT_MARKUP
-            .iter()
-            .any(|skipped| name.eq_ignore_ascii_case(skipped))
-        {
-            continue;
-        }
-        if let Some(children) = dom_ctx.children_of(handle.get_inner()) {
-            stack.extend(children.iter().copied());
+        match handle.get(parser) {
+            Some(tl::Node::Raw(text)) => total += decoded_len(text.as_bytes()),
+            Some(tl::Node::Tag(tag)) if holds_readable_text(tag, parser) => {
+                stack.extend(tag.children().top().iter().copied());
+            }
+            _ => {}
         }
     }
-    false
+    total
+}
+
+/// The count of characters of `text` that are not ASCII white space, after its character
+/// references are decoded. Text with no `&` is counted as it is.
+fn decoded_len(text: &[u8]) -> usize {
+    // ~keep A byte of the form 10xxxxxx continues a character, so it starts none.
+    let characters = |bytes: &[u8]| {
+        bytes
+            .iter()
+            .filter(|byte| !byte.is_ascii_whitespace() && (**byte & 0xC0) != 0x80)
+            .count()
+    };
+    if memchr::memchr(b'&', text).is_none() {
+        return characters(text);
+    }
+    characters(decode_html_entities_cow(&String::from_utf8_lossy(text)).as_bytes())
+}
+
+/// Elements whose text the converter never writes. The tree builder moves a `title` that
+/// starts a page into the head, and the converter writes the text of a `title` in no place.
+const NO_READABLE_TEXT: [&[u8]; 5] = [b"script", b"style", b"template", b"noscript", b"title"];
+
+/// False for an element whose text the converter never writes, so text that the tree builder
+/// moves into one counts as lost.
+///
+/// ~keep The tree builder moves a `<noframes>` that starts a page into the head, and `tl`
+/// ~keep reads the markup in it as elements: `<noframes><div></noframes><p>one</p>` comes back
+/// ~keep with all its text in the head. A `head` is read by the rule of the converter
+/// ~keep ([`is_body_content_in_head`]).
+fn holds_readable_text(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> bool {
+    let name = tag.name().as_bytes();
+    if name.eq_ignore_ascii_case(b"head") {
+        return tag.children().top().iter().any(|child| {
+            matches!(
+                child.get(parser),
+                Some(tl::Node::Tag(child)) if is_body_content_in_head(&normalized_tag_name(child.name().as_utf8_str()))
+            )
+        });
+    }
+    !NO_READABLE_TEXT
+        .iter()
+        .any(|skipped| name.eq_ignore_ascii_case(skipped))
 }
 
 /// True if `child`, as a direct child of a `<table>` element, is content that a
@@ -507,62 +529,68 @@ fn element_has_noise_hint(tag: &tl::HTMLTag) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::has_frameset_element;
-    use crate::converter::utility::caching::build_dom_context;
+    use super::readable_text_len;
 
-    fn holds_frameset(html: &str) -> bool {
-        let dom = tl::parse(html, tl::ParserOptions::default()).expect("parse");
-        has_frameset_element(&build_dom_context(&dom, dom.parser(), html.len()), dom.parser())
+    fn text_len(html: &str) -> usize {
+        readable_text_len(&tl::parse(html, tl::ParserOptions::default()).expect("parse"))
     }
 
     #[test]
-    fn should_find_a_frameset_element_in_any_case_and_at_any_depth() {
-        for html in [
-            "<frameset><frame></frameset>",
-            "<FRAMESET><FRAME></FRAMESET>",
-            "<FrameSet></FrameSet>",
-            "<html><head><title>t</title></head><frameset><frame></frameset></html>",
-            "<p>one</p><div><frameset></frameset></div>",
-            "<textarea>a</textarea><frameset></frameset>",
+    fn should_count_the_characters_of_text_that_are_not_white_space() {
+        for (html, expected) in [
+            ("", 0),
+            ("<p> \n\t</p>", 0),
+            ("<div><p>one</div>tail", 7),
+            ("lead<DIV>one <b>two</b></DIV>", 10),
+            ("<p>é ü</p>", 2),
+            ("<!-- comment --><p>one<!-- two --></p>", 3),
+            ("<p title=\"text\">one</p>", 3),
         ] {
-            assert!(holds_frameset(html), "{html:?}");
+            assert_eq!(text_len(html), expected, "{html:?}");
         }
     }
 
     #[test]
-    fn should_count_a_frameset_in_noframes_iframe_and_noscript() {
-        for html in [
-            "<noframes><frameset></noframes><p>one</p>",
-            "<iframe><frameset></iframe><p>one</p>",
-            "<noscript><frameset></noscript><p>one</p>",
+    fn should_count_a_character_reference_as_the_character_it_names() {
+        for (html, expected) in [
+            ("<p>&#65;</p>", 1),
+            ("<p>&#x41;</p>", 1),
+            ("<p>&amp;</p>", 1),
+            ("<p>R&amp;D</p>", 3),
+            ("<p>a&nbsp;b&#160;c&#xA0;d&#32;e</p>", 8),
+            ("<p>a\u{a0}b</p>", 3),
+            ("<p>&copy 2020</p>", 5),
         ] {
-            assert!(holds_frameset(html), "{html:?}");
+            assert_eq!(text_len(html), expected, "{html:?}");
         }
     }
 
     #[test]
-    fn should_find_no_frameset_in_a_comment_an_attribute_or_a_longer_name() {
+    fn should_leave_out_the_text_that_the_converter_never_writes() {
+        for name in ["script", "style", "template", "noscript", "title", "TITLE", "NoScript"] {
+            let html = format!("<{name}>out <b>out</b></{name}><p>one</p>");
+            assert_eq!(text_len(&html), 3, "{html:?}");
+        }
         for html in [
-            "<!-- <frameset> --><p>one</p>",
-            "<framesetter></framesetter>",
-            "<frame></frame><frames></frames>",
-            "<div title=\"<frameset>\">one</div>",
-            "<p>frameset</p>",
-            "",
+            "<titles>four</titles><p>one</p>",
+            "<header>four</header><p>one</p>",
+            "<noframes>four</noframes><p>one</p>",
+            "<iframe>four</iframe><p>one</p>",
         ] {
-            assert!(!holds_frameset(html), "{html:?}");
+            assert_eq!(text_len(html), 7, "{html:?}");
         }
     }
 
     #[test]
-    fn should_find_no_frameset_where_the_tree_builder_reads_text_or_a_template() {
-        for name in [
-            "template", "textarea", "title", "script", "style", "xmp", "noembed", "TEXTAREA",
+    fn should_read_a_head_only_when_it_holds_body_content() {
+        for (html, expected) in [
+            ("<head>out<noframes><b>out</b></noframes></head><p>one</p>", 3),
+            ("<HEAD><NOFRAMES><DIV>out</NOFRAMES></HEAD>", 0),
+            ("<head><title>t</title><div>one</div><p>two</p>", 6),
+            ("<HEAD><TITLE>t</TITLE><BODY><p>one</p>", 3),
+            ("<header>one</header>", 3),
         ] {
-            let html = format!("<{name}><frameset></frameset></{name}><p>one</p>");
-            assert!(!holds_frameset(&html), "{html:?}");
-            let nested = format!("<{name}><b><frameset></frameset></b></{name}>");
-            assert!(!holds_frameset(&nested), "{nested:?}");
+            assert_eq!(text_len(html), expected, "{html:?}");
         }
     }
 }

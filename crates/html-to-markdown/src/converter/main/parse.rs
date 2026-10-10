@@ -1,7 +1,7 @@
 use super::preprocess_repaired_html;
 use crate::converter::DomContext;
 use crate::converter::main_helpers::{repair_with_html5ever, repair_with_html5ever_within_depth};
-use crate::converter::preprocessing_helpers::{has_frameset_element, has_inline_block_misnest, has_omitted_end_tag};
+use crate::converter::preprocessing_helpers::{has_inline_block_misnest, has_omitted_end_tag, readable_text_len};
 use crate::converter::utility::caching::build_dom_context;
 use crate::error::{ConversionError, Result};
 
@@ -11,62 +11,61 @@ thread_local! {
     static FORCE_INVALID_LENGTH: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
-fn parse_html(input: &str) -> std::result::Result<tl::VDom<'_>, tl::ParseError> {
+fn parse_html(input: &str) -> Result<tl::VDom<'_>> {
     #[cfg(test)]
     PARSE_CALLS.with(|calls| calls.set(calls.get() + 1));
     #[cfg(test)]
     if FORCE_INVALID_LENGTH.with(std::cell::Cell::get) {
-        return Err(tl::ParseError::InvalidLength);
+        return Err(invalid_length(input));
     }
-    tl::parse(input, tl::ParserOptions::default())
+    tl::parse(input, tl::ParserOptions::default()).map_err(|tl::ParseError::InvalidLength| invalid_length(input))
 }
 
-#[expect(
-    clippy::large_enum_variant,
-    reason = "boxing the hot Ready variant would allocate on every conversion; Retry is cold"
-)]
-pub(super) enum ParseOutcome<'a> {
-    Ready { dom: tl::VDom<'a>, dom_ctx: DomContext },
-    Retry(String),
+fn invalid_length(input: &str) -> ConversionError {
+    tracing::error!(
+        target: "html_to_markdown::convert",
+        input_len = input.len(),
+        "failed to parse HTML; input length exceeds parser capacity"
+    );
+    ConversionError::ParseError("Failed to parse HTML".to_string())
 }
 
+/// The tree that the converter reads, and the length of the page that the tree is made of.
+pub(super) struct ParsedPage<'a> {
+    pub(super) dom: tl::VDom<'a>,
+    pub(super) dom_ctx: DomContext,
+    pub(super) len: usize,
+}
+
+/// Parse `input`, and parse it a second time through the HTML tree builder when it has an
+/// omitted end tag or a misnest. `repaired_page` holds the page of the second parse.
+///
+/// ~keep The repair must never lose text. The tree builder drops text that the first parse
+/// ~keep keeps (all that follows `</frameset>` in a frameset document), and no list of such
+/// ~keep cases is kept here: both pages are read by `tl` and measured by
+/// ~keep [`readable_text_len`], and a repaired page with a smaller count is not used. The
+/// ~keep page then converts as it did before issue #772.
 pub(super) fn parse_for_conversion<'a>(
     input: &'a str,
+    repaired_page: &'a std::cell::OnceCell<String>,
     preserve_menu: bool,
-    attempted_misnest_repair: &mut bool,
-) -> Result<ParseOutcome<'a>> {
-    let dom = match parse_html(input) {
-        Ok(dom) => dom,
-        Err(tl::ParseError::InvalidLength) => {
-            tracing::error!(
-                target: "html_to_markdown::convert",
-                input_len = input.len(),
-                "failed to parse HTML; input length exceeds parser capacity"
-            );
-            return Err(ConversionError::ParseError("Failed to parse HTML".to_string()));
-        }
-    };
+) -> Result<ParsedPage<'a>> {
+    let dom = parse_html(input)?;
     let parser = dom.parser();
     let dom_ctx = build_dom_context(&dom, parser, input.len());
-    if *attempted_misnest_repair {
-        return Ok(ParseOutcome::Ready { dom, dom_ctx });
-    }
-    // ~keep In a frameset document the tree builder drops the text after `</frameset>`, which
-    // ~keep the first parse keeps. `tl` also leaves a `<frame>` open, so such a page looks like
-    // ~keep one with no end tag when every end tag is written. It keeps the first parse. Only a
-    // ~keep page that looks so is searched for a `frameset` element.
-    let omitted_end_tag = has_omitted_end_tag(&dom_ctx, parser) && !has_frameset_element(&dom_ctx, parser);
+    let len = input.len();
+    let omitted_end_tag = has_omitted_end_tag(&dom_ctx, parser);
     if !omitted_end_tag && !has_inline_block_misnest(&dom_ctx, parser) {
-        return Ok(ParseOutcome::Ready { dom, dom_ctx });
+        return Ok(ParsedPage { dom, dom_ctx, len });
     }
-    *attempted_misnest_repair = true;
-    // ~keep The depth limit is for the second parse that only an omitted end tag asks for. A
-    // ~keep misnest got the second parse before issue #772 and keeps it with no limit: its first
-    // ~keep parse can hide content, so it is not a tree to fall back on.
+    // ~keep The depth limit and the text rule are for the second parse that only an omitted end
+    // ~keep tag asks for. A misnest got the second parse before issue #772 and keeps it with no
+    // ~keep limit and no rule: its first parse can hide content, so it is not a tree to fall
+    // ~keep back on.
     let within_depth = omitted_end_tag
         .then(|| repair_with_html5ever_within_depth(input))
         .flatten();
-    let repaired_as_omitted_end_tag = within_depth.is_some();
+    let for_omitted_end_tag = within_depth.is_some();
     let repaired = within_depth.or_else(|| {
         (!omitted_end_tag || has_inline_block_misnest(&dom_ctx, parser))
             .then(|| repair_with_html5ever(input))
@@ -77,9 +76,20 @@ pub(super) fn parse_for_conversion<'a>(
             target: "html_to_markdown::convert",
             "html5ever repair gave no tree (the document nests too deep or cannot be written back); proceeding with original structure"
         );
-        return Ok(ParseOutcome::Ready { dom, dom_ctx });
+        return Ok(ParsedPage { dom, dom_ctx, len });
     };
-    if repaired_as_omitted_end_tag {
+    let page = repaired_page.get_or_init(|| preprocess_repaired_html(&repaired, preserve_menu));
+    let second = parse_html(page)?;
+    let loses_text = for_omitted_end_tag && readable_text_len(&second) < readable_text_len(&dom);
+    if loses_text && !has_inline_block_misnest(&dom_ctx, parser) {
+        // ~keep A frameset page with every end tag written comes here, so this is no warning.
+        tracing::debug!(
+            target: "html_to_markdown::convert",
+            "html5ever repair would lose text; proceeding with original structure"
+        );
+        return Ok(ParsedPage { dom, dom_ctx, len });
+    }
+    if for_omitted_end_tag && !loses_text {
         // ~keep An omitted end tag is HTML that the standard permits, so this route is logged
         // ~keep at debug, like the choice of a tier. A misnest is an authoring error and warns.
         tracing::debug!(
@@ -92,7 +102,12 @@ pub(super) fn parse_for_conversion<'a>(
             "misnested HTML elements detected; re-parsed with html5ever repair"
         );
     }
-    Ok(ParseOutcome::Retry(preprocess_repaired_html(&repaired, preserve_menu)))
+    let dom_ctx = build_dom_context(&second, second.parser(), page.len());
+    Ok(ParsedPage {
+        dom: second,
+        dom_ctx,
+        len: page.len(),
+    })
 }
 
 #[cfg(test)]
@@ -133,19 +148,6 @@ mod tests {
 
         assert_eq!(content.as_deref(), Some("one\n\ntail\n"));
         assert_eq!(calls, 2);
-    }
-
-    #[test]
-    fn should_parse_twice_when_only_a_comment_or_a_longer_tag_name_holds_the_word_frameset() {
-        for html in [
-            "<!-- <frameset> --><div><p>one</div>tail",
-            "<framesetter></framesetter><div><p>one</div>tail",
-        ] {
-            let (calls, content) = parse_calls_for(html);
-
-            assert_eq!(content.as_deref(), Some("one\n\ntail\n"), "{html:?}");
-            assert_eq!(calls, 2, "{html:?}");
-        }
     }
 
     #[test]
@@ -196,20 +198,33 @@ mod tests {
     }
 
     #[test]
-    fn should_parse_once_when_the_page_writes_a_frameset() {
+    fn should_convert_the_first_parse_when_the_repaired_page_holds_less_text() {
         // ~keep `tl` leaves a `<frame>` open, so the first page looks like one with no end tag.
+        // ~keep The second call is the parse of the repaired page, which is measured and left.
         for (html, expected) in [
             (
                 "<frameset><frame></frameset><div><p>one</p></div><p>tail</p>",
                 "one\n\ntail\n",
             ),
             ("<FRAMESET></FRAMESET><div><p>one</div>tail", "onetail\n"),
+            ("<noframes><div></noframes><div><p>one</p></div>tail", "one\n\ntail\n"),
         ] {
             let (calls, content) = parse_calls_for(html);
 
             assert_eq!(content.as_deref(), Some(expected), "{html:?}");
-            assert_eq!(calls, 1, "{html:?}");
+            assert_eq!(calls, 2, "{html:?}");
         }
+    }
+
+    #[test]
+    fn should_log_at_debug_that_a_repair_that_loses_text_is_not_used() {
+        assert_eq!(
+            repair_events("<frameset><frame></frameset><div><p>one</p></div><p>tail</p>"),
+            [(
+                tracing::Level::DEBUG,
+                "html5ever repair would lose text; proceeding with original structure".to_string()
+            )]
+        );
     }
 
     type Events = std::sync::Arc<std::sync::Mutex<Vec<(tracing::Level, String)>>>;
