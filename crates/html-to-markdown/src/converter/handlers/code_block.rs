@@ -235,7 +235,7 @@ pub fn handle_pre(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
         .map(|offsets| offsets.borrow().clone())
         .unwrap_or_default();
     let segmented = (!offsets.is_empty()).then(|| content.clone());
-    let processed = process_pre_content(content);
+    let processed = process_pre_content(content, handler.options.whitespace_mode, false);
     #[cfg(feature = "visitor")]
     if let Some(custom_output) = visit_code_block(tag, language.as_deref(), &processed, &handler) {
         handler.output.push_str(&custom_output);
@@ -338,10 +338,22 @@ fn language_from_class(tag: &tl::HTMLTag<'_>) -> Option<String> {
 /// ~keep second one as a blank first line of the code. Every other character is a character of
 /// ~keep the code and stays: indentation that all lines share, blank lines between lines of code,
 /// ~keep spaces at a line end (issues #782, #783). The fence drops the line feeds at the end.
-/// ~keep The white space mode does not change the rule: it is the rule of the parser.
-pub(in crate::converter) fn process_pre_content(mut content: String) -> String {
-    let leading = usize::from(content.starts_with('\n'));
-    content.drain(..leading);
+///
+/// ~keep Strict white space mode writes the start of a block as it did before that rule: the line
+/// ~keep feeds at the start are one blank first line. `tag_feed_dropped` is true for Tier-1, which
+/// ~keep dropped the line feed after the tag in that mode too.
+pub(in crate::converter) fn process_pre_content(
+    mut content: String,
+    whitespace_mode: crate::options::WhitespaceMode,
+    tag_feed_dropped: bool,
+) -> String {
+    let leading = content.len() - content.trim_start_matches('\n').len();
+    let kept = if whitespace_mode == crate::options::WhitespaceMode::Strict {
+        leading.saturating_sub(usize::from(tag_feed_dropped)).min(1)
+    } else {
+        leading.saturating_sub(1)
+    };
+    content.drain(..leading - kept);
     content
 }
 

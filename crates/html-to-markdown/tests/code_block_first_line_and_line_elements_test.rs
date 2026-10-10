@@ -129,19 +129,76 @@ fn should_not_start_an_indented_code_block_with_a_blank_line() {
     );
 }
 
+/// Strict white space mode writes the line feeds at the start of a block as it did before the rule
+/// of the default mode: one blank first line for one or more of them. Chrome shows that blank line
+/// when the line feed is in the `code` element, and when two line feeds follow the `pre` tag.
 #[test]
-fn should_drop_only_the_first_line_feed_of_a_block_in_strict_white_space_mode() {
+fn should_keep_a_blank_first_line_of_a_block_in_strict_white_space_mode() {
+    let fenced = [
+        ("<pre><code>\na\n</code></pre>", "\na"),
+        ("<pre><code>\n\na\n</code></pre>", "\na"),
+        ("<pre>\n\na\nb\n</pre>", "\na\nb"),
+    ];
+    let mut failures = Vec::new();
+    let mut checked = 0;
+    for (html, code) in fenced {
+        for (style, fence) in [(CodeBlockStyle::Backticks, "```"), (CodeBlockStyle::Tildes, "~~~")] {
+            let strict = ConversionOptions {
+                whitespace_mode: WhitespaceMode::Strict,
+                code_block_style: style,
+                ..ConversionOptions::default()
+            };
+            let mut settings = vec![("default options".to_owned(), strict.clone())];
+            for tier_strategy in tiers() {
+                // The fast converter leaves a tilde fence to the full one, and has its own start
+                // of a backtick fence in this mode (the next test).
+                if matches!(tier_strategy, TierStrategy::Tier2) || matches!(style, CodeBlockStyle::Tildes) {
+                    let forced = ConversionOptions {
+                        extract_metadata: false,
+                        tier_strategy,
+                        ..strict.clone()
+                    };
+                    settings.push((format!("{tier_strategy:?} forced"), forced));
+                }
+            }
+            let expected = format!("{fence}\n{code}\n{fence}\n");
+            for (name, options) in settings {
+                checked += 1;
+                let actual = converted(html, Some(options));
+                if actual != expected {
+                    failures.push(format!("{html:?} ({style:?}, {name}): {actual:?} is not {expected:?}"));
+                }
+            }
+        }
+    }
+    assert_eq!(checked, if cfg!(feature = "testkit") { 15 } else { 12 });
+    assert_none(&failures, checked);
+}
+
+/// The start of a block in strict white space mode, as each converter wrote it before: the full
+/// one keeps the line feed after the `pre` tag (Chrome does not show that one), the fast one drops
+/// it, and more than one blank first line is one.
+#[test]
+fn should_write_the_start_of_a_block_in_strict_white_space_mode_as_each_tier_did() {
     let cases = [
-        ("<pre>\na\nb\n</pre>", "```\na\nb\n```\n"),
-        ("<pre>\n\na\nb\n</pre>", "```\n\na\nb\n```\n"),
-        ("<pre>\n\n\na\n</pre>", "```\n\n\na\n```\n"),
+        ("<pre>\na\nb\n</pre>", "```\n\na\nb\n```\n", "```\na\nb\n```\n"),
+        ("<pre>\n\n\na\n</pre>", "```\n\na\n```\n", "```\n\na\n```\n"),
+        ("<pre>\n\n\n\na\n</pre>", "```\n\na\n```\n", "```\n\na\n```\n"),
+        ("<pre><code>\na\n</code></pre>", "```\n\na\n```\n", "```\na\n```\n"),
         (
             "<ul><li>t<pre>\n\na\nb\n</pre></li></ul>",
             "- t\n\n  ```\n\n  a\n  b\n  ```\n",
+            "- t\n\n  ```\n\n  a\n  b\n  ```\n",
         ),
+        ("<pre>a\n\nb\n</pre>", "```\na\n\nb\n```\n", "```\na\n\nb\n```\n"),
     ];
-    for (html, expected) in cases {
+    for (html, full, fast) in cases {
         for tier_strategy in tiers() {
+            let expected = if matches!(tier_strategy, TierStrategy::Tier2) {
+                full
+            } else {
+                fast
+            };
             let options = ConversionOptions {
                 whitespace_mode: WhitespaceMode::Strict,
                 ..options(tier_strategy)
@@ -149,6 +206,19 @@ fn should_drop_only_the_first_line_feed_of_a_block_in_strict_white_space_mode() 
             assert_eq!(converted(html, Some(options)), expected, "{html:?} ({tier_strategy:?})");
         }
     }
+}
+
+/// The default mode drops one line feed and keeps the others, whatever their count.
+#[test]
+fn should_drop_only_the_first_line_feed_of_a_block_in_the_default_mode() {
+    assert_style(
+        CodeBlockStyle::Backticks,
+        &[
+            ("<pre>\na\nb\n</pre>", "```\na\nb\n```\n"),
+            ("<pre>\n\n\na\n</pre>", "```\n\n\na\n```\n"),
+            ("<pre><code>\na\n</code></pre>", "```\na\n```\n"),
+        ],
+    );
 }
 
 #[test]

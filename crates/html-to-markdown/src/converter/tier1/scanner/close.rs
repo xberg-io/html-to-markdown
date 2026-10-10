@@ -501,7 +501,8 @@ fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOption
     // indent every physical line to the item's continuation column
     // before appending to `state.output` — see `push_list_item_continuation_lines`.
     // ~keep The text rule and the renderer are Tier-2's own functions, so the tiers cannot differ.
-    let content = crate::converter::handlers::code_block::process_pre_content(raw);
+    let content =
+        crate::converter::handlers::code_block::process_pre_content(raw, options.whitespace_mode, true);
     let mut rendered = String::with_capacity(content.len() + 16);
     crate::converter::handlers::code_block::render_code_block(
         &content,
