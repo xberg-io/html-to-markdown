@@ -3,6 +3,8 @@
 
 #![allow(missing_docs)]
 
+mod support;
+
 use html_to_markdown_rs::{
     ConversionOptions, ConversionOptionsUpdate, HiddenContent, OutputFormat, TierStrategy, convert,
 };
@@ -926,3 +928,5 @@ fn should_apply_the_choice_from_an_update_and_keep_it_when_the_update_names_anot
     let built = ConversionOptions::builder().hidden_content(HiddenContent::All).build();
     assert_eq!(built.hidden_content, HiddenContent::All);
 }
+
+include!("support/issue_753_word_order.rs");

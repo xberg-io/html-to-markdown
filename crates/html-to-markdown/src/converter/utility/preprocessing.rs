@@ -1,5 +1,6 @@
 //! HTML cleanup and normalization used before conversion.
 
+mod head_scan;
 mod lists;
 mod markup;
 mod menu;

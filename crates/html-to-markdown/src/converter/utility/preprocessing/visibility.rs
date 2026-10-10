@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 
+use super::head_scan::HeadScan;
 use super::markup::{find_tag_end, matches_tag_start};
 use super::raw_text::{find_closing_tag_bytes_nested, is_self_closing_tag, opens_a_tag, skip_opaque_region};
 use crate::options::HiddenContent;
@@ -379,8 +380,11 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
 /// renders in its host element. [`HiddenContent::All`] removes the tags of every `<template>` and
 /// `<noscript>`. An element whose tags stay is dropped by the walk, as before. Inside `<head>` no
 /// tag is removed: what the two elements hold there is metadata (`<link>`, `<meta>`, `<style>`),
-/// and removing the tags would make it the metadata of the document. The head ends at its end
-/// tag or at the first start tag of an element that it cannot hold.
+/// and removing the tags would make it the metadata of the document. [`HeadScan`] says where
+/// the head ends.
+///
+/// The two tags of one element are removed together or not at all: an end tag is removed only
+/// when the start tag that it closes was removed.
 ///
 /// ~keep The tags are removed before the parse, not skipped in the walk, so that every reader
 /// ~keep of the tree sees the content: a row in a `<template>` that is a child of a `<table>` is
@@ -390,16 +394,16 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
         return Cow::Borrowed(input);
     }
     let bytes = input.as_bytes();
-    // ~keep One entry for each open `<template>`: whether its tags are removed. An end tag takes
-    // ~keep the entry of the start tag it closes, so a kept template inside a dropped one, and
-    // ~keep the reverse, each close with their own tag.
-    let mut open_templates: Vec<bool> = Vec::new();
+    // ~keep For `<template>` and for `<noscript>`, one entry for each open start tag after the
+    // ~keep head: whether the tag was removed. An end tag takes the entry of the start tag that
+    // ~keep it closes. A start tag that stays while its end tag is removed holds the rest of the
+    // ~keep page, and the walk drops what it holds.
+    let mut open: [Vec<bool>; 2] = [Vec::new(), Vec::new()];
     let mut output: Option<String> = None;
     let mut last = 0;
     let mut idx = 0;
     let mut tag_ends = TagEndScan::new(bytes);
-    // ~keep The text of a `<title>` is not markup: a tag written in it does not end the head.
-    let (mut in_head, mut in_title) = (false, false);
+    let mut head = HeadScan::Before;
 
     while idx < bytes.len() {
         let Some(offset) = memchr::memchr(b'<', &bytes[idx..]) else {
@@ -410,18 +414,13 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
         let name_start = idx + 1 + usize::from(is_end_tag);
         let is_template = matches_tag_start(bytes, name_start, b"template");
         let is_noscript = matches_tag_start(bytes, name_start, b"noscript");
-        if matches_tag_start(bytes, name_start, b"head") {
-            in_head = !is_end_tag;
-        } else if matches_tag_start(bytes, name_start, b"title") {
-            in_title = !is_end_tag;
-        } else if in_head && !in_title && !is_end_tag && ends_the_head(bytes, name_start) {
-            in_head = false;
-        }
-        if in_head || (!is_template && !is_noscript) {
+        let is_tag = opens_a_tag(bytes, idx);
+        let tag_end = if is_tag { tag_ends.tag_end(idx + 1) } else { None };
+        let closes_itself = tag_end.is_some_and(|end| is_self_closing_tag(&bytes[idx..end], b"template"));
+        head = head.after_tag(bytes, name_start, is_end_tag, closes_itself);
+        if head != HeadScan::After || (!is_template && !is_noscript) {
             // ~keep A comment, a raw-text body and a quoted attribute value can hold text that
             // ~keep looks like one of the two tags. Step over each as one unit.
-            let is_tag = opens_a_tag(bytes, idx);
-            let tag_end = if is_tag { tag_ends.tag_end(idx + 1) } else { None };
             // ~keep A raw-text element starts with a tag that ends. For a tag start with no end
             // ~keep the raw-text scan would read to the end of the input and find nothing.
             idx = if is_tag && tag_end.is_none() {
@@ -431,18 +430,17 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
             };
             continue;
         }
-        let Some(tag_end) = tag_ends.tag_end(idx + 1) else {
+        let Some(tag_end) = tag_end else {
             break;
         };
-        let remove = if is_noscript {
-            hidden_content == HiddenContent::All
-        } else if is_end_tag {
-            open_templates.pop().unwrap_or(false)
+        let open = &mut open[usize::from(is_noscript)];
+        let remove = if is_end_tag {
+            open.pop().unwrap_or(false)
         } else {
-            let tag = &input[idx..tag_end];
-            let remove = hidden_content == HiddenContent::All || tag_declares_shadow_root(tag);
-            if !is_self_closing_tag(tag.as_bytes(), b"template") {
-                open_templates.push(remove);
+            let remove =
+                hidden_content == HiddenContent::All || (is_template && tag_declares_shadow_root(&input[idx..tag_end]));
+            if !closes_itself {
+                open.push(remove);
             }
             remove
         };
@@ -461,34 +459,6 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
         }
         None => Cow::Borrowed(input),
     }
-}
-
-/// The elements that a browser keeps in the document head, without `title`, which the scan reads
-/// by itself.
-const HEAD_CONTENT_NAMES: [&[u8]; 11] = [
-    b"base",
-    b"basefont",
-    b"bgsound",
-    b"html",
-    b"link",
-    b"meta",
-    b"noframes",
-    b"noscript",
-    b"script",
-    b"style",
-    b"template",
-];
-
-/// Whether the start tag whose name starts at `name_start` ends the document head.
-///
-/// ~keep The end tag of the head and the body tag are optional. A browser ends the head at the
-/// ~keep first start tag of an element that the head cannot hold, so `<head><title>t</title><p>`
-/// ~keep has its paragraph in the body.
-fn ends_the_head(bytes: &[u8], name_start: usize) -> bool {
-    bytes.get(name_start).is_some_and(u8::is_ascii_alphabetic)
-        && !HEAD_CONTENT_NAMES
-            .iter()
-            .any(|name| matches_tag_start(bytes, name_start, name))
 }
 
 /// Whether the start tag of a `<template>` declares a shadow root: `shadowrootmode` is `open` or
@@ -848,6 +818,107 @@ mod tag_ends_tests {
                 "{name} took {raw_text:?}, an ordinary tag took {plain:?}"
             );
         }
+    }
+
+    /// The pieces of the generated pages: the text, and for a tag of the two elements its
+    /// element and whether it is a start tag.
+    type Piece = (&'static str, Option<(usize, bool)>);
+    const PIECES: [Piece; 10] = [
+        ("<head>", None),
+        ("</head>", None),
+        ("<title>", None),
+        ("</title>", None),
+        ("<p>", None),
+        ("<template>", Some((0, true))),
+        (r#"<TEMPLATE shadowrootmode="open">"#, Some((0, true))),
+        ("</template>", Some((0, false))),
+        (r#"<noscript class="a">"#, Some((1, true))),
+        ("</NOSCRIPT>", Some((1, false))),
+    ];
+
+    /// Which pieces of `page` the scan removed. A comment with the position follows each piece.
+    fn removed_pieces(pieces: &[Piece], page: &str, choice: HiddenContent) -> Vec<bool> {
+        let unwrapped = unwrap_kept_inert_elements(page, choice);
+        let mut rest: &str = &unwrapped;
+        let removed = pieces
+            .iter()
+            .enumerate()
+            .map(|(position, (text, _))| {
+                let kept = rest.strip_prefix(text);
+                rest = kept
+                    .unwrap_or(rest)
+                    .strip_prefix(&format!("<!--{position}-->"))
+                    .unwrap_or_else(|| panic!("{page} {choice:?}: {unwrapped} is not the page without some tags"));
+                kept.is_none()
+            })
+            .collect();
+        assert_eq!(rest, "", "{page} {choice:?}");
+        removed
+    }
+
+    /// Check one page under one choice, and give the count of its elements with two tags and
+    /// the count of those whose tags the scan removed.
+    ///
+    /// ~keep The pairs come from a count of start and end tags for each element, which knows
+    /// ~keep nothing of the head.
+    fn check_the_pairs(pieces: &[Piece], page: &str, choice: HiddenContent) -> (usize, usize) {
+        let has_head = pieces.iter().any(|(text, _)| *text == "<head>");
+        let removed = removed_pieces(pieces, page, choice);
+        let mut open: [Vec<usize>; 2] = [Vec::new(), Vec::new()];
+        let (mut pairs, mut removed_pairs) = (0, 0);
+        for (position, (text, tag)) in pieces.iter().enumerate() {
+            let Some((element, is_start)) = *tag else {
+                assert!(!removed[position], "{page} {choice:?}: {text} is removed");
+                continue;
+            };
+            if is_start {
+                open[element].push(position);
+                let kept_by_choice = choice == HiddenContent::All || text.contains("shadowrootmode");
+                assert!(kept_by_choice || !removed[position], "{page} {choice:?}: {text}");
+                assert!(
+                    has_head || removed[position] == kept_by_choice,
+                    "{page} {choice:?}: {text}"
+                );
+            } else if let Some(start) = open[element].pop() {
+                pairs += 1;
+                removed_pairs += usize::from(removed[position]);
+                assert_eq!(
+                    removed[start], removed[position],
+                    "{page} {choice:?}: the tags at {start} and {position} are one element"
+                );
+            } else {
+                assert!(!removed[position], "{page} {choice:?}: {text} closes nothing");
+            }
+        }
+        (pairs, removed_pairs)
+    }
+
+    #[test]
+    fn should_remove_the_two_tags_of_an_element_together_or_not_at_all() {
+        // ~keep Every page of up to five pieces.
+        let (mut pairs, mut removed_pairs) = (0, 0);
+        for len in 0..=5u32 {
+            for mut code in 0..PIECES.len().pow(len) {
+                let mut pieces = Vec::new();
+                let mut page = String::new();
+                for position in 0..len {
+                    let piece = PIECES[code % PIECES.len()];
+                    code /= PIECES.len();
+                    pieces.push(piece);
+                    page.extend([piece.0, "<!--", &position.to_string(), "-->"]);
+                }
+                assert_eq!(unwrap_kept_inert_elements(&page, HiddenContent::Drop), page);
+                for choice in [HiddenContent::Reachable, HiddenContent::All] {
+                    let (in_page, removed_in_page) = check_the_pairs(&pieces, &page, choice);
+                    pairs += in_page;
+                    removed_pairs += removed_in_page;
+                }
+            }
+        }
+        assert!(
+            pairs > 20_000 && removed_pairs > 5_000,
+            "{pairs} pairs, {removed_pairs} removed"
+        );
     }
 
     #[test]

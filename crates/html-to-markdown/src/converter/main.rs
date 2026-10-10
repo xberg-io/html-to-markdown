@@ -76,16 +76,10 @@ pub fn convert_html_impl(
         base_url,
         document_base_href,
     } = parameters;
-    let preserve_menu = options.preserve_tags.iter().any(|tag| tag.eq_ignore_ascii_case("menu"));
-    let mut preprocessed = prepare_html(html, preserve_menu, options.hidden_content);
+    let mut preprocessed = prepare_html(html, options);
     let mut attempted_misnest_repair = false;
     let (dom, dom_ctx) = loop {
-        let repaired = match parse_for_conversion(
-            &preprocessed,
-            preserve_menu,
-            options.hidden_content,
-            &mut attempted_misnest_repair,
-        )? {
+        let repaired = match parse_for_conversion(&preprocessed, options, &mut attempted_misnest_repair)? {
             ParseOutcome::Ready { dom, dom_ctx } => break (dom, dom_ctx),
             ParseOutcome::Retry(repaired) => repaired,
         };
@@ -365,7 +359,13 @@ fn document_language_and_direction(
     (language, direction)
 }
 
-fn prepare_html(html: &str, preserve_menu: bool, hidden_content: HiddenContent) -> String {
+/// Whether the caller keeps `<menu>` elements as HTML.
+fn preserves_menu(options: &ConversionOptions) -> bool {
+    options.preserve_tags.iter().any(|tag| tag.eq_ignore_ascii_case("menu"))
+}
+
+fn prepare_html(html: &str, options: &ConversionOptions) -> String {
+    let (preserve_menu, hidden_content) = (preserves_menu(options), options.hidden_content);
     let mut preprocessed = preprocess_initial_html(html, preserve_menu, hidden_content);
     if has_custom_element_tags(&preprocessed) {
         preprocessed = repair_custom_elements(preprocessed, preserve_menu, hidden_content);

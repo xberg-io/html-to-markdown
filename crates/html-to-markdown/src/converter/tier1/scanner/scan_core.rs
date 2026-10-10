@@ -161,15 +161,8 @@ impl<'a> Tier1Scanner<'a> {
         if name_lower == b"svg" && self.scan_svg(name_end)? {
             return Ok(());
         }
-        if name_lower == b"template" {
-            // ~keep Tier-1 skips a template. A caller that keeps hidden content needs Tier-2,
-            // ~keep whose preprocessing removes the tags of the templates it keeps.
-            if self.options.hidden_content != crate::options::HiddenContent::Drop {
-                return Err(BailReason::Classifier);
-            }
-            if self.scan_template(name_end) {
-                return Ok(());
-            }
+        if name_lower == b"template" && self.scan_template(name_end)? {
+            return Ok(());
         }
 
         let spec = resolve_tag_spec(name_lower, tag_name_bytes, self.pos)?;
@@ -292,11 +285,16 @@ impl<'a> Tier1Scanner<'a> {
         Ok(true)
     }
 
-    fn scan_template(&mut self, name_end: usize) -> bool {
+    fn scan_template(&mut self, name_end: usize) -> Result<bool, BailReason> {
+        // ~keep Tier-1 skips a template. A caller that keeps hidden content needs Tier-2,
+        // ~keep whose preprocessing removes the tags of the templates it keeps.
+        if self.options.hidden_content != crate::options::HiddenContent::Drop {
+            return Err(BailReason::Classifier);
+        }
         let Some((close_pos, is_self_closing)) = parse::find_tag_close(self.bytes, name_end) else {
             self.pos = self.bytes.len();
             self.text_start = self.pos;
-            return true;
+            return Ok(true);
         };
         let open_tag_end = close_pos + 1;
         self.pos = if is_self_closing {
@@ -305,7 +303,7 @@ impl<'a> Tier1Scanner<'a> {
             find_balanced_close(self.bytes, open_tag_end, b"template").unwrap_or(self.bytes.len())
         };
         self.text_start = self.pos;
-        true
+        Ok(true)
     }
 
     fn skip_preprocessed_tag(&mut self, name_lower: &[u8], name_end: usize) -> Result<bool, BailReason> {
