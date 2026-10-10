@@ -32,6 +32,9 @@ use crate::rcdom::{Handle, NodeData, RcDom};
 /// The private attribute that carries an anchor's origin id through the tree builder.
 const ORIGIN_ATTR: &str = "data-h2m-anchor-origin";
 
+/// The private attribute that marks a `<tbody>` or a `<colgroup>` that a start tag asked for.
+const AUTHORED_ATTR: &str = "data-h2m-authored";
+
 /// Elements that make an anchor non-empty even without text.
 const CONTENT_BEARING: [&str; 14] = [
     "img", "picture", "video", "audio", "svg", "canvas", "iframe", "object", "embed", "input", "math", "button",
@@ -69,13 +72,15 @@ impl Tracer for HandleCount {
 }
 
 /// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it,
-/// records whether an `<html>` and a `<body>` start tag went by, and stops forwarding when the
-/// tree builder holds more than `max_open_elements` elements open.
+/// marks each `<tbody>` and `<colgroup>` start tag, records whether an `<html>` start tag, a
+/// `<table>` start tag and a `<body>` start tag that opens the body went by, and stops
+/// forwarding when the tree builder holds more than `max_open_elements` elements open.
 struct AnchorOriginStamper {
     inner: TreeBuilder<Handle, RcDom>,
     next_origin: Cell<u32>,
     saw_html_tag: Cell<bool>,
     saw_body_tag: Cell<bool>,
+    saw_table_tag: Cell<bool>,
     max_open_elements: Option<usize>,
     start_tags: Cell<usize>,
     too_deep: Cell<bool>,
@@ -102,23 +107,40 @@ impl AnchorOriginStamper {
         }
         match &*tag.name {
             "html" => self.saw_html_tag.set(true),
-            "body" => self.saw_body_tag.set(true),
+            // ~keep A `<body>` start tag after the body is open opens no element: the tree
+            // ~keep builder copies its attributes to the body it implied. That body is still
+            // ~keep one that no start tag asked for.
+            "body" if !self.has_body() => self.saw_body_tag.set(true),
+            "table" => self.saw_table_tag.set(true),
+            "tbody" | "colgroup" => set_private_attr(tag, AUTHORED_ATTR, StrTendril::new()),
             "a" => self.stamp_anchor(tag),
             _ => {}
         }
     }
 
+    /// True when the tree already holds a `<body>`.
+    fn has_body(&self) -> bool {
+        child_element(&self.inner.sink.document, "html")
+            .is_some_and(|html| child_element(&html, "body").is_some())
+    }
+
     fn stamp_anchor(&self, tag: &mut Tag) {
-        // ~keep Input may already carry the private attribute; it must never survive as an
-        // ~keep origin claim, so it is dropped before the genuine stamp is added.
-        tag.attrs.retain(|attribute| &*attribute.name.local != ORIGIN_ATTR);
         let origin = self.next_origin.get();
         self.next_origin.set(origin.wrapping_add(1));
-        tag.attrs.push(Attribute {
-            name: QualName::new(None, ns!(), LocalName::from(ORIGIN_ATTR)),
-            value: StrTendril::from(origin.to_string()),
-        });
+        set_private_attr(tag, ORIGIN_ATTR, StrTendril::from(origin.to_string()));
     }
+}
+
+/// Give `tag` the private attribute `name` with `value`.
+///
+/// ~keep Input may already carry the private attribute; it must never survive as a claim of
+/// ~keep the input, so it is dropped before the genuine one is added.
+fn set_private_attr(tag: &mut Tag, name: &str, value: StrTendril) {
+    tag.attrs.retain(|attribute| &*attribute.name.local != name);
+    tag.attrs.push(Attribute {
+        name: QualName::new(None, ns!(), LocalName::from(name)),
+        value,
+    });
 }
 
 impl TokenSink for AnchorOriginStamper {
@@ -154,10 +176,13 @@ impl TokenSink for AnchorOriginStamper {
 /// `Tokenizer<TreeBuilder<..>>` and leaves no room for a sink between the two. The input is
 /// already a `str`, so nothing the `TendrilSink` driver adds (UTF-8 decoding) is lost.
 ///
-/// ~keep The tree builder gives every document an `<html>` and a `<body>`. Each one that no
+/// ~keep The tree builder gives every document an `<html>` and a `<body>`, a table with a bare
+/// ~keep row a `<tbody>`, and a table with a bare `<col>` a `<colgroup>`. Each one that no
 /// ~keep start tag asked for is unwrapped, so the tree is no deeper than the input wrote it:
 /// ~keep the depth limit of the converter counts every level, and a page must not reach it
-/// ~keep sooner because it was repaired. Input with no `<body>` start tag is also a fragment,
+/// ~keep sooner because it was repaired. The `<tr>` that the tree builder gives a cell with no
+/// ~keep row stays: that page is a misnest, and the row is its repair.
+/// ~keep Input with no `<body>` start tag is also a fragment,
 /// ~keep and rules that ask "is this element in the body of a page" (the page header rule) must
 /// ~keep still see a fragment after the repair.
 pub fn parse_with_anchor_origins(html: &str) -> RcDom {
@@ -184,6 +209,7 @@ fn build_tree(html: &str, max_open_elements: Option<usize>) -> (RcDom, bool) {
             next_origin: Cell::new(0),
             saw_html_tag: Cell::new(false),
             saw_body_tag: Cell::new(false),
+            saw_table_tag: Cell::new(false),
             max_open_elements,
             start_tags: Cell::new(0),
             too_deep: Cell::new(false),
@@ -197,9 +223,36 @@ fn build_tree(html: &str, max_open_elements: Option<usize>) -> (RcDom, bool) {
     let too_deep = tokenizer.sink.too_deep.get();
     let saw_html_tag = tokenizer.sink.saw_html_tag.get();
     let saw_body_tag = tokenizer.sink.saw_body_tag.get();
+    let saw_table_tag = tokenizer.sink.saw_table_tag.get();
     let dom = TreeSink::finish(tokenizer.sink.inner.sink);
     unwrap_implied_wrappers(&dom.document, saw_html_tag, saw_body_tag);
+    // ~keep Only a table gets a `<tbody>` or a `<colgroup>`, so a page with no table skips the walk.
+    if saw_table_tag {
+        unwrap_implied_table_parts(&dom.document);
+    }
     (dom, too_deep)
+}
+
+/// Replace each `<tbody>` and `<colgroup>` under `document` that no start tag asked for with its
+/// children, and strip the mark from the others.
+fn unwrap_implied_table_parts(document: &Handle) {
+    let mut stack = vec![Rc::clone(document)];
+    while let Some(node) = stack.pop() {
+        stack.extend(node.children.borrow().iter().cloned());
+        let NodeData::Element { name, attrs, .. } = &node.data else {
+            continue;
+        };
+        if !matches!(&*name.local, "tbody" | "colgroup") {
+            continue;
+        }
+        let mut attrs = attrs.borrow_mut();
+        let before = attrs.len();
+        attrs.retain(|attribute| &*attribute.name.local != AUTHORED_ATTR);
+        if attrs.len() == before {
+            drop(attrs);
+            unwrap_element(&node);
+        }
+    }
 }
 
 /// Replace the `<body>` and then the `<html>` of `document` with its children, each one only
@@ -353,7 +406,10 @@ mod tests {
     use std::fmt::Write as _;
 
     fn repaired(html: &str) -> String {
-        let dom = parse_with_anchor_origins(html);
+        written(parse_with_anchor_origins(html))
+    }
+
+    fn written(dom: RcDom) -> String {
         collapse_split_anchors(&dom.document);
         let mut buf = Vec::new();
         serialize(
@@ -380,6 +436,100 @@ mod tests {
             repaired("<title>T</title><p>one<!-- <body> --><p>two"),
             "<head><title>T</title></head><p>one<!-- <body> --></p><p>two</p>"
         );
+    }
+
+    #[test]
+    fn should_give_no_body_element_to_input_with_a_body_start_tag_after_the_body_is_open() {
+        // ~keep The late start tag opens no element; the tree builder copies its attributes.
+        assert_eq!(
+            repaired("<p>one<BODY class=late><p>two"),
+            "<head></head><p>one</p><p>two</p>"
+        );
+        assert_eq!(
+            repaired("<header>h</header><p>one</p><body class=b><div><p>two</div>tail"),
+            "<head></head><header>h</header><p>one</p><div><p>two</p></div>tail"
+        );
+    }
+
+    #[test]
+    fn should_give_a_table_no_tbody_and_no_colgroup_that_the_input_did_not_write() {
+        assert_eq!(
+            body("<table><tr><td>one</td></tr></table><p>tail"),
+            "<table><tr><td>one</td></tr></table><p>tail</p>"
+        );
+        assert_eq!(
+            body("<table><col><tr><td>one</table>"),
+            "<table><col><tr><td>one</td></tr></table>"
+        );
+        assert_eq!(
+            body("<table><tr><td><table><tr><td>one"),
+            "<table><tr><td><table><tr><td>one</td></tr></table></td></tr></table>"
+        );
+    }
+
+    #[test]
+    fn should_keep_the_row_that_the_tree_builder_gives_a_cell_with_no_row() {
+        assert_eq!(body("<table><td>one"), "<table><tr><td>one</td></tr></table>");
+    }
+
+    #[test]
+    fn should_keep_the_tbody_and_the_colgroup_that_the_input_wrote() {
+        assert_eq!(
+            body("<table><COLGROUP><col></colgroup><TBODY class=b><tr><td>one</table>"),
+            "<table><colgroup><col></colgroup><tbody class=\"b\"><tr><td>one</td></tr></tbody></table>"
+        );
+        // ~keep The row after the written `tbody` gets a second one, which no start tag asked for.
+        assert_eq!(
+            body("<table><tbody><tr><td>one</td></tr></tbody><tr><td>two</td></tr></table>"),
+            "<table><tbody><tr><td>one</td></tr></tbody><tr><td>two</td></tr></table>"
+        );
+    }
+
+    #[test]
+    fn should_never_leak_the_mark_of_a_written_tbody_even_when_the_input_carries_it() {
+        assert_eq!(
+            body("<table><tbody data-h2m-authored=x><tr><td>one</table>"),
+            "<table><tbody><tr><td>one</td></tr></tbody></table>"
+        );
+    }
+
+    #[test]
+    fn should_measure_after_start_tags_only() {
+        // ~keep Start tag 512 is measured with 512 handles. Ten more blocks open, 54 end tags
+        // ~keep that end no element go by, the ten blocks end, and start tag 576 is measured
+        // ~keep with 512 handles again. A count of every tag measures at the last stray end
+        // ~keep tag, with 522 handles.
+        let page = format!(
+            "{}{}{}{}{}x",
+            "<br>".repeat(4),
+            "<div>".repeat(518),
+            "</span>".repeat(54),
+            "</div>".repeat(10),
+            "<br>".repeat(54)
+        );
+        assert!(parse_with_anchor_origins_within_depth(&page).is_some());
+    }
+
+    #[test]
+    fn should_build_nothing_more_once_the_tree_builder_went_past_the_limit() {
+        // ~keep Start tags 512 and 576 are measured with 512 handles, start tag 640 with 576.
+        // ~keep The page then ends its blocks, and start tags 704 and 768 go by with 4 open.
+        let page = format!(
+            "{}{}{}{}after{}{}<p>late",
+            "<br>".repeat(4),
+            "<div>".repeat(508),
+            "<br>".repeat(64),
+            "<div>".repeat(64),
+            "</div>".repeat(572),
+            "<br>".repeat(128)
+        );
+        let (dom, too_deep) = build_tree(&page, Some(MAX_OPEN_ELEMENTS));
+        assert!(too_deep);
+        let built = written(dom);
+        assert_eq!(built.matches("<div>").count(), 572);
+        assert!(!built.contains("after"), "{}", &built[built.len() - 40..]);
+        assert!(!built.contains("late"));
+        assert!(parse_with_anchor_origins_within_depth(&page).is_none());
     }
 
     #[test]
@@ -480,8 +630,8 @@ mod tests {
             "<head></head><body><header>h</header><p>one</p></body>"
         );
         assert_eq!(
-            repaired("<p>one<BODY class=late><p>two"),
-            "<head></head><body class=\"late\"><p>one</p><p>two</p></body>"
+            repaired("<title>T</title><BODY class=b><p>one<body id=late><p>two"),
+            "<head><title>T</title></head><body class=\"b\" id=\"late\"><p>one</p><p>two</p></body>"
         );
     }
 

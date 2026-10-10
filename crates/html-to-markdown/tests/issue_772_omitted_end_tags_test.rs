@@ -459,21 +459,21 @@ fn a_deep_page_that_took_the_second_parse_before_keeps_its_text_and_its_warning(
     // ~keep #772, and the first parse hides such a cell. The limit on the second parse for an
     // ~keep omitted end tag must not apply to them. The text and the warning are those of
     // ~keep 3.17.2. The empty tables at the limit are not: the repaired tree has no `<html>` and
-    // ~keep no `<body>` that the input did not write, so the limit cuts it two levels later.
+    // ~keep no `<body>` and no `<tbody>` that the input did not write, so the limit cuts it later.
     let open = "<table><td>".repeat(400);
     let close = "</td></table>".repeat(400);
     let pages = [
         (
             format!("<table><td>one<table><td>two{open}x"),
-            "one\n\ntwo\n\n|   |\n| --- |\n\n|  |\n| --- |\n",
+            "one\n\ntwo\n\n|  |\n| --- |\n",
         ),
         (
             format!("<table><td>one{open}x{close}</td></table><p>tail</p>"),
-            "one\n\n|   |\n| --- |\n\n|  |\n| --- |\n\ntail\n",
+            "one\n\n|  |\n| --- |\n\ntail\n",
         ),
         (
             format!("<x-note>note</x-note>{open}x{close}<p>tail</p>"),
-            "note\n\n|   |\n| --- |\n\n|  |\n| --- |\n\ntail\n",
+            "note\n\n|  |\n| --- |\n\ntail\n",
         ),
         (format!("<x-note><p>one</x-note>{open}x"), "one\n\n|  |\n| --- |\n"),
     ];
@@ -484,5 +484,57 @@ fn a_deep_page_that_took_the_second_parse_before_keeps_its_text_and_its_warning(
             assert_eq!(result.warnings.len(), 1, "warnings: {:?}", result.warnings);
             assert!(matches!(result.warnings[0].kind, WarningKind::DepthLimitExceeded));
         }
+    }
+}
+
+#[test]
+fn nested_tables_with_an_omitted_end_tag_convert_as_the_page_with_every_end_tag() {
+    // ~keep The tree builder gives a table with a bare row a `<tbody>`: one more level for each
+    // ~keep table, so 16 nested tables reached the depth limit that 22 reach with every end tag.
+    // ~keep The outputs are those of 3.17.2.
+    for document_start in ["", "<!doctype html><html><body>"] {
+        for depth in [15, 16, 17, 20, 21, 22, 25] {
+            let open = format!("{document_start}<p>lead words</p>{}", "<table><tr><td>".repeat(depth));
+            let close = "</td></tr></table>".repeat(depth);
+            let closed = content_and_depth_warnings(&format!("{open}<p>inner words</p>{close}<p>tail words</p>"));
+            if document_start.is_empty() && depth <= 20 {
+                for (content, depth_warnings) in &closed {
+                    assert_eq!(
+                        content.as_deref(),
+                        Some("lead words\n\n| inner words |\n| ----------- |\n\ntail words\n")
+                    );
+                    assert_eq!(*depth_warnings, 0);
+                }
+            }
+            for omitted in [
+                format!("{open}<p>inner words</p>{close}<p>tail words"),
+                format!("{open}<p>inner words{close}<p>tail words</p>"),
+            ] {
+                assert_eq!(
+                    content_and_depth_warnings(&omitted),
+                    closed,
+                    "{document_start:?} at depth {depth}: {:?}",
+                    &omitted[omitted.len() - 12..]
+                );
+            }
+            assert_eq!(
+                content_and_depth_warnings(&format!("{open}<p>inner words")),
+                content_and_depth_warnings(&format!("{open}<p>inner words</p>{close}")),
+                "{document_start:?} at depth {depth}: no end tag"
+            );
+        }
+    }
+}
+
+#[test]
+fn a_body_start_tag_after_content_keeps_the_header_in_front_of_it() {
+    let closed = "<header>h</header><p>one</p><body class=b><div><p>two</p></div>tail";
+    let omitted = "<header>h</header><p>one</p><body class=b><div><p>two</div>tail";
+    for (content, depth_warnings) in content_and_depth_warnings(closed)
+        .into_iter()
+        .chain(content_and_depth_warnings(omitted))
+    {
+        assert_eq!(content.as_deref(), Some("h\n\none\n\ntwo\n\ntail\n"));
+        assert_eq!(depth_warnings, 0);
     }
 }

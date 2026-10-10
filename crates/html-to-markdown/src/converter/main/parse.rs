@@ -156,7 +156,7 @@ mod tests {
         let html = format!("{}x", "<table><td>".repeat(300));
         let (calls, content) = parse_calls_for(&html);
 
-        assert_eq!(content.as_deref(), Some("|   |\n| --- |\n\n|  |\n| --- |\n"));
+        assert_eq!(content.as_deref(), Some("|  |\n| --- |\n"));
         assert_eq!(calls, 2);
     }
 
@@ -243,6 +243,21 @@ mod tests {
         );
         assert_eq!(
             repair_events("<b><p>one</p></b>"),
+            [(
+                tracing::Level::WARN,
+                "misnested HTML elements detected; re-parsed with html5ever repair".to_string()
+            )]
+        );
+    }
+
+    #[test]
+    fn should_warn_of_a_misnest_when_a_page_with_an_omitted_end_tag_takes_the_repair_with_no_limit() {
+        // ~keep No cell has an end tag, and the tree builder nests past the limit for an
+        // ~keep omitted end tag. The repair that the page then takes is the one for a misnest.
+        let html = format!("{}x", "<table><td>".repeat(300));
+
+        assert_eq!(
+            repair_events(&html),
             [(
                 tracing::Level::WARN,
                 "misnested HTML elements detected; re-parsed with html5ever repair".to_string()
