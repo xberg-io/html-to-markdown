@@ -354,12 +354,7 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     // emits `[Designed by](url)`. It runs before the trim, as it does in Tier-2:
     // a no-break space at the edge of the label is white space of the label.
     normalize_link_label_nbsp(dest, trim_start);
-    trim_label_preserving_boundary_hard_breaks(
-        dest,
-        trim_start,
-        keeps_boundary_hard_breaks,
-        marker,
-    );
+    trim_label_preserving_boundary_hard_breaks(dest, trim_start, keeps_boundary_hard_breaks, marker);
     // ~keep Tier-2 labels a link whose content gives no text with the name of the link, and
     // ~keep leaves such a link out when it points into its own page. This scanner has neither
     // ~keep rule, so it leaves the page to Tier-2.

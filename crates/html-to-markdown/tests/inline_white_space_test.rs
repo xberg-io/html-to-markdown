@@ -685,7 +685,10 @@ fn a_line_break_at_an_end_of_a_link_label_is_one_space_outside_the_link_in_a_hea
         ),
         // ~keep Nothing is owed at the end of the heading or the cell, or where a space is written.
         ("<h2><a href=\"/p\">Go<br></a></h2>", "## [Go](/p)\n"),
-        ("<h2>Press <a href=\"/p\">Go<br></a> now</h2>", "## Press [Go](/p) now\n"),
+        (
+            "<h2>Press <a href=\"/p\">Go<br></a> now</h2>",
+            "## Press [Go](/p) now\n",
+        ),
     ]);
 }
 
@@ -902,10 +905,7 @@ fn the_strict_mode_writes_what_it_wrote_before_the_rules_of_running_text() {
         // ~keep A block boundary in a heading writes no space of its own.
         ("<h2>x<footer> Logo</footer></h2>", "## x Logo\n"),
         // ~keep Two children of a link label that touch get one space when a block is among them.
-        (
-            "<a href=\"/x\"><b>H</b>ello<div>x</div></a>",
-            "[**H** ello x](/x)\n",
-        ),
+        ("<a href=\"/x\"><b>H</b>ello<div>x</div></a>", "[**H** ello x](/x)\n"),
     ];
     let wrong: Vec<String> = cases
         .iter()
