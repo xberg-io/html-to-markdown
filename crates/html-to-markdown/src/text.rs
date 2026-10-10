@@ -719,7 +719,7 @@ pub fn decode_attribute_value_cow(value: &str) -> Cow<'_, str> {
 /// Check if a character is a unicode space character.
 ///
 /// Includes: non-breaking space, various width spaces, etc.
-const fn is_unicode_space(ch: char) -> bool {
+pub const fn is_unicode_space(ch: char) -> bool {
     matches!(
         ch,
         '\u{00A0}'

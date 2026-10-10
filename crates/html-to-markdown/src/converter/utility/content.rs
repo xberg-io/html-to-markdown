@@ -195,17 +195,6 @@ pub const fn line_end_before_element(in_running_text: bool, next: NextElement) -
     }
 }
 
-/// `text` without its trailing white space, when that white space holds a line end.
-///
-/// ~keep The caller removes such white space before a zero-width space: CSS makes a run of
-/// ~keep line ends one line end and drops it beside that character, so the two parts stay one
-/// ~keep word (`long\n&#8203;word`, and `long\n\n&#8203;word` too).
-#[must_use]
-pub fn without_trailing_line_end(text: &str) -> Option<&str> {
-    let kept = text.trim_end_matches(crate::converter::utility::white_space::is_collapsible);
-    text[kept.len()..].contains('\n').then_some(kept)
-}
-
 /// The source text `raw` without the white space at its end, when that white space holds a
 /// line end and other text is before it. A character reference to white space is white space:
 /// `one&#10;` and `one\n&#32;` end with a line end as `one\n` does.

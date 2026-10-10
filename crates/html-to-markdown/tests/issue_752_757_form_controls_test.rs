@@ -519,6 +519,7 @@ fn should_look_for_the_task_checkbox_only_before_the_first_content_of_an_item() 
             "- x a\n",
         ),
         (r#"<ul><li><hr><input type="checkbox"> a</li></ul>"#, "- ___\n\n  a\n"),
+        (r#"<ul><li><p>x</p><input type="checkbox"> a</li></ul>"#, "- x\n\n  a\n"),
         (
             r#"<ul><li><ul><li>x</li></ul><input type="checkbox"> a</li></ul>"#,
             "- * x\n\n  a\n",

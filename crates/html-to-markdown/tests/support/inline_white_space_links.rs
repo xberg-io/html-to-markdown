@@ -155,7 +155,7 @@ fn white_space_that_bold_text_starts_with_in_a_link_label_is_written_as_before()
 /// In `pre` and in a code span the text is written as it is.
 ///
 /// ~keep The rows of a list item are the output of the full converter, not of a browser: it
-/// ~keep writes one space where the fast converter writes the indent of the item for a `span`.
+/// ~keep writes the indent of the item for a `span` as the fast converter does.
 #[test]
 fn a_link_with_no_address_is_written_as_a_span_is() {
     let cases = [
@@ -189,8 +189,8 @@ fn a_link_with_no_address_is_written_as_a_span_is() {
         assert_eq!(convert_everywhere(&span, false), Ok(expected.to_owned()), "{span:?}");
     }
     assert_on_full(&[
-        ("<ul><li>Press <a>Go<br> </a> now</li></ul>", "- Press Go  \n now\n"),
-        ("<ul><li>Press<a>Go<br> </a> now</li></ul>", "- PressGo  \n now\n"),
+        ("<ul><li>Press <a>Go<br> </a> now</li></ul>", "- Press Go  \n  now\n"),
+        ("<ul><li>Press<a>Go<br> </a> now</li></ul>", "- PressGo  \n  now\n"),
         ("<pre>Press <a>Go </a>now</pre>", "```\nPress Go now\n```\n"),
         ("<p><code>Press <a>Go </a>now</code></p>", "`Press Go now`\n"),
     ]);
@@ -228,34 +228,35 @@ fn a_link_label_of_white_space_only_puts_no_space_outside_the_link() {
     }
 }
 
-/// A code span keeps the white space of its text. The white space at an end of a link label is
-/// not written a second time outside the link there. The fast converter gives a link in a code
+/// A code span keeps the white space of its text. A link in it is written as its text, and the
+/// white space at an end of the label is not moved. The fast converter gives a link in a code
 /// span to the full one.
+///
+/// ~keep These rows pin the output of the base, not the output of a browser, which shows one
+/// ~keep space between the words: a code span keeps every space of the source.
 #[test]
 fn white_space_at_an_end_of_a_link_label_is_not_moved_in_a_code_span() {
     assert_on_full(&[
         (
             "<p><code>Press <a href=\"/p\"> Go </a> now</code></p>",
-            "`Press [Go](/p) now`\n",
+            "`Press  Go  now`\n",
         ),
         (
             "<p><code>Press <a href=\"/p\">Go </a> now</code></p>",
-            "`Press [Go](/p) now`\n",
+            "`Press Go  now`\n",
         ),
-        // ~keep This row pins the output of the base, not the output of a browser, which shows
-        // ~keep `Press Go now`: a label space is not moved in a code span.
         (
             "<p><code>Press<a href=\"/p\"> Go </a>now</code></p>",
-            "`Press[Go](/p)now`\n",
+            "`Press Go now`\n",
         ),
-        ("<p><code><a href=\"/p\"> Go </a></code></p>", "`[Go](/p)`\n"),
+        ("<p><code><a href=\"/p\"> Go </a></code></p>", "` Go `\n"),
         (
             "<p><code><a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"> </a></code></p>",
-            "`[![Go](/i.png)](/p)`\n",
+            "`  `\n",
         ),
         (
             "<p><kbd>Press <a href=\"/p\"> Go </a> now</kbd></p>",
-            "`Press [Go](/p) now`\n",
+            "`Press Go now`\n",
         ),
         // ~keep A link with no address is running text of the span, with its white space.
         ("<p><code>Press<a>Go </a>now</code></p>", "`PressGo now`\n"),
@@ -263,26 +264,21 @@ fn white_space_at_an_end_of_a_link_label_is_not_moved_in_a_code_span() {
 }
 
 /// In `<pre>`, `<code>`, `<kbd>` and `<samp>` no rule of running text runs. Each row pins the
-/// output of the full converter before those rules, not the output of a browser. The fast
+/// output of the full converter before those rules, not the output of a browser: a link in
+/// such an element is written as its text, with the white space of the source. The fast
 /// converter gives a link or a block in such an element to the full one.
 #[test]
 fn the_rules_of_running_text_do_not_run_in_code() {
     assert_on_full(&[
-        (
-            "<pre>Press<a href=\"/p\">Go </a>now</pre>",
-            "```\nPress[Go](/p)now\n```\n",
-        ),
-        (
-            "<pre>Press<a href=\"/p\"> Go </a>now</pre>",
-            "```\nPress[Go](/p)now\n```\n",
-        ),
+        ("<pre>Press<a href=\"/p\">Go </a>now</pre>", "```\nPressGo now\n```\n"),
+        ("<pre>Press<a href=\"/p\"> Go </a>now</pre>", "```\nPress Go now\n```\n"),
         ("<pre>Press<q> Go </q>now</pre>", "```\nPress\"Go\"now\n```\n"),
         (
             "<pre>one\n<a href=\"/y\">t<div>y</div></a></pre>",
-            "```\none\n[t y](/y)\n```\n",
+            "```\none\nt\ny\n```\n",
         ),
         ("<p><kbd>Press<a name=\"n\">Go </a> now</kbd></p>", "`PressGo now`\n"),
-        ("<pre>x<section> a</section></pre>", "```\nx\n\n a\n```\n"),
+        ("<pre>x<section> a</section></pre>", "```\nx\n a\n```\n"),
     ]);
 }
 

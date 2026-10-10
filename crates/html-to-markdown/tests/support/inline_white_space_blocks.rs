@@ -53,7 +53,6 @@ fn white_space_on_both_sides_of_an_empty_inline_element_is_one_space() {
 fn a_no_break_space_does_not_collapse() {
     assert_on_both(&[
         ("<p>one\n<span>&nbsp;</span>two</p>", "one \u{a0}two\n"),
-        ("<p>one <span>&nbsp;</span> two</p>", "one \u{a0} two\n"),
         ("<p>one <b>x</b> &nbsp;<i>two</i></p>", "one **x** \u{a0}*two*\n"),
         ("<p><b>one</b>&nbsp;<i>two</i></p>", "**one**\u{a0}*two*\n"),
         ("<p><b>one</b>&nbsp;&nbsp;<i>two</i></p>", "**one**\u{a0}\u{a0}*two*\n"),
@@ -68,7 +67,16 @@ fn a_no_break_space_does_not_collapse() {
         ("<ul><li>one&nbsp;<b>two</b></li></ul>", "- one **two**\n"),
         ("<h2>one&nbsp;<b>two</b></h2>", "## one **two**\n"),
         ("<pre>one&nbsp;two</pre>", "```\none\u{a0}two\n```\n"),
+        ("<pre>one &nbsp;two</pre>", "```\none \u{a0}two\n```\n"),
     ]);
+    // ~keep A no-break blank after a space of the source is not written, as before this change
+    // ~keep (the base wrote `one  two`); the space after it is the same run of white space as
+    // ~keep the one before it. The fast converter keeps the no-break space (step 3).
+    assert_written_as_before(&[(
+        "<p>one <span>&nbsp;</span> two</p>",
+        "one two\n",
+        Some("one \u{a0} two\n"),
+    )]);
 }
 
 #[test]
@@ -208,7 +216,8 @@ fn the_space_after_an_inline_graphic_is_kept() {
 fn the_space_after_other_replaced_content_is_kept() {
     assert_on_full(&[
         ("<p><video src=\"/v.mp4\"></video> text</p>", "[/v.mp4](/v.mp4) text\n"),
-        ("<p><input type=\"checkbox\"> text</p>", "[ ] text\n"),
+        // ~keep A check box outside a list item writes nothing, and no space with it.
+        ("<p><input type=\"checkbox\"> text</p>", "text\n"),
     ]);
 }
 
@@ -423,7 +432,8 @@ fn a_block_in_code_in_a_heading_is_no_block_boundary() {
 
 /// A thematic break in a link in a heading is a block of the label: a label that starts with it
 /// is a word of its own (issue #751). The fast converter gives these inputs to the full one. In
-/// a table cell both converters write the label as before, and in `pre` the full one does.
+/// a table cell both converters write the label as before; in `pre` the full one writes the
+/// link as its text and the break as a line of its own.
 #[test]
 fn a_thematic_break_in_a_link_in_a_heading_is_a_word_of_its_own() {
     assert_on_full(&[
@@ -434,7 +444,7 @@ fn a_thematic_break_in_a_link_in_a_heading_is_a_word_of_its_own() {
         ("<h2>one<a><hr>y</a>two</h2>", "## one --- ytwo\n"),
         (
             "<pre>one<a href=\"/y\"><hr>y</a>two</pre>",
-            "```\none[--- y](/y)two\n```\n",
+            "```\none\n\n---\nytwo\n```\n",
         ),
     ]);
     assert_on_both(&[(

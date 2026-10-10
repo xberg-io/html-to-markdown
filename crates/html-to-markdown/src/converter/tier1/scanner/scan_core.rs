@@ -648,7 +648,6 @@ fn push_open_frame(
         dropped_whitespace_only_text: false,
         own_buffer: renders_into_own_buffer(spec.kind, name_lower, prev_ctx),
         starts_with_whitespace: false,
-        children_in_own_buffer: matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription),
     });
 }
 

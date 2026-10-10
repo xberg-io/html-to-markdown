@@ -379,11 +379,22 @@ fn emit_input(
         Some(checked) if ctx.in_cell_of_inputs => output.push_str(if checked { "[x]" } else { "[ ]" }),
         // ~keep The white space on both sides of a checkbox that writes nothing is one space
         // ~keep between two words. A checkbox with the role of a button writes nothing too.
-        _ if !ctx.in_code && output.ends_with(' ') && super::spacing::white_space_follows(id, parser, dom_ctx) => {
+        // ~keep The space after a line end is the indent of the line, not white space between
+        // ~keep words: `<li><p>x</p><input type="checkbox"> a</li>` keeps the two spaces of `a`.
+        _ if !ctx.in_code
+            && ends_with_a_space_between_words(output)
+            && super::spacing::white_space_follows(id, parser, dom_ctx) =>
+        {
             output.pop();
         }
         _ => {}
     }
+}
+
+/// Whether `output` ends with a space that follows a word on its line.
+fn ends_with_a_space_between_words(output: &str) -> bool {
+    let before_spaces = output.trim_end_matches(' ');
+    before_spaces.len() < output.len() && !before_spaces.is_empty() && !before_spaces.ends_with('\n')
 }
 
 /// Handles the `<input>` element.

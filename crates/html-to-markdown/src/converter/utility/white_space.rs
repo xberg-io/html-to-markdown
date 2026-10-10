@@ -3,8 +3,8 @@
 //! The rule is CSS `white-space: normal` as a browser applies it to the decoded text of the
 //! parsed tree:
 //!
-//! 1. Collapsible white space is exactly the five characters of [`is_collapsible`]. A no-break
-//!    space and every other Unicode space is a character.
+//! 1. Collapsible white space is exactly the four characters of [`is_collapsible`]. A form feed,
+//!    a no-break space and every other Unicode space is a character.
 //! 2. A segment break (a line feed) is removed when the character before or after its run,
 //!    across inline element boundaries and comments, is a zero-width space; otherwise it is
 //!    a space.
@@ -14,14 +14,30 @@
 //!    line and not after a space already written. Markdown marks are not characters: the space
 //!    goes outside the marks.
 //! 5. Inside `pre`, code and in strict mode nothing above applies: the caller does not ask.
+//!
+//! The full converter also decides here what it writes for a no-break space and the other
+//! Unicode spaces, which the rule above leaves as characters:
+//!
+//! - A text is [blank](is_blank) when a reader sees nothing in it. A blank text before the first
+//!   visible content of a block writes nothing. A blank text elsewhere is written as it is.
+//! - Inside a text with visible characters a Unicode space is a space: the [visible](visible)
+//!   part of the text collapses it with the spaces around it, and at an [edge](edges) of the
+//!   text it is the one space the edge owes. In a [cell](cell_text) a line end is such a space
+//!   too.
+
+use std::borrow::Cow;
 
 use crate::converter::utility::content::ZERO_WIDTH_SPACE;
+use crate::text;
 
-/// Whether `character` is collapsible white space: a space, a tab, a line feed, a carriage
-/// return or a form feed. No other character is.
+/// Whether `character` is collapsible white space: a space, a tab, a line feed or a carriage
+/// return. No other character is.
+///
+/// ~keep A form feed is a character in CSS text, as a browser shows it: the HTML parser treats
+/// ~keep it as white space in a tag, but in running text it stays between the words.
 #[must_use]
 pub const fn is_collapsible(character: char) -> bool {
-    matches!(character, ' ' | '\t' | '\n' | '\r' | '\u{c}')
+    matches!(character, ' ' | '\t' | '\n' | '\r')
 }
 
 /// A run of collapsible white space at an edge of a text.
@@ -78,6 +94,62 @@ pub fn classify_text(decoded: &str) -> TextClass<'_> {
     }
 }
 
+/// Whether a reader sees nothing in `decoded`: every character is Unicode white space, a
+/// no-break space included (`char::is_whitespace`). An empty text is blank.
+///
+/// ~keep A blank text before the first visible content of a block writes nothing, as a browser
+/// ~keep shows none: `<p>&nbsp;<b>a</b></p>` is `**a**`. Between inline content and after the
+/// ~keep last content of a block the caller writes it as it is (`<b>a</b>&nbsp;<b>b</b>`).
+#[must_use]
+pub fn is_blank(decoded: &str) -> bool {
+    decoded.chars().all(char::is_whitespace)
+}
+
+/// The white space a text with visible characters writes at its edges: one space before it
+/// when it starts with white space of any kind (a line end too), and after it a blank line when
+/// it ends with two line ends, one space when it ends with a space, a tab or a Unicode space,
+/// nothing when it ends with one line end (the caller decides that one by its siblings).
+///
+/// ~keep A no-break space at an edge is the one space of that edge: `<p>a<em>&nbsp;x</em></p>`
+/// ~keep is `a *x*`, and `<p>a&nbsp;</p>` is `a` because the block drops the space at its end.
+#[must_use]
+pub fn edges(decoded: &str) -> (&'static str, &'static str) {
+    let is_space = |character: char| matches!(character, ' ' | '\t') || text::is_unicode_space(character);
+    let before = if decoded.starts_with(char::is_whitespace) {
+        " "
+    } else {
+        ""
+    };
+    let after = if decoded.ends_with("\n\n") || decoded.ends_with("\r\n\r\n") {
+        "\n\n"
+    } else if decoded.ends_with(is_space) {
+        " "
+    } else {
+        ""
+    };
+    (before, after)
+}
+
+/// The visible characters of a text as written: without the white space of any kind at its
+/// edges, every run of spaces, tabs and Unicode spaces inside it one space, and no space after
+/// a line end.
+///
+/// ~keep `<p>a<em>&nbsp;&nbsp;x</em></p>` is `a *x*`: the run is the one space of the edge.
+#[must_use]
+pub fn visible(decoded: &str) -> Cow<'_, str> {
+    text::normalize_block_whitespace_cow(decoded.trim())
+}
+
+/// A text in a table cell as written: a cell has no line, so a line end is a space, and every
+/// run of spaces, tabs and Unicode spaces is one space. The edges stay.
+///
+/// ~keep `<td>a<em>&nbsp;x</em></td>` is `a *x*` as in a paragraph; `<td>quick &nbsp; amet</td>`
+/// ~keep is `quick amet`, as the fast converter writes it.
+#[must_use]
+pub fn cell_text(decoded: &str) -> Cow<'_, str> {
+    text::normalize_cell_whitespace_cow(decoded)
+}
+
 /// Rule 2: a segment break is removed when the character `before` or `after` its run is a
 /// zero-width space. `None` is a block boundary or the end of the text.
 #[must_use]
@@ -95,6 +167,19 @@ pub fn space_is_owed(written: &str) -> bool {
     !written.ends_with([' ', '\n'])
 }
 
+/// Rule 4 in the full converter, which builds the body of an inline element in a scratch
+/// buffer of its own: an empty scratch buffer is mid-line and owes the space, an empty block
+/// buffer is a line start and owes none.
+///
+/// ~keep `<strong><em><br></em></strong>` lost its one space when an empty scratch buffer
+/// ~keep counted as a line start (issue #504); `<p>A</p><p><i> </i>B</p>` opened its second
+/// ~keep paragraph with a stray space when it did not (issue #501).
+#[must_use]
+pub fn space_is_owed_in(output: &String, ctx: &crate::converter::context::Context) -> bool {
+    let is_block_buffer = std::ptr::from_ref::<String>(output) as usize == ctx.block_output_ptr;
+    space_is_owed(output) && !(output.is_empty() && is_block_buffer)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -103,24 +188,59 @@ mod tests {
     const BREAK: Option<Run> = Some(Run { segment_break: true });
 
     #[test]
-    fn the_five_characters_are_collapsible() {
-        for character in [' ', '\t', '\n', '\r', '\u{c}'] {
+    fn a_text_of_unicode_white_space_is_blank() {
+        for blank in ["", " \t\r\n", "\u{a0}", " \u{a0}\n", "\u{2003}\u{3000}"] {
+            assert!(is_blank(blank), "{blank:?}");
+        }
+        for text in ["a", " a ", "\u{a0}a", "\u{200b}", "\u{feff}"] {
+            assert!(!is_blank(text), "{text:?}");
+        }
+    }
+
+    #[test]
+    fn an_edge_of_a_text_is_one_space_for_white_space_of_any_kind() {
+        assert_eq!(edges("one"), ("", ""));
+        assert_eq!(edges(" one "), (" ", " "));
+        assert_eq!(edges("\u{a0}one\u{a0}"), (" ", " "));
+        assert_eq!(edges("\none\t"), (" ", " "));
+        assert_eq!(edges("one\n"), ("", ""));
+        assert_eq!(edges("one\n\n"), ("", "\n\n"));
+        assert_eq!(edges("one\r\n\r\n"), ("", "\n\n"));
+        assert_eq!(edges("one\u{c}"), ("", ""));
+    }
+
+    #[test]
+    fn the_visible_part_of_a_text_collapses_a_no_break_space_with_the_spaces_around_it() {
+        assert_eq!(visible(" one \u{a0} two\u{a0}"), "one two");
+        assert_eq!(visible("one\n  two"), "one\ntwo");
+        assert_eq!(visible("\u{a0}\u{a0}"), "");
+    }
+
+    #[test]
+    fn a_cell_text_folds_a_line_end_to_a_space_and_keeps_its_edges() {
+        assert_eq!(cell_text(" one\n\u{a0}two "), " one two ");
+        assert_eq!(cell_text("quick \u{a0} amet"), "quick amet");
+    }
+
+    #[test]
+    fn the_four_characters_are_collapsible() {
+        for character in [' ', '\t', '\n', '\r'] {
             assert!(is_collapsible(character), "{character:?}");
         }
     }
 
     #[test]
-    fn a_no_break_space_and_the_other_unicode_spaces_are_characters() {
+    fn a_form_feed_a_no_break_space_and_the_other_unicode_spaces_are_characters() {
         for character in [
-            '\u{a0}', '\u{2002}', '\u{2003}', '\u{3000}', '\u{200b}', '\u{feff}', 'a',
+            '\u{c}', '\u{a0}', '\u{2002}', '\u{2003}', '\u{3000}', '\u{200b}', '\u{feff}', 'a',
         ] {
             assert!(!is_collapsible(character), "{character:?}");
         }
     }
 
     #[test]
-    fn a_text_of_the_five_characters_is_white_space_only() {
-        assert_eq!(classify_text(" \t\r\u{c}"), TextClass::WhiteSpaceOnly(RUN));
+    fn a_text_of_the_four_characters_is_white_space_only() {
+        assert_eq!(classify_text(" \t\r"), TextClass::WhiteSpaceOnly(RUN));
         assert_eq!(classify_text(" \n "), TextClass::WhiteSpaceOnly(BREAK));
         assert_eq!(classify_text(""), TextClass::WhiteSpaceOnly(None));
     }
@@ -148,7 +268,7 @@ mod tests {
     #[test]
     fn the_edges_of_a_text_are_its_runs() {
         assert_eq!(
-            classify_text("\u{c}\none"),
+            classify_text("\r\none"),
             TextClass::Text {
                 prefix: BREAK,
                 core: "one",
@@ -159,7 +279,7 @@ mod tests {
             classify_text("one\u{c}\n"),
             TextClass::Text {
                 prefix: None,
-                core: "one",
+                core: "one\u{c}",
                 suffix: BREAK
             }
         );

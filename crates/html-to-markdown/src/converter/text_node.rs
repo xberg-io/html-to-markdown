@@ -11,15 +11,16 @@ use std::borrow::Cow;
 
 use crate::converter::block::container::HandlerContext;
 use crate::converter::dom_context::DomContext;
-use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
-use crate::converter::utility::content::{
-    NextElement, ZERO_WIDTH_SPACE, line_end_before_element, without_trailing_line_end,
-};
+use crate::converter::main_helpers::{hard_break_marker, is_inline_element};
+use crate::converter::utility::content::{NextElement, ZERO_WIDTH_SPACE, line_end_before_element};
 use crate::converter::utility::siblings::{
     FollowingContent, br_follows_enclosing_elements, content_starts_with_block, following_sibling_content,
-    get_next_sibling_tag, get_previous_sibling_tag, next_sibling_is_inline_tag, zero_width_space_follows,
+    get_next_sibling_tag, get_previous_sibling_tag, line_end_precedes, next_sibling_is_inline_tag,
+    zero_width_space_follows,
 };
-use crate::converter::utility::white_space::{TextClass, classify_text, space_is_owed};
+use crate::converter::utility::white_space::{
+    TextClass, cell_text, classify_text, edges, is_blank, is_collapsible, space_is_owed, visible,
+};
 use crate::text;
 #[cfg(feature = "visitor")]
 use crate::visitor::EMPTY_ATTRS;
@@ -98,7 +99,7 @@ impl TextProcessor<'_, '_, '_> {
         if self.handler.options.strip_newlines && (decoded.contains('\r') || decoded.contains('\n')) {
             decoded = Cow::Owned(decoded.replace(['\r', '\n'], " "));
         }
-        if matches!(classify_text(&decoded), TextClass::WhiteSpaceOnly(_)) {
+        if is_blank(&decoded) {
             let output_start = self.output.len();
             self.emit_whitespace(decoded.as_ref(), &facts);
             if crate::converter::structure_capture::is_text_capture_active(self.handler.ctx) {
@@ -131,17 +132,22 @@ impl TextProcessor<'_, '_, '_> {
         if self.handler.ctx.in_code || self.handler.options.whitespace_mode == crate::options::WhitespaceMode::Strict {
             return text;
         }
-        let Some(kept) = without_trailing_line_end(text.as_ref()) else {
+        let TextClass::Text {
+            core,
+            suffix: Some(suffix),
+            ..
+        } = classify_text(text.as_ref())
+        else {
             return text;
         };
         // ~keep The segment break goes when a zero-width space is on either side of it: the
         // ~keep last character of this text, or the first character after it.
-        if !kept.ends_with(ZERO_WIDTH_SPACE)
-            && !zero_width_space_follows(self.node_handle, self.parser, self.handler.dom_ctx)
-        {
+        let after =
+            zero_width_space_follows(self.node_handle, self.parser, self.handler.dom_ctx).then_some(ZERO_WIDTH_SPACE);
+        if suffix.writes_space(core.chars().last(), after) {
             return text;
         }
-        Cow::Owned(kept.to_string())
+        Cow::Owned(text.trim_end_matches(is_collapsible).to_string())
     }
 
     fn escape_asterisks(&self) -> bool {
@@ -173,12 +179,30 @@ impl TextProcessor<'_, '_, '_> {
         }
         if facts.had_newlines {
             self.emit_newline_whitespace(value, facts.was_fresh_block_start);
-            return;
+        } else if !matches!(classify_text(value), TextClass::WhiteSpaceOnly(_)) {
+            // ~keep A blank text that holds a no-break space is written as it is, and not after
+            // ~keep a space of the source: `<b>a</b>&nbsp;<b>b</b>` keeps it, `<li>&nbsp;</li>`
+            // ~keep drops it. The space written for a line end is this change's own
+            // ~keep (`one\n<span>&nbsp;</span>two`): the no-break space after it stays.
+            if !self.output.ends_with(' ') || line_end_precedes(self.node_handle, self.parser, self.handler.dom_ctx) {
+                self.output.push_str(value);
+            }
+        } else if !self.at_block_line_start() && !self.output.ends_with(' ') && !self.after_hard_break() {
+            // ~keep A space-only text between two blocks of a quote (`<p>8</p> <p>0</p>`) is a
+            // ~keep line of one space, as before this change: only the block's own buffer
+            // ~keep refuses a space at a line start. A line that a `<br>` ended starts the next
+            // ~keep one in a list item's own buffer too: the text after it writes the indent.
+            self.output.push(' ');
         }
-        if self.ascii_whitespace_at_line_start(value) {
-            return;
-        }
-        self.emit_inline_whitespace(value);
+    }
+
+    fn after_hard_break(&self) -> bool {
+        self.output.ends_with(hard_break_marker(self.handler.options))
+    }
+
+    fn at_block_line_start(&self) -> bool {
+        std::ptr::from_ref::<String>(self.output) as usize == self.handler.ctx.block_output_ptr
+            && (self.output.is_empty() || self.output.ends_with('\n'))
     }
 
     fn between_adjacent_images(&self) -> bool {
@@ -209,6 +233,9 @@ impl TextProcessor<'_, '_, '_> {
         is_fresh_block_start(self.handler.ctx, was_fresh)
     }
 
+    /// Writes the one space of a blank text that holds a line end, where the rule owes it:
+    /// before an inline sibling, or at the end of an inline element that a word follows. A
+    /// no-break space in such a text is written as it is when it is the only one.
     fn emit_newline_whitespace(&mut self, value: &str, was_fresh: bool) {
         if self.output.is_empty() {
             if !was_fresh && self.handler.ctx.inline_depth > 0 {
@@ -219,51 +246,21 @@ impl TextProcessor<'_, '_, '_> {
         if self.output.ends_with("\n\n") {
             return;
         }
-        let significant: String = value
-            .chars()
-            .filter(|character| !matches!(character, ' ' | '\t' | '\n' | '\r'))
-            .collect();
-        let lone = (!has_more_than_one_char(&significant))
-            .then(|| significant.chars().next())
-            .flatten();
-        self.emit_significant_newline_whitespace(&significant, lone);
-    }
-
-    fn emit_significant_newline_whitespace(&mut self, significant: &str, lone: Option<char>) {
-        if let Some(next_tag) = get_next_sibling_tag(self.node_handle, self.parser, self.handler.dom_ctx) {
-            if is_inline_element(next_tag) {
-                if let Some(character) = lone {
-                    self.output.push(character);
-                } else if !self.output.ends_with(' ') && !self.output.ends_with('\n') {
-                    self.output.push(' ');
-                }
-            }
+        let next_tag = get_next_sibling_tag(self.node_handle, self.parser, self.handler.dom_ctx);
+        if next_tag.is_some_and(|next_tag| !is_inline_element(next_tag)) {
             return;
         }
-        if let Some(character) = lone {
+        let mut kept = value.chars().filter(|character| !is_collapsible(*character));
+        let first_kept = kept.next();
+        let holds_more = kept.next().is_some();
+        if let (Some(character), false) = (first_kept, holds_more) {
             self.output.push(character);
             return;
         }
-        let needs_space = newline_span_needs_separating_space(self.node_handle, self.parser, self.handler.dom_ctx)
-            || !significant.is_empty();
-        if needs_space && !self.output.ends_with(' ') && !self.output.ends_with('\n') {
-            self.output.push(' ');
-        }
-    }
-
-    fn ascii_whitespace_at_line_start(&self, value: &str) -> bool {
-        is_ascii_whitespace_only(value)
-            && std::ptr::from_ref::<String>(self.output) as usize == self.handler.ctx.block_output_ptr
-            && (self.output.is_empty() || self.output.ends_with('\n'))
-    }
-
-    fn emit_inline_whitespace(&mut self, value: &str) {
-        // ~keep White space of the source is one space, whatever it is (a tab was written as a
-        // ~keep tab), and none after a space. A no-break space is not white space that
-        // ~keep collapses: it is kept, also after a space.
-        if !is_ascii_whitespace_only(value) {
-            self.output.push_str(value);
-        } else if !self.output.ends_with(' ') {
+        let needs_space = next_tag.is_some()
+            || holds_more
+            || newline_span_needs_separating_space(self.node_handle, self.parser, self.handler.dom_ctx);
+        if needs_space && space_is_owed(self.output) {
             self.output.push(' ');
         }
     }
@@ -303,10 +300,10 @@ impl TextProcessor<'_, '_, '_> {
     fn process_table_cell(&self, value: &str, escape_asterisks: bool, capture_semantic: bool) -> ProcessedText {
         let options = self.handler.options;
         let normalized = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
-            let collapsed = text::normalize_cell_whitespace_cow(value);
+            let collapsed = cell_text(value);
             // ~keep White space after a space is the same run of white space, as in `skip_prefix`.
             match collapsed.strip_prefix(' ') {
-                Some(rest) if self.output.ends_with(' ') => Cow::Owned(rest.to_string()),
+                Some(rest) if !space_is_owed(self.output) => Cow::Owned(rest.to_string()),
                 _ => collapsed,
             }
         } else {
@@ -374,15 +371,8 @@ impl TextProcessor<'_, '_, '_> {
     ) -> ProcessedText {
         let has_double_newline = value.contains("\n\n") || value.contains("\r\n\r\n");
         let trailing_single_newline = value.ends_with('\n') && !value.ends_with("\n\n") && !value.ends_with("\r\n\r\n");
-        // ~keep The edges and the core are decided by the rule of running text: a no-break
-        // ~keep space is a character, so a text of one is a word, not white space.
-        let TextClass::Text { prefix, core, .. } = classify_text(value) else {
-            return ProcessedText::same(String::new(), capture_semantic);
-        };
-        let prefix = if prefix.is_some() { " " } else { "" };
-        let normalized = text::normalize_whitespace_cow(value);
-        let (_, suffix, _) = text::chomp(normalized.as_ref());
-        let core = text::normalize_block_whitespace_cow(core);
+        let (prefix, suffix) = edges(value);
+        let core = visible(value);
         let mut output = String::with_capacity(prefix.len() + core.len() + suffix.len() + 2);
         let mut semantic = capture_semantic.then(|| String::with_capacity(output.capacity()));
         if !self.skip_prefix(prefix, was_fresh) && !prefix.is_empty() {

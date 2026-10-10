@@ -316,14 +316,7 @@ fn follows_block_separator(active: &str) -> bool {
 }
 
 fn follows_line_end(state: &mut Tier1State) -> bool {
-    let active_len = state.cell_or_output_mut().len();
-    let opens_own_buffer = state
-        .stack
-        .iter()
-        .rev()
-        .take_while(|frame| frame.content_start >= active_len)
-        .any(|frame| frame.children_in_own_buffer);
-    !opens_own_buffer && state.cell_or_output_mut().ends_with('\n')
+    state.cell_or_output_mut().ends_with('\n')
 }
 
 fn emit_verbatim_text(

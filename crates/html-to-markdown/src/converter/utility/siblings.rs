@@ -4,6 +4,7 @@
 //! and inline/block element detection for whitespace handling.
 
 use crate::converter::DomContext;
+use crate::converter::main_helpers::is_inline_element;
 
 /// Get the tag name of the next sibling element.
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -54,6 +55,47 @@ pub fn get_previous_sibling_tag<'a>(
 /// The block element the content before `node_handle` in its parent ends with: the previous
 /// sibling when it is a block, or the block an inline sibling's own last content ends with
 /// (`<span><ul>...</ul></span>`). Whitespace text and comments are skipped (issue #585).
+/// Whether the text before `node_handle` in document order ends with a line end: its previous
+/// sibling, or the text before the inline element it is the first child of.
+///
+/// ~keep The space a line end makes before an inline element is the claim of the inline white
+/// ~keep space rules; a no-break blank after it stays (`one\n<span>&nbsp;</span>two`), where one
+/// ~keep after a space of the source goes, as before (`one <span>&nbsp;</span> two`).
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn line_end_precedes(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    previous_text_ends_with_line_end(node_handle.get_inner(), parser, dom_ctx).unwrap_or(false)
+}
+
+fn previous_text_ends_with_line_end(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> Option<bool> {
+    loop {
+        let parent = dom_ctx.parent_of(id);
+        let siblings = if let Some(parent_id) = parent {
+            dom_ctx.children_of(parent_id)?
+        } else {
+            &dom_ctx.root_children
+        };
+        let position = dom_ctx.sibling_index(id).or_else(|| {
+            siblings
+                .iter()
+                .position(|handle: &tl::NodeHandle| handle.get_inner() == id)
+        })?;
+        if let Some(previous) = position.checked_sub(1).and_then(|before| siblings.get(before)) {
+            return Some(match previous.get(parser) {
+                Some(tl::Node::Raw(raw)) => raw.as_utf8_str().ends_with(['\n', '\r']),
+                _ => false,
+            });
+        }
+        let parent_id = parent?;
+        if !dom_ctx
+            .tag_info(parent_id, parser)
+            .is_some_and(|info| is_inline_element(info.name.as_str()))
+        {
+            return Some(false);
+        }
+        id = parent_id;
+    }
+}
+
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn previous_content_block<'a>(
     node_handle: &tl::NodeHandle,
