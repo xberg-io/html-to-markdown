@@ -247,7 +247,7 @@ pub fn chomp(text: &str) -> (&str, &str, &str) {
         return ("", "", "");
     }
 
-    let prefix = if text.starts_with(|c: char| c.is_whitespace()) {
+    let prefix = if text.starts_with(|c: char| c.is_whitespace() && c != '\u{c}') {
         " "
     } else {
         ""
@@ -262,9 +262,11 @@ pub fn chomp(text: &str) -> (&str, &str, &str) {
     };
 
     let trimmed = if suffix == "\n\n" {
-        text.trim_end_matches("\n\n").trim_end_matches("\r\n\r\n").trim()
+        text.trim_end_matches("\n\n")
+            .trim_end_matches("\r\n\r\n")
+            .trim_matches(|c: char| c.is_whitespace() && c != '\u{c}')
     } else {
-        text.trim()
+        text.trim_matches(|c: char| c.is_whitespace() && c != '\u{c}')
     };
 
     (prefix, suffix, trimmed)

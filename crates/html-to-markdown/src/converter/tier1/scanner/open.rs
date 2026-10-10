@@ -217,6 +217,14 @@ fn prepare_open_state(
     name_lower: &[u8],
     options: &ConversionOptions,
 ) -> Result<(), BailReason> {
+    if std::mem::take(&mut state.last_closed_list)
+        && matches!(spec.kind, TagKind::Pre)
+        && options.code_block_style == crate::options::CodeBlockStyle::Indented
+        && !state.in_table_cell()
+    {
+        state.ensure_blank_line();
+        push_list_item_continuation_lines(state, "<!-- -->\n\n");
+    }
     state.last_closed_custom_element = false;
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
@@ -274,7 +282,7 @@ fn emit_open_kind(
         TagKind::Strong => open_strong(state)?,
         TagKind::Emphasis => open_emphasis(state)?,
         TagKind::Strikethrough => open_marker(state, "~~")?,
-        TagKind::Inserted => open_marker(state, "==")?,
+        TagKind::Inserted => {}
         TagKind::Code if !state.escape_ctx.contains(EscapeCtx::PRE) && !state.escape_ctx.contains(EscapeCtx::CODE) => {}
         TagKind::Code if state.pre_lang.is_none() && state.escape_ctx.contains(EscapeCtx::PRE) => {
             if let Some(lang) = extract_language_from_class(attrs) {
@@ -304,8 +312,6 @@ fn emit_open_kind(
         TagKind::Block => open_block_container(state, name_lower, options.br_in_tables),
         TagKind::Summary => open_summary_container(state, options.br_in_tables)?,
         TagKind::Figcaption => open_figcaption(state),
-        // ~keep Button: no leading separator (matches Tier-2 handle_button which
-        // does nothing on open).  Close-side `\n\n` is emitted by close_button.
         TagKind::Button => {}
         TagKind::Inline => {}
         _ => {}

@@ -288,8 +288,20 @@ pub fn handle_label(
         dom_ctx,
     } = context;
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let mut rendered = String::new();
         let children = tag.children();
+        // ~keep A code block shows the text of a label as written, so nothing is trimmed (issue #822).
+        if ctx.in_code_block {
+            for child_handle in children.top().iter() {
+                super::walk_node(
+                    child_handle,
+                    parser,
+                    output,
+                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
+                );
+            }
+            return;
+        }
+        let mut rendered = String::new();
         let label_ctx = ctx.inline_buffer(output, false);
         {
             for child_handle in children.top().iter() {
@@ -631,9 +643,6 @@ pub fn handle_button(
                 VisitResult::Skip => return,
                 VisitResult::Custom(custom) => {
                     output.push_str(&custom);
-                    if !ctx.convert_as_inline && !custom.ends_with('\n') {
-                        output.push_str("\n\n");
-                    }
                     return;
                 }
                 VisitResult::PreserveHtml => {
@@ -650,7 +659,6 @@ pub fn handle_button(
             }
         }
 
-        let start_len = output.len();
         let children = tag.children();
         {
             for child_handle in children.top().iter() {
@@ -661,10 +669,6 @@ pub fn handle_button(
                     crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
                 );
             }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push_str("\n\n");
         }
     }
 }

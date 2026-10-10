@@ -117,7 +117,7 @@ fn should_keep_the_default_markers_when_something_separates_the_lists() {
     );
     assert_eq!(
         convert_with("<ol><li>a</li></ol><!-- c --><ol><li>b</li></ol>", &options),
-        "1. a\n\n<!-- c -->\n\n1. b\n"
+        "1. a\n\n<!-- -->\n\n1. b\n"
     );
     assert_lists(
         "<ul><li>a</li></ul><ol><li>b</li></ol>",

@@ -458,6 +458,7 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
         let end = dest.trim_end().len();
         state.last_ordered_list_end = Some(end);
     }
+    state.last_closed_list = true;
 }
 
 fn close_list_item(state: &mut Tier1State, frame: &OpenTag) -> Result<(), BailReason> {
@@ -552,10 +553,14 @@ fn close_dt(state: &mut Tier1State) {
     }
     trim_trailing_inline_whitespace(state);
     let buf = state.cell_or_output_mut();
-    if buf.is_empty() || buf.ends_with('\n') {
+    if buf.is_empty() || buf.ends_with("\n\n") {
         return;
     }
-    buf.push('\n');
+    if buf.ends_with('\n') {
+        buf.push('\n');
+    } else {
+        buf.push_str("\n\n");
+    }
 }
 
 fn close_dd(state: &mut Tier1State) {

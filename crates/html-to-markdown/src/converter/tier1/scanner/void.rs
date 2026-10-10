@@ -468,8 +468,8 @@ fn dispatch_close(
         TagKind::Strikethrough if suppress_close_marker(state, EscapeCtx::empty(), false) => {}
         TagKind::Strikethrough => close_inline_marker(state, frame, "~~")?,
         TagKind::Inserted if suppress_close_marker(state, EscapeCtx::empty(), false) => {}
-        TagKind::Inserted => close_inline_marker(state, frame, "==")?,
-        TagKind::Code => close_code(state, frame, matches!(name_lower, b"kbd" | b"samp"), options)?,
+        TagKind::Inserted => {}
+        TagKind::Code => close_code(state, frame, matches!(name_lower, b"kbd" | b"samp" | b"tt"), options)?,
         TagKind::Link => close_link(state, frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, frame),
         TagKind::List(kind) => close_list(state, kind),
@@ -485,7 +485,7 @@ fn dispatch_close(
         TagKind::Block => close_block_container(state, frame, name_lower),
         TagKind::Summary => close_summary(state, frame),
         TagKind::Figcaption => close_figcaption(state, frame),
-        TagKind::Button => close_button(state, frame),
+        TagKind::Button => {}
         TagKind::Inline if name_lower == b"abbr" => close_abbreviation(state, frame),
         TagKind::Hr
         | TagKind::TableFoot
@@ -672,38 +672,6 @@ fn close_figcaption(state: &mut Tier1State, _frame: &OpenTag) {
     dest.push('*');
     dest.push_str(trimmed);
     dest.push_str("*\n\n");
-}
-
-/// Close a `<button>` (Phase T).  When the button produced visible content,
-/// emit `\n\n` after.  Skipped in table cells (cells stay one logical line).
-///
-/// Mirrors the block-separator tail of Tier-2 `form/elements.rs`'s `handle_button`:
-/// ```text
-/// if !ctx.convert_as_inline && output.len() > start_len {
-///     output.push_str("\n\n");
-/// }
-/// ```
-fn close_button(state: &mut Tier1State, frame: &OpenTag) {
-    if state.in_table_cell() {
-        return;
-    }
-    let dest = state.cell_or_output_mut();
-    if dest.len() <= frame.content_start {
-        return;
-    }
-    // ~keep Drop trailing horizontal whitespace from the inter-tag fix before the
-    // block separator (Phase U-2).
-    while dest.ends_with(' ') || dest.ends_with('\t') {
-        dest.pop();
-    }
-    if dest.ends_with("\n\n") {
-        return;
-    }
-    if dest.ends_with('\n') {
-        dest.push('\n');
-    } else {
-        dest.push_str("\n\n");
-    }
 }
 
 /// Clamp a stored byte offset (e.g. `OpenTag::content_start`, captured as
