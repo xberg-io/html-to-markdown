@@ -70,12 +70,17 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
         return;
     };
     // ~keep Code shows every character as text, so a link in code writes its text and no marks.
-    // ~keep A visitor still sees the link and decides what it writes.
+    // ~keep A visitor sees the links that it sees outside code, and decides what they write.
     if handler.context.in_code {
+        handler.context.inline_data_replaced.set(false);
         let text_start = handler.output.len();
         walk_handles_to_output(data.children.iter().copied(), &mut handler);
         let text = handler.output.split_off(text_start);
-        emit_link(tag, &data, &text, false, &mut handler);
+        if data.is_shown_to_visitor_in_code(&text, &handler) {
+            emit_link(tag, &data, &text, false, &mut handler);
+        } else {
+            handler.output.push_str(&text);
+        }
         #[cfg(feature = "metadata")]
         record_link_metadata(tag, &data, text.trim(), handler.context);
         return;
@@ -127,6 +132,46 @@ impl<'a> LinkData<'a> {
     /// ~keep content is (a graphic, an empty element, nothing) and whether or not it has a name.
     fn is_dropped(&self, label: &str, handler: &HandlerContext<'_>) -> bool {
         label.is_empty() && (handler.context.inline_data_replaced.get() || self.same_page_fragment)
+    }
+
+    /// Whether the link has the visible `<address>` form outside code.
+    fn is_autolink(&self, options: &ConversionOptions) -> bool {
+        // ~keep Deferred tables and dropped data addresses can never use the visible `<href>` form (#120, #490).
+        options.autolinks
+            && !options.default_title
+            && !self.emit_blocks_separately
+            && !self.href.is_empty()
+            && !self.href_addr_dropped
+            && has_uri_scheme(&self.href)
+            && (self.raw_text == self.href || (self.href.starts_with("mailto:") && self.raw_text == self.href[7..]))
+    }
+
+    /// Whether a visitor gets a `visit_link` call for this link in code, where `text` is what the
+    /// content of the link writes there.
+    ///
+    /// ~keep The calls are those of a link outside code, which makes none for a link in the
+    /// ~keep `<address>` form, for a link around one heading, and for a link that is left out (see
+    /// ~keep `is_dropped`). A highlighter writes one empty anchor into its own page for each line
+    /// ~keep of code. An image writes nothing in code and is a label outside it, so a link that
+    /// ~keep holds one is never left out here.
+    fn is_shown_to_visitor_in_code(&self, text: &str, handler: &HandlerContext<'_>) -> bool {
+        if self.is_autolink(handler.options) {
+            return false;
+        }
+        let is_heading_link = !self.href_addr_dropped
+            && !text.trim().is_empty()
+            && find_single_heading_child(*handler.node_handle, handler.parser).is_some();
+        if is_heading_link {
+            return false;
+        }
+        let mut label = normalize_link_label(text);
+        apply_label_fallbacks(self, &mut label, handler);
+        let holds_image = self.children.iter().any(|child| {
+            subtree_has_tag(child, handler.parser, handler.dom_context, &|name| {
+                matches!(name, "img" | "svg" | "picture")
+            })
+        });
+        holds_image || !self.is_dropped(&label, handler)
     }
 
     fn new(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Option<Self> {
@@ -182,15 +227,7 @@ impl<'a> LinkData<'a> {
 }
 
 fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool {
-    // ~keep Deferred tables and dropped data addresses can never use the visible `<href>` form (#120, #490).
-    let autolink = handler.options.autolinks
-        && !handler.options.default_title
-        && !data.emit_blocks_separately
-        && !data.href.is_empty()
-        && !data.href_addr_dropped
-        && has_uri_scheme(&data.href)
-        && (data.raw_text == data.href || (data.href.starts_with("mailto:") && data.raw_text == data.href[7..]));
-    if !autolink {
+    if !data.is_autolink(handler.options) {
         return false;
     }
     handler.output.push('<');
@@ -571,29 +608,38 @@ fn should_defer_table_blocks(
 ) -> bool {
     (!ctx.convert_as_inline || ctx.in_layout_cell)
         && !ctx.in_heading
-        && deferred.iter().any(|handle| subtree_has_table(handle, parser, dom_ctx))
+        && deferred
+            .iter()
+            .any(|handle| subtree_has_tag(handle, parser, dom_ctx, &|name| name == "table"))
 }
 
-/// Short-circuiting DFS: does `handle`'s subtree (itself or any descendant) contain a
-/// `<table>`?
+/// Short-circuiting DFS: does `handle`'s subtree (itself or any descendant) contain an element
+/// whose name `wanted` accepts?
 ///
-/// ~keep Checked only against a deferred block child of an `<a>` (issue #490), so the cost
-/// ~keep is paid only when the anchor actually has a block child, and the walk stops at the
-/// ~keep first `<table>` found regardless of subtree size.
+/// ~keep Asked for a `<table>` only against a deferred block child of an `<a>` (issue #490), and
+/// ~keep for an image only against a link in code, so the cost is paid only there, and the walk
+/// ~keep stops at the first element found regardless of subtree size.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn subtree_has_table(handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn subtree_has_tag(
+    handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    dom_ctx: &DomContext,
+    wanted: &dyn Fn(&str) -> bool,
+) -> bool {
     let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
         return false;
     };
-    if normalized_tag_name(tag.name().as_utf8_str()) == "table" {
+    if wanted(&normalized_tag_name(tag.name().as_utf8_str())) {
         return true;
     }
     if let Some(children) = dom_ctx.children_of(handle.get_inner()) {
-        children.iter().any(|child| subtree_has_table(child, parser, dom_ctx))
+        children
+            .iter()
+            .any(|child| subtree_has_tag(child, parser, dom_ctx, wanted))
     } else {
         tag.children()
             .top()
             .iter()
-            .any(|child| subtree_has_table(child, parser, dom_ctx))
+            .any(|child| subtree_has_tag(child, parser, dom_ctx, wanted))
     }
 }
