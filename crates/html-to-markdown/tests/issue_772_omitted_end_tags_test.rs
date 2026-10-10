@@ -638,8 +638,8 @@ fn a_page_with_character_references_is_repaired() {
     );
 }
 
-/// ~keep The tree builder moves a `<title>` that starts a page into the head. The converter
-/// ~keep writes the text of a `title` only as metadata, so that move loses no text.
+/// ~keep The tree builder moves a `<title>` that starts a page into the head. The default route
+/// ~keep writes that text as metadata; the forced second tier wrote it as body text and stops.
 #[test]
 fn a_page_that_starts_with_a_title_is_repaired() {
     let html = "<TITLE>My page</TITLE><div><p>one</div>tail<!-- <frameset> -->";

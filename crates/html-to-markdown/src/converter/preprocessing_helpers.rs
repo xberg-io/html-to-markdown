@@ -273,11 +273,11 @@ fn decoded_len(text: &[u8]) -> usize {
     characters(decode_html_entities_cow(&String::from_utf8_lossy(text)).as_bytes())
 }
 
-/// Elements whose text the converter never writes. The tree builder moves a `title` that
-/// starts a page into the head, and the converter writes the text of a `title` in no place.
+/// Elements whose text the count leaves out. The tree builder moves a `title` that starts a
+/// page into the head; only the forced second tier wrote a `title` with no `head` as body text.
 const NO_READABLE_TEXT: [&[u8]; 5] = [b"script", b"style", b"template", b"noscript", b"title"];
 
-/// False for an element whose text the converter never writes, so text that the tree builder
+/// False for an element whose text the count leaves out, so text that the tree builder
 /// moves into one counts as lost.
 ///
 /// ~keep The tree builder moves a `<noframes>` that starts a page into the head, and `tl`
