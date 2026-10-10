@@ -600,6 +600,19 @@ fn escape_emitted_text(dest: &mut String, context: EmittedTextContext) {
     }
 }
 
+/// `raw` without the line end at its end, when `raw` has other content too.
+///
+/// ~keep A line end beside a zero-width space is no white space: the two parts are one word.
+/// ~keep Mirrors Tier-2's `without_line_end_before_zero_width_space`.
+fn without_line_end_at_zero_width_space(raw: &str) -> &str {
+    let has_content = !raw.bytes().all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'));
+    if has_content {
+        crate::converter::utility::content::without_trailing_line_end(raw).unwrap_or(raw)
+    } else {
+        raw
+    }
+}
+
 fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), BailReason> {
     let TextFlush {
         raw,
@@ -626,11 +639,8 @@ fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), Bail
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
     let in_code = state.escape_ctx.contains(EscapeCtx::CODE);
 
-    // ~keep A line end beside a zero-width space is no white space: the two parts are one word.
-    // ~keep Mirrors Tier-2's `without_line_end_before_zero_width_space`.
-    let has_content = !raw.bytes().all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'));
-    let raw = if upcoming.line_end_meets_zero_width_space && has_content && !in_pre && !in_code {
-        crate::converter::utility::content::without_trailing_line_end(raw).unwrap_or(raw)
+    let raw = if upcoming.line_end_meets_zero_width_space && !in_pre && !in_code {
+        without_line_end_at_zero_width_space(raw)
     } else {
         raw
     };
