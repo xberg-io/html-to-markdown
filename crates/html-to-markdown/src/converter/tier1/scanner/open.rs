@@ -252,11 +252,11 @@ fn prepare_open_state(
     if is_link_block && state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link)) {
         return Err(BailReason::Classifier);
     }
-    // ~keep In code (`<pre>`, `<code>`, `<kbd>`, `<samp>`) Tier-2 writes a link and a block as
-    // ~keep it did before the rules of running text. This scanner writes other code text for
-    // ~keep them, so it leaves the page to Tier-2.
+    // ~keep In code (`<pre>`, `<code>`, `<kbd>`, `<samp>`) Tier-2 writes a link label as it did
+    // ~keep before the rules of running text. This scanner trims the label, so it leaves the
+    // ~keep page to Tier-2. A block in code writes the same lines in both converters.
     let in_code = state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE);
-    if in_code && (is_link_block || matches!(spec.kind, TagKind::Link)) {
+    if in_code && matches!(spec.kind, TagKind::Link) {
         return Err(BailReason::Classifier);
     }
     // ~keep A block inside marks inside a heading (`<h2>one<b><p>y</p></b>two</h2>`): Tier-2

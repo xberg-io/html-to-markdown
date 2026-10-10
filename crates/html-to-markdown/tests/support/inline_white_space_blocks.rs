@@ -420,8 +420,8 @@ fn a_block_in_code_in_a_heading_is_no_block_boundary() {
             "<blockquote><h2>one<code><hr></code>two</h2></blockquote>",
             "> ## one`---`two\n",
         ),
+        ("<h1>one<code><p>y</p></code>two</h1>", "# one`y`two\n"),
     ]);
-    assert_on_full(&[("<h1>one<code><p>y</p></code>two</h1>", "# one`y`two\n")]);
     assert_eq!(tier2("<h1>one<kbd><hr></kbd>two</h1>"), "# one`---`two\n");
     // ~keep In a link label the space beside such code is older than the rule: it stays.
     assert_eq!(

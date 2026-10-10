@@ -266,7 +266,7 @@ fn white_space_at_an_end_of_a_link_label_is_not_moved_in_a_code_span() {
 /// In `<pre>`, `<code>`, `<kbd>` and `<samp>` no rule of running text runs. Each row pins the
 /// output of the full converter before those rules, not the output of a browser: a link in
 /// such an element is written as its text, with the white space of the source. The fast
-/// converter gives a link or a block in such an element to the full one.
+/// converter gives a link in such an element to the full one; a block in it both write alike.
 #[test]
 fn the_rules_of_running_text_do_not_run_in_code() {
     assert_on_full(&[
@@ -278,8 +278,8 @@ fn the_rules_of_running_text_do_not_run_in_code() {
             "```\none\nt\ny\n```\n",
         ),
         ("<p><kbd>Press<a name=\"n\">Go </a> now</kbd></p>", "`PressGo now`\n"),
-        ("<pre>x<section> a</section></pre>", "```\nx\n a\n```\n"),
     ]);
+    assert_on_both(&[("<pre>x<section> a</section></pre>", "```\nx\n a\n```\n")]);
 }
 
 /// A block in marks in a heading is a word of its own: one space after the closing marks. The

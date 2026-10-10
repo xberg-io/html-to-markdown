@@ -468,16 +468,33 @@ fn inline_follows_comments(bytes: &[u8], lt_pos: usize) -> bool {
 }
 
 /// Whether the text that follows the markup at `bytes[lt_pos]` starts with a zero-width space.
-/// The scan looks into the elements that only wrap text, leaves such an open element of
-/// `stack` at its end tag and passes the empty ones, comments and `<wbr>`. Any other element,
-/// an element whose `style` attribute sets `display` or `white-space` and the end of any
-/// other parent end the scan. Inside an open element with such a `style` attribute the answer
+/// Inside an open element whose `style` attribute sets `display` or `white-space` the answer
 /// is no.
 ///
 /// ~keep Mirrors Tier-2's `zero_width_space_follows`, which asks the same of the tree.
 fn zero_width_space_is_upcoming(html: &str, lt_pos: usize, stack: &[OpenTag]) -> bool {
     use crate::converter::utility::content::ZERO_WIDTH_SPACE;
 
+    upcoming_text_starts_with(html, lt_pos, stack, |text| text.starts_with(ZERO_WIDTH_SPACE))
+        && !open_element_sets_display_or_white_space(html.as_bytes(), stack)
+}
+
+/// Whether the text that follows the markup at `bytes[lt_pos]` starts with white space of any
+/// kind, a no-break space included.
+///
+/// ~keep The content of a link with no address starts with white space when its first text
+/// ~keep does, through a comment, an empty element or the open tag of an inline child:
+/// ~keep `<a name="n"><i> Go</i></a>` and `<a name="n">&#32;Go</a>` as `<a name="n"> Go</a>`.
+fn white_space_is_upcoming(html: &str, lt_pos: usize, stack: &[OpenTag]) -> bool {
+    upcoming_text_starts_with(html, lt_pos, stack, |text| text.starts_with(char::is_whitespace))
+}
+
+/// Whether `starts_with` holds for the decoded text that follows the markup at
+/// `bytes[lt_pos]`. The scan looks into the elements that only wrap text, leaves such an open
+/// element of `stack` at its end tag and passes the empty ones, comments and `<wbr>`. Any
+/// other element, an element whose `style` attribute sets `display` or `white-space` and the
+/// end of any other parent end the scan with no.
+fn upcoming_text_starts_with(html: &str, lt_pos: usize, stack: &[OpenTag], starts_with: impl Fn(&str) -> bool) -> bool {
     let bytes = html.as_bytes();
     let mut pos = lt_pos;
     let mut open_wrappers = 0usize;
@@ -488,7 +505,7 @@ fn zero_width_space_is_upcoming(html: &str, lt_pos: usize, stack: &[OpenTag]) ->
             let window_end = clamp_to_char_boundary(html, (pos + 40).min(bytes.len()));
             let text_end = memchr::memchr(b'<', &bytes[pos..window_end]).map_or(window_end, |offset| pos + offset);
             let text = crate::text::decode_html_entities_cow(&html[pos..text_end]);
-            return text.starts_with(ZERO_WIDTH_SPACE) && !open_element_sets_display_or_white_space(bytes, stack);
+            return starts_with(&text);
         }
         match bytes.get(pos + 1) {
             Some(b'!') => match skip_bang(bytes, pos) {

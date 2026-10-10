@@ -82,36 +82,6 @@ fn check_tier2(cases: &[(&str, &str, &str)]) {
     assert!(failures.is_empty(), "cell differs:\n{}", failures.join("\n"));
 }
 
-/// The cell `convert` writes, as `(cell html, br_in_tables off, br_in_tables on)`, for a page the
-/// fast converter hands over to Tier-2: a block inside a code block.
-fn check_handed_over(cases: &[(&str, &str, &str)]) {
-    let mut failures = Vec::new();
-    for (cell, off, on) in cases {
-        let html = table(cell);
-        for (br_in_tables, expected) in [(false, off), (true, on)] {
-            let options = ConversionOptions {
-                tier_strategy: TierStrategy::Auto,
-                ..tier2_options(br_in_tables)
-            };
-            let out = convert(&html, Some(options))
-                .expect("conversion must succeed")
-                .content
-                .unwrap_or_default();
-            let tier2_out = tier2(&html, br_in_tables);
-            let tier1_out = tier1_run(&html, br_in_tables);
-            if out.lines().next() != Some(format!("| {expected} |").as_str())
-                || out != tier2_out
-                || !matches!(tier1_out, Err(tier1::BailReason::Classifier))
-            {
-                failures.push(format!(
-                    "{cell:?} br_in_tables={br_in_tables}: convert {out:?} tier2 {tier2_out:?} tier1 {tier1_out:?}, want | {expected} |"
-                ));
-            }
-        }
-    }
-    assert!(failures.is_empty(), "cell differs:\n{}", failures.join("\n"));
-}
-
 #[test]
 fn should_separate_text_after_a_paragraph_or_heading_in_a_cell() {
     check(&[
@@ -176,6 +146,7 @@ fn should_keep_the_cell_break_whole_before_a_quote_in_a_cell() {
         ("<div><hr><blockquote><pre><li></pre></blockquote></div>", "---", "---"),
         ("a <blockquote><br>b</blockquote>", "a b", "a<br><br>b"),
         ("a <blockquote><hr></blockquote>", "a ---", "a<br>---"),
+        ("x <pre><p>b</p></pre>", "x `b`", "x<br>`b`"),
         ("x<pre><li>b</li></pre>", "x `b`", "x<br>`b`"),
         (
             "a <blockquote><details><summary>s<p>x</p></summary></details></blockquote>",
@@ -183,7 +154,6 @@ fn should_keep_the_cell_break_whole_before_a_quote_in_a_cell() {
             "a<br>**s<br>x**",
         ),
     ]);
-    check_handed_over(&[("x <pre><p>b</p></pre>", "x `b`", "x<br>`b`")]);
 }
 
 /// A quote or a table next to it outside the cell does not change where the cell's content starts.
@@ -214,7 +184,7 @@ fn should_write_the_same_cell_in_a_table_inside_a_quote_in_both_tiers() {
 /// ~keep A real break in a preformatted cell stays outside the code spans that surround it.
 #[test]
 fn should_keep_cell_break_outside_preformatted_code_spans() {
-    check_handed_over(&[
+    check(&[
         ("<pre>a<br><p>b</p></pre>", "`a b`", "`a`<br>`b`"),
         ("<pre>a<br><div>b</div></pre>", "`a b`", "`a`<br>`b`"),
     ]);
@@ -260,7 +230,7 @@ fn should_write_the_same_paragraph_break_in_a_cell_in_both_tiers() {
 /// code before it.
 #[test]
 fn should_break_before_a_block_in_bold_inside_a_code_block_in_a_cell() {
-    check_handed_over(&[("<pre>a<b><p>y</p></b>q</pre>", "`a yq`", "`a`<br>`yq`")]);
+    check(&[("<pre>a<b><p>y</p></b>q</pre>", "`a yq`", "`a`<br>`yq`")]);
 }
 
 /// Tier-2 still sees a navigation block that preprocessing drops, so the text after it breaks.

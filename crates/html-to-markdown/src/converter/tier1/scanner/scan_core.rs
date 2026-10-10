@@ -88,17 +88,23 @@ impl<'a> Tier1Scanner<'a> {
             .iter()
             .all(u8::is_ascii_whitespace)
             && inline_follows_comments(self.bytes, self.pos);
+        // ~keep Both scans of the markup ahead decide what a line end at the end of the text
+        // ~keep becomes, so a text that ends with no line end does not scan: each scan passes
+        // ~keep the open tags of the elements that only wrap text, and a run of them on every
+        // ~keep text made the converter four times slower on deep nesting.
+        let ends_with_line_end = crate::converter::utility::content::without_trailing_line_end_in_source(
+            &self.html[self.text_start..self.pos],
+        )
+        .is_some();
         let upcoming = UpcomingTextSibling {
             is_list: upcoming_tag_is_list_open(self.bytes, self.pos),
             is_img: upcoming_tag_is_named(self.bytes, self.pos, b"img"),
             is_inline,
             inline_follows_comments,
-            inline_starts_with_block: (is_inline || inline_follows_comments)
+            inline_starts_with_block: ends_with_line_end
+                && (is_inline || inline_follows_comments)
                 && upcoming_inline_starts_with_block(self.bytes, self.pos),
-            line_end_meets_zero_width_space: crate::converter::utility::content::without_trailing_line_end_in_source(
-                &self.html[self.text_start..self.pos],
-            )
-            .is_some()
+            line_end_meets_zero_width_space: ends_with_line_end
                 && zero_width_space_is_upcoming(self.html, self.pos, &self.state.stack),
         };
         flush_text(
@@ -385,8 +391,10 @@ impl<'a> Tier1Scanner<'a> {
             let (raw_href, title) = extract_link_attrs(attrs)?;
             // ~keep A link with no address is running text in Tier-2. This scanner writes it as
             // ~keep a label and loses the white space at the ends of its content (`close_link`
-            // ~keep has the other end), so it leaves the page to Tier-2.
-            if raw_href.is_none() && self.bytes.get(self.pos).is_some_and(u8::is_ascii_whitespace) {
+            // ~keep has the other end), so it leaves the page to Tier-2. The decision reads the
+            // ~keep decoded text of the content: `&#32;`, a comment or an empty element first,
+            // ~keep or a space inside the first inline child, is white space at the start too.
+            if raw_href.is_none() && white_space_is_upcoming(self.html, self.pos, &self.state.stack) {
                 return Err(BailReason::Classifier);
             }
             let href = raw_href

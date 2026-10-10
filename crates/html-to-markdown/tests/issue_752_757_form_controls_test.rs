@@ -586,12 +586,12 @@ fn should_hand_a_control_with_separated_text_to_the_full_converter() {
         assert!(matches!(result, Err(BailReason::FormControl)), "{html}: {result:?}");
     }
     // ~keep An input writes nothing and adds no space in both converters, so the fast converter
-    // ~keep keeps the input.
+    // ~keep keeps the input. The white space on both sides of it is one run, so one space.
     for (html, expected) in [
         ("<p>Name<input>Mail</p>", "NameMail\n"),
         (r#"<p>Name<input type="text" value="typed">Mail</p>"#, "NameMail\n"),
         (r#"<p>Name<input type="radio" checked>Mail</p>"#, "NameMail\n"),
-        ("<p>Name <input> Mail</p>", "Name  Mail\n"),
+        ("<p>Name <input> Mail</p>", "Name Mail\n"),
         ("<p><input>Mail</p>", "Mail\n"),
         (r#"<p>a<input type="hidden" value="t">b</p>"#, "ab\n"),
     ] {

@@ -787,15 +787,22 @@ fn handle_empty_inline_body(
     marker: &str,
 ) -> Result<bool, BailReason> {
     let content_absent = buf.len() <= content_start;
+    let is_marks = matches!(marker, "**" | "*" | "~~" | "==");
+    // ~keep In marks a blank body is the module's `is_blank`: `<p>a <em>&nbsp;</em> b</p>` goes
+    // ~keep to the full converter, which writes `a b`. Code keeps its text.
     let whitespace_only = !content_absent
-        && buf[content_start..]
-            .bytes()
-            .all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'));
+        && if is_marks {
+            crate::converter::utility::white_space::is_blank(&buf[content_start..])
+        } else {
+            buf[content_start..]
+                .bytes()
+                .all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'))
+        };
     if !content_absent && !whitespace_only {
         return Ok(false);
     }
     let was_whitespace_only = whitespace_only || (content_absent && frame.dropped_whitespace_only_text);
-    if was_whitespace_only && matches!(marker, "**" | "*" | "~~" | "==") {
+    if was_whitespace_only && is_marks {
         return Err(BailReason::WhitespaceOnlyInlineEmphasis);
     }
     let marker_start = clamp_to_char_boundary(buf, content_start.saturating_sub(marker.len()));
