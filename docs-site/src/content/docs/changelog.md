@@ -73,6 +73,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A page with a structured data script keeps its text when a text value of the JSON holds a tag.
+  `<script type="application/ld+json">{"a":"<p>"}</script>` in the head made the whole page
+  convert to an empty string, and the same script in the body removed the text after it. The
+  JSON in the metadata keeps the tags of its values: `{"a":"<p>Nice</p>"}` gave `{"a":"Nice"}`
+  and now gives the JSON as written. The end tag of the script can have any spelling a browser
+  reads (`</SCRIPT>`, `</script >`, `</script/>`); each of these also gave an empty page. A type
+  written with a character reference (`application/ld&#43;json`) is read as structured data
+  ([#818](https://github.com/xberg-io/html-to-markdown/issues/818)).
 - The options of a select list are separate words instead of one joined word. A select list
   with the options `Quickstart`, `Installation` and `Ruby 101` gave
   `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`; a label, a
