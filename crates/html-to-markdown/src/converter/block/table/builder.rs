@@ -214,6 +214,7 @@ fn render_wrapper_cell(
     let Some(tl::Node::Tag(cell)) = cell_handle.get(parser) else {
         return;
     };
+    let cell_ctx = handler.ctx.for_cell(cell_handle.get_inner(), parser, handler.dom_ctx);
     for child in cell.children().top().iter() {
         super::super::super::walk_node(
             child,
@@ -221,7 +222,7 @@ fn render_wrapper_cell(
             output,
             crate::converter::block::container::HandlerContext::new(
                 handler.options,
-                handler.ctx,
+                &cell_ctx,
                 handler.depth + cell_depth + 1,
                 handler.dom_ctx,
             ),

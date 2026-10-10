@@ -108,13 +108,15 @@ pub fn white_space_follows(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -
         .is_some_and(|next| matches!(next, tl::Node::Raw(raw) if raw.as_utf8_str().starts_with(char::is_whitespace)))
 }
 
-/// Whether node `id` is in a table cell that holds only inputs and white space.
-pub fn in_cell_of_inputs(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
-    let Some(parent_id) = dom_ctx.parent_of(id) else {
-        return false;
-    };
-    matches!(dom_ctx.parent_tag_name(id, parser), Some("td" | "th"))
-        && dom_ctx.children_of(parent_id).is_some_and(|children| {
+/// Whether node `cell_id` is a table cell that holds only inputs and white space.
+///
+/// ~keep This reads every child of the cell, so a cell asks it one time, where it opens
+/// ~keep (`Context::for_cell`). A control reads the answer from its context.
+pub fn cell_holds_only_inputs(cell_id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    dom_ctx
+        .tag_info(cell_id, parser)
+        .is_some_and(|info| matches!(info.name.as_str(), "td" | "th"))
+        && dom_ctx.children_of(cell_id).is_some_and(|children| {
             children.iter().all(|child| match child.get(parser) {
                 Some(tl::Node::Raw(raw)) => raw.as_utf8_str().trim().is_empty(),
                 Some(tl::Node::Tag(_)) => dom_ctx.tag_name_for(*child, parser).as_deref() == Some("input"),

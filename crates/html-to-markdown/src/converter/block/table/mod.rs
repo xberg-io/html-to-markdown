@@ -233,6 +233,11 @@ fn collect_grid_row(
         // ~keep including into the very `DocumentStructure` this walk exists to build.
         let mut cell_ctx = super::super::Context {
             in_table_cell: true,
+            in_cell_of_inputs: crate::converter::form::spacing::cell_holds_only_inputs(
+                cell_handle.get_inner(),
+                parser,
+                handler.dom_ctx,
+            ),
             ..handler.ctx.clone()
         };
         #[cfg(feature = "metadata")]

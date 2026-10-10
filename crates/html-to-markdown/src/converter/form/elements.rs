@@ -379,7 +379,7 @@ fn emit_input(
         return;
     };
     let id = node_handle.get_inner();
-    if super::spacing::in_cell_of_inputs(id, parser, dom_ctx) {
+    if ctx.in_cell_of_inputs {
         output.push_str(if checked { "[x]" } else { "[ ]" });
     } else if !ctx.in_code && output.ends_with(' ') && super::spacing::white_space_follows(id, parser, dom_ctx) {
         // ~keep The white space on both sides of the checkbox is one space between two words.
