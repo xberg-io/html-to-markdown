@@ -102,14 +102,16 @@ pub fn handle_code(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     }
 
     #[cfg(feature = "visitor")]
-    if let Some(custom_output) = visit_inline_code(tag, &content, &handler) {
-        handler.output.push_str(&custom_output);
-        return;
+    if tag.name().as_utf8_str().eq_ignore_ascii_case("code") {
+        if let Some(custom_output) = visit_inline_code(tag, &content, &handler) {
+            handler.output.push_str(&custom_output);
+            return;
+        }
     }
     emit_inline_code_with_links(&content, &links.borrow(), &mut handler);
 }
 
-fn contains_anchor(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> bool {
+pub(in crate::converter) fn contains_anchor(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> bool {
     let mut pending = tag.children().top().to_vec();
     while let Some(handle) = pending.pop() {
         if let Some(tl::Node::Tag(child)) = handle.get(parser) {
@@ -142,9 +144,7 @@ fn emit_inline_code_with_links(
             handler,
         );
         if pending_break && emitted {
-            handler
-                .output
-                .push_str(crate::converter::main_helpers::hard_break_marker(handler.options));
+            emit_collected_code_break(handler);
         }
         pending_break = false;
         handler.output.push_str(&link.markdown);
@@ -160,19 +160,36 @@ fn emit_linked_code_text(
     emitted: &mut bool,
     handler: &mut HandlerContext<'_>,
 ) {
+    let break_count = content.matches('\n').count();
     for (index, segment) in content.split('\n').enumerate() {
         *pending_break |= index > 0;
         if segment.is_empty() {
             continue;
         }
         if *pending_break && *emitted {
-            handler
-                .output
-                .push_str(crate::converter::main_helpers::hard_break_marker(handler.options));
+            emit_collected_code_break(handler);
+        }
+        let segment = if (handler.context.in_table_cell || handler.context.in_heading) && index < break_count {
+            segment.trim_end()
+        } else {
+            segment
+        };
+        if segment.is_empty() {
+            continue;
         }
         emit_code_content(segment, handler);
         *emitted = true;
         *pending_break = false;
+    }
+}
+
+fn emit_collected_code_break(handler: &mut HandlerContext<'_>) {
+    if handler.context.in_table_cell || handler.context.in_heading {
+        handler.output.push(' ');
+    } else {
+        handler
+            .output
+            .push_str(crate::converter::main_helpers::hard_break_marker(handler.options));
     }
 }
 

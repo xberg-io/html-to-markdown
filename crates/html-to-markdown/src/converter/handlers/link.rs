@@ -96,7 +96,10 @@ fn emit_code_link(tag: &tl::HTMLTag<'_>, data: &LinkData<'_>, handler: &mut Hand
         inline_code_links: None,
         ..handler.context.clone()
     };
-    let raw = collect_code_link_text(data, &context, handler);
+    let mut raw = collect_code_link_text(data, &context, handler);
+    if (handler.context.in_table_cell || handler.context.in_heading) && followed_by_break(handler) {
+        raw.truncate(raw.trim_end().len());
+    }
     if let Some(links) = handler.context.inline_code_links.as_ref().filter(|_| {
         !handler.context.in_code_block && !data.href.is_empty() && !data.href_addr_dropped && !raw.is_empty()
     }) {
@@ -128,11 +131,28 @@ fn emit_code_link(tag: &tl::HTMLTag<'_>, data: &LinkData<'_>, handler: &mut Hand
                 markdown,
             });
         }
+    } else if handler.context.inline_code_links.is_some() {
+        handler.output.push_str(&raw);
     } else {
         emit_link(tag, data, &raw, false, handler);
     }
     #[cfg(feature = "metadata")]
     record_link_metadata(tag, data, raw.trim(), handler.context);
+}
+
+fn followed_by_break(handler: &HandlerContext<'_>) -> bool {
+    let id = handler.node_handle.get_inner();
+    let next = handler
+        .dom_context
+        .parent_of(id)
+        .and_then(|parent| handler.dom_context.children_of(parent))
+        .and_then(|siblings| {
+            handler
+                .dom_context
+                .get_sibling_index(id)
+                .and_then(|index| siblings.get(index + 1))
+        });
+    matches!(next.and_then(|handle| handle.get(handler.parser)), Some(tl::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("br"))
 }
 
 fn collect_code_link_text(data: &LinkData<'_>, context: &Context, handler: &HandlerContext<'_>) -> String {
@@ -213,7 +233,9 @@ impl<'a> LinkData<'a> {
                 .filter(|value| !value.trim().is_empty())
                 .or_else(|| title.clone()),
             empty_span_content: !children.is_empty()
-                && children.iter().all(|child| empty_span_child(child, handler.parser)),
+                && children
+                    .iter()
+                    .all(|child| empty_text_wrapper_child(child, handler.parser)),
             href,
             title,
             children,
@@ -226,16 +248,36 @@ impl<'a> LinkData<'a> {
     }
 }
 
-// ~keep Empty span wrappers carry no textual or media fallback; preserve their destination
+// ~keep Empty presentational wrappers carry no textual or media fallback; preserve their destination
 // ~keep without inserting URL words into document content (#771). Icon fonts and images
 // ~keep still use the link-name/address fallback required by #774 and #775.
-fn empty_span_child(handle: &tl::NodeHandle, parser: &tl::Parser<'_>) -> bool {
+fn empty_text_wrapper_child(handle: &tl::NodeHandle, parser: &tl::Parser<'_>) -> bool {
     let mut pending = vec![*handle];
     while let Some(child) = pending.pop() {
         match child.get(parser) {
-            Some(tl::Node::Raw(raw)) if raw.as_utf8_str().trim().is_empty() => {}
+            Some(tl::Node::Raw(raw)) if text::decode_html_entities_cow(&raw.as_utf8_str()).trim().is_empty() => {}
             Some(tl::Node::Comment(_)) => {}
-            Some(tl::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("span") => {
+            Some(tl::Node::Tag(tag))
+                if matches!(
+                    normalized_tag_name(tag.name().as_utf8_str()).as_ref(),
+                    "span"
+                        | "b"
+                        | "strong"
+                        | "em"
+                        | "mark"
+                        | "del"
+                        | "s"
+                        | "strike"
+                        | "ins"
+                        | "u"
+                        | "small"
+                        | "sub"
+                        | "sup"
+                        | "code"
+                        | "kbd"
+                        | "samp"
+                ) =>
+            {
                 pending.extend(tag.children().top().iter().copied());
             }
             _ => return false,

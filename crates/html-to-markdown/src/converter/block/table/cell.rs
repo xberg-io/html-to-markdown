@@ -190,9 +190,40 @@ fn render_cell_content(
         *text = escape_cell_text(normalized.as_ref(), handler.options);
         return;
     }
+    let mut table_ends = Vec::new();
     for child_handle in children.top().iter() {
         render_cell_child(child_handle, parser, text, handler, deferred_tables);
+        if deferred_tables.is_none() && super::utils::is_or_contains_table(child_handle, parser, handler.dom_ctx) {
+            table_ends.push(text.len());
+        }
     }
+    separate_nested_table_following_content(text, &table_ends, handler.options.br_in_tables);
+}
+
+/// Separate content after a flattened nested table once the cell's inline markup is complete.
+/// ~keep Delaying insertion keeps code/link offsets stable and avoids a trailing synthetic `<br>`.
+pub fn separate_nested_table_following_content(text: &mut String, table_ends: &[usize], br_in_tables: bool) {
+    if table_ends.is_empty() {
+        return;
+    }
+    let original = std::mem::take(text);
+    let mut start = 0;
+    let content_end = original.trim_end().len();
+    for &end in table_ends {
+        if end <= start {
+            continue;
+        }
+        let Some(piece) = original.get(start..end) else {
+            continue;
+        };
+        let Some(following) = original.get(end..) else { continue };
+        text.push_str(piece);
+        if end < content_end && !following.starts_with(char::is_whitespace) && !following.starts_with("<br>") {
+            text.push_str(if br_in_tables { "<br>" } else { " " });
+        }
+        start = end;
+    }
+    text.push_str(&original[start..]);
 }
 
 /// ~keep A nested table's structural pipes bypass text-node escaping. It must either be deferred

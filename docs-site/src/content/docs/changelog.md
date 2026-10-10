@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Links inside `code`, `kbd` and `samp` spans keep their destinations outside the code marks,
+  including links in table cells. Image labels stay literal, and quotes and hidden templates
+  retain their normal behavior ([#813](https://github.com/xberg-io/html-to-markdown/issues/813)).
+- Nested tables in a Markdown cell retain their text without nested table delimiters, with
+  spaces between cells and surrounding content
+  ([#760](https://github.com/xberg-io/html-to-markdown/issues/760)).
+- Stray table rows and cells retain their text
+  ([#805](https://github.com/xberg-io/html-to-markdown/issues/805)). Empty link destinations
+  keep the label as plain text, and empty presentational wrappers follow the same label rule
+  as a bare empty link; named labels and icons retain their fallback names.
+
 ## [3.17.2] - 2026-10-06
 
 ### Changed

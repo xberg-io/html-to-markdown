@@ -353,7 +353,7 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     // ~keep Close the link: `](href "title")` or `](href)`
     // If no href, just emit the text as-is (Tier-2 behaviour: no link markup).
     // Link state was pushed to state.link_stack at open; pop it now.
-    let (href, title, has_nested_tag) = state.link_stack.pop().unwrap_or((None, None, false));
+    let (href, title, has_nested_tag, has_aria_label) = state.link_stack.pop().unwrap_or((None, None, false, false));
     // ~keep Mirrors the branch ORDER of Tier-2's `line_break.rs`, where `in_heading` and
     // `in_table_cell` are both tested ahead of the link arm: a single-line ATX heading
     // and a pipe-table cell cannot carry a hard break at all, so a `<br>` in either has
@@ -378,7 +378,7 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     // space.  Tier-1 otherwise emits `[Designed\u{a0}by](url)` where Tier-2
     // emits `[Designed by](url)`.
     normalize_link_label_nbsp(dest, trim_start);
-    if dest.len() == trim_start && (has_nested_tag || title.is_some()) {
+    if dest.len() == trim_start && (has_nested_tag || title.is_some() || has_aria_label) {
         return Err(BailReason::LinkEmptyLabel);
     }
     if let Some(href_str) = href.as_deref() {

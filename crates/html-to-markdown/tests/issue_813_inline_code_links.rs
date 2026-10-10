@@ -101,7 +101,12 @@ fn should_keep_links_inside_nested_code_formatting_wrappers() {
         "abbr", "q",
     ] {
         let html = format!(r#"<p><code>prefix<{wrapper}><a href="/b">b</a></{wrapper}>tail</code></p>"#);
-        assert_paths(&html, "`prefix`[`b`](/b)`tail`\n");
+        let expected = if wrapper == "q" {
+            "`prefix\"`[`b`](/b)`\"tail`\n"
+        } else {
+            "`prefix`[`b`](/b)`tail`\n"
+        };
+        assert_paths(&html, expected);
     }
 }
 

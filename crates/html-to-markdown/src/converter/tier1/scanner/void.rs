@@ -483,7 +483,7 @@ fn dispatch_close(
         TagKind::TableHead => close_table_head(state),
         TagKind::TableBody => close_table_body(state),
         TagKind::TableRow => close_table_row(state),
-        TagKind::TableCell { .. } => close_table_cell(state, false)?,
+        TagKind::TableCell { .. } => close_table_cell(state, false, options)?,
         TagKind::TableCaption => close_table_caption(state),
         TagKind::Block => close_block_container(state, frame, name_lower),
         TagKind::Summary => close_summary(state, frame),

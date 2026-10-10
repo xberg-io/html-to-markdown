@@ -338,9 +338,6 @@ impl<'a> Tier1Scanner<'a> {
             1
         };
         if matches!(spec.kind, TagKind::Link) {
-            if find_attr(attrs, b"aria-label").is_some() {
-                return Err(BailReason::LinkEmptyLabel);
-            }
             let (href, title) = extract_link_attrs(attrs)?;
             let href = href.map(|value| {
                 self.state
@@ -349,7 +346,9 @@ impl<'a> Tier1Scanner<'a> {
                     .and_then(|base| crate::converter::url_resolve::resolve_link_url(base, &value))
                     .unwrap_or(value)
             });
-            self.state.link_stack.push((href, title, false));
+            self.state
+                .link_stack
+                .push((href, title, false, find_attr(attrs, b"aria-label").is_some()));
         }
         if name_lower == b"abbr" {
             let title = find_attr(attrs, b"title")

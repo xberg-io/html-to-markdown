@@ -201,6 +201,9 @@ fn render_image(
     if let std::ops::ControlFlow::Break(result) = visit_image(tag, data, handler) {
         return result;
     }
+    if context.in_code {
+        return (inline_data != InlineDataMedia::DropElement).then(|| data.alt.to_string());
+    }
     render_image_default(data, inline_data, should_use_alt_text, handler)
 }
 

@@ -107,14 +107,16 @@ fn render_closed_table(
         // ~keep Markdown tables cannot nest: keep inner cell content and row breaks only (#760).
         let mut nested = table.caption_text.as_deref().unwrap_or_default().to_string();
         for row in &table.rows {
-            if !nested.is_empty() {
-                crate::converter::main_helpers::emit_table_cell_break(&mut nested, options.br_in_tables);
-            }
-            for (index, (cell, _)) in row.iter().enumerate() {
-                if index > 0 && !nested.ends_with(' ') {
-                    nested.push(' ');
+            let mut row_cells = row.iter().filter(|(cell, _)| !cell.is_empty());
+            if let Some((first, _)) = row_cells.next() {
+                if !nested.is_empty() {
+                    crate::converter::main_helpers::emit_table_cell_break(&mut nested, options.br_in_tables);
                 }
-                nested.push_str(cell);
+                nested.push_str(first);
+                for (cell, _) in row_cells {
+                    nested.push(' ');
+                    nested.push_str(cell);
+                }
             }
         }
         let write_nested = |dest: &mut String| {
@@ -141,6 +143,11 @@ fn render_closed_table(
             with_cell_scratch(state, write_nested);
         } else {
             write_nested(state.cell_or_output_mut());
+            if !nested.is_empty()
+                && let Some(outer) = state.table_stack.last_mut()
+            {
+                outer.nested_table_ends.push(outer.current_cell.len());
+            }
         }
     } else {
         emit_gfm_table(&mut state.output, table, options.output_format);
@@ -206,12 +213,18 @@ fn close_table_row(state: &mut Tier1State) {
 /// `is_implicit` skips the pipe-escape bail that only applies when the cell
 /// was explicitly closed (implicit closes happen during row/table teardown
 /// where we've already committed to the data we have).
-fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), BailReason> {
+fn close_table_cell(state: &mut Tier1State, is_implicit: bool, options: &ConversionOptions) -> Result<(), BailReason> {
     let Some(ts) = state.table_stack.last_mut() else {
         return Ok(());
     };
     ts.in_cell = false;
     // ~keep Trim the accumulated cell text (matches Tier-2 `text.trim()`).
+    crate::converter::block::table::cell::separate_nested_table_following_content(
+        &mut ts.current_cell,
+        &ts.nested_table_ends,
+        options.br_in_tables,
+    );
+    ts.nested_table_ends.clear();
     let cell_text_raw = ts.current_cell.trim().to_owned();
     // ~keep Replace newlines with spaces — mirrors Tier-2's `cell_text_content`
     // which calls `text.replace('\n', " ")` when `br_in_tables` is false.
