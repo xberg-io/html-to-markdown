@@ -16,8 +16,8 @@ pub enum CodeScan<'a> {
 /// Follows the indented code blocks of finished Markdown, one line at a time.
 ///
 /// ~keep The lines are read when the first answer is asked for. A block quote asks only about a
-/// ~keep line of white space, so most quotes read nothing: a read of the whole content at each
-/// ~keep level of nested quotes costs the square of the depth.
+/// ~keep line of white space, so most quotes read nothing. That saves a constant factor: a quote
+/// ~keep reads only the lines of its own level (see below), never the square of the depth.
 ///
 /// ~keep With [`QuoteLines::Kept`] the read starts after the last line of a quote at the left
 /// ~keep margin and stops before the next one: such a line closes every list item and every

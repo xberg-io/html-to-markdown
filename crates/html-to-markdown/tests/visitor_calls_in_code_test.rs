@@ -331,6 +331,30 @@ const IMAGE_LINK_CASES: &[(&str, Images, &str, &[&str])] = &[
         &["image i.png", "link #x", "code_block"],
     ),
     (
+        "a link into its own page that holds an image with no alt text in a block",
+        Images::Default,
+        "<pre><a href=\"#l1\"><div><img src=\"i.png\"></div></a>x</pre>",
+        &["image i.png", "code_block"],
+    ),
+    (
+        "a link into its own page that holds an image and then an empty link",
+        Images::Default,
+        "<pre><a href=\"#o\"><img src=\"i.png\"><a href=\"#i\"></a></a>x</pre>",
+        &["image i.png", "link #o", "code_block"],
+    ),
+    (
+        "a link into its own page that holds only an empty link to another page",
+        Images::Default,
+        "<pre><a href=\"#o\"><a href=\"/q\"></a></a>x</pre>",
+        &["link /q", "link #o", "code_block"],
+    ),
+    (
+        "a link around one heading that holds only an image with alt text",
+        Images::Default,
+        "<pre><a href=\"/x\"><h2><img src=\"i.png\" alt=\"p\"></h2></a>z</pre>",
+        &["image i.png", "code_block"],
+    ),
+    (
         "a link into its own page that holds only a graphic",
         Images::Default,
         "<pre><a href=\"#x\"><svg width=\"4\" height=\"4\"><rect width=\"4\" height=\"4\"/></svg></a>z</pre>",

@@ -470,21 +470,28 @@ pub fn handle_svg(
 
     let title = graphic_text(tag, parser);
     // ~keep Code shows every character as text, so a graphic in code writes its text and no marks.
-    let is_written_as_text = ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly;
     if ctx.in_code {
-        // ~keep Outside code a graphic that is written as an image is the label of a link
-        // ~keep around it, also when it has no text.
-        if !is_written_as_text {
-            ctx.image_label_hidden_in_code.set(true);
-        }
         output.push_str(&title);
-        return;
-    }
-    if is_written_as_text {
-        write_graphic_as_text(*node_handle, parser, output, context, &title);
-    } else {
+    } else if graphic_is_written_as_image(options, ctx) {
         write_graphic_as_image(*node_handle, parser, output, context, &title);
+    } else {
+        write_graphic_as_text(*node_handle, parser, output, context, &title);
     }
+}
+
+/// Whether a graphic is written as an image with the options and the context given, and not as its
+/// text or not at all.
+///
+/// ~keep A graphic that is written as an image is the label of a link around it, also when it
+/// ~keep has no text. A link in code asks this with the context of its label outside code.
+pub fn graphic_is_written_as_image(
+    options: &crate::options::ConversionOptions,
+    ctx: &crate::converter::Context,
+) -> bool {
+    !options.skip_images
+        && !ctx.convert_as_inline
+        && super::inline_data_treatment(options.inline_data_media, "data:image/svg+xml")
+            == crate::options::InlineDataMedia::Keep
 }
 
 /// Gives an inline `<svg>` to the collector of inline images, with the text of its `title` child
