@@ -383,6 +383,12 @@ impl<'a> Tier1Scanner<'a> {
         };
         if matches!(spec.kind, TagKind::Link) {
             let (raw_href, title) = extract_link_attrs(attrs)?;
+            // ~keep A link with no address is running text in Tier-2. This scanner writes it as
+            // ~keep a label and loses the white space at the ends of its content (`close_link`
+            // ~keep has the other end), so it leaves the page to Tier-2.
+            if raw_href.is_none() && self.bytes.get(self.pos).is_some_and(u8::is_ascii_whitespace) {
+                return Err(BailReason::Classifier);
+            }
             let href = raw_href
                 .as_deref()
                 .map(|value| self.state.resolve_url(value).unwrap_or_else(|| value.to_owned()));

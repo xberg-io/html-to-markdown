@@ -351,6 +351,12 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     // source HTML with whitespace before `</a>`), while keeping a `<br>` that sits at
     // either edge of the label (issue #497).
     let trim_start = clamp_to_char_boundary(dest, frame.content_start);
+    // ~keep A link with no address is running text in Tier-2, which keeps the white space that
+    // ~keep its content ends with. The trim below loses it, so the page goes to Tier-2 (the
+    // ~keep scanner does the same where such a link opens, for the white space at its start).
+    if href.is_none() && dest[trim_start..].ends_with(char::is_whitespace) {
+        return Err(BailReason::Classifier);
+    }
     // ~keep Mirror Tier-2's `normalize_whitespace_cow` step inside
     // `normalize_link_label` (utility/content.rs): any Unicode whitespace
     // in the link label (notably NBSP `\u{00a0}`) collapses to a single ASCII

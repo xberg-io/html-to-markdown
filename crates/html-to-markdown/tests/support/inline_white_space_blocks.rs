@@ -421,6 +421,28 @@ fn a_block_in_code_in_a_heading_is_no_block_boundary() {
     );
 }
 
+/// A thematic break in a link in a heading is a block of the label: a label that starts with it
+/// is a word of its own (issue #751). The fast converter gives these inputs to the full one. In
+/// a table cell both converters write the label as before, and in `pre` the full one does.
+#[test]
+fn a_thematic_break_in_a_link_in_a_heading_is_a_word_of_its_own() {
+    assert_on_full(&[
+        ("<h2>one<a href=\"/y\"><hr>y</a></h2>", "## one [--- y](/y)\n"),
+        ("<h2>one<a href=\"/y\"><hr>y</a>two</h2>", "## one [--- y](/y)two\n"),
+        ("<h2>one <a href=\"/y\"><hr>y</a>two</h2>", "## one [--- y](/y)two\n"),
+        ("<h2>one<a href=\"/y\">y<hr></a>two</h2>", "## one[y ---](/y) two\n"),
+        ("<h2>one<a><hr>y</a>two</h2>", "## one --- ytwo\n"),
+        (
+            "<pre>one<a href=\"/y\"><hr>y</a>two</pre>",
+            "```\none[--- y](/y)two\n```\n",
+        ),
+    ]);
+    assert_on_both(&[(
+        "<table><tr><td>one<a href=\"/y\"><hr>y</a>two</td></tr></table>",
+        "| one[--- y](/y)two |\n| ----------------- |\n",
+    )]);
+}
+
 #[test]
 fn blocks_inside_a_heading_or_a_cell_are_separate_words() {
     assert_on_both(&[

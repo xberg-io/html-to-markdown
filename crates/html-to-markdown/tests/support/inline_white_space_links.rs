@@ -138,27 +138,62 @@ fn white_space_at_an_end_of_an_image_link_an_autolink_or_a_short_quotation_is_wr
     ]);
 }
 
-/// A link with no address is running text. The full converter keeps the white space at the ends
-/// of its text, and the fast converter does not (issue #800, open): each row is the output of
-/// each converter before the rules of this file. The last row is a link with an address: the
-/// fast converter keeps the white space that bold text starts with in the label, in a paragraph
-/// and in a sectioning element, and the full converter does not.
+/// The fast converter keeps the white space that bold text starts with in a link label, in a
+/// paragraph and in a sectioning element, and the full converter does not (issue #800, open):
+/// the row is the output of each converter before the rules of this file.
 #[test]
-fn white_space_at_an_end_of_a_link_with_no_address_is_written_as_before() {
+fn white_space_that_bold_text_starts_with_in_a_link_label_is_written_as_before() {
+    let html = "x<footer><a href=\"/x\"><b> Logo</b></a></footer>";
+    assert_eq!(tier2(html), "x\n\n[**Logo**](/x)\n");
+    let written = tier1::run(html, &PrescanReport::default(), &tier_options());
+    assert_eq!(written.as_deref().ok(), Some("x\n\n[ **Logo**](/x)\n"));
+}
+
+/// A link with no address is running text: each row is written as the same content in a `span`
+/// is. The white space at an end of the content is one space, as a browser shows it (issue
+/// #762). The fast converter gives a link with no address and such white space to the full one.
+/// In `pre` and in a code span the text is written as it is.
+///
+/// ~keep The rows of a list item are the output of the full converter, not of a browser: it
+/// ~keep writes one space where the fast converter writes the indent of the item for a `span`.
+#[test]
+fn a_link_with_no_address_is_written_as_a_span_is() {
     let cases = [
-        ("<p>Press <a>Go </a>now.</p>", "Press Go now.\n", "Press Gonow.\n"),
-        ("<p>Press<a> Go</a> now.</p>", "Press Go now.\n", "PressGo now.\n"),
         (
-            "x<footer><a href=\"/x\"><b> Logo</b></a></footer>",
-            "x\n\n[**Logo**](/x)\n",
-            "x\n\n[ **Logo**](/x)\n",
+            "<p><a> <img src=\"/i.png\" alt=\"Go\"> </a>now</p>",
+            "![Go](/i.png) now\n",
+        ),
+        (
+            "<p><a name=\"n\"> <img src=\"/i.png\" alt=\"Go\"> </a>now</p>",
+            "![Go](/i.png) now\n",
+        ),
+        ("<p>Press <a>Go </a>now.</p>", "Press Go now.\n"),
+        ("<p>Press<a> Go</a> now.</p>", "Press Go now.\n"),
+        ("<p>Press <a> Go </a> now.</p>", "Press Go now.\n"),
+        ("<p>Press <a href>Go </a>now.</p>", "Press Go now.\n"),
+        ("<p>Press<a> </a>now.</p>", "Press now.\n"),
+        ("<h2>Press <a>Go </a>now</h2>", "## Press Go now\n"),
+        (
+            "<table><tr><td>Press <a>Go </a>now</td></tr></table>",
+            "| Press Go now |\n| ------------ |\n",
         ),
     ];
-    for (html, full, fast) in cases {
-        assert_eq!(tier2(html), full, "full converter: {html:?}");
-        let written = tier1::run(html, &PrescanReport::default(), &tier_options());
-        assert_eq!(written.as_deref().ok(), Some(fast), "fast converter: {html:?}");
+    assert_on_full(&cases);
+    assert_on_both(&[("<p>Press <a>Go</a> now.</p>", "Press Go now.\n")]);
+    for (html, expected) in cases {
+        let span = html
+            .replace("<a name=\"n\">", "<span>")
+            .replace("<a href>", "<span>")
+            .replace("<a>", "<span>")
+            .replace("</a>", "</span>");
+        assert_eq!(convert_everywhere(&span, false), Ok(expected.to_owned()), "{span:?}");
     }
+    assert_on_full(&[
+        ("<ul><li>Press <a>Go<br> </a> now</li></ul>", "- Press Go  \n now\n"),
+        ("<ul><li>Press<a>Go<br> </a> now</li></ul>", "- PressGo  \n now\n"),
+        ("<pre>Press <a>Go </a>now</pre>", "```\nPress Go now\n```\n"),
+        ("<p><code>Press <a>Go </a>now</code></p>", "`Press Go now`\n"),
+    ]);
 }
 
 /// A label of white space only has no ends, so no space goes outside the link. The full
@@ -353,8 +388,10 @@ fn a_sectioning_element_does_not_start_with_a_space() {
         ("x<footer><b> Logo</b></footer>", "x\n\n**Logo**\n"),
         ("x<footer> <b>Logo</b></footer>", "x\n\n**Logo**\n"),
         ("x<footer><div><i> Logo</i></div></footer>", "x\n\n*Logo*\n"),
-        ("x<footer><div><a> Logo</a></div></footer>", "x\n\nLogo\n"),
     ]);
+    // ~keep The fast converter gives a link with no address and white space at an end to the
+    // ~keep full one.
+    assert_on_full(&[("x<footer><div><a> Logo</a></div></footer>", "x\n\nLogo\n")]);
 }
 
 /// Only the one space of collapsed white space is removed at the start of a sectioning

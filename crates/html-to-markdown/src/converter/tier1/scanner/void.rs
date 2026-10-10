@@ -119,6 +119,12 @@ fn emit_hr(state: &mut Tier1State) -> Result<(), BailReason> {
     {
         return Err(BailReason::RuleBetweenInlineMarkers);
     }
+    // ~keep A rule in a link in a heading is a block of the link: Tier-2 writes the block
+    // ~keep boundary as one space outside the link (issue #751). This scanner has written the
+    // ~keep text before the link by then, so it leaves the page to Tier-2.
+    if state.escape_ctx.contains(EscapeCtx::HEADING) && !state.link_stack.is_empty() {
+        return Err(BailReason::Classifier);
+    }
     // ~keep Tier-2 starts a rule after an item's content at the item's content column
     // ~keep (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
     if !state.in_table_cell() && state.list_continuation_indent_width() > 0 && !inside_stray_definition(state) {
