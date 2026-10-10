@@ -12,10 +12,12 @@ use std::borrow::Cow;
 use crate::converter::block::container::HandlerContext;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
-use crate::converter::utility::content::{line_end_before_element, space_is_owed, without_single_line_end};
+use crate::converter::utility::content::{
+    NextElement, line_end_before_element, space_is_owed, without_single_line_end,
+};
 use crate::converter::utility::siblings::{
-    FollowingContent, br_follows_enclosing_elements, following_sibling_content, get_next_sibling_tag,
-    get_previous_sibling_tag, next_sibling_is_inline_tag, zero_width_space_follows,
+    FollowingContent, br_follows_enclosing_elements, content_starts_with_block, following_sibling_content,
+    get_next_sibling_tag, get_previous_sibling_tag, next_sibling_is_inline_tag, zero_width_space_follows,
 };
 use crate::text;
 #[cfg(feature = "visitor")]
@@ -447,7 +449,12 @@ impl TextProcessor<'_, '_, '_> {
         }
         let ctx = self.handler.ctx;
         let in_running_text = ctx.inline_depth > 0 || ctx.convert_as_inline || ctx.in_paragraph;
-        output.push(line_end_before_element(in_running_text, is_inline_element(next_tag)));
+        let dom_ctx = self.handler.dom_ctx;
+        let starts_with_block = dom_ctx
+            .next_tag_id(self.node_handle.get_inner(), self.parser)
+            .is_some_and(|next| content_starts_with_block(next, self.parser, dom_ctx));
+        let next = NextElement::new(is_inline_element(next_tag), starts_with_block);
+        output.push(line_end_before_element(in_running_text, next));
     }
 
     #[cfg(feature = "visitor")]

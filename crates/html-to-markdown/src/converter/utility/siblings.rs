@@ -273,6 +273,44 @@ fn is_plain_text_wrapper(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> 
         && tag.attributes().get("style").is_none()
 }
 
+/// Whether the content of the element `id` starts with a block. White space and comments are
+/// no content, and the walk looks into the elements that only wrap text (`<a><b><div>`).
+///
+/// ~keep A `<span>` writes no marks, so a block that only `<span>` elements wrap breaks the
+/// ~keep line itself and the answer is no.
+/// ~keep Tier-1 answers the same question on the bytes (`upcoming_inline_starts_with_block`).
+pub fn content_starts_with_block(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    use crate::converter::utility::content::is_text_wrapper;
+
+    let mut current = id;
+    let mut inside_marks = false;
+    // ~keep A loop rather than recursion: nested wrappers are attacker-controlled depth.
+    loop {
+        let Some(wrapper) = dom_ctx.tag_info(current, parser) else {
+            return false;
+        };
+        if !is_text_wrapper(&wrapper.name) {
+            return false;
+        }
+        inside_marks |= wrapper.name != "span";
+        let first_content = dom_ctx.children_of(current).and_then(|children| {
+            children.iter().find(|child| match child.get(parser) {
+                Some(tl::Node::Raw(raw)) => !raw.as_bytes().iter().all(u8::is_ascii_whitespace),
+                Some(tl::Node::Comment(_)) => false,
+                _ => true,
+            })
+        });
+        let Some(first_content) = first_content else {
+            return false;
+        };
+        match dom_ctx.tag_info(first_content.get_inner(), parser) {
+            Some(info) if info.is_block => return inside_marks,
+            Some(_) => current = first_content.get_inner(),
+            None => return false,
+        }
+    }
+}
+
 /// The node after `id` among the children of its parent.
 fn next_sibling(id: u32, dom_ctx: &DomContext) -> Option<tl::NodeHandle> {
     let siblings = match dom_ctx.parent_of(id) {

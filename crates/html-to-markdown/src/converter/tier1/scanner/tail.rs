@@ -391,7 +391,7 @@ fn upcoming_open_tag_name<'b>(bytes: &[u8], lt_pos: usize, buf: &'b mut [u8; MAX
 ///   `inline_depth`-incrementing wrappers) ancestor, joins with a single
 ///   space; anything else (e.g. a bare `<div>`) joins with a literal newline,
 ///   which a `<br>` that follows removes again (`Tier1State::pending_newline_join`).
-fn trailing_single_newline_join(state: &Tier1State, next_tag_is_inline: bool) -> &'static str {
+fn trailing_single_newline_join(state: &Tier1State, next: NextElement) -> &'static str {
     let block_start = clamp_to_char_boundary(&state.output, nearest_block_content_start(state));
     if state.output[block_start..].ends_with("\n\n") {
         return "";
@@ -403,10 +403,49 @@ fn trailing_single_newline_join(state: &Tier1State, next_tag_is_inline: bool) ->
         )
     });
     // ~keep The one decision of both converters: before an inline element the line end is a space.
-    match crate::converter::utility::content::line_end_before_element(in_paragraph_or_inline_wrapper, next_tag_is_inline)
-    {
+    match crate::converter::utility::content::line_end_before_element(in_paragraph_or_inline_wrapper, next) {
         ' ' => " ",
         _ => "\n",
+    }
+}
+
+/// Whether the content of the inline element that opens at `bytes[lt_pos]`, or after the
+/// comments there, starts with a block. White space and comments are no content, and the scan
+/// looks into the elements that only wrap text (`<a><b><div>`).
+///
+/// ~keep Mirrors Tier-2's `content_starts_with_block`, which asks the same of the tree.
+fn upcoming_inline_starts_with_block(bytes: &[u8], lt_pos: usize) -> bool {
+    use crate::converter::utility::content::is_text_wrapper;
+
+    let mut pos = lt_pos;
+    let mut inside_marks = false;
+    loop {
+        if bytes.get(pos..).is_some_and(|rest| rest.starts_with(b"<!--")) {
+            let Ok(after) = skip_bang(bytes, pos) else {
+                return false;
+            };
+            pos = parse::skip_ws(bytes, after);
+            continue;
+        }
+        let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
+        let Some(name) = upcoming_open_tag_name(bytes, pos, &mut name_buf) else {
+            return false;
+        };
+        if is_block_tag(name) {
+            return inside_marks;
+        }
+        if !std::str::from_utf8(name).is_ok_and(is_text_wrapper) {
+            return false;
+        }
+        let Some((close, self_closing)) = parse::find_tag_close(bytes, pos + 1 + name.len()) else {
+            return false;
+        };
+        if self_closing {
+            return false;
+        }
+        // ~keep A `<span>` writes no marks: a block that only spans wrap breaks the line itself.
+        inside_marks |= name != b"span";
+        pos = parse::skip_ws(bytes, close + 1);
     }
 }
 
@@ -496,9 +535,10 @@ fn plain_text_wrapper_open_end(bytes: &[u8], name: &[u8], attributes_start: usiz
         return None;
     }
     let (close, self_closing) = parse::find_tag_close(bytes, attributes_start)?;
+    // ~keep An attribute name has no letter case in HTML, and Tier-2's parser gives it in lower case.
     let has_style = parse::collect_attrs(bytes, attributes_start, close)
         .iter()
-        .any(|(key, _)| *key == b"style");
+        .any(|(key, _)| key.eq_ignore_ascii_case(b"style"));
     (!has_style).then_some((close, self_closing))
 }
 

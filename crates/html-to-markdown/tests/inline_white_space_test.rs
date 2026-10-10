@@ -200,6 +200,58 @@ fn a_line_break_before_a_filled_inline_element_is_a_space_in_each_container() {
     ]);
 }
 
+/// An inline element whose content starts with a block starts a line of its own in a browser:
+/// the line end before it stays a line end, and a heading in a list item stays a heading.
+#[test]
+fn a_line_break_before_an_inline_element_that_starts_with_a_block_stays_a_line_break() {
+    assert_on_both(&[
+        ("<div>one\n<b><p>y</p></b></div>", "one\n**y**\n"),
+        ("one\n<b><p>y</p></b>", "one\n**y**\n"),
+        ("<blockquote>one\n<b><p>y</p></b></blockquote>", "> one\n> **y**\n"),
+        ("<div>one\n<b> <!-- c --> <p>y</p></b></div>", "one\n**y**\n"),
+        ("<div>one\n<!-- c --><b><p>y</p></b></div>", "one\n**y**\n"),
+        ("<div>one\n<b><i><p>y</p></i></b></div>", "one\n***y***\n"),
+        (
+            "<blockquote>one\n<span><h3>y</h3></span></blockquote>",
+            "> one\n>\n> ### y\n",
+        ),
+        (
+            "<details><summary>one\n<span><div>y</div></span></summary>body</details>",
+            "**one**\n\n**y**\n\nbody\n",
+        ),
+        // ~keep A `<span>` writes no marks: the block in it breaks the line as it does alone.
+        (
+            "<blockquote>one\n<span><div>y</div></span></blockquote>",
+            "> one\n>\n> y\n",
+        ),
+        (
+            "<blockquote>one\n<span><ul><li>y</li></ul></span>two</blockquote>",
+            "> one\n>\n> - y\n>\n> two\n",
+        ),
+        ("<div>one\n<span><b><p>y</p></b></span></div>", "one\n**y**\n"),
+        // ~keep Text before the block, or no block: the element is inline content.
+        ("<div>one\n<b>x<p>y</p></b></div>", "one **x**\n\n**y**\n"),
+        ("<div>one\n<b><i>y</i></b></div>", "one ***y***\n"),
+        ("<div>one\n<b>y</b></div>", "one **y**\n"),
+    ]);
+    assert_on_full(&[
+        ("<div>one\n<a href=\"/y\"><div>y</div></a></div>", "one\n[y](/y)\n"),
+        (
+            "<ul><li>one\n<a href=\"/y\"><div>y</div></a></li></ul>",
+            "- one\n[y](/y)\n",
+        ),
+        (
+            "<ul><li>one\n<a href=\"/y\"><h3>y</h3></a></li></ul>",
+            "- one\n    ### [y](/y)\n",
+        ),
+        (
+            "<ol><li>one\n<a href=\"/y\"><h2>Title</h2></a></li></ol>",
+            "1. one\n    ## [Title](/y)\n",
+        ),
+        ("<ul><li>one\n<b><p>y</p></b></li></ul>", "- one\n**y**\n"),
+    ]);
+}
+
 /// White space before an element and white space at its start are one run: one space, and it
 /// goes outside the marks of the element.
 #[test]
@@ -337,6 +389,30 @@ fn a_space_beside_a_zero_width_space_is_kept() {
         (
             "<pre>one\n<span></span>\u{200b}two</pre>",
             "```\none\n\u{200b}two\n```\n",
+        ),
+    ]);
+}
+
+/// The name of the `style` attribute has no letter case: both converters read `STYLE` and
+/// `Style` as `style`.
+#[test]
+fn the_style_attribute_name_is_read_in_any_letter_case() {
+    assert_on_both(&[
+        (
+            "<p>one\n<span STYLE=\"color:red\">&#8203;two</span></p>",
+            "one \u{200b}two\n",
+        ),
+        (
+            "<p>one\n<span Style=\"display:inline-block\"></span>&#8203;two</p>",
+            "one \u{200b}two\n",
+        ),
+        (
+            "<p><span STYLE=\"display:inline-block\">one\n</span>\u{200b}two</p>",
+            "one \u{200b}two\n",
+        ),
+        (
+            "<table><tr><td>one\n<span STYLE=\"color:red\">&#8203;two</span></td></tr></table>",
+            "| one \u{200b}two |\n| -------- |\n",
         ),
     ]);
 }

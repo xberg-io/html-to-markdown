@@ -161,12 +161,42 @@ pub fn label_edge_spaces(content: &str) -> (bool, bool) {
     (starts_with_space, content.ends_with(is_space))
 }
 
+/// The element that follows a line end of the source.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NextElement {
+    /// A block, or an element that is not inline.
+    Block,
+    /// An inline element.
+    Inline,
+    /// An inline element whose content starts with a block (`<a href="/y"><h3>y</h3></a>`).
+    InlineAroundBlock,
+}
+
+impl NextElement {
+    /// The kind of an element from the two facts that each converter reads in its own way.
+    #[must_use]
+    pub const fn new(is_inline: bool, content_starts_with_block: bool) -> Self {
+        match (is_inline, content_starts_with_block) {
+            (true, true) => Self::InlineAroundBlock,
+            (true, false) => Self::Inline,
+            (false, _) => Self::Block,
+        }
+    }
+}
+
 /// What one line end of the source becomes before the element that follows it: a space in
 /// running text and before an inline element, a line end before a block. Both converters ask
 /// here, so a line end is the same space in a paragraph, a `<div>`, a list item and the root.
+///
+/// ~keep An inline element whose content starts with a block starts a line of its own in a
+/// ~keep browser, so the line end before it stays a line end, as before a block.
 #[must_use]
-pub const fn line_end_before_element(in_running_text: bool, next_is_inline: bool) -> char {
-    if in_running_text || next_is_inline { ' ' } else { '\n' }
+pub const fn line_end_before_element(in_running_text: bool, next: NextElement) -> char {
+    if in_running_text || matches!(next, NextElement::Inline) {
+        ' '
+    } else {
+        '\n'
+    }
 }
 
 /// `text` without its trailing white space, when that white space holds exactly one line end.

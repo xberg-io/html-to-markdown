@@ -80,15 +80,19 @@ impl<'a> Tier1Scanner<'a> {
             return Ok(());
         }
         self.state.start_body(self.text_start);
+        let is_inline = upcoming_tag_is_inline(self.bytes, self.pos);
+        // ~keep Only a text with content asks, so a run of comments is read once.
+        let inline_follows_comments = !self.bytes[self.text_start..self.pos]
+            .iter()
+            .all(u8::is_ascii_whitespace)
+            && inline_follows_comments(self.bytes, self.pos);
         let upcoming = UpcomingTextSibling {
             is_list: upcoming_tag_is_list_open(self.bytes, self.pos),
             is_img: upcoming_tag_is_named(self.bytes, self.pos, b"img"),
-            is_inline: upcoming_tag_is_inline(self.bytes, self.pos),
-            // ~keep Only a text with content asks, so a run of comments is read once.
-            inline_follows_comments: !self.bytes[self.text_start..self.pos]
-                .iter()
-                .all(u8::is_ascii_whitespace)
-                && inline_follows_comments(self.bytes, self.pos),
+            is_inline,
+            inline_follows_comments,
+            inline_starts_with_block: (is_inline || inline_follows_comments)
+                && upcoming_inline_starts_with_block(self.bytes, self.pos),
             line_end_meets_zero_width_space: crate::converter::utility::content::without_single_line_end(
                 &self.html[self.text_start..self.pos],
             )
