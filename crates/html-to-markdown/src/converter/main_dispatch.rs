@@ -29,7 +29,7 @@ pub(super) fn dispatch_tag<'a>(
     if handler.ctx.in_heading
         && matches!(
             tag_name,
-            "p" | "section" | "article" | "nav" | "aside" | "header" | "footer" | "main"
+            "p" | "section" | "article" | "nav" | "aside" | "header" | "footer" | "main" | "form"
         )
     {
         dispatcher.dispatch_div_like();
