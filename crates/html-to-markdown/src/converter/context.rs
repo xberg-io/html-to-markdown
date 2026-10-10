@@ -302,6 +302,10 @@ pub struct Context {
     /// Shared flag set when `inline_data_media` replaced or dropped an element. A link reads it to
     /// tell a label emptied by that option from an empty one.
     pub(crate) inline_data_replaced: Rc<Cell<bool>>,
+    /// Shared flag set when an image or a graphic in code wrote less than it writes outside code,
+    /// where it is the label of a link. A link in code reads it to tell a link that is left out
+    /// outside code from one whose label code does not show.
+    pub(crate) image_label_hidden_in_code: Rc<Cell<bool>>,
     #[cfg(feature = "inline-images")]
     /// Shared collector for inline images when enabled.
     pub(crate) inline_collector: Option<InlineCollectorHandle>,
@@ -420,6 +424,7 @@ impl Context {
             excluded_node_ids: Rc::new(HashSet::new()),
             depth_limit_reached: Rc::new(Cell::new(false)),
             inline_data_replaced: Rc::new(Cell::new(false)),
+            image_label_hidden_in_code: Rc::new(Cell::new(false)),
             #[cfg(feature = "inline-images")]
             inline_collector: parameters.inline_collector,
             #[cfg(feature = "metadata")]

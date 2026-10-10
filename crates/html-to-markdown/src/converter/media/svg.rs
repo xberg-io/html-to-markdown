@@ -470,11 +470,17 @@ pub fn handle_svg(
 
     let title = graphic_text(tag, parser);
     // ~keep Code shows every character as text, so a graphic in code writes its text and no marks.
+    let is_written_as_text = ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly;
     if ctx.in_code {
+        // ~keep Outside code a graphic that is written as an image is the label of a link
+        // ~keep around it, also when it has no text.
+        if !is_written_as_text {
+            ctx.image_label_hidden_in_code.set(true);
+        }
         output.push_str(&title);
         return;
     }
-    if ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
+    if is_written_as_text {
         write_graphic_as_text(*node_handle, parser, output, context, &title);
     } else {
         write_graphic_as_image(*node_handle, parser, output, context, &title);

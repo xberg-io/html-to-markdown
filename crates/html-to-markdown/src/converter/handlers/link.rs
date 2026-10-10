@@ -73,6 +73,7 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     // ~keep A visitor sees the links that it sees outside code, and decides what they write.
     if handler.context.in_code {
         handler.context.inline_data_replaced.set(false);
+        handler.context.image_label_hidden_in_code.set(false);
         let text_start = handler.output.len();
         walk_handles_to_output(data.children.iter().copied(), &mut handler);
         let text = handler.output.split_off(text_start);
@@ -152,8 +153,9 @@ impl<'a> LinkData<'a> {
     /// ~keep The calls are those of a link outside code, which makes none for a link in the
     /// ~keep `<address>` form, for a link around one heading, and for a link that is left out (see
     /// ~keep `is_dropped`). A highlighter writes one empty anchor into its own page for each line
-    /// ~keep of code. An image writes nothing in code and is a label outside it, so a link that
-    /// ~keep holds one is never left out here.
+    /// ~keep of code. An image writes nothing in code, so the image itself says whether it is a
+    /// ~keep label outside code (`image_label_hidden_in_code`): a link with such a label is not
+    /// ~keep left out. A link is left out when its image is skipped, removed or without a text.
     fn is_shown_to_visitor_in_code(&self, text: &str, handler: &HandlerContext<'_>) -> bool {
         if self.is_autolink(handler.options) {
             return false;
@@ -166,12 +168,7 @@ impl<'a> LinkData<'a> {
         }
         let mut label = normalize_link_label(text);
         apply_label_fallbacks(self, &mut label, handler);
-        let holds_image = self.children.iter().any(|child| {
-            subtree_has_tag(child, handler.parser, handler.dom_context, &|name| {
-                matches!(name, "img" | "svg" | "picture")
-            })
-        });
-        holds_image || !self.is_dropped(&label, handler)
+        handler.context.image_label_hidden_in_code.get() || !self.is_dropped(&label, handler)
     }
 
     fn new(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Option<Self> {

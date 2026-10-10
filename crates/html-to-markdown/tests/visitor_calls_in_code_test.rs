@@ -11,7 +11,7 @@
 //! the `<address>` form, none for a link around one heading.
 
 use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
-use html_to_markdown_rs::{CodeBlockStyle, ConversionOptions, convert};
+use html_to_markdown_rs::{CodeBlockStyle, ConversionOptions, InlineDataMedia, convert};
 use std::sync::{Arc, Mutex};
 
 #[derive(Debug, Default)]
@@ -52,13 +52,22 @@ impl HtmlVisitor for Recorder {
 }
 
 fn record(html: &str, style: CodeBlockStyle) -> (Recorder, String) {
+    record_with(
+        html,
+        ConversionOptions {
+            code_block_style: style,
+            ..ConversionOptions::default()
+        },
+    )
+}
+
+fn record_with(html: &str, options: ConversionOptions) -> (Recorder, String) {
     let recorder = Arc::new(Mutex::new(Recorder::default()));
     let handle: VisitorHandle = recorder.clone();
     let options = ConversionOptions {
         extract_metadata: false,
-        code_block_style: style,
         visitor: Some(handle),
-        ..ConversionOptions::default()
+        ..options
     };
     let content = convert(html, Some(options))
         .expect("the conversion succeeds")
@@ -231,6 +240,143 @@ fn a_visitor_gets_the_same_calls_for_links_and_highlights_in_code_as_before() {
         "{} of {} rows differ:\n{}",
         failures.len(),
         CASES.len() * 3,
+        failures.join("\n")
+    );
+}
+
+/// How a row of [`IMAGE_LINK_CASES`] sets the options.
+#[derive(Clone, Copy, Debug)]
+enum Images {
+    Default,
+    Skipped,
+    DataDropped,
+    DataAsAltText,
+}
+
+const DATA_IMAGE: &str = "data:image/png;base64,iVBORw0KGgo=";
+
+/// Each row: a name, the options, the page (`{data}` stands for [`DATA_IMAGE`]), the calls in
+/// order. The calls are those of a run of the same page before code wrote a link as its text.
+const IMAGE_LINK_CASES: &[(&str, Images, &str, &[&str])] = &[
+    (
+        "a link into its own page that holds only an image, images skipped",
+        Images::Skipped,
+        "<pre><a href=\"#x\"><img src=\"i.png\" alt=\"p\"></a>z</pre>",
+        &["image i.png", "code_block"],
+    ),
+    (
+        "the same link in a code span",
+        Images::Skipped,
+        "<p>t <code><a href=\"#x\"><img src=\"i.png\" alt=\"p\"></a>z</code></p>",
+        &["image i.png", "code_inline"],
+    ),
+    (
+        "a link that holds only a graphic into its own page, images skipped",
+        Images::Skipped,
+        "<pre><a href=\"#x\"><svg width=\"4\" height=\"4\"><rect width=\"4\" height=\"4\"/></svg></a>z</pre>",
+        &["code_block"],
+    ),
+    (
+        "a link that holds only a data image, data images removed",
+        Images::DataDropped,
+        "<pre><a href=\"/x\"><img src=\"{data}\" alt=\"p\"></a>z</pre>",
+        &["image {data}", "code_block"],
+    ),
+    (
+        "the same link into its own page",
+        Images::DataDropped,
+        "<pre><a href=\"#x\"><img src=\"{data}\" alt=\"p\"></a>z</pre>",
+        &["image {data}", "code_block"],
+    ),
+    (
+        "the same link in a code span",
+        Images::DataDropped,
+        "<p>t <code><a href=\"/x\"><img src=\"{data}\" alt=\"p\"></a>z</code></p>",
+        &["image {data}", "code_inline"],
+    ),
+    (
+        "a link that holds only a graphic, data images removed",
+        Images::DataDropped,
+        "<pre><a href=\"/x\"><svg width=\"4\" height=\"4\"><rect width=\"4\" height=\"4\"/></svg></a>z</pre>",
+        &["code_block"],
+    ),
+    (
+        "the same link in a code span",
+        Images::DataDropped,
+        "<p>t <code><a href=\"/x\"><svg width=\"4\" height=\"4\"><rect width=\"4\" height=\"4\"/></svg></a>z</code></p>",
+        &["code_inline"],
+    ),
+    (
+        "a link into its own page that holds a picture without an image",
+        Images::Default,
+        "<pre><a href=\"#x\"><picture><source srcset=\"a.webp\"></picture></a>z</pre>",
+        &["code_block"],
+    ),
+    (
+        "a link into its own page that holds a data image with no alt text, data images as alt text",
+        Images::DataAsAltText,
+        "<pre><a href=\"#x\"><img src=\"{data}\" alt=\"\"></a>z</pre>",
+        &["image {data}", "code_block"],
+    ),
+    (
+        "a link to another page that holds only an image, images skipped",
+        Images::Skipped,
+        "<pre><a href=\"/x\"><img src=\"i.png\" alt=\"p\"></a>z</pre>",
+        &["image i.png", "link /x", "code_block"],
+    ),
+    (
+        "a link into its own page that holds an image with no alt text",
+        Images::Default,
+        "<pre><a href=\"#x\"><img src=\"i.png\" alt=\"\"></a>z</pre>",
+        &["image i.png", "link #x", "code_block"],
+    ),
+    (
+        "a link into its own page that holds only a graphic",
+        Images::Default,
+        "<pre><a href=\"#x\"><svg width=\"4\" height=\"4\"><rect width=\"4\" height=\"4\"/></svg></a>z</pre>",
+        &["link #x", "code_block"],
+    ),
+    (
+        "a link that holds a data image with alt text, data images as alt text",
+        Images::DataAsAltText,
+        "<pre><a href=\"/x\"><img src=\"{data}\" alt=\"p\"></a>z</pre>",
+        &["image {data}", "link /x", "code_block"],
+    ),
+    (
+        "a link into its own page that holds an image and a data image, data images removed",
+        Images::DataDropped,
+        "<pre><a href=\"#x\"><img src=\"i.png\" alt=\"p\"><img src=\"{data}\" alt=\"q\"></a>z</pre>",
+        &["image i.png", "image {data}", "link #x", "code_block"],
+    ),
+];
+
+#[test]
+fn a_visitor_gets_the_same_calls_for_a_link_around_an_image_in_code_as_before() {
+    let mut failures = Vec::new();
+    for (name, images, html, expected) in IMAGE_LINK_CASES {
+        let options = ConversionOptions {
+            skip_images: matches!(images, Images::Skipped),
+            inline_data_media: match images {
+                Images::DataDropped => InlineDataMedia::DropElement,
+                Images::DataAsAltText => InlineDataMedia::AltTextOnly,
+                Images::Default | Images::Skipped => InlineDataMedia::default(),
+            },
+            ..ConversionOptions::default()
+        };
+        let expected: Vec<String> = expected.iter().map(|call| call.replace("{data}", DATA_IMAGE)).collect();
+        let (seen, content) = record_with(&html.replace("{data}", DATA_IMAGE), options);
+        if seen.calls != expected {
+            failures.push(format!(
+                "{name} ({images:?}): calls {:?}, expected {expected:?}; output {content:?}",
+                seen.calls
+            ));
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} of {} rows differ:\n{}",
+        failures.len(),
+        IMAGE_LINK_CASES.len(),
         failures.join("\n")
     );
 }

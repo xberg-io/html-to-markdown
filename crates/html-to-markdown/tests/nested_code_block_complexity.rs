@@ -31,17 +31,61 @@ const DEPTHS: [usize; 4] = [5, 10, 20, 40];
 /// ~keep Enough lines that the reads of the code outweigh the fixed cost of a conversion.
 const CODE_LINES: usize = 400;
 
+/// A page that makes every block quote ask which of its lines are code.
+#[derive(Clone, Copy, Debug)]
+enum Shape {
+    /// Only the code block.
+    CodeBlock,
+    /// The last line of the code ends in spaces: each quote trims its content, and keeps the
+    /// white space at the end of a line of code.
+    LastLineEndsInSpaces,
+    /// Each quote also holds a small code block with a line of spaces: a quote writes a blank
+    /// line as its marker alone, and keeps a line of code.
+    LineOfSpacesInEachQuote,
+}
+
+const SHAPES: [Shape; 3] = [
+    Shape::CodeBlock,
+    Shape::LastLineEndsInSpaces,
+    Shape::LineOfSpacesInEachQuote,
+];
+
 /// A code block that is `depth` block quotes deep.
-fn page(depth: usize) -> String {
+fn page(shape: Shape, depth: usize) -> String {
     let mut html = "<blockquote>".repeat(depth);
     html.push_str("<pre>");
     html.push_str(&"value = 1\n".repeat(CODE_LINES));
+    if matches!(shape, Shape::LastLineEndsInSpaces) {
+        html.push_str("end = 1  ");
+    }
     html.push_str("</pre>");
-    html.push_str(&"</blockquote>".repeat(depth));
+    for _ in 0..depth {
+        if matches!(shape, Shape::LineOfSpacesInEachQuote) {
+            html.push_str("<pre>a\n  \nb</pre>");
+        }
+        html.push_str("</blockquote>");
+    }
     html
 }
 
-fn fastest_convert(html: &str, tier_strategy: TierStrategy) -> Duration {
+/// ~keep A page that is not written as its shape says measures nothing.
+fn assert_shape(shape: Shape, depth: usize, output: &str) {
+    match shape {
+        Shape::CodeBlock => {}
+        Shape::LastLineEndsInSpaces => assert!(
+            output.contains("     end = 1  \n"),
+            "the last line of the code keeps its spaces"
+        ),
+        Shape::LineOfSpacesInEachQuote => assert_eq!(
+            output.lines().filter(|line| line.ends_with(">       ")).count(),
+            depth,
+            "each quote keeps its line of spaces"
+        ),
+    }
+}
+
+fn fastest_convert(shape: Shape, depth: usize, tier_strategy: TierStrategy) -> Duration {
+    let html = &page(shape, depth);
     let options = ConversionOptions {
         extract_metadata: false,
         code_block_style: CodeBlockStyle::Indented,
@@ -62,42 +106,46 @@ fn fastest_convert(html: &str, tier_strategy: TierStrategy) -> Duration {
                 CODE_LINES,
                 "every line of the code is indented code in the output"
             );
+            assert_shape(shape, depth, &output);
             elapsed
         })
         .min()
         .expect("at least one run")
 }
 
-/// The doubling ratios of one converter, or a description of why they look quadratic.
-fn measure(tier_strategy: TierStrategy) -> Result<(), String> {
+/// The doubling ratios of one converter for one shape, or a description of why they look quadratic.
+fn measure(shape: Shape, tier_strategy: TierStrategy) -> Result<(), String> {
     let seconds: Vec<f64> = DEPTHS
         .into_iter()
-        .map(|depth| fastest_convert(&page(depth), tier_strategy).as_secs_f64().max(1e-6))
+        .map(|depth| fastest_convert(shape, depth, tier_strategy).as_secs_f64().max(1e-6))
         .collect();
     let ratios: Vec<f64> = seconds.windows(2).map(|pair| pair[1] / pair[0]).collect();
     if ratios.iter().all(|ratio| *ratio < MAX_DOUBLING_RATIO) {
         return Ok(());
     }
     Err(format!(
-        "{tier_strategy:?}: depths {DEPTHS:?} took {seconds:.4?} seconds, ratios {ratios:.2?}; \
+        "{shape:?}, {tier_strategy:?}: depths {DEPTHS:?} took {seconds:.4?} seconds, ratios {ratios:.2?}; \
          expected under {MAX_DOUBLING_RATIO}x for each doubling"
     ))
 }
 
 #[test]
 fn an_indented_code_block_in_nested_block_quotes_scales_linearly_in_both_tiers() {
-    // ~keep Both converters are measured before the test fails, so one red run names each of them.
+    // ~keep Every shape is measured on both converters before the test fails, so one red run
+    // ~keep names each slow pair.
     let mut slow = Vec::new();
-    for tier_strategy in [TierStrategy::Tier1, TierStrategy::Tier2] {
-        let mut failures = Vec::with_capacity(MAX_MEASUREMENT_ATTEMPTS);
-        for attempt in 1..=MAX_MEASUREMENT_ATTEMPTS {
-            match measure(tier_strategy) {
-                Ok(()) => break,
-                Err(reason) => failures.push(format!("attempt {attempt}: {reason}")),
+    for shape in SHAPES {
+        for tier_strategy in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let mut failures = Vec::with_capacity(MAX_MEASUREMENT_ATTEMPTS);
+            for attempt in 1..=MAX_MEASUREMENT_ATTEMPTS {
+                match measure(shape, tier_strategy) {
+                    Ok(()) => break,
+                    Err(reason) => failures.push(format!("attempt {attempt}: {reason}")),
+                }
             }
-        }
-        if failures.len() == MAX_MEASUREMENT_ATTEMPTS {
-            slow.extend(failures);
+            if failures.len() == MAX_MEASUREMENT_ATTEMPTS {
+                slow.extend(failures);
+            }
         }
     }
     assert!(

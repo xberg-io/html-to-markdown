@@ -167,8 +167,16 @@ fn render_image(
         return result;
     }
     // ~keep Code shows every character as text, and a browser shows no text for an image. Only
-    // ~keep what a visitor writes for the image is written in code.
+    // ~keep what a visitor writes for the image is written in code. A link around the image
+    // ~keep learns here whether the image is its label outside code: not when images are
+    // ~keep skipped, not when the image is removed, not when it is written as an empty alt text.
     if context.in_code {
+        let is_label_outside_code = !handler.options.skip_images
+            && inline_data != InlineDataMedia::DropElement
+            && !(should_use_alt_text && data.alt.is_empty());
+        if is_label_outside_code {
+            context.image_label_hidden_in_code.set(true);
+        }
         return None;
     }
     render_image_default(data, inline_data, should_use_alt_text, handler)

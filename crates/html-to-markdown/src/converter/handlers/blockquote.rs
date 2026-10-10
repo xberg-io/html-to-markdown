@@ -72,7 +72,7 @@ pub fn container_content<'p, 'a, 'c>(
     content: &'c str,
     style: crate::options::CodeBlockStyle,
 ) -> &'c str {
-    let kept = crate::converter::code_scan::quote_content_range(content, style);
+    let kept = crate::converter::code_scan::trimmed_quotes_content_range(content, style);
     let start = if starts_with_code_block(tag, parser) {
         kept.start
     } else {
@@ -320,7 +320,7 @@ fn emit_quote_lines(
     style: crate::options::CodeBlockStyle,
     output: &mut String,
 ) {
-    let mut code = crate::converter::code_scan::CodeScan::new(style, content);
+    let mut code = crate::converter::code_scan::CodeScan::of_quote_content(style, content);
     // ~keep Every physical quote line needs the list continuation indent to remain in the item (#13).
     for (index, line) in content.lines().enumerate() {
         if (index > 0 || continuation) && indent.is_some() {

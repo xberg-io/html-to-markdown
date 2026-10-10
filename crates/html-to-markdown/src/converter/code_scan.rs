@@ -18,11 +18,73 @@ pub enum CodeScan<'a> {
 /// ~keep The lines are read when the first answer is asked for. A block quote asks only about a
 /// ~keep line of white space, so most quotes read nothing: a read of the whole content at each
 /// ~keep level of nested quotes costs the square of the depth.
+///
+/// ~keep With [`QuoteLines::Kept`] the read starts after the last line of a quote at the left
+/// ~keep margin and stops before the next one: such a line closes every list item and every
+/// ~keep paragraph, so the lines on its other side change no answer. Each quote reads the lines
+/// ~keep of its own level, and no line of a quote inside it.
 pub struct IndentedScan<'a> {
     output: &'a str,
-    /// Whether each line is code, in the order of the lines.
-    lines: Option<Vec<bool>>,
-    next: usize,
+    quotes: QuoteLines,
+    /// The index of the first line that was read, and whether each line from there is code.
+    lines: Option<(usize, Vec<bool>)>,
+    /// The index of the next line, and where it starts in `output`.
+    next: (usize, usize),
+    /// The index and the start of the line that a read starts at.
+    first: (usize, usize),
+}
+
+impl IndentedScan<'_> {
+    /// Go past the next line. Gives its index, and whether it is the line of a quote that is
+    /// not read.
+    fn advance(&mut self) -> (usize, bool) {
+        let (index, start) = self.next;
+        let rest = self.output.get(start..).unwrap_or_default();
+        let length = rest.find('\n').unwrap_or(rest.len());
+        self.next = (index + 1, start + length + 1);
+        let is_kept_quote_line = self.quotes == QuoteLines::Kept && rest.starts_with('>');
+        if is_kept_quote_line {
+            self.first = self.next;
+            self.lines = None;
+        }
+        (index, is_kept_quote_line)
+    }
+
+    /// Whether the next line is a line of code.
+    fn is_code(&mut self) -> bool {
+        let start = self.next.1;
+        let (index, is_kept_quote_line) = self.advance();
+        if is_kept_quote_line {
+            return true;
+        }
+        let (output, quotes, first) = (self.output, self.quotes, self.first);
+        let (first_index, lines) = self.lines.get_or_insert_with(|| {
+            let rest = output.get(first.1..).unwrap_or_default();
+            let end = match quotes {
+                QuoteLines::Read => rest.len(),
+                QuoteLines::Kept => output
+                    .get(start..)
+                    .and_then(|after| after.find("\n>"))
+                    .map_or(rest.len(), |length| start - first.1 + length),
+            };
+            (first.0, indented_code_lines(&rest[..end], quotes))
+        });
+        lines.get(index - *first_index).copied().unwrap_or(false)
+    }
+}
+
+/// How a scan for indented code reads the lines of a block quote.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum QuoteLines {
+    /// The scan reads them. The text is a finished document, or Markdown whose block quotes did
+    /// not trim their content.
+    Read,
+    /// The scan does not read them. The text is the content of a container, and a block quote
+    /// in it trimmed its own content: its lines stay as they are.
+    ///
+    /// ~keep A read of the lines of every nested quote, at each level of nested quotes, costs
+    /// ~keep the square of the depth: a line has one marker for each level.
+    Kept,
 }
 
 impl<'a> CodeScan<'a> {
@@ -32,11 +94,23 @@ impl<'a> CodeScan<'a> {
     /// ~keep fence opens nothing, and neither does a line of tildes in a document whose fences are
     /// ~keep backticks.
     pub const fn new(style: CodeBlockStyle, output: &'a str) -> Self {
+        Self::with_quote_lines(style, output, QuoteLines::Read)
+    }
+
+    /// A scan of `content`, the Markdown that a block quote holds, for the code blocks that
+    /// `style` writes. The lines of a quote in it are not read (see [`QuoteLines::Kept`]).
+    pub const fn of_quote_content(style: CodeBlockStyle, content: &'a str) -> Self {
+        Self::with_quote_lines(style, content, QuoteLines::Kept)
+    }
+
+    const fn with_quote_lines(style: CodeBlockStyle, output: &'a str, quotes: QuoteLines) -> Self {
         match style {
             CodeBlockStyle::Indented => Self::Indented(IndentedScan {
                 output,
+                quotes,
                 lines: None,
-                next: 0,
+                next: (0, 0),
+                first: (0, 0),
             }),
             CodeBlockStyle::Backticks => Self::Fenced(FenceScan {
                 fence: b'`',
@@ -53,17 +127,7 @@ impl<'a> CodeScan<'a> {
     pub fn is_code(&mut self, line: &str) -> bool {
         match self {
             Self::Fenced(fences) => fences.is_code(line),
-            Self::Indented(scan) => {
-                let output = scan.output;
-                let is_code = scan
-                    .lines
-                    .get_or_insert_with(|| indented_code_lines(output))
-                    .get(scan.next)
-                    .copied()
-                    .unwrap_or(false);
-                scan.next += 1;
-                is_code
-            }
+            Self::Indented(scan) => scan.is_code(),
         }
     }
 
@@ -73,7 +137,9 @@ impl<'a> CodeScan<'a> {
             Self::Fenced(fences) => {
                 fences.is_code(line);
             }
-            Self::Indented(scan) => scan.next += 1,
+            Self::Indented(scan) => {
+                scan.advance();
+            }
         }
     }
 }
@@ -233,7 +299,11 @@ impl LineCursor<'_> {
 /// ~keep list items it is in, and it does not continue a paragraph. The blank lines between two
 /// ~keep lines of one code block belong to the block. The indentation alone does not say this:
 /// ~keep the third level of a list is indented by four columns too.
-fn indented_code_lines(output: &str) -> Vec<bool> {
+///
+/// ~keep With [`QuoteLines::Kept`] a line of a block quote is not read past its indentation: the
+/// ~keep answer for it is `true`, and it opens nothing for the lines after it. The work for such
+/// ~keep a line does not grow with the number of quote markers on it.
+fn indented_code_lines(output: &str, quotes: QuoteLines) -> Vec<bool> {
     let mut code = Vec::new();
     let mut containers: Vec<Container> = Vec::new();
     let mut in_paragraph = false;
@@ -254,6 +324,7 @@ fn indented_code_lines(output: &str) -> Vec<bool> {
             containers.truncate(depth);
             last_code = None;
         }
+        let mut is_kept_quote_line = false;
         let is_code = loop {
             let indent = cursor.indent();
             if indent >= 4 {
@@ -261,6 +332,11 @@ fn indented_code_lines(output: &str) -> Vec<bool> {
             }
             cursor.skip(indent);
             if cursor.rest.starts_with('>') {
+                if quotes == QuoteLines::Kept {
+                    is_kept_quote_line = true;
+                    in_paragraph = false;
+                    break false;
+                }
                 cursor.skip_quote_marker();
                 containers.push(Container::Quote);
             } else if let Some(marker) = list_marker_length(cursor.rest) {
@@ -291,6 +367,7 @@ fn indented_code_lines(output: &str) -> Vec<bool> {
             last_code = Some(index);
         } else {
             last_code = None;
+            code[index] = is_kept_quote_line;
         }
     }
     code
@@ -302,7 +379,14 @@ fn indented_code_lines(output: &str) -> Vec<bool> {
 /// ~keep line end of a last line of code: without its four columns the line is running text.
 pub fn quote_content_range(content: &str, style: CodeBlockStyle) -> std::ops::Range<usize> {
     let start = quote_content_start(content, style);
-    start..quote_content_end(content, style).max(start)
+    start..quote_content_end(content, style, QuoteLines::Read).max(start)
+}
+
+/// The same part of `content` when each block quote in it trimmed its own content, as the
+/// containers of the full converter do (see [`QuoteLines::Kept`]).
+pub fn trimmed_quotes_content_range(content: &str, style: CodeBlockStyle) -> std::ops::Range<usize> {
+    let start = quote_content_start(content, style);
+    start..quote_content_end(content, style, QuoteLines::Kept).max(start)
 }
 
 /// Where the content of a block quote starts: at its first character that is not white space, or
@@ -317,7 +401,7 @@ pub fn quote_content_start(content: &str, style: CodeBlockStyle) -> usize {
     }
     let first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
     let line_end = content[start..].find('\n').map_or(content.len(), |index| start + index);
-    if indented_code_lines(&content[first_line..line_end]) == [true] {
+    if indented_code_lines(&content[first_line..line_end], QuoteLines::Read) == [true] {
         first_line
     } else {
         start
@@ -329,7 +413,12 @@ pub fn quote_content_start(content: &str, style: CodeBlockStyle) -> usize {
 ///
 /// ~keep Only white space at the end of the last line depends on the answer. Without it the lines
 /// ~keep are not read.
-fn quote_content_end(content: &str, style: CodeBlockStyle) -> usize {
+///
+/// ~keep With [`QuoteLines::Kept`] the last line alone answers first. A line that is not code
+/// ~keep alone is not code after other lines. A line of a nested quote that is code alone is
+/// ~keep code: that quote trimmed its own content. So a quote in a quote reads one line, and only
+/// ~keep the quote that holds the code block reads the lines before it.
+fn quote_content_end(content: &str, style: CodeBlockStyle, quotes: QuoteLines) -> usize {
     let end = content.trim_end().len();
     if style != CodeBlockStyle::Indented || end == 0 {
         return end;
@@ -339,8 +428,25 @@ fn quote_content_end(content: &str, style: CodeBlockStyle) -> usize {
         return end;
     }
     let start = content.len() - content.trim_start().len();
-    let first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
-    if indented_code_lines(&content[first_line..last_line]).last() == Some(&true) {
+    let mut first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
+    if quotes == QuoteLines::Kept {
+        let line_start = content[..end].rfind('\n').map_or(0, |index| index + 1);
+        let line = &content[line_start..last_line];
+        if indented_code_lines(line, QuoteLines::Read) != [true] {
+            return end;
+        }
+        if line.trim_start_matches([' ', '\t']).starts_with('>') {
+            return last_line;
+        }
+        // ~keep A line of a quote at the left margin closes every list item and every paragraph:
+        // ~keep the read starts after the last one.
+        if let Some(quote) = content[..line_start].rfind("\n>") {
+            first_line = content[quote + 1..line_start]
+                .find('\n')
+                .map_or(line_start, |length| quote + length + 2);
+        }
+    }
+    if indented_code_lines(&content[first_line..last_line], quotes).last() == Some(&true) {
         last_line
     } else {
         end
@@ -353,7 +459,7 @@ mod tests {
 
     /// One character for each line of `markdown`: `1` for a line of indented code, `0` for another.
     fn code(markdown: &str) -> String {
-        indented_code_lines(markdown)
+        indented_code_lines(markdown, QuoteLines::Read)
             .into_iter()
             .map(|is_code| if is_code { '1' } else { '0' })
             .collect()
@@ -432,7 +538,7 @@ mod tests {
         }
         let first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
         let last_line = content[end..].find('\n').map_or(content.len(), |index| end + index);
-        let code = indented_code_lines(&content[first_line..last_line]);
+        let code = indented_code_lines(&content[first_line..last_line], QuoteLines::Read);
         let start = if code.first() == Some(&true) { first_line } else { start };
         let end = if code.last() == Some(&true) { last_line } else { end };
         start..end
@@ -458,6 +564,12 @@ mod tests {
         for (content, expected) in cases {
             let range = quote_content_range(content, CodeBlockStyle::Indented);
             assert_eq!(range, expected, "{content:?}");
+            // No quote line of these cases depends on the lines of a quote before it.
+            assert_eq!(
+                trimmed_quotes_content_range(content, CodeBlockStyle::Indented),
+                expected,
+                "{content:?}"
+            );
             assert_eq!(range, range_from_every_line(content), "{content:?}");
             assert_eq!(
                 quote_content_start(content, CodeBlockStyle::Indented),
@@ -468,6 +580,55 @@ mod tests {
         // A fenced style has no indented code: the white space at both ends goes.
         assert_eq!(quote_content_range("\n    a  \n", CodeBlockStyle::Tildes), 5..6);
         assert_eq!(quote_content_start("\n    a  \n", CodeBlockStyle::Backticks), 5);
+    }
+
+    #[test]
+    fn should_not_read_the_lines_of_a_quote_that_trimmed_its_own_content() {
+        let kept = |markdown: &str| -> String {
+            indented_code_lines(markdown, QuoteLines::Kept)
+                .into_iter()
+                .map(|is_kept| if is_kept { '1' } else { '0' })
+                .collect()
+        };
+        // The lines of a quote stay as they are. The lines after them are read as in a document.
+        assert_eq!(kept("> > a\n\n    b\n      \n    c\n> d"), "101111");
+        // A quote in a list item is a quote, and the item goes on after it.
+        assert_eq!(kept("- a\n  > b\n\n    c\n\n      d"), "010001");
+        // A line of white space between two quotes is not their code.
+        assert_eq!(kept(">     a\n \n>     b"), "101");
+        assert_eq!(code(">     a\n \n>     b"), "111");
+
+        let indented = CodeBlockStyle::Indented;
+        // The last line of a quote in the content keeps the line end that the quote kept.
+        assert_eq!(trimmed_quotes_content_range("a\n\n> >     b  \n\n", indented), 0..14);
+        // Text that starts with the marker is not the line of a quote that kept code.
+        assert_eq!(trimmed_quotes_content_range("a\n> b  \n", indented), 0..5);
+        // A line after a quote is read with the lines of its own level.
+        assert_eq!(trimmed_quotes_content_range("> a\n\n    b  \n", indented), 0..12);
+        assert_eq!(trimmed_quotes_content_range("- a\n  > b\n\n    c  \n", indented), 0..16);
+        assert_eq!(trimmed_quotes_content_range("- a\n> b\n\n    c  \n", indented), 0..16);
+
+        // A read starts after the last line of a quote at the left margin and stops before the
+        // next one. The answers are those of one read of every line.
+        let content = "    a\n \n    b\n> c\n\n    d\n      \n    e\n> f\n  ";
+        assert_eq!(kept(content), "1111011110");
+        let mut scan = CodeScan::of_quote_content(indented, content);
+        let mut answers = String::new();
+        for line in content.split('\n') {
+            if line.trim().is_empty() {
+                answers.push(if scan.is_code(line) { '1' } else { '0' });
+            } else {
+                scan.pass(line);
+                answers.push('-');
+            }
+        }
+        assert_eq!(answers, "-1--0-1--0");
+        let mut scan = CodeScan::of_quote_content(indented, content);
+        let every: String = content
+            .split('\n')
+            .map(|line| if scan.is_code(line) { '1' } else { '0' })
+            .collect();
+        assert_eq!(every, kept(content));
     }
 
     #[test]
