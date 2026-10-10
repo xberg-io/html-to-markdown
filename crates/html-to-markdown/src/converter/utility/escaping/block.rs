@@ -346,6 +346,18 @@ pub fn ends_with_hard_break(buffer: &str) -> bool {
 /// marker when that text would otherwise be parsed as block structure (issue #735).
 pub fn escape_block_start(buffer: &mut String, from: usize, in_list_item: bool, followed_by_inline: bool) {
     let before = &buffer[..from];
+    // ~keep A non-indent byte cannot precede a fresh block opener except an unfinished ordered
+    // ~keep marker. Reject it before finding the line start, or comment-separated form feeds
+    // ~keep folded onto one growing line cause a quadratic scan of the already-emitted text.
+    if !in_list_item
+        && before
+            .trim_end_matches([' ', '\t'])
+            .chars()
+            .next_back()
+            .is_some_and(|character| !matches!(character, '\n' | '.' | ')'))
+    {
+        return;
+    }
     let line_start = before.rfind('\n').map_or(0, |position| position + 1);
     let prefix = &before[line_start..];
     let content_start = if in_list_item {

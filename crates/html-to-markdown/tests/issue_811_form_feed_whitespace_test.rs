@@ -67,3 +67,13 @@ fn should_preserve_form_feeds_at_paragraph_boundaries() {
         }
     }
 }
+
+#[test]
+fn should_preserve_form_feeds_between_many_comment_fragments() {
+    let fragments = "<!--c-->\u{c}\n".repeat(64);
+    check(
+        &format!("<p>a{fragments}<b>b</b></p>"),
+        &format!("a{}**b**\n", "\u{c} ".repeat(64)),
+        &ConversionOptions::default(),
+    );
+}
