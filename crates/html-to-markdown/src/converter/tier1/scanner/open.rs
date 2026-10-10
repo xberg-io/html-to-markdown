@@ -313,28 +313,31 @@ fn emit_open_kind(
         TagKind::Block => open_block_container(state, name_lower, options.br_in_tables),
         TagKind::Summary => open_summary_container(state, options.br_in_tables)?,
         TagKind::Figcaption => open_figcaption(state),
-        // ~keep Button: nothing on open. `close_button` writes the space before its text and
-        // ~keep the `\n\n` after it, as Tier-2 `handle_button` does. In a line that goes on
-        // ~keep after the control, Tier-2 reads the text that follows it instead.
-        TagKind::Button => {
-            let in_inline_container = state.stack.iter().any(|frame| {
-                matches!(
-                    frame.spec.kind,
-                    TagKind::Heading(_) | TagKind::Summary | TagKind::Figcaption | TagKind::Link | TagKind::TableCaption
-                )
-            });
-            let in_inline_element = state
-                .stack
-                .last()
-                .is_some_and(|parent| crate::converter::form::spacing::line_goes_on_in(Some(parent.spec)));
-            if in_inline_container || in_inline_element {
-                return Err(BailReason::FormControl);
-            }
-        }
+        TagKind::Button => open_button(state)?,
         TagKind::Inline => {}
         _ => {}
     }
 
+    Ok(())
+}
+
+/// ~keep Button: nothing on open. `close_button` writes the space before its text and
+/// ~keep the `\n\n` after it, as Tier-2 `handle_button` does. In a line that goes on
+/// ~keep after the control, Tier-2 reads the text that follows it instead.
+fn open_button(state: &Tier1State) -> Result<(), BailReason> {
+    let in_inline_container = state.stack.iter().any(|frame| {
+        matches!(
+            frame.spec.kind,
+            TagKind::Heading(_) | TagKind::Summary | TagKind::Figcaption | TagKind::Link | TagKind::TableCaption
+        )
+    });
+    let in_inline_element = state
+        .stack
+        .last()
+        .is_some_and(|parent| crate::converter::form::spacing::line_goes_on_in(Some(parent.spec)));
+    if in_inline_container || in_inline_element {
+        return Err(BailReason::FormControl);
+    }
     Ok(())
 }
 
