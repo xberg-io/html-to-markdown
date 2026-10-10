@@ -381,3 +381,34 @@ fn a_page_that_nests_past_the_limit_is_still_cut_and_reports_it() {
         assert!(matches!(result.warnings[0].kind, WarningKind::DepthLimitExceeded));
     }
 }
+
+#[test]
+fn a_deep_page_that_took_the_second_parse_before_keeps_its_text_and_its_warning() {
+    // ~keep A cell with no row and a custom element asked for the second parse before issue
+    // ~keep #772, and the first parse hides such a cell. The limit on the second parse for an
+    // ~keep omitted end tag must not apply to them. The outputs are those of 3.17.2.
+    let open = "<table><td>".repeat(400);
+    let close = "</td></table>".repeat(400);
+    let pages = [
+        (
+            format!("<table><td>one<table><td>two{open}x"),
+            "one\n\ntwo\n\n|  |\n| --- |\n",
+        ),
+        (
+            format!("<table><td>one{open}x{close}</td></table><p>tail</p>"),
+            "one\n\n|  |\n| --- |\n\ntail\n",
+        ),
+        (
+            format!("<x-note>note</x-note>{open}x{close}<p>tail</p>"),
+            "note\n\n|  |\n| --- |\n\ntail\n",
+        ),
+    ];
+    for (html, expected) in &pages {
+        let default = convert(html, None).expect("conversion must succeed");
+        for result in [default, convert_with(html, TierStrategy::Tier2)] {
+            assert_eq!(result.content.as_deref(), Some(*expected), "{:?}", &html[..40]);
+            assert_eq!(result.warnings.len(), 1, "warnings: {:?}", result.warnings);
+            assert!(matches!(result.warnings[0].kind, WarningKind::DepthLimitExceeded));
+        }
+    }
+}

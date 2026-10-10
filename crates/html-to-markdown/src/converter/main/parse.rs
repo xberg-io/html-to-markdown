@@ -1,6 +1,6 @@
 use super::preprocess_repaired_html;
 use crate::converter::DomContext;
-use crate::converter::main_helpers::repair_with_html5ever;
+use crate::converter::main_helpers::{repair_with_html5ever, repair_with_html5ever_within_depth};
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, has_omitted_end_tag};
 use crate::converter::utility::caching::build_dom_context;
 use crate::error::{ConversionError, Result};
@@ -56,14 +56,26 @@ pub(super) fn parse_for_conversion<'a>(
         return Ok(ParseOutcome::Ready { dom, dom_ctx });
     }
     *attempted_misnest_repair = true;
-    let Some(repaired) = repair_with_html5ever(input) else {
+    // ~keep The depth limit is for the second parse that only an omitted end tag asks for. A
+    // ~keep misnest got the second parse before issue #772 and keeps it with no limit: its first
+    // ~keep parse can hide content, so it is not a tree to fall back on.
+    let within_depth = omitted_end_tag
+        .then(|| repair_with_html5ever_within_depth(input))
+        .flatten();
+    let repaired_as_omitted_end_tag = within_depth.is_some();
+    let repaired = within_depth.or_else(|| {
+        (!omitted_end_tag || has_inline_block_misnest(&dom_ctx, parser))
+            .then(|| repair_with_html5ever(input))
+            .flatten()
+    });
+    let Some(repaired) = repaired else {
         tracing::warn!(
             target: "html_to_markdown::convert",
             "html5ever repair gave no tree (the document nests too deep or cannot be written back); proceeding with original structure"
         );
         return Ok(ParseOutcome::Ready { dom, dom_ctx });
     };
-    if omitted_end_tag {
+    if repaired_as_omitted_end_tag {
         // ~keep An omitted end tag is HTML that the standard permits, so this route is logged
         // ~keep at debug, like the choice of a tier. A misnest is an authoring error and warns.
         tracing::debug!(
@@ -139,6 +151,16 @@ mod tests {
     }
 
     #[test]
+    fn should_parse_twice_when_a_misnest_nests_past_the_limit_for_an_omitted_end_tag() {
+        // ~keep A cell with no row is a misnest and has no end tag. The first parse hides it.
+        let html = format!("{}x", "<table><td>".repeat(300));
+        let (calls, content) = parse_calls_for(&html);
+
+        assert_eq!(content.as_deref(), Some("|  |\n| --- |\n"));
+        assert_eq!(calls, 2);
+    }
+
+    #[test]
     fn should_parse_once_when_the_open_element_has_no_content() {
         for html in ["<p>one</p><br>", "<p>one</p><span>", "<html><body><p>one</p><hr>"] {
             let (calls, content) = parse_calls_for(html);
@@ -194,6 +216,12 @@ mod tests {
     fn repair_events(html: &str) -> Vec<(tracing::Level, String)> {
         let events = Events::default();
         tracing::subscriber::with_default(EventLog(Events::clone(&events)), || {
+            // ~keep A callsite keeps the interest of the thread that reaches it first, and a
+            // ~keep test on another thread reaches these with no subscriber. So the first
+            // ~keep conversion only reaches them, and the interest is then asked again.
+            parse_calls_for(html);
+            tracing::callsite::rebuild_interest_cache();
+            events.lock().expect("event log").clear();
             parse_calls_for(html);
         });
         let events = events.lock().expect("event log");

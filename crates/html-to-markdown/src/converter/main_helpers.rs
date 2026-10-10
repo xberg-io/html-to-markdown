@@ -543,9 +543,7 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
 
 /// Try to repair HTML using html5ever parser.
 ///
-/// Returns `Some(repaired_html)` if repair was successful, None otherwise. The repair gives up
-/// on a document that nests deeper than a browser builds (512 open elements), so its cost stays
-/// linear in the size of the input.
+/// Returns `Some(repaired_html)` if repair was successful, None otherwise.
 ///
 /// Before feeding the input to the HTML5 parser, XML-style self-closing tags on
 /// non-void elements (e.g. `<ac:parameter name="foo" />`) are expanded to explicit
@@ -554,19 +552,37 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
 /// element would be left open and subsequent siblings would nest inside it, breaking
 /// visitor start/end event pairing (issue #331).
 pub fn repair_with_html5ever(input: &str) -> Option<String> {
-    use crate::converter::anchor_origin::{collapse_split_anchors, parse_with_anchor_origins};
-    use crate::rcdom::SerializableHandle;
-    use html5ever::serialize::{SerializeOpts, serialize};
+    use crate::converter::anchor_origin::parse_with_anchor_origins;
 
     let expanded = expand_xml_self_closing_tags(input);
+    write_repaired(parse_with_anchor_origins(&expanded), input.len())
+}
+
+/// The repair of [`repair_with_html5ever`], given up on a document that nests deeper than a
+/// browser builds (512 open elements), so its cost stays linear in the size of the input.
+///
+/// ~keep For the second parse that an omitted end tag asks for (issue #772) only. A caller that
+/// ~keep made the repair before that issue keeps the repair with no limit: its first parse can
+/// ~keep hide content (a table cell with no row), so giving up there loses text and the depth
+/// ~keep warning.
+pub fn repair_with_html5ever_within_depth(input: &str) -> Option<String> {
+    use crate::converter::anchor_origin::parse_with_anchor_origins_within_depth;
+
+    let expanded = expand_xml_self_closing_tags(input);
+    write_repaired(parse_with_anchor_origins_within_depth(&expanded)?, input.len())
+}
+
+fn write_repaired(dom: crate::rcdom::RcDom, capacity: usize) -> Option<String> {
+    use crate::converter::anchor_origin::collapse_split_anchors;
+    use crate::rcdom::SerializableHandle;
+    use html5ever::serialize::{SerializeOpts, serialize};
 
     // ~keep The adoption agency splits an `<a>` around a block into an authored element and
     // ~keep clones; collapse the empty halves before the tree is flattened to a string and
     // ~keep the provenance is gone (issue #493).
-    let dom = parse_with_anchor_origins(&expanded)?;
     collapse_split_anchors(&dom.document);
 
-    let mut buf = Vec::with_capacity(input.len());
+    let mut buf = Vec::with_capacity(capacity);
     let handle = SerializableHandle::from(dom.document);
     serialize(&mut buf, &handle, SerializeOpts::default()).ok()?;
     String::from_utf8(buf).ok()
@@ -701,6 +717,15 @@ pub fn is_inline_element(tag_name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn should_repair_a_document_of_any_depth_and_give_up_only_within_the_depth_limit() {
+        let deep = format!("{}x", "<div>".repeat(600));
+
+        assert!(repair_with_html5ever(&deep).is_some_and(|repaired| repaired.matches("</div>").count() == 600));
+        assert!(repair_with_html5ever_within_depth(&deep).is_none());
+        assert!(repair_with_html5ever_within_depth("<div><p>one</div>tail").is_some());
+    }
 
     #[test]
     fn test_is_ignorable_before_head() {

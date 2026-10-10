@@ -80,18 +80,6 @@ fn should_convert_blocks_with_no_end_tag_that_nest_in_linear_time() {
 }
 
 #[test]
-fn should_convert_deep_blocks_on_the_older_routes_to_the_second_parse_in_linear_time() {
-    // ~keep A table moves the blocks in front of itself; a block in an inline element is a
-    // ~keep misnest. Both asked for the second parse before issue #772.
-    assert_linear("blocks in a table", 2_500, 3, |count| {
-        format!("<table>{}x", "<div>".repeat(count))
-    });
-    assert_linear("blocks after a misnest", 2_500, 3, |count| {
-        format!("<b><p>one</p></b>{}x", "<div>".repeat(count))
-    });
-}
-
-#[test]
 fn should_convert_one_hundred_thousand_paragraphs_with_no_end_tag_in_linear_time() {
     assert_linear("paragraphs with no end tag", 25_000, 1, |count| "<p>x ".repeat(count));
 

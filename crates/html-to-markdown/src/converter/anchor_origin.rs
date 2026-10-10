@@ -15,8 +15,8 @@
 //! and the split can be undone on the repaired tree before it is serialized. ~keep
 //!
 //! The same token sink records whether the input wrote a `<body>` start tag, which the tree
-//! also no longer shows, and gives the repair up when the tree builder nests too deep: see
-//! [`parse_with_anchor_origins`]. ~keep
+//! also no longer shows, and can give the repair up when the tree builder nests too deep: see
+//! [`parse_with_anchor_origins_within_depth`]. ~keep
 
 use std::cell::Cell;
 use std::collections::BTreeMap;
@@ -70,17 +70,21 @@ impl Tracer for HandleCount {
 
 /// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it,
 /// records whether a `<body>` start tag went by, and stops forwarding when the tree builder
-/// holds more than [`MAX_OPEN_ELEMENTS`] elements open.
+/// holds more than `max_open_elements` elements open.
 struct AnchorOriginStamper {
     inner: TreeBuilder<Handle, RcDom>,
     next_origin: Cell<u32>,
     saw_body_tag: Cell<bool>,
+    max_open_elements: Option<usize>,
     start_tags: Cell<usize>,
     too_deep: Cell<bool>,
 }
 
 impl AnchorOriginStamper {
     fn measure_depth(&self) {
+        let Some(max_open_elements) = self.max_open_elements else {
+            return;
+        };
         let start_tags = self.start_tags.get() + 1;
         self.start_tags.set(start_tags);
         if !is_measured(start_tags) {
@@ -88,7 +92,7 @@ impl AnchorOriginStamper {
         }
         let held = HandleCount(Cell::new(0));
         self.inner.trace_handles(&held);
-        self.too_deep.set(held.0.get() > MAX_OPEN_ELEMENTS);
+        self.too_deep.set(held.0.get() > max_open_elements);
     }
 
     fn stamp(&self, tag: &mut Tag) {
@@ -150,17 +154,30 @@ impl TokenSink for AnchorOriginStamper {
 /// ~keep fragment, and rules that ask "is this element in the body of a page" (the page header
 /// ~keep rule) must still see a fragment after the repair, so the body that no tag asked for is
 /// ~keep unwrapped and its children become children of `<html>`.
+pub fn parse_with_anchor_origins(html: &str) -> RcDom {
+    build_tree(html, None).0
+}
+
+/// The tree of [`parse_with_anchor_origins`], or `None` when the tree builder holds more than
+/// [`MAX_OPEN_ELEMENTS`] elements open.
 ///
-/// Returns `None` when the tree builder holds more than [`MAX_OPEN_ELEMENTS`] elements open.
 /// The rest of the input is then tokenized and not built, so the call stays linear in the size
 /// of the input.
-pub fn parse_with_anchor_origins(html: &str) -> Option<RcDom> {
+pub fn parse_with_anchor_origins_within_depth(html: &str) -> Option<RcDom> {
+    let (dom, too_deep) = build_tree(html, Some(MAX_OPEN_ELEMENTS));
+    (!too_deep).then_some(dom)
+}
+
+/// Build the tree and say whether the tree builder went past `max_open_elements`. A tree that
+/// went past it holds the input only up to that point.
+fn build_tree(html: &str, max_open_elements: Option<usize>) -> (RcDom, bool) {
     let tree_builder = TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default());
     let tokenizer = Tokenizer::new(
         AnchorOriginStamper {
             inner: tree_builder,
             next_origin: Cell::new(0),
             saw_body_tag: Cell::new(false),
+            max_open_elements,
             start_tags: Cell::new(0),
             too_deep: Cell::new(false),
         },
@@ -170,15 +187,13 @@ pub fn parse_with_anchor_origins(html: &str) -> Option<RcDom> {
     input.push_back(StrTendril::from(html));
     while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
     tokenizer.end();
-    if tokenizer.sink.too_deep.get() {
-        return None;
-    }
+    let too_deep = tokenizer.sink.too_deep.get();
     let saw_body_tag = tokenizer.sink.saw_body_tag.get();
     let dom = TreeSink::finish(tokenizer.sink.inner.sink);
     if !saw_body_tag {
         unwrap_implied_body(&dom.document);
     }
-    Some(dom)
+    (dom, too_deep)
 }
 
 /// Replace the `<body>` of `document` with its children.
@@ -325,7 +340,7 @@ mod tests {
     use std::fmt::Write as _;
 
     fn repaired(html: &str) -> String {
-        let dom = parse_with_anchor_origins(html).expect("a tree");
+        let dom = parse_with_anchor_origins(html);
         collapse_split_anchors(&dom.document);
         let mut buf = Vec::new();
         serialize(
@@ -367,13 +382,13 @@ mod tests {
     #[test]
     fn should_give_no_tree_when_the_tree_builder_nests_past_the_limit() {
         let nested = |depth: usize| format!("{}x", "<div>".repeat(depth));
-        assert!(parse_with_anchor_origins(&nested(400)).is_some());
-        assert!(parse_with_anchor_origins(&nested(600)).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&nested(400)).is_some());
+        assert!(parse_with_anchor_origins_within_depth(&nested(600)).is_none());
         // ~keep A table moves the blocks in front of itself, so they are not its descendants,
         // ~keep and the tree builder still holds every one of them open.
-        assert!(parse_with_anchor_origins(&format!("<table>{}", nested(600))).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&format!("<table>{}", nested(600))).is_none());
         let closed = format!("{}x{}", "<div>".repeat(400), "</div>".repeat(400));
-        assert!(parse_with_anchor_origins(&closed.repeat(4)).is_some());
+        assert!(parse_with_anchor_origins_within_depth(&closed.repeat(4)).is_some());
     }
 
     #[test]
@@ -382,21 +397,21 @@ mod tests {
         // ~keep remembers. A `<br>` is a start tag that leaves nothing open, so start tag 512 is
         // ~keep measured with 512 handles in the first page and 513 in the second.
         let page = |breaks: usize, blocks: usize| format!("{}{}x", "<br>".repeat(breaks), "<div>".repeat(blocks));
-        assert!(parse_with_anchor_origins(&page(4, 508)).is_some());
-        assert!(parse_with_anchor_origins(&page(3, 509)).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&page(4, 508)).is_some());
+        assert!(parse_with_anchor_origins_within_depth(&page(3, 509)).is_none());
     }
 
     #[test]
     fn should_give_no_tree_when_elements_that_no_start_tag_names_nest_past_the_limit() {
         // ~keep One `<td>` start tag opens a `tbody`, a `tr` and the cell.
         let cells = format!("{}x", "<table><td>".repeat(300));
-        assert!(parse_with_anchor_origins(&cells).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&cells).is_none());
         let foreign = format!("<svg>{}<text>x", "<g>".repeat(600));
-        assert!(parse_with_anchor_origins(&foreign).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&foreign).is_none());
         let math = format!("<math>{}<mi>x", "<mrow>".repeat(600));
-        assert!(parse_with_anchor_origins(&math).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&math).is_none());
         let templates = format!("{}x", "<template>".repeat(600));
-        assert!(parse_with_anchor_origins(&templates).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&templates).is_none());
         // ~keep Each `<b>` with its own attribute is held twice: open, and as a formatting
         // ~keep element that the tree builder opens again in the next paragraph.
         let mut formatting = String::from("<p>");
@@ -404,7 +419,7 @@ mod tests {
             write!(formatting, "<b id='b{number}'>").expect("write to a string");
         }
         formatting.push('x');
-        assert!(parse_with_anchor_origins(&formatting).is_none());
+        assert!(parse_with_anchor_origins_within_depth(&formatting).is_none());
     }
 
     #[test]
