@@ -71,6 +71,12 @@ pub struct DomContext {
     pub(crate) table_content_summary_cache: RefCell<HashMap<u32, TableContentSummary>>,
 }
 
+/// A script or a style element draws nothing. The white space on its two sides is read as if the
+/// element were not there.
+pub fn draws_nothing(name: &str) -> bool {
+    matches!(name, "script" | "style")
+}
+
 impl DomContext {
     pub(crate) fn ensure_capacity(&mut self, id: u32) {
         let idx = id as usize;
@@ -155,6 +161,9 @@ impl DomContext {
 
                 for sibling in siblings.iter().take(position).rev() {
                     if let Some(info) = self.tag_info(sibling.get_inner(), parser) {
+                        if draws_nothing(&info.name) {
+                            continue;
+                        }
                         return info.is_inline_like;
                     }
                     if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
@@ -194,6 +203,9 @@ impl DomContext {
 
                 for sibling in siblings.iter().skip(position + 1) {
                     if let Some(info) = self.tag_info(sibling.get_inner(), parser) {
+                        if draws_nothing(&info.name) {
+                            continue;
+                        }
                         return info.is_inline_like;
                     }
                     if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {

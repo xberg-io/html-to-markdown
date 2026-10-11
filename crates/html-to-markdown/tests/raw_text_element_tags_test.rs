@@ -1,0 +1,342 @@
+//! The start tag and the end tag of a raw-text element follow the HTML rule on both converters:
+//! the name in any case, then tab, line feed, form feed, carriage return, space, `/` or `>`.
+
+#![allow(missing_docs)]
+// ~keep The converter is chosen by name, which the crate offers under this feature only.
+#![cfg(feature = "testkit")]
+
+use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
+
+const STRATEGIES: [TierStrategy; 3] = [TierStrategy::Auto, TierStrategy::Tier1, TierStrategy::Tier2];
+
+fn content(html: &str, tier_strategy: TierStrategy) -> String {
+    let options = ConversionOptions {
+        tier_strategy,
+        ..ConversionOptions::default()
+    };
+    convert(html, Some(options))
+        .expect("conversion should succeed")
+        .content
+        .unwrap_or_default()
+        .trim_end()
+        .to_string()
+}
+
+const AFTER_THE_NAME: [&str; 7] = [" ", "\t", "\n", "\x0C", "\r", "/", ""];
+
+/// The JSON of a structured data script: no tag, a start tag, and the start tag of a script.
+const JSON_VALUES: [&str; 3] = [r#"{"a":"b"}"#, r#"{"a":"<p>"}"#, r#"{"a":"<script>"}"#];
+
+/// Issue 825: a slash or a form feed after the name of a script start tag. The page was empty
+/// when the JSON held `<script>`.
+#[test]
+fn a_script_start_tag_is_read_with_every_byte_after_its_name() {
+    for name in ["script", "SCRIPT"] {
+        for after_name in ["/", "\x0C", " ", "\t", "\n", "\r"] {
+            for value in JSON_VALUES {
+                let html = format!(
+                    "<html><head><{name}{after_name}type=\"application/ld+json\">{value}</script></head>\
+                     <body><h1>Shop</h1><p>visible</p></body></html>"
+                );
+                for tier_strategy in STRATEGIES {
+                    assert_eq!(
+                        content(&html, tier_strategy),
+                        "# Shop\n\nvisible",
+                        "{tier_strategy:?}: {html:?}"
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// Issue 825: a plain script with a slash or a form feed after its name is removed.
+#[test]
+fn a_plain_script_start_tag_is_read_with_every_byte_after_its_name() {
+    for after_name in ["/", "\x0C", " "] {
+        let html = format!("<p>before</p>\n<script{after_name}async>var a = \"<p>SECRET\";</script>\n<p>after</p>");
+        for tier_strategy in STRATEGIES {
+            assert_eq!(
+                content(&html, tier_strategy),
+                "before\n\nafter",
+                "{tier_strategy:?}: {html:?}"
+            );
+        }
+    }
+}
+
+/// Issue 826: the end tag of a style or script element in every spelling.
+#[test]
+fn a_raw_text_end_tag_is_read_with_every_byte_after_its_name() {
+    for (name, end_name) in [("style", "style"), ("style", "STYLE"), ("script", "script")] {
+        for after_name in AFTER_THE_NAME {
+            let html =
+                format!("<p>before</p><{name}>p::before{{content:\"<p>SECRET\"}}</{end_name}{after_name}><p>after</p>");
+            for tier_strategy in STRATEGIES {
+                assert_eq!(
+                    content(&html, tier_strategy),
+                    "before\n\nafter",
+                    "{tier_strategy:?}: {html:?}"
+                );
+            }
+        }
+    }
+}
+
+/// A longer name does not end the element, on both converters.
+#[test]
+fn a_longer_name_does_not_end_a_style_element() {
+    let html = "<p>before</p><style>a{}</styles>b{}</style><p>after</p>";
+    for tier_strategy in STRATEGIES {
+        assert_eq!(content(html, tier_strategy), "before\n\nafter", "{tier_strategy:?}");
+    }
+}
+
+/// Issue 828: the content of a textarea is text. The fast converter hands a textarea over, so
+/// the rows run the automatic choice and the full converter.
+#[test]
+fn the_tags_inside_a_textarea_are_text() {
+    for (html, expected) in [
+        (
+            "<textarea><b>bold</b><i>it</i></textarea><div><p>one</p></div>tail",
+            "<b>bold</b><i>it</i>\n\none\n\ntail",
+        ),
+        (
+            "<textarea><b>bold</b><i>it</i></textarea><div><p>one</div>tail",
+            "<b>bold</b><i>it</i>\n\none\n\ntail",
+        ),
+        (
+            "<TEXTAREA\x0Cname=a><b>bold</b><i>it</i></textarea\x0C><div><p>one</p></div>tail",
+            "<b>bold</b><i>it</i>\n\none\n\ntail",
+        ),
+    ] {
+        for tier_strategy in [TierStrategy::Auto, TierStrategy::Tier2] {
+            assert_eq!(content(html, tier_strategy), expected, "{tier_strategy:?}: {html:?}");
+        }
+    }
+}
+
+const STRUCTURED_DATA: &str = r#"<script type="application/ld+json">{"a":1}</script>"#;
+const PLAIN_SCRIPT: &str = "<script>x</script>";
+
+/// Issue 827: a structured data script adds no space of its own, on both converters. The white
+/// space on its two sides collapses as if the script were not there, as a browser shows it.
+#[test]
+fn a_structured_data_script_adds_no_space() {
+    for (html, expected) in [
+        (format!("<p>foo {STRUCTURED_DATA} bar</p>"), "foo bar"),
+        (format!("<p>foo{STRUCTURED_DATA} bar</p>"), "foo bar"),
+        (format!("<p>foo {STRUCTURED_DATA}bar</p>"), "foo bar"),
+        (format!("<p>foo{STRUCTURED_DATA}bar</p>"), "foobar"),
+    ] {
+        for tier_strategy in STRATEGIES {
+            assert_eq!(content(&html, tier_strategy), expected, "{tier_strategy:?}: {html:?}");
+        }
+    }
+    let html = format!("<pre>foo{STRUCTURED_DATA}bar</pre>");
+    for tier_strategy in STRATEGIES {
+        let found = content(&html, tier_strategy);
+        assert!(found.contains("foobar"), "{tier_strategy:?}: {found:?}");
+    }
+}
+
+/// A script with `<script` in its text ends at its first end tag, with every start tag form.
+#[test]
+fn a_script_with_a_start_tag_in_its_text_ends_at_its_first_end_tag() {
+    for after_name in ["", " async", "/async", "\x0Casync"] {
+        let html = format!("<p>before</p><script{after_name}>var s = \"<script>\";</script><p>after</p>");
+        for tier_strategy in STRATEGIES {
+            assert_eq!(
+                content(&html, tier_strategy),
+                "before\n\nafter",
+                "{tier_strategy:?}: {html:?}"
+            );
+        }
+    }
+}
+
+/// A removed script with white space on its two sides gives the text of the kept script.
+#[test]
+fn a_plain_script_between_two_spaces_leaves_one_space() {
+    let html = format!("<p>foo {PLAIN_SCRIPT} bar</p>");
+    for tier_strategy in STRATEGIES {
+        assert_eq!(content(&html, tier_strategy), "foo bar", "{tier_strategy:?}");
+    }
+}
+
+const STYLE: &str = "<style>p{}</style>";
+
+/// Issue 827: in a table cell the white space on the two sides of a script, a style element or
+/// a comment gives one space, as in a paragraph, on both converters.
+#[test]
+fn an_element_that_draws_nothing_between_two_spaces_leaves_one_space_in_a_cell() {
+    for element in [STRUCTURED_DATA, PLAIN_SCRIPT, STYLE] {
+        let html = format!("<table><tr><td>foo {element} bar</td></tr></table>");
+        for tier_strategy in STRATEGIES {
+            let found = content(&html, tier_strategy);
+            assert!(
+                found.starts_with("| foo bar |\n"),
+                "{tier_strategy:?}: {html:?} gave {found:?}"
+            );
+        }
+    }
+}
+
+/// The content of a cell that ends a part of its text with a space before more text.
+const CELLS_WITH_A_SPACE_BEFORE_TEXT: [&str; 6] = [
+    "foo <!-- c --> bar",
+    "<b>foo </b> bar",
+    "<strong>foo&nbsp;</strong> bar",
+    "<em>foo </em> bar",
+    "<x-widget>foo &nbsp;</x-widget> bar",
+    "foo <x-widget></x-widget> bar",
+];
+
+/// The fast converter and the full converter write the same cell for each of these contents.
+#[test]
+fn the_space_that_opens_a_text_in_a_cell_is_the_same_on_both_converters() {
+    for cell in CELLS_WITH_A_SPACE_BEFORE_TEXT {
+        let html = format!("<table><tr><td>{cell}</td></tr></table>");
+        let full = content(&html, TierStrategy::Tier2);
+        assert_eq!(content(&html, TierStrategy::Tier1), full, "{html:?}");
+        assert_eq!(content(&html, TierStrategy::Auto), full, "{html:?}");
+    }
+    let html = "<table><tr><td>foo <!-- c --> bar</td></tr></table>";
+    for tier_strategy in STRATEGIES {
+        let found = content(html, tier_strategy);
+        assert!(
+            found.starts_with("| foo bar |\n"),
+            "{tier_strategy:?}: {html:?} gave {found:?}"
+        );
+    }
+}
+
+/// A comment and a script side by side between two spaces leave one space, on both converters.
+#[test]
+fn a_comment_beside_a_script_between_two_spaces_leaves_one_space() {
+    for script in [STRUCTURED_DATA, PLAIN_SCRIPT] {
+        for (before, after) in [
+            ("<p>foo ", " bar</p>"),
+            ("<ul><li>foo ", " bar</li></ul>"),
+            ("<table><tr><td>foo ", " bar</td></tr></table>"),
+        ] {
+            let html = format!("{before}<!-- c -->{script}{after}");
+            for tier_strategy in STRATEGIES {
+                let without = content(&format!("{before}{after}"), tier_strategy);
+                assert!(without.contains("foo bar"), "{tier_strategy:?}: {without:?}");
+                assert_eq!(content(&html, tier_strategy), without, "{tier_strategy:?}: {html:?}");
+            }
+        }
+    }
+}
+
+/// A list item and a heading use the rule of a paragraph for the same three elements.
+#[test]
+fn an_element_that_draws_nothing_between_two_spaces_leaves_one_space_in_an_item_and_a_heading() {
+    for element in [STRUCTURED_DATA, PLAIN_SCRIPT, STYLE] {
+        for (before, after) in [("<ul><li>foo ", " bar</li></ul>"), ("<h2>foo ", " bar</h2>")] {
+            let html = format!("{before}{element}{after}");
+            for tier_strategy in STRATEGIES {
+                let without = content(&format!("{before}{after}"), tier_strategy);
+                assert!(without.ends_with("foo bar"), "{tier_strategy:?}: {without:?}");
+                assert_eq!(content(&html, tier_strategy), without, "{tier_strategy:?}: {html:?}");
+            }
+        }
+    }
+}
+
+/// Issue 827: a structured data script gives the text of the same page without the script, in
+/// every context and on both converters.
+#[test]
+fn a_structured_data_script_gives_the_text_of_the_page_without_it() {
+    for (before, after) in [
+        ("<pre>foo", "bar</pre>"),
+        ("<pre>foo ", " bar</pre>"),
+        ("<p><code>foo", "bar</code></p>"),
+        ("<p><b>foo</b>", "<i>bar</i></p>"),
+        ("<p><b>foo</b> ", " <i>bar</i></p>"),
+        ("<p>foo</p>", "<p>bar</p>"),
+        ("<p>foo</p>", "bar"),
+        ("<ul><li>foo", "</li><li>bar</li></ul>"),
+        ("<table><tr><td>foo", "bar</td></tr></table>"),
+        ("<h1>foo ", " bar</h1>"),
+    ] {
+        for tier_strategy in STRATEGIES {
+            let without = content(&format!("{before}{after}"), tier_strategy);
+            let structured_data = content(&format!("{before}{STRUCTURED_DATA}{after}"), tier_strategy);
+            assert_eq!(structured_data, without, "{tier_strategy:?}: {before:?} {after:?}");
+            assert!(
+                without.contains("foo") && without.contains("bar"),
+                "{tier_strategy:?}: {without:?}"
+            );
+        }
+    }
+}
+
+/// Issue 827: a line end in an inline element, then a structured data script, then text that
+/// starts with a space. The full converter asks what follows the inline element, and the
+/// script is not what follows: the text is. The fast converter does not ask this question.
+#[test]
+fn a_structured_data_script_is_not_what_follows_an_inline_element() {
+    let (before, after) = ("<p>Alpha<span>\n</span>", " 13</p>");
+    for tier_strategy in [TierStrategy::Auto, TierStrategy::Tier2] {
+        let without = content(&format!("{before}{after}"), tier_strategy);
+        let structured_data = content(&format!("{before}{STRUCTURED_DATA}{after}"), tier_strategy);
+        assert_eq!(structured_data, without, "{tier_strategy:?}");
+        assert!(
+            without.contains("Alpha") && without.contains("13"),
+            "{tier_strategy:?}: {without:?}"
+        );
+    }
+}
+
+#[cfg(feature = "metadata")]
+mod structured_data {
+    use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
+
+    /// The JSON of each script, by the automatic choice and by the full converter.
+    fn raw_json(html: &str) -> Vec<Vec<String>> {
+        [TierStrategy::Auto, TierStrategy::Tier2]
+            .into_iter()
+            .map(|tier_strategy| {
+                let options = ConversionOptions {
+                    tier_strategy,
+                    ..ConversionOptions::default()
+                };
+                convert(html, Some(options))
+                    .expect("conversion should succeed")
+                    .metadata
+                    .structured_data
+                    .into_iter()
+                    .map(|data| data.raw_json)
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// Issue 825: a script start tag with any byte of the HTML rule after its name gives its
+    /// JSON as written.
+    #[test]
+    fn a_script_start_tag_gives_its_json_with_every_byte_after_its_name() {
+        for name in ["script", "SCRIPT"] {
+            for after_name in ["/", "\x0C", " ", "\t", "\n", "\r"] {
+                for value in super::JSON_VALUES {
+                    let html = format!(
+                        "<html><head><{name}{after_name}type=\"application/ld+json\">{value}</script></head>\
+                         <body><h1>Shop</h1><p>visible</p></body></html>"
+                    );
+                    assert_eq!(raw_json(&html), vec![vec![value.to_string()]; 2], "{html:?}");
+                }
+            }
+        }
+    }
+}
+
+/// A textarea with no tag in it gives the same text as before.
+#[test]
+fn a_textarea_without_a_tag_is_unchanged() {
+    let html = "<p>before</p><textarea>a &amp; b</textarea><p>after</p>";
+    let auto = content(html, TierStrategy::Auto);
+    assert_eq!(auto, content(html, TierStrategy::Tier2));
+    assert!(auto.contains("a & b"), "{auto:?}");
+}

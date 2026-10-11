@@ -263,7 +263,7 @@ impl TextProcessor<'_, '_, '_> {
             return ProcessedText::same(value.into_owned(), capture_semantic);
         }
         if ctx.in_table_cell {
-            return self.process_table_cell(value.as_ref(), escape_asterisks, capture_semantic);
+            return self.process_table_cell(value.as_ref(), escape_asterisks, was_fresh, capture_semantic);
         }
         if self.handler.options.whitespace_mode == crate::options::WhitespaceMode::Strict {
             return self.process_strict(value.as_ref(), escape_asterisks, capture_semantic);
@@ -271,17 +271,31 @@ impl TextProcessor<'_, '_, '_> {
         self.process_normalized(value.as_ref(), escape_asterisks, was_fresh, capture_semantic)
     }
 
-    fn process_table_cell(&self, value: &str, escape_asterisks: bool, capture_semantic: bool) -> ProcessedText {
+    fn process_table_cell(
+        &self,
+        value: &str,
+        escape_asterisks: bool,
+        was_fresh: bool,
+        capture_semantic: bool,
+    ) -> ProcessedText {
         let options = self.handler.options;
-        let normalized = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
+        let collapses = options.whitespace_mode == crate::options::WhitespaceMode::Normalized;
+        let folded = if collapses {
             text::normalize_cell_whitespace_cow(value)
         } else {
             text::fold_cell_line_breaks_verbatim_cow(value)
         };
+        // ~keep The space that opens a text in a cell follows the rule of running text
+        // ~keep (`skip_prefix`): after a space in the output it adds nothing, unless an inline
+        // ~keep element is between the two. A comment, a script or a style element is not.
+        let normalized = folded
+            .strip_prefix(' ')
+            .filter(|_| collapses && self.skip_prefix(" ", was_fresh))
+            .unwrap_or_else(|| folded.as_ref());
         let mut output = String::with_capacity(normalized.len());
         text::escape_into(
             &mut output,
-            normalized.as_ref(),
+            normalized,
             options.escape_misc,
             escape_asterisks,
             options.escape_underscores,
@@ -298,7 +312,7 @@ impl TextProcessor<'_, '_, '_> {
         .into_owned();
         ProcessedText {
             output,
-            semantic: capture_semantic.then(|| normalized.into_owned()),
+            semantic: capture_semantic.then(|| normalized.to_string()),
         }
     }
 

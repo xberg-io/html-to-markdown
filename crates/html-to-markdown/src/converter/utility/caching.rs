@@ -4,6 +4,7 @@
 //! DOM context building.
 
 use crate::converter::DomContext;
+use crate::converter::dom_context::draws_nothing;
 use crate::converter::main_helpers::is_inline_element;
 use crate::converter::utility::content::normalized_tag_name;
 
@@ -16,7 +17,9 @@ fn inline_like_value(node_handle: tl::NodeHandle, parser: &tl::Parser) -> Option
     match node_handle.get(parser) {
         Some(tl::Node::Tag(tag)) => {
             let name = normalized_tag_name(tag.name().as_utf8_str());
-            Some(is_inline_element(&name) || matches!(name.as_ref(), "script" | "style"))
+            // ~keep A script or a style element draws nothing: the white space on its two sides
+            // ~keep is read as if the element were not there, as for a comment.
+            (!draws_nothing(&name)).then(|| is_inline_element(&name))
         }
         Some(tl::Node::Raw(raw)) if raw.as_utf8_str().trim().is_empty() => None,
         Some(tl::Node::Raw(_)) => Some(false),
@@ -46,7 +49,9 @@ fn cache_sibling_context(siblings: &[tl::NodeHandle], parser: &tl::Parser, ctx: 
 
         match sibling.get(parser) {
             Some(tl::Node::Tag(_)) => {
-                next_inline_like = inline_like_value(*sibling, parser).unwrap_or(false);
+                if let Some(value) = inline_like_value(*sibling, parser) {
+                    next_inline_like = value;
+                }
                 next_tag = Some(id);
                 next_whitespace = false;
             }

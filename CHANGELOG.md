@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The text inside a `textarea` is text: `<textarea><b>bold</b></textarea>` gave `**bold**` and now gives `<b>bold</b>` ([#828](https://github.com/xberg-io/html-to-markdown/issues/828)).
+- The fast converter keeps the text after a `</style>` end tag with a form feed after the name ([#826](https://github.com/xberg-io/html-to-markdown/issues/826)).
+- A page is not empty when a structured data script has a slash or a form feed after `script` in its start tag and `<script>` in its JSON ([#825](https://github.com/xberg-io/html-to-markdown/issues/825)).
+- The fast converter writes one space, not two, for a script or a style element with a space on its two sides.
+- A comment between two words leaves one space on the fast converter, in a paragraph, a list item and a table cell. It left two spaces.
+- A table cell writes one space, not two, for a doubled space after a comment, a block child, bold or italic text or a custom element, with both converters. A structured data script with a space on its two sides gives one space there too.
+- A character reference in a structured data script is kept as written in the metadata: `{"a":"&lt;p&gt;"}` gave `{"a":"<p>"}` in `raw_json` and now gives `{"a":"&lt;p&gt;"}` ([#824](https://github.com/xberg-io/html-to-markdown/issues/824)).
+- A structured data script adds no space of its own: `<p>foo<script type="application/ld+json">{}</script>bar</p>` gives `foobar` with both converters (the fast converter gave `foo bar`), and white space on its two sides gives one space ([#827](https://github.com/xberg-io/html-to-markdown/issues/827)).
 - A checkbox outside a task list item writes nothing.
   `<p>Agree <input type="checkbox"> to the terms</p>` gave `Agree [ ] to the terms` and now gives
   `Agree to the terms`. Bracket pairs in running text are link syntax: `[x](optional)` rendered as
@@ -949,47 +957,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   straight out of `[Unreleased]` and leaves it empty on `main` — an Unreleased-only comparison
   would compare zero lines and pass while a released section drifted.
 
-## [3.15.0] - 2026-09-26
-
-### Added
-
-- **`ConversionOptions::base_url`** resolves relative `href`/`src` destinations against a
-  caller-supplied base URL, honoring a document's own `<base href>` the way a browser does.
-  Defaults to `None`, so output is byte-identical for callers who do not set it. Resolution
-  happens identically in both the Tier 1 and Tier 2 rendering paths.
-
-### Changed
-
-- Upgraded `rmcp` to 3.4.1.
-- Repinned the `alef` generator to 0.96.5 and regenerated every binding. Generator drift
-  only; no public API of any binding changed.
-- Split `converter/utility/content.rs` and `converter/inline/link.rs` (each over the
-  1000-line quality gate) into smaller modules, and reduced `convert_table_row`'s cyclomatic
-  complexity by extracting its visitor-hook pre-pass into a separate function. No behavior
-  change; every existing import path is preserved via re-exports.
-
-### Fixed
-
-- **The R binding compiles again.** `ConversionOptions::base_url` is the struct's first
-  `Option<String>`, and alef's extendr backend assigned it a bare `String`, failing the whole R
-  package build with `error[E0308]: expected Option<String>, found String`. Fixed in alef 0.96.5.
-  It went unnoticed for two commits because two independent mechanisms each suppressed the leg.
-  On the commit that introduced the line, `Test: R` was **cancelled**: `ci-e2e.yaml`'s
-  `cancel-in-progress: true` group is keyed on the branch, so the next push to `main` killed the
-  run before R finished. On the commit after that, `Test: R` was **skipped**: the leg is gated on
-  a `packages/r/**`/`crates/html-to-markdown/**` paths filter that commit did not match. Neither
-  state is a failure, so `CI E2E` reported success twice without ever compiling R.
-
-- CI's fixture-snippet validation now really validates the 341 Swift snippets. They had all
-  been reporting `Unavailable` with `no such module 'HtmlToMarkdown'`: Swift 6.3 made
-  `swiftbuild` the default build system, whose bin path holds the `.swiftmodule` files
-  directly and emits no `Modules/` directory, while alef points `-I` at `<bin-path>/Modules`.
-  The session now reconstructs that layout after building. The gate went red without any
-  change to this tree, when the runner's preinstalled Swift moved to 6.4.
-
 ## Archives
 
-- [3.14.3 through 3.14.0](changelog-archive-6.md)
+- [3.15.0 through 3.14.0](changelog-archive-6.md)
 - [3.13.0 through 3.11.5](changelog-archive-1.md)
 - [3.11.4 through 3.6.21](changelog-archive-2.md)
 - [3.6.20 through 3.2.0](changelog-archive-3.md)
