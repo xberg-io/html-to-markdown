@@ -15,6 +15,8 @@ struct Tier1Scanner<'a> {
     table_probes: Vec<TableLayoutProbe>,
     pos: usize,
     text_start: usize,
+    /// The end of the last comment, script or style element that a text ends before.
+    text_ends_before: Option<usize>,
 }
 
 impl<'a> Tier1Scanner<'a> {
@@ -27,6 +29,7 @@ impl<'a> Tier1Scanner<'a> {
             table_probes: Vec::new(),
             pos: 0,
             text_start: 0,
+            text_ends_before: None,
         }
     }
 
@@ -102,8 +105,13 @@ impl<'a> Tier1Scanner<'a> {
         if self.html[self.pos..].starts_with("<![CDATA[") {
             return Err(BailReason::Cdata { offset: self.pos });
         }
+        let bang_start = self.pos;
         self.pos = skip_bang(self.bytes, self.pos)?;
         self.text_start = self.pos;
+        // ~keep A comment draws nothing: the text on its two sides is one text.
+        if self.bytes[bang_start..].starts_with(b"<!--") {
+            self.join_spaces_around_element(bang_start);
+        }
         Ok(())
     }
 
@@ -404,7 +412,9 @@ impl<'a> Tier1Scanner<'a> {
             Some(close) => close.0 + 1,
             None => self.bytes.len(),
         };
-        self.pos = find_raw_text_close(self.bytes, open_end, name_lower).unwrap_or(self.bytes.len());
+        // ~keep The rule for the end of raw text is the one Tier-2 uses.
+        self.pos = crate::converter::utility::preprocessing::find_raw_text_end_tag(self.bytes, open_end, name_lower)
+            .map_or(self.bytes.len(), |(_, end)| end);
 
         // ~keep Tier-2's `strip_script_and_style_tags` preprocessing pass
         // (converter/utility/preprocessing.rs, outside tier1/) inserts a
@@ -446,7 +456,11 @@ impl<'a> Tier1Scanner<'a> {
         // produced by a preceding sibling is never doubled up; the "after"
         // check peeks the next source byte, matching Tier-2's boundary
         // condition exactly.
-        if name_lower == b"script" || name_lower == b"style" {
+        // ~keep Tier-2 keeps a structured data script, and a kept element adds no space.
+        let open_tag = self.html.get(name_start - 1..open_end).unwrap_or_default();
+        let kept =
+            name_lower == b"script" && crate::converter::utility::preprocessing::is_json_ld_script_open_tag(open_tag);
+        if !kept && (name_lower == b"script" || name_lower == b"style") {
             let after_is_word = self.pos < self.bytes.len() && !self.bytes[self.pos].is_ascii_whitespace();
             if after_is_word {
                 let dest = self.state.cell_or_output_mut();
@@ -461,7 +475,43 @@ impl<'a> Tier1Scanner<'a> {
                 }
             }
         }
+        self.join_spaces_around_element(name_start - 1);
         Ok(())
+    }
+
+    /// The text before the element at `element_start` and the text after it are one text, as in
+    /// the page without the element. When the first part ends in a space, the spaces and tabs
+    /// at the start of the second part add nothing.
+    ///
+    /// ~keep The space is read from the output, where a character reference is already
+    /// ~keep decoded. A tag or a comment before the element ends in `>`: then no text ends at
+    /// ~keep the element, and the space in the output is not the text's. Text in `pre` and in
+    /// ~keep code is written as it is. A line end after the element keeps the line rules of
+    /// ~keep the text that follows.
+    fn join_spaces_around_element(&mut self, element_start: usize) {
+        if self.state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE) {
+            return;
+        }
+        // ~keep An element that starts where the last one ended continues it: the text that
+        // ~keep ended before the first of them is the text before each of them.
+        let after_text = element_start
+            .checked_sub(1)
+            .is_some_and(|before| self.bytes[before] != b'>');
+        let text_before = after_text || self.text_ends_before == Some(element_start);
+        self.text_ends_before = text_before.then_some(self.pos);
+        if !text_before || !self.state.cell_or_output_mut().ends_with(' ') {
+            return;
+        }
+        let spaces = self.bytes[self.pos..]
+            .iter()
+            .take_while(|&&byte| matches!(byte, b' ' | b'\t'))
+            .count();
+        if matches!(self.bytes.get(self.pos + spaces), Some(b'\n' | b'\r')) {
+            return;
+        }
+        self.pos += spaces;
+        self.text_start = self.pos;
+        self.text_ends_before = Some(self.pos);
     }
 
     fn scan_ignored(&mut self, spec: &TagSpec, name_end: usize, name_lower: &[u8]) -> Result<(), BailReason> {

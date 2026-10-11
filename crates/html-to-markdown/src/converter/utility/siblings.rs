@@ -4,6 +4,7 @@
 //! and inline/block element detection for whitespace handling.
 
 use crate::converter::DomContext;
+use crate::converter::dom_context::draws_nothing;
 
 /// Get the tag name of the next sibling element.
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -163,6 +164,11 @@ pub fn following_sibling_content(id: u32, parser: &tl::Parser, dom_ctx: &DomCont
 
     for sibling in siblings.iter().skip(position + 1) {
         if let Some(info) = dom_ctx.tag_info(sibling.get_inner(), parser) {
+            // ~keep A script or a style element draws nothing: the scan passes it, as it
+            // ~keep passes a comment.
+            if draws_nothing(&info.name) {
+                continue;
+            }
             return if info.is_inline_like {
                 FollowingContent::Inline
             } else {

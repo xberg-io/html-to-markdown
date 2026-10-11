@@ -264,6 +264,7 @@ fn trim_leading_text_run<'a>(
     in_pre: bool,
     in_code: bool,
     at_inline_frame_start: bool,
+    after_custom_element: bool,
 ) -> std::borrow::Cow<'a, str> {
     let was_at_document_start = std::mem::replace(&mut state.at_document_start, false);
     let document_start_strip = should_strip_document_start(state, was_at_document_start);
@@ -274,17 +275,20 @@ fn trim_leading_text_run<'a>(
             state.stack.last().map(|frame| frame.spec.kind),
             Some(TagKind::Strong | TagKind::Emphasis)
         );
-    let in_link_frame = matches!(state.stack.last().map(|frame| frame.spec.kind), Some(TagKind::Link));
     let after_line_end = follows_line_end(state);
     let bare_inline_after_space = bare_inline_follows_space(state);
+    // ~keep Tier-2 does not count a custom element as an inline element: in a cell, the space
+    // ~keep that opens the text after one adds nothing to a space already in the cell.
+    let custom_element_after_space =
+        after_custom_element && state.in_table_cell() && state.cell_or_output_mut().ends_with(' ');
     let should_trim = !in_pre
         && !in_code
-        && (!state.in_table_cell() || in_link_frame)
         && (at_inline_frame_start
             || block_separator_after
             || document_start_strip
             || after_line_end
-            || bare_inline_after_space);
+            || bare_inline_after_space
+            || custom_element_after_space);
     if !should_trim {
         return std::borrow::Cow::Borrowed(raw);
     }
@@ -631,7 +635,14 @@ fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), Bail
     if handle_whitespace_text(state, raw, in_pre, position, history, upcoming) {
         return Ok(());
     }
-    let trimmed_leading = trim_leading_text_run(state, raw, in_pre, in_code, position.at_inline_frame_start);
+    let trimmed_leading = trim_leading_text_run(
+        state,
+        raw,
+        in_pre,
+        in_code,
+        position.at_inline_frame_start,
+        history.after_custom_element,
+    );
     let raw = trimmed_leading.as_ref();
     if raw.is_empty() {
         return Ok(());

@@ -31,123 +31,145 @@ pub(super) fn track_svg_tag(bytes: &[u8], idx: usize, svg_depth: &mut usize) -> 
     None
 }
 
-/// Strip a `<script>…</script>` or `<style>…</style>` element starting at `idx` (which must
-/// point at the `<`), appending everything before it to `*output` (lazily allocated) and
-/// inserting a single space if collapsing the removed span would otherwise fuse two
-/// non-whitespace characters together.
+/// What the first pass does with the content of a raw-text element.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RawTextContent {
+    /// The element is removed (`style`).
+    Removed,
+    /// The element is removed, but a structured data script is kept for the metadata.
+    RemovedUnlessStructuredData,
+    /// The element is kept and its content is text (`textarea`).
+    Kept,
+}
+
+/// The page that the first pass reads.
 ///
-/// `open_tag_pattern` is the lowercase opening-tag prefix including `<` (e.g. `b"<script"`);
-/// `close_tag_name` is the bare lowercase tag name for the closing-tag scan (e.g. `b"script"`).
-/// `json_ld_exempt` keeps a `type="application/ld+json"` script, with each `<` of its body written
-/// as `&lt;` — only meaningful for the script element, so callers stripping `<style>` pass `false`.
-///
-/// Returns `Some(new_pos)` when the element was stripped — the caller should set both `last`
-/// and `idx` to it and `continue` the scan — or `None` when `idx` does not start a strippable
-/// element of this kind, in which case the caller falls through unchanged.
-///
-/// Extracted from `strip_script_and_style_tags` — identical prefix/whitespace-boundary/
-/// closing-tag-scan logic, unchanged.
+/// ~keep The escape of a kept script is not idempotent (`&` becomes `&amp;`), so it runs on the
+/// ~keep source page only. The tree builder writes a script as raw text and escapes the text of
+/// ~keep a `textarea` itself, so a kept element of a repaired page is already in the form the
+/// ~keep parser reads, however many times the page is repaired.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RawTextPage {
+    /// The page as its author wrote it.
+    Source,
+    /// The page that the HTML tree builder wrote from a page this pass has read.
+    Repaired,
+}
+
+/// A candidate raw-text element: `idx` is its `<`, `last` is the end of the copied input and
+/// `name` is the tag name in lower case.
 struct RawTextElement<'a> {
     input: &'a str,
-    bytes: &'a [u8],
     idx: usize,
-    len: usize,
     last: usize,
-    open_tag_pattern: &'a [u8],
-    close_tag_name: &'a [u8],
-    json_ld_exempt: bool,
+    name: &'a str,
+    content: RawTextContent,
+    page: RawTextPage,
 }
 
-impl<'a> RawTextElement<'a> {
-    const fn new(
-        input: &'a str,
-        idx: usize,
-        last: usize,
-        open_tag_pattern: &'a [u8],
-        close_tag_name: &'a [u8],
-        json_ld_exempt: bool,
-    ) -> Self {
-        Self {
-            input,
-            bytes: input.as_bytes(),
-            idx,
-            len: input.len(),
-            last,
-            open_tag_pattern,
-            close_tag_name,
-            json_ld_exempt,
-        }
-    }
-}
+/// Remove or rewrite the raw-text element that starts at `element.idx`, appending the input
+/// before it to `*output` (lazily allocated).
+///
+/// A removed element leaves one space when the two characters around it are not white space.
+/// A kept element is written by `push_kept_element` and adds no space: the walker reads the
+/// white space on its two sides as if the element were not there.
+///
+/// Returns `Some(new_pos)` when the element was consumed — the caller sets both `last` and `idx`
+/// to it — or `None` when `idx` does not start a closed element of this name, or when a kept
+/// element needs no change (a `textarea` with no `<`, any kept element of a repaired page).
+fn strip_raw_text_element(element: &RawTextElement<'_>, output: &mut Option<String>) -> Option<usize> {
+    let bytes = element.input.as_bytes();
+    let name = element.name.as_bytes();
+    let tag_end = raw_text_tag_end(bytes, element.idx, name, TagSide::Start)?;
+    let (close_start, close_idx) = find_raw_text_end_tag(bytes, tag_end, name)?;
+    let body = &element.input[tag_end..close_start];
 
-fn strip_raw_text_element(element: RawTextElement<'_>, output: &mut Option<String>) -> Option<usize> {
-    let prefix_len = element.open_tag_pattern.len();
-    if element.idx + prefix_len >= element.len
-        || !eq_ascii_insensitive(
-            &element.bytes[element.idx..element.idx + prefix_len],
-            element.open_tag_pattern,
-        )
-    {
-        return None;
-    }
-    let after_tag = element.bytes[element.idx + prefix_len];
-    if !(after_tag == b'>' || after_tag == b' ' || after_tag == b'\t' || after_tag == b'\n' || after_tag == b'\r') {
+    let kept = match element.content {
+        RawTextContent::Removed => false,
+        RawTextContent::RemovedUnlessStructuredData => is_json_ld_script_open_tag(&element.input[element.idx..tag_end]),
+        // ~keep A `textarea` with no `<` in it is already one text for the parser.
+        RawTextContent::Kept if !body.contains('<') => return None,
+        RawTextContent::Kept => true,
+    };
+    if kept && element.page == RawTextPage::Repaired {
         return None;
     }
 
-    let mut tag_end = element.idx + prefix_len;
-    while tag_end < element.len && element.bytes[tag_end] != b'>' {
-        tag_end += 1;
-    }
-    if tag_end >= element.len {
-        return None;
-    }
-    tag_end += 1;
-
-    let (close_start, close_idx) = find_closing_tag_span(element.bytes, tag_end, element.close_tag_name)?;
-
-    let out = output.get_or_insert_with(|| String::with_capacity(element.len));
+    let out = output.get_or_insert_with(|| String::with_capacity(element.input.len()));
     out.push_str(&element.input[element.last..element.idx]);
-    if element.json_ld_exempt && is_json_ld_script_open_tag(&element.input[element.idx..tag_end]) {
-        push_structured_data_script(
-            out,
-            &element.input[element.idx + prefix_len..tag_end],
-            &element.input[tag_end..close_start],
-        );
-        return Some(close_idx);
+    if kept {
+        let attributes = &element.input[element.idx + 1 + name.len()..tag_end];
+        push_kept_element(out, element.name, attributes, body, element.content);
     }
-    if element.idx > 0
-        && close_idx < element.len
-        && !element.bytes[element.idx - 1].is_ascii_whitespace()
-        && !element.bytes[close_idx].is_ascii_whitespace()
+    // ~keep A kept element adds no space of its own: the white space around it is the page's.
+    if !kept
+        && element.idx > 0
+        && close_idx < bytes.len()
+        && !bytes[element.idx - 1].is_ascii_whitespace()
+        && !bytes[close_idx].is_ascii_whitespace()
     {
         out.push(' ');
     }
     Some(close_idx)
 }
 
-/// Write a structured data script in a form the parser reads as one element with one text.
-/// `attributes` is the open tag after its name, with the `>`; `body` is the text of the script.
+/// Write a kept raw-text element in a form the parser reads as one element with one text.
+/// `attributes` is the open tag after its name, with the `>`; `body` is the content.
 ///
-/// ~keep The parser has no raw-text rule: a `<p>` in a JSON string would open an element that
-/// ~keep holds the rest of the page, so each `<` of the body is written as `&lt;`. The metadata
-/// ~keep extraction decodes the reference. The parser also closes an element only with an end
-/// ~keep tag of the same spelling, so the two tag names are written in one spelling: `</SCRIPT>`
-/// ~keep or `</script >` after `<script>` would leave the script open to the end of the page.
-fn push_structured_data_script(out: &mut String, attributes: &str, body: &str) {
-    out.push_str("<script");
-    out.push_str(attributes);
-    for (piece_index, piece) in body.split('<').enumerate() {
-        if piece_index > 0 {
-            out.push_str("&lt;");
-        }
-        out.push_str(piece);
+/// ~keep The parser has no raw-text rule: a `<p>` in the content would open an element that
+/// ~keep holds the rest of the page, so each `<` of the body is written as `&lt;`; the reader
+/// ~keep of the text decodes the reference. A script is raw text: a reference in it is not
+/// ~keep decoded, so each `&` is written as `&amp;` and the one decode of the reader gives the
+/// ~keep text as written. A `textarea` is escapable raw text: its references are decoded, so
+/// ~keep its `&` stays. The parser also closes an element only with an end tag of the same
+/// ~keep spelling, so the two tag names are written in one spelling, and it reads only white
+/// ~keep space after the name, so a `/` or a form feed there is written as a space.
+fn push_kept_element(out: &mut String, name: &str, attributes: &str, body: &str, content: RawTextContent) {
+    let references_are_text = content == RawTextContent::RemovedUnlessStructuredData;
+    out.push('<');
+    out.push_str(name);
+    if matches!(attributes.as_bytes().first(), Some(b'/' | b'\x0C')) {
+        out.push(' ');
+        out.push_str(&attributes[1..]);
+    } else {
+        out.push_str(attributes);
     }
-    out.push_str("</script>");
+    let mut rest = body;
+    while let Some(at) = memchr::memchr2(b'<', b'&', rest.as_bytes()) {
+        out.push_str(&rest[..at]);
+        out.push_str(match rest.as_bytes()[at] {
+            b'<' => "&lt;",
+            _ if references_are_text => "&amp;",
+            _ => "&",
+        });
+        rest = &rest[at + 1..];
+    }
+    out.push_str(rest);
+    out.push_str("</");
+    out.push_str(name);
+    out.push('>');
 }
 
-/// Strip script and style tags and their content from HTML.
+/// The raw-text elements the first pass reads, each with what happens to its content.
+const FIRST_PASS_ELEMENTS: [(&str, RawTextContent); 3] = [
+    ("script", RawTextContent::RemovedUnlessStructuredData),
+    ("style", RawTextContent::Removed),
+    ("textarea", RawTextContent::Kept),
+];
+
+/// Strip script and style tags and their content from HTML, and write the content of a
+/// structured data script and of a `textarea` as text.
 pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
+    strip_raw_text_elements(input, RawTextPage::Source)
+}
+
+/// Strip script and style tags and their content from a page that the HTML tree builder wrote
+/// from the output of [`strip_script_and_style_tags`]. A kept element stays as it is.
+pub fn strip_script_and_style_tags_of_repaired_page(input: &str) -> Cow<'_, str> {
+    strip_raw_text_elements(input, RawTextPage::Repaired)
+}
+
+fn strip_raw_text_elements(input: &str, page: RawTextPage) -> Cow<'_, str> {
     let bytes = input.as_bytes();
     let len = bytes.len();
 
@@ -190,19 +212,19 @@ pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
                 }
             }
 
-            if let Some(new_pos) = strip_raw_text_element(
-                RawTextElement::new(input, idx, last, b"<script", b"script", true),
-                &mut output,
-            ) {
-                last = new_pos;
-                idx = new_pos;
-                continue;
-            }
-
-            if let Some(new_pos) = strip_raw_text_element(
-                RawTextElement::new(input, idx, last, b"<style", b"style", false),
-                &mut output,
-            ) {
+            // ~keep The first name that matches consumes the element; no name is a prefix of another.
+            let consumed = FIRST_PASS_ELEMENTS.iter().find_map(|&(name, content)| {
+                let element = RawTextElement {
+                    input,
+                    idx,
+                    last,
+                    name,
+                    content,
+                    page,
+                };
+                strip_raw_text_element(&element, &mut output)
+            });
+            if let Some(new_pos) = consumed {
                 last = new_pos;
                 idx = new_pos;
                 continue;
@@ -229,30 +251,49 @@ pub fn strip_script_and_style_tags(input: &str) -> Cow<'_, str> {
 /// ~keep the whole document for every such tag.
 const MAX_CLOSING_TAG_SCAN: usize = 100_000_000;
 
-/// If `idx` starts a `</tag>` (or `</tag ...>`, `</tag/>`) closing tag matching `tag` (case-insensitively),
-/// return the index just past its `>`. Returns `None` when `idx` does not start such a tag.
-///
-/// Extracted from `find_closing_tag_bytes`'s inner match — identical boundary checks and
-/// closing-`>` scan, unchanged.
-fn match_closing_tag_at(bytes: &[u8], idx: usize, len: usize, tag: &[u8]) -> Option<usize> {
-    let tag_len = tag.len();
-    if idx + 2 >= len || bytes[idx + 1] != b'/' {
-        return None;
-    }
-    if idx + 2 + tag_len > len || !eq_ascii_insensitive(&bytes[idx + 2..idx + 2 + tag_len], tag) {
-        return None;
-    }
-    let after_tag = idx + 2 + tag_len;
-    // ~keep The HTML rule for the end of raw text: the name, then white space, `/` or `>`.
-    if after_tag >= len || !(matches!(bytes[after_tag], b'>' | b'/') || bytes[after_tag].is_ascii_whitespace()) {
-        return None;
-    }
+/// The side of an element that a tag is on.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum TagSide {
+    /// `<name ...>`
+    Start,
+    /// `</name ...>`
+    End,
+}
 
-    let mut close_idx = after_tag;
-    while close_idx < len && bytes[close_idx] != b'>' {
-        close_idx += 1;
+/// The one rule for the start tag and the end tag of a raw-text element. If the `<` at `lt`
+/// starts a tag of `name` on `side`, return the index after the `>` of the tag.
+///
+/// ~keep The HTML rule: the name in any case, then tab, LF, FF, CR, space, `/` or `>`. The
+/// ~keep first pass, the scan of hidden regions and the fast converter call this function; a
+/// ~keep second copy of the rule is how they came to disagree on the form feed and the slash.
+/// ~keep The second pass (`preprocess_html`) reads only what the first pass leaves: an element
+/// ~keep with no end tag.
+/// ~keep A `>` in a quoted attribute value does not end a start tag. A start tag with a quote
+/// ~keep that never ends, and an end tag, end at the first `>`.
+pub fn raw_text_tag_end(bytes: &[u8], lt: usize, name: &[u8], side: TagSide) -> Option<usize> {
+    if bytes.get(lt) != Some(&b'<') {
+        return None;
     }
-    if close_idx < len { Some(close_idx + 1) } else { None }
+    let name_start = match side {
+        TagSide::Start => lt + 1,
+        TagSide::End if bytes.get(lt + 1) == Some(&b'/') => lt + 2,
+        TagSide::End => return None,
+    };
+    let after_name = name_start + name.len();
+    if !bytes.get(name_start..after_name)?.eq_ignore_ascii_case(name) {
+        return None;
+    }
+    if !matches!(
+        bytes.get(after_name)?,
+        b'\t' | b'\n' | b'\x0C' | b'\r' | b' ' | b'/' | b'>'
+    ) {
+        return None;
+    }
+    let first_bracket = || memchr::memchr(b'>', &bytes[after_name..]).map(|offset| after_name + offset + 1);
+    match side {
+        TagSide::Start => find_tag_end(bytes, after_name).or_else(first_bracket),
+        TagSide::End => first_bracket(),
+    }
 }
 
 /// Find the position of the FIRST closing tag in bytes, ignoring nesting.
@@ -268,31 +309,20 @@ fn match_closing_tag_at(bytes: &[u8], idx: usize, len: usize, tag: &[u8]) -> Opt
 /// ~keep unify the two functions.
 #[inline]
 pub fn find_closing_tag_bytes(bytes: &[u8], start: usize, tag: &[u8]) -> Option<usize> {
-    find_closing_tag_span(bytes, start, tag).map(|(_, end)| end)
+    find_raw_text_end_tag(bytes, start, tag).map(|(_, end)| end)
 }
 
-/// The first closing tag as `find_closing_tag_bytes` finds it: the position of its `<` and the
-/// position after its `>`.
-fn find_closing_tag_span(bytes: &[u8], start: usize, tag: &[u8]) -> Option<(usize, usize)> {
-    let len = bytes.len();
+/// The first end tag of the raw-text element `name` at or after `start`: the position of its
+/// `<` and the position after its `>`. Both converters end a raw-text element here.
+pub fn find_raw_text_end_tag(bytes: &[u8], start: usize, name: &[u8]) -> Option<(usize, usize)> {
     let mut idx = start;
-
-    while idx < len && (idx - start) < MAX_CLOSING_TAG_SCAN {
-        if bytes[idx] != b'<' {
-            if let Some(pos) = memchr::memchr(b'<', &bytes[idx..]) {
-                idx += pos;
-            } else {
-                break;
-            }
+    while idx < bytes.len() && (idx - start) < MAX_CLOSING_TAG_SCAN {
+        idx += memchr::memchr(b'<', &bytes[idx..])?;
+        if let Some(end) = raw_text_tag_end(bytes, idx, name, TagSide::End) {
+            return Some((idx, end));
         }
-
-        if let Some(close_pos) = match_closing_tag_at(bytes, idx, len, tag) {
-            return Some((idx, close_pos));
-        }
-
         idx += 1;
     }
-
     None
 }
 
@@ -366,8 +396,7 @@ pub fn skip_opaque_region(bytes: &[u8], idx: usize) -> Option<usize> {
     }
 
     for raw_text_name in RAW_TEXT_ELEMENT_NAMES {
-        if matches_tag_start(bytes, idx + 1, raw_text_name) {
-            let open_end = find_tag_end(bytes, idx + 1 + raw_text_name.len())?;
+        if let Some(open_end) = raw_text_tag_end(bytes, idx, raw_text_name, TagSide::Start) {
             // ~keep First-match close is the spec terminator for raw text — see
             // ~keep the doc comment on `find_closing_tag_bytes`.
             return Some(find_closing_tag_bytes(bytes, open_end, raw_text_name).unwrap_or(len));
