@@ -68,15 +68,9 @@ fn a_no_break_space_does_not_collapse() {
         ("<h2>one&nbsp;<b>two</b></h2>", "## one **two**\n"),
         ("<pre>one&nbsp;two</pre>", "```\none\u{a0}two\n```\n"),
         ("<pre>one &nbsp;two</pre>", "```\none \u{a0}two\n```\n"),
+        ("<p>one <span>&nbsp;</span> two</p>", "one \u{a0} two\n"),
+        ("<p><b>one\n</b><span>&nbsp;</span>two</p>", "**one** \u{a0}two\n"),
     ]);
-    // ~keep A no-break blank after a space of the source is not written, as before this change
-    // ~keep (the base wrote `one  two`); the space after it is the same run of white space as
-    // ~keep the one before it. The fast converter keeps the no-break space (step 3).
-    assert_written_as_before(&[(
-        "<p>one <span>&nbsp;</span> two</p>",
-        "one two\n",
-        Some("one \u{a0} two\n"),
-    )]);
 }
 
 #[test]

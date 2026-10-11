@@ -15,11 +15,10 @@ use crate::converter::main_helpers::{hard_break_marker, is_inline_element};
 use crate::converter::utility::content::{NextElement, ZERO_WIDTH_SPACE, line_end_before_element};
 use crate::converter::utility::siblings::{
     FollowingContent, br_follows_enclosing_elements, content_starts_with_block, following_sibling_content,
-    get_next_sibling_tag, get_previous_sibling_tag, line_end_precedes, next_sibling_is_inline_tag,
-    zero_width_space_follows,
+    get_next_sibling_tag, get_previous_sibling_tag, next_sibling_is_inline_tag, zero_width_space_follows,
 };
 use crate::converter::utility::white_space::{
-    TextClass, cell_text, classify_text, edges, is_blank, is_collapsible, space_is_owed, visible,
+    TextClass, cell_text, classify_text, edges, is_blank, is_collapsible, space_is_owed, visible, with_line_feeds,
 };
 use crate::text;
 #[cfg(feature = "visitor")]
@@ -88,6 +87,9 @@ struct TextProcessor<'dom, 'output, 'handler> {
 impl TextProcessor<'_, '_, '_> {
     fn process(&mut self, raw: &str) {
         let mut decoded = text::decode_html_entities_cow(raw);
+        if !self.handler.ctx.in_code {
+            decoded = with_line_feeds(decoded);
+        }
         if decoded.is_empty() {
             return;
         }
@@ -180,13 +182,16 @@ impl TextProcessor<'_, '_, '_> {
         if facts.had_newlines {
             self.emit_newline_whitespace(value, facts.was_fresh_block_start);
         } else if !matches!(classify_text(value), TextClass::WhiteSpaceOnly(_)) {
-            // ~keep A blank text that holds a no-break space is written as it is, and not after
-            // ~keep a space of the source: `<b>a</b>&nbsp;<b>b</b>` keeps it, `<li>&nbsp;</li>`
-            // ~keep drops it. The space written for a line end is this change's own
-            // ~keep (`one\n<span>&nbsp;</span>two`): the no-break space after it stays.
-            if !self.output.ends_with(' ') || line_end_precedes(self.node_handle, self.parser, self.handler.dom_ctx) {
-                self.output.push_str(value);
-            }
+            // ~keep A blank text that holds a no-break space is written, whatever white space
+            // ~keep of the source is before it: a browser shows `one <span>&nbsp;</span>two`
+            // ~keep with both spaces. Only its own collapsible white space joins a space
+            // ~keep already written (rule 4). `<li>&nbsp;</li>` is a block start and drops it.
+            let kept = if space_is_owed(self.output) {
+                value
+            } else {
+                value.trim_start_matches(is_collapsible)
+            };
+            self.output.push_str(kept);
         } else if !self.at_block_line_start() && !self.output.ends_with(' ') && !self.after_hard_break() {
             // ~keep A space-only text between two blocks of a quote (`<p>8</p> <p>0</p>`) is a
             // ~keep line of one space, as before this change: only the block's own buffer

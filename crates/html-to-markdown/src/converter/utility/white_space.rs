@@ -40,6 +40,57 @@ pub const fn is_collapsible(character: char) -> bool {
     matches!(character, ' ' | '\t' | '\n' | '\r')
 }
 
+/// `decoded` with every carriage return a line feed: `\r\n` and `\r` are one `\n`.
+///
+/// ~keep In running text a carriage return is the same line end as a line feed, as a
+/// ~keep character or as a reference (`one&#13;`): both converters ask here. Neither asks for
+/// ~keep the text of code or `pre`, which is written as it is.
+#[must_use]
+pub fn with_line_feeds(decoded: Cow<'_, str>) -> Cow<'_, str> {
+    if decoded.contains('\r') {
+        Cow::Owned(decoded.replace("\r\n", "\n").replace('\r', "\n"))
+    } else {
+        decoded
+    }
+}
+
+/// The source text `source` with every character reference to collapsible white space written
+/// as the character it stands for (`&#10;`, `&#xA;`, `&NewLine;`, `&#13;`, `&#32;`, `&Tab;`).
+/// A carriage return stays one: outside code the caller asks [`with_line_feeds`].
+///
+/// ~keep The fast converter decides on source text and decodes it when it writes it. With this
+/// ~keep form every decision it makes on white space reads what the full converter reads in
+/// ~keep its decoded text. No other reference is decoded, so the text is never decoded twice:
+/// ~keep `&amp;#10;` stays the text `&#10;`. A reference without its `;` stays too: the fast
+/// ~keep converter gives that page to the full one.
+#[must_use]
+pub fn with_white_space_references_decoded(source: &str) -> Cow<'_, str> {
+    let mut buffer: Option<String> = None;
+    let mut copied = 0;
+    let mut from = 0;
+    while let Some(found) = source[from..].find('&') {
+        let amp = from + found;
+        from = amp + 1;
+        let Some((end, character, None)) = text::decode_character_reference(source, amp, text::ReferenceContext::Text)
+        else {
+            continue;
+        };
+        if !is_collapsible(character) || !source[..end].ends_with(';') {
+            continue;
+        }
+        let target = buffer.get_or_insert_with(|| String::with_capacity(source.len()));
+        target.push_str(&source[copied..amp]);
+        target.push(character);
+        copied = end;
+        from = end;
+    }
+    let Some(mut decoded) = buffer else {
+        return Cow::Borrowed(source);
+    };
+    decoded.push_str(&source[copied..]);
+    Cow::Owned(decoded)
+}
+
 /// A run of collapsible white space at an edge of a text.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Run {
@@ -220,6 +271,55 @@ mod tests {
     fn a_cell_text_folds_a_line_end_to_a_space_and_keeps_its_edges() {
         assert_eq!(cell_text(" one\n\u{a0}two "), " one two ");
         assert_eq!(cell_text("quick \u{a0} amet"), "quick amet");
+    }
+
+    #[test]
+    fn a_reference_to_collapsible_white_space_is_written_as_the_character() {
+        for (source, decoded) in [
+            ("one&#10;", "one\n"),
+            ("one&#xA;two", "one\ntwo"),
+            ("&#x0a;", "\n"),
+            ("one&NewLine;", "one\n"),
+            ("one&#13;", "one\r"),
+            ("one&#13;&#10;two", "one\r\ntwo"),
+            ("one&#32;&Tab;&#9;two", "one \t\ttwo"),
+            ("a &amp; b&#10;", "a &amp; b\n"),
+            ("é&#10;é", "é\né"),
+        ] {
+            assert_eq!(with_white_space_references_decoded(source), decoded, "{source:?}");
+        }
+    }
+
+    #[test]
+    fn a_text_with_no_reference_to_collapsible_white_space_is_not_changed() {
+        for source in [
+            "",
+            "one\n",
+            "one &",
+            "one&amp;#10;",
+            "one&nbsp;",
+            "one&#12;",
+            "one&#8203;",
+            "one&NewLines;",
+            "one&#10",
+        ] {
+            assert!(
+                matches!(with_white_space_references_decoded(source), Cow::Borrowed(same) if same == source),
+                "{source:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_carriage_return_is_a_line_feed() {
+        assert_eq!(
+            with_line_feeds(Cow::Borrowed("one\r\ntwo\rthree\n")),
+            "one\ntwo\nthree\n"
+        );
+        assert!(matches!(
+            with_line_feeds(Cow::Borrowed("one\n")),
+            Cow::Borrowed("one\n")
+        ));
     }
 
     #[test]

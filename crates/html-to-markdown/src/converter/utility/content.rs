@@ -4,6 +4,7 @@
 //! and empty element detection.
 
 use crate::converter::utility::escaping::is_block_level_name;
+use crate::converter::utility::white_space::is_collapsible;
 use crate::text;
 use std::borrow::Cow;
 #[cfg(feature = "visitor")]
@@ -196,33 +197,16 @@ pub const fn line_end_before_element(in_running_text: bool, next: NextElement) -
 }
 
 /// The source text `raw` without the white space at its end, when that white space holds a
-/// line end and other text is before it. A character reference to white space is white space:
-/// `one&#10;` and `one\n&#32;` end with a line end as `one\n` does.
+/// line end and other text is before it.
 ///
-/// ~keep Tier-1 holds source text and decodes it when it writes it, so this removes source
-/// ~keep bytes and decodes only the last reference of each turn to read it. The text is never
-/// ~keep decoded twice: `&amp;#10;` is the text `&#10;`, not a line end.
+/// ~keep Tier-1 gives its text with the references to white space already written as
+/// ~keep characters (`with_white_space_references_decoded`), so `one&#10;` and `one\n&#32;`
+/// ~keep end with a line end here as `one\n` does. This function decodes nothing: one decoder
+/// ~keep reads a reference, and `&amp;#10;` stays the text `&#10;`.
 #[must_use]
 pub fn without_trailing_line_end_in_source(raw: &str) -> Option<&str> {
-    const WHITE_SPACE: [char; 4] = [' ', '\t', '\n', '\r'];
-
-    let mut kept = raw;
-    let mut has_line_end = false;
-    loop {
-        let trimmed = kept.trim_end_matches(WHITE_SPACE);
-        has_line_end |= kept[trimmed.len()..].contains('\n');
-        kept = trimmed;
-        let Some(start) = kept.rfind('&') else {
-            break;
-        };
-        let reference = text::decode_html_entities_cow(&kept[start..]);
-        if reference.is_empty() || !reference.chars().all(|character| WHITE_SPACE.contains(&character)) {
-            break;
-        }
-        has_line_end |= reference.contains('\n');
-        kept = &kept[..start];
-    }
-    (has_line_end && !kept.is_empty()).then_some(kept)
+    let kept = raw.trim_end_matches(is_collapsible);
+    (raw[kept.len()..].contains('\n') && !kept.is_empty()).then_some(kept)
 }
 
 /// Whether the source text `raw` ends with a zero-width space, written as the character or as
@@ -559,6 +543,7 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
 #[cfg(test)]
 mod tests {
     use super::{ends_with_zero_width_space_in_source, without_trailing_line_end_in_source};
+    use crate::converter::utility::white_space::with_white_space_references_decoded;
 
     #[test]
     fn a_source_text_that_ends_with_a_line_end_loses_its_trailing_white_space() {
@@ -579,7 +564,8 @@ mod tests {
             ("one &\n", "one &"),
             ("é&#10;", "é"),
         ] {
-            assert_eq!(without_trailing_line_end_in_source(raw), Some(kept), "{raw:?}");
+            let text = with_white_space_references_decoded(raw);
+            assert_eq!(without_trailing_line_end_in_source(&text), Some(kept), "{raw:?}");
         }
     }
 
@@ -602,7 +588,8 @@ mod tests {
             "&#10;",
             "&#32;&#10;\n",
         ] {
-            assert_eq!(without_trailing_line_end_in_source(raw), None, "{raw:?}");
+            let text = with_white_space_references_decoded(raw);
+            assert_eq!(without_trailing_line_end_in_source(&text), None, "{raw:?}");
         }
     }
 

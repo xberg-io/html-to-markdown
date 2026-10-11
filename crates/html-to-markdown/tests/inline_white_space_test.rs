@@ -198,19 +198,104 @@ fn a_no_break_space_stays_after_a_line_end_that_a_comment_follows() {
     ]);
 }
 
-/// A space of the source decides as before on the full converter, with a comment after it too.
+/// White space of the source before an element that holds a no-break space is one space, and
+/// the no-break space stays, as a browser shows it: in every spelling of the white space, in
+/// every container, on both converters.
 ///
-/// ~keep The two converters differ for these inputs, at the base too: the fast converter keeps
-/// ~keep the no-break space. This test pins only that the line end rule leaves the full one alone.
+/// ~keep A carriage return reaches a text only as a reference and is a line end. A comment is
+/// ~keep no text, before, after or between the white space. An indent after a line end is the
+/// ~keep same run of white space.
 #[test]
-fn a_no_break_space_goes_after_a_space_of_the_source_in_every_spelling() {
-    for html in [
-        "<p>one <span>&nbsp;</span>two</p>",
-        "<p>one&#32;<span>&nbsp;</span>two</p>",
-        "<p>one <!--c--><span>&nbsp;</span>two</p>",
-    ] {
-        assert_eq!(tier2(html), "one two\n", "{html}");
-    }
+fn white_space_before_a_no_break_space_is_one_space_in_every_spelling_and_container() {
+    const SPELLINGS: [&str; 22] = [
+        "\n",
+        "\r",
+        "\r\n",
+        " ",
+        "\t",
+        "&#10;",
+        "&#xA;",
+        "&#x0a;",
+        "&NewLine;",
+        "&#13;",
+        "&#13;&#10;",
+        "&#32;",
+        "&Tab;",
+        "\n  ",
+        "&#10;&#32;&#32;",
+        "<!--c-->\n",
+        "\n<!--c-->",
+        "<!--c-->&#10;",
+        "&#10;<!--c-->",
+        "\n<!--c--> ",
+        " <!--c-->",
+        "<!--c-->&#32;<!--d-->",
+    ];
+    let containers: [(&str, &str, &str, &str); 4] = [
+        ("<p>", "</p>", "", "\n"),
+        ("<ul><li>", "</li></ul>", "- ", "\n"),
+        ("<h2>", "</h2>", "## ", "\n"),
+        (
+            "<table><tr><th>h</th></tr><tr><td>",
+            "</td></tr></table>",
+            "| h        |\n| -------- |\n| ",
+            " |\n",
+        ),
+    ];
+    let cases: Vec<(String, String)> = containers
+        .iter()
+        .flat_map(|(open, close, before, after)| {
+            SPELLINGS.iter().map(move |white_space| {
+                (
+                    format!("{open}one{white_space}<span>&nbsp;</span>two{close}"),
+                    format!("{before}one \u{a0}two{after}"),
+                )
+            })
+        })
+        .collect();
+    assert_eq!(cases.len(), 88);
+    let cases: Vec<(&str, &str)> = cases
+        .iter()
+        .map(|(html, expected)| (html.as_str(), expected.as_str()))
+        .collect();
+    assert_on_both(&cases);
+}
+
+/// Inside `pre` no rule for running text applies: every spelling of a line end is one line end
+/// and the no-break space stays. A carriage return reference is written as before this file's
+/// rules (no browser output is recorded for it).
+#[test]
+fn a_line_end_before_a_no_break_space_in_pre_is_written_as_it_is() {
+    let cases: Vec<(String, &str)> = ["\n", "&#10;", "&#xA;", "&#x0a;", "&NewLine;", "<!--c-->&#10;"]
+        .iter()
+        .map(|line_end| {
+            (
+                format!("<pre>one{line_end}<span>&nbsp;</span>two</pre>"),
+                "```\none\n\u{a0}two\n```\n",
+            )
+        })
+        .collect();
+    let cases: Vec<(&str, &str)> = cases
+        .iter()
+        .map(|(html, expected)| (html.as_str(), *expected))
+        .collect();
+    assert_on_both(&cases);
+    assert_written_as_before(&[(
+        "<pre>one&#13;<span>&nbsp;</span>two</pre>",
+        "```\none\r\u{a0}two\n```\n",
+        Some("```\none\r\u{a0}two\n```\n"),
+    )]);
+}
+
+/// A text of one reference to a line end is white space between two elements, as the line end.
+#[test]
+fn a_line_end_written_as_a_reference_between_two_elements_is_one_space() {
+    assert_on_both(&[
+        ("<p><code>a</code>&#10;<code>b</code></p>", "`a` `b`\n"),
+        ("<p><code>a</code>\n<code>b</code></p>", "`a` `b`\n"),
+        ("<p><b>a</b>&#13;<b>b</b></p>", "**a** **b**\n"),
+        ("<p><b>a</b><!--c-->&#xA;<b>b</b></p>", "**a** **b**\n"),
+    ]);
 }
 
 /// The element that follows the line end holds text: the same space in each container.

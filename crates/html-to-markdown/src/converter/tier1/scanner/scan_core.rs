@@ -80,21 +80,21 @@ impl<'a> Tier1Scanner<'a> {
             return Ok(());
         }
         self.state.start_body(self.text_start);
+        // ~keep Every decision on this text reads the white space of the source as characters,
+        // ~keep as the full converter reads its decoded text: `&#10;` alone is white space.
+        let html = self.html;
+        let text = text_for_decisions(&html[self.text_start..self.pos], &self.state);
         let is_inline = upcoming_tag_is_inline(self.bytes, self.pos);
         // ~keep Only a text with content asks: white space alone takes its own path in
         // ~keep `flush_text`. A form feed is white space here, so a text of form feeds and
         // ~keep line ends keeps its line end before the comments.
-        let inline_follows_comments = !self.bytes[self.text_start..self.pos]
-            .iter()
-            .all(u8::is_ascii_whitespace)
-            && inline_follows_comments(self.bytes, self.pos);
+        let inline_follows_comments =
+            !text.bytes().all(|byte| byte.is_ascii_whitespace()) && inline_follows_comments(self.bytes, self.pos);
         // ~keep Both scans of the markup ahead decide what a line end at the end of the text
         // ~keep becomes, so a text that ends with no line end does not scan: each scan passes
         // ~keep the open tags of the elements that only wrap text, and a run of them on every
         // ~keep text made the converter four times slower on deep nesting.
-        let before_line_end = crate::converter::utility::content::without_trailing_line_end_in_source(
-            &self.html[self.text_start..self.pos],
-        );
+        let before_line_end = crate::converter::utility::content::without_trailing_line_end_in_source(&text);
         let ends_with_line_end = before_line_end.is_some();
         let upcoming = UpcomingTextSibling {
             is_list: upcoming_tag_is_list_open(self.bytes, self.pos),
@@ -113,7 +113,7 @@ impl<'a> Tier1Scanner<'a> {
         flush_text(
             &mut self.state,
             TextFlush {
-                raw: &self.html[self.text_start..self.pos],
+                raw: &text,
                 base_offset: self.text_start,
                 upcoming,
                 br_in_tables: self.options.br_in_tables,
@@ -663,6 +663,19 @@ fn push_open_frame(
     });
 }
 
+/// The source text `source` as the decisions on it read it: with its references to white space
+/// decoded and, outside code and `pre`, each carriage return a line feed.
+fn text_for_decisions<'source>(source: &'source str, state: &Tier1State) -> std::borrow::Cow<'source, str> {
+    use crate::converter::utility::white_space::{with_line_feeds, with_white_space_references_decoded};
+
+    let text = with_white_space_references_decoded(source);
+    if state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE) {
+        text
+    } else {
+        with_line_feeds(text)
+    }
+}
+
 /// ~keep EOF closes open frames, then applies Tier-2's trim/collapse/trailing-newline order.
 fn finish_scan(
     mut state: Tier1State,
@@ -673,10 +686,11 @@ fn finish_scan(
     mut table_probes: Vec<TableLayoutProbe>,
 ) -> Result<ScanOutput, BailReason> {
     if text_start < pos {
+        let text = text_for_decisions(&html[text_start..pos], &state);
         flush_text(
             &mut state,
             TextFlush {
-                raw: &html[text_start..pos],
+                raw: &text,
                 base_offset: text_start,
                 upcoming: UpcomingTextSibling::default(),
                 br_in_tables: options.br_in_tables,
