@@ -90,3 +90,21 @@ include_outputs = false
 [lint]
 # ~keep Alef publishes the canonical html-to-markdown MCP reference as the mcp skill.
 allow_overrides = ["claude:mcp", "python-conventions"]
+
+# Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
+[[lint.ignore_rules]]
+rules = ["AR701"]
+paths = [
+  ".claude/skills/*/SKILL.md",
+  ".codex/skills/*/SKILL.md",
+  ".github/skills/*/SKILL.md",
+  "plugin/.cursor-plugin/skills/*/SKILL.md",
+  "plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/*/SKILL.md",
+  "plugin/.hermes/plugins/html-to-markdown/skills/*/SKILL.md",
+  "plugin/.opencode/skills/*/SKILL.md",
+  "plugin/.pi/skills/*/SKILL.md",
+  "plugin/skills/*/SKILL.md",
+  # The generated root skills/. A bare skills/ pattern also matches the authored skills. ~keep
+  "../skills/*/SKILL.md",
+]
+reason = "The generated harness and plugin copies repeat the source skill descriptions and names. ai-rulez counts each copy as a duplicate."

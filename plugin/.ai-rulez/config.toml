@@ -6,3 +6,31 @@ description = "Fast, lossless HTML→Markdown conversion with structured metadat
 agents_md = false
 # Pinned by `ai-rulez migrate v5`: the 4.x default. Remove this line to take the v5 default.
 gitignore = true
+
+[lint]
+# The repository MCP reference intentionally keeps the Claude /mcp name. ~keep
+allow_overrides = ["claude:mcp"]
+
+# Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
+[[lint.ignore_rules]]
+rules = ["AR701"]
+paths = [
+  ".claude/skills/*/SKILL.md",
+  ".codex/skills/*/SKILL.md",
+  ".github/skills/*/SKILL.md",
+]
+reason = "The generated harness and plugin copies repeat the source skill descriptions and names. ai-rulez counts each copy as a duplicate."
+
+[[lint.ignore_rules]]
+rules = ["AR701", "AR703"]
+paths = [
+  "plugin/.cursor-plugin/skills/*/SKILL.md",
+  "plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/*/SKILL.md",
+  "plugin/.hermes/plugins/html-to-markdown/skills/*/SKILL.md",
+  "plugin/.opencode/skills/*/SKILL.md",
+  "plugin/.pi/skills/*/SKILL.md",
+  "plugin/skills/*/SKILL.md",
+  # The generated root skills/. A bare skills/ pattern also matches the authored skills. ~keep
+  "../../skills/*/SKILL.md",
+]
+reason = "The generated harness and plugin copies repeat the source skill descriptions and names. ai-rulez counts each copy as a duplicate."
