@@ -80,7 +80,8 @@ html-to-markdown is written following strict AI engineering practices. That is, 
 
 ### Conventions
 
-Use `ai-rulez` 5.6.0, the version that CI and the Taskfile pin, to manage agent conventions. Edit authored content under
+Use `ai-rulez` 5.6.0, the version that CI and the Taskfile pin, to manage agent conventions. Install it with
+`uv tool install ai-rulez==5.6.0`. Edit authored content under
 `.ai-rulez/`; `AGENTS.md`, `CLAUDE.md` and harness directories are generated outputs.
 The main `config.toml` selects the `plugins` layer through `default_layers`; marketplace and
 plugin settings live separately in `config.plugins.toml`.

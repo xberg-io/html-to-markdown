@@ -104,6 +104,7 @@ paths = [
   "plugin/.opencode/skills/*/SKILL.md",
   "plugin/.pi/skills/*/SKILL.md",
   "plugin/skills/*/SKILL.md",
-  "skills/*/SKILL.md",
+  # The generated root skills/. A bare skills/ pattern also matches the authored skills. ~keep
+  "../skills/*/SKILL.md",
 ]
 reason = "The generated harness and plugin copies repeat the source skill descriptions and names. ai-rulez counts each copy as a duplicate."
