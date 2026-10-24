@@ -44,6 +44,10 @@ includes:
     taskfile: ./.task/tools/general.yml
     flatten: true
 
+vars:
+  # One pin for every task that runs ai-rulez. Keep it equal to ai-rulez-version in the workflows. ~keep
+  AI_RULEZ: "uvx --from ai-rulez==5.6.0 ai-rulez"
+
 tasks:
   setup:
     desc: "Install all dependencies and dev tools"
@@ -797,7 +801,7 @@ tasks:
   governance:check:
     desc: Check materialized local governance outputs against shared sources
     cmds:
-      - ai-rulez generate --check --no-local --strict-config
+      - "{{.AI_RULEZ}} generate --check --no-local --strict-config"
 
   plugin:skills:test:
     desc: Verify public skill ownership and resource freshness

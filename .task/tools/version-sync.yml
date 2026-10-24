@@ -6,7 +6,6 @@ includes:
 
 vars:
   ALEF: "alef"
-  AI_RULEZ: "ai-rulez"
 
 tasks:
   sync:

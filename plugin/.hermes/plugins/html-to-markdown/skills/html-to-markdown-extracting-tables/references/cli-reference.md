@@ -1,7 +1,7 @@
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:3993e4b317a6c78412510e4877f8933e859447c2abd5fe194628f53d4637ed02
-Source-Hash: blake3:4237e14c4d547597faf915235dde5b5d71e8c9d84681d23919d03302b738a0b4
+Content-Hash: blake3:7b31116c0675aa5e751006468a8dfc11c3aee55c4d5cfeec6d8b8eaedc43dd98
+Source-Hash: blake3:2290eb4aca943fca5f8b3f078e648d3eb491b0cbedbe12d41657117cfd30334c
 Schema-Version: v1
 -->
 
@@ -14,8 +14,8 @@ Binary name: `html-to-markdown`
 ```bash
 brew install xberg-io/tap/html-to-markdown
 # or run without a persistent install (self-installs the binary):
-pnpm dlx @xberg-io/html-to-markdown-cli --help
-uvx --from html-to-markdown html-to-markdown --help
+pnpm dlx @xberg-io/html-to-markdown-cli@0.0.1 --help
+uvx --from html-to-markdown==3.18.6 html-to-markdown --help
 # or build from source:
 cargo install html-to-markdown-cli
 ```
