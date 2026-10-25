@@ -14,11 +14,7 @@ allow_overrides = ["claude:mcp"]
 # Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
 [[lint.ignore_rules]]
 rules = ["AR701"]
-paths = [
-  ".claude/skills/*/SKILL.md",
-  ".codex/skills/*/SKILL.md",
-  ".github/skills/*/SKILL.md",
-]
+paths = [".claude/skills/*/SKILL.md", ".codex/skills/*/SKILL.md", ".github/skills/*/SKILL.md"]
 reason = "The generated harness and plugin copies repeat the source skill descriptions and names. ai-rulez counts each copy as a duplicate."
 
 [[lint.ignore_rules]]
