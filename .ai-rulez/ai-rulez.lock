@@ -4,7 +4,7 @@
 version = 1
 ai_rulez_version = '5.6.3'
 scope = 'all'
-tree = 'sha256:a7f8e44d76744233dc2ff8a183e3ced29708a12256f0af09b946a98432ec26d2'
+tree = 'sha256:1b773827ac4029c4319bf266207d91830ea2a3337e816e8ec964d730f3d1c0ec'
 
 [[include]]
 name = 'xberg-cicd'
@@ -122,10 +122,16 @@ commit = 'bca4b4e8f1f198bef25308aaabf7a2c238a387a3'
 digest = 'sha256:2a09247d65e936b055a2cde9f4aae3bd92195b702bd4fcdd5bb276a9dcd9d6ac'
 
 [[served]]
+name = 'core-conversion-architecture'
+source = '.ai-rulez/skills/core-conversion-architecture/SKILL.md'
+commit = ''
+digest = 'sha256:057875e47a4361286128d753745b656a921fe6c0e13988b07374730a79e440ba'
+
+[[served]]
 name = 'crate-structure'
 source = '.ai-rulez/skills/crate-structure/SKILL.md'
 commit = ''
-digest = 'sha256:ea629bbe4cab2d67a4e25202e95d43a47dd4f4a15c48ade2b97e346a161779dd'
+digest = 'sha256:a411663247725978a781a5eb39b41d436bd99a0cf537899329b3ae560148a495'
 
 [[served]]
 name = 'create-e2e-fixture'
@@ -269,13 +275,7 @@ digest = 'sha256:552648a1d89cccb6bc3d47cb25f3b6355f75a104936fc70668fdb6167868c96
 kind = 'rule'
 id = 'alef-generated-bindings'
 path = 'rules/alef-generated-bindings.md'
-digest = 'sha256:117a91f0b493fa6947d440c352beefcfb95e8da8032015195c86a7f4c44c291b'
-
-[[item]]
-kind = 'rule'
-id = 'typescript-conventions'
-path = 'rules/typescript-conventions.md'
-digest = 'sha256:0dc2cd57a3b548383c7de9945ad7d8b31f2e6470c7af6027ea483dd1a6182eaa'
+digest = 'sha256:2cef83a4abc74dc467bb7cb58cf62bed087961f4b48f1a8ea5b9ca7215dfff90'
 
 [[item]]
 kind = 'settings'
@@ -284,6 +284,12 @@ digest = 'sha256:0c3ec1142275bddbddcc03caadc03358528d1b6a97aca401bc75e4471ba346c
 
 [[item]]
 kind = 'skill'
+id = 'core-conversion-architecture'
+path = 'skills/core-conversion-architecture'
+digest = 'sha256:6b02c053a10e789c6d13a717d23709085308d68145f416de21e96eb1147d4e89'
+
+[[item]]
+kind = 'skill'
 id = 'crate-structure'
 path = 'skills/crate-structure'
-digest = 'sha256:788fb164a7bc37a818b859fa82e9050b896b1c987e548c1d765791d0a8ccabb2'
+digest = 'sha256:4571b6b2cda809b2cce6e6147d85435fbad21a7d7c64f51d7028fbf56c46f160'
