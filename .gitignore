@@ -338,7 +338,6 @@ bin/
 .github/instructions/systematic-debugging.instructions.md
 .github/instructions/targeted-verification.instructions.md
 .github/instructions/test-alongside-code.instructions.md
-.github/instructions/typescript-conventions.instructions.md
 .github/instructions/typescript.instructions.md
 .github/instructions/verification-before-completion.instructions.md
 .github/instructions/wasm.instructions.md
