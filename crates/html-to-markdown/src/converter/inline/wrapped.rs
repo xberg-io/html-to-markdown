@@ -447,7 +447,15 @@ pub fn emit_wrapped_inline(
     // ~keep A blank wrapper after real strong markup remains a separator (#502/#504).
     // DOM provenance plus the configured close marker excludes marker-looking prose.
     let content = strong_separator_content(output, moved, keeps_hard_break(content, site), site);
-    let (prefix, suffix, trimmed) = chomp_inline(content);
+    let (mut prefix, mut suffix, trimmed) = chomp_inline(content);
+    if options.whitespace_mode == crate::options::WhitespaceMode::Normalized && !trimmed.is_empty() {
+        if content.starts_with(crate::text::is_unicode_space) {
+            prefix = " ";
+        }
+        if content.ends_with(crate::text::is_unicode_space) {
+            suffix = " ";
+        }
+    }
     if emit_break_sentinel(output, content, ctx, options) {
         return;
     }

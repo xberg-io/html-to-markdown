@@ -421,12 +421,9 @@ impl LinkData {
             link_allow_inline_images: handler.context.keep_inline_images_in.contains("a"),
             same_page_fragment,
             names_place: href.split_once('#').is_some_and(|(_, fragment)| !fragment.is_empty()),
-            // ~keep White space alone is content of a link to another page, not an empty wrapper:
-            // ~keep the address names that link. A link into its own page gets no such label, so
-            // ~keep white space and comments are no content there, as for a link with no child
-            // ~keep (#851).
+            // ~keep Bare and formatted white space separate words without inventing URL text (#932).
             empty_span_content: !children.is_empty()
-                && (same_page_fragment || holds_element)
+                && (same_page_fragment || holds_element || !text_source.text.is_empty())
                 && children
                     .iter()
                     .all(|child| empty_text_wrapper_child(child, handler.parser)),
@@ -758,6 +755,18 @@ fn write_link_with_edges(
         && !is_fresh_block_start(handler.context, handler.context.at_fresh_block_start.get())
     {
         push_inline_prefix(handler.output, data.text_edges.0, handler.options, handler.context);
+    }
+    if data.saw_block
+        && !data.emit_blocks_separately
+        && crate::converter::utility::siblings::get_previous_sibling_tag(
+            handler.node_handle,
+            handler.parser,
+            handler.dom_context,
+        ) == Some("a")
+        && !handler.output.is_empty()
+        && !handler.output.ends_with(char::is_whitespace)
+    {
+        handler.output.push(' ');
     }
     write_with_edges(edges, handler, |handler| {
         write_link(handler.output, tag, data, label, handler.options, handler.context);
