@@ -29,7 +29,7 @@ fn should_keep_a_source_formatted_fraction_in_its_paragraph() {
         .expect("math conversion should succeed")
         .content
         .unwrap_or_default();
-    assert_eq!(actual, "a dxdy b\n");
+    assert_eq!(actual, "a (dx)/(dy) b\n");
 }
 
 #[test]

@@ -208,18 +208,18 @@ fn whitespace_only_wrappers_preserve_space_outside_the_empty_link() {
     assert_on_each_converter(&[
         (
             "<p>Press<a href=\"/p\"> </a>now</p>",
-            "Press[/p](/p)now\n",
-            Some("Press[](/p)now\n"),
+            "Press [](/p)now\n",
+            Some("Press [](/p)now\n"),
         ),
         (
             "<p>Press <a href=\"/p\"> </a>.</p>",
-            "Press [/p](/p).\n",
+            "Press [](/p).\n",
             Some("Press [](/p).\n"),
         ),
         (
             "<p>Press<a href=\"/p\">&nbsp;</a>now</p>",
-            "Press[/p](/p)now\n",
-            Some("Press[](/p)now\n"),
+            "Press [](/p)now\n",
+            Some("Press [](/p)now\n"),
         ),
         (
             // ~keep Issue #771 decides: before the sync this row had the address as the label.

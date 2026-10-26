@@ -28,23 +28,6 @@ on:
       - ".task/tools/version-sync.yml"
       - "scripts/tests/**"
       - ".github/workflows/ci-plugin.yaml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "Cargo.toml"
-      - "plugin/**"
-      - "skills/**"
-      - "scripts/sync_public_skills.py"
-      - "scripts/tests/test_public_skills.py"
-      - "scripts/tests/test_mcp_launcher_cwd.py"
-      - "package.json"
-      - ".claude-plugin/**"
-      - ".agents/plugins/**"
-      - ".ai-rulez/config*.toml"
-      - "scripts/sync_plugin_version.py"
-      - ".task/tools/version-sync.yml"
-      - "scripts/tests/**"
-      - ".github/workflows/ci-plugin.yaml"
   workflow_dispatch:
 
 # ~keep `github.sha` not `github.ref` for pushes: a cancelled run reports neither pass

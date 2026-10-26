@@ -11,6 +11,7 @@ pub mod attributes;
 pub mod caching;
 pub mod content;
 pub mod escaping;
+mod math;
 pub mod preprocessing;
 pub mod serialization;
 pub mod siblings;

@@ -71,6 +71,13 @@ pub fn open(handler: HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> 
 pub fn close(content: &str, mut handler: HandlerContext<'_>) {
     use crate::converter::{append_inline_suffix, chomp_inline};
 
+    if !content.is_empty()
+        && content.bytes().all(|byte| byte == b'\n')
+        && handler.options.whitespace_mode == crate::options::WhitespaceMode::Normalized
+    {
+        crate::converter::inline::wrapped::emit_whitespace_only_inline_body(content, handler.output);
+        return;
+    }
     let normalized = text::normalize_whitespace(content);
     let (prefix, suffix, trimmed) = chomp_inline(&normalized);
 

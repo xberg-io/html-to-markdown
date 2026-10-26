@@ -877,7 +877,12 @@ impl crate::converter::walk::ChildHook for LabelHook {
     fn close(self: Box<Self>, site: &mut crate::converter::walk::HookSite<'_>) {
         let trimmed = self.content.trim();
         if trimmed.is_empty() {
+            crate::converter::inline::wrapped::emit_whitespace_only_inline_body(&self.content, site.output);
             return;
+        }
+        if self.content.trim_start_matches([' ', '\t']).starts_with('\n') && !site.output.is_empty() {
+            site.output
+                .push_str(crate::converter::main_helpers::hard_break_marker(site.options));
         }
         let start = ControlStart::new(site.output);
         site.output.push_str(trimmed);
@@ -886,8 +891,9 @@ impl crate::converter::walk::ChildHook for LabelHook {
         {
             start.finish(site.output);
         }
-        if self.content.ends_with([' ', '\t']) {
-            site.output.push(' ');
+        let (_, suffix, _) = crate::converter::chomp_inline(&self.content);
+        if !suffix.is_empty() {
+            site.output.push_str(suffix);
         }
     }
 }
