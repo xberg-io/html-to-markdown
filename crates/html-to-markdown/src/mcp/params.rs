@@ -96,6 +96,8 @@ pub struct ConvertConfig {
     pub preserve_tags: Option<Vec<String>>,
     /// Omit all `<img>` elements from the output. Default `false`.
     pub skip_images: Option<bool>,
+    /// Use link accessibility-name fallbacks and SVG labels. Default `true`.
+    pub use_accessible_names: Option<bool>,
     /// What to write for an image or media element whose address is a `data:` URL:
     /// `"keep"` (default, the URL with its payload), `"alt_text_only"`, or `"drop_element"`.
     pub inline_data_media: Option<String>,
@@ -362,6 +364,7 @@ impl ConvertConfig {
         update.strip_tags = self.strip_tags.take();
         update.preserve_tags = self.preserve_tags.take();
         update.skip_images = self.skip_images.take();
+        update.use_accessible_names = self.use_accessible_names.take();
         update.inline_data_media = validated_enum(
             "inline_data_media",
             self.inline_data_media.take(),
@@ -694,6 +697,36 @@ mod tests {
         let opts: ConversionOptions = config.try_into().expect("no enum fields set");
         assert!(!opts.expand_abbreviations);
         assert!(!opts.include_blockquote_citations);
+    }
+
+    #[test]
+    fn should_pass_accessible_name_policy_from_schema_to_conversion() {
+        let html = r##"<p>see <a href="https://example.com/x">GitHub<svg aria-label="(opens in new tab)"><use href="#ext"></use></svg></a> now</p>"##;
+        for (config, enabled, expected) in [
+            (
+                serde_json::json!({"inline_data_media": "alt_text_only"}),
+                true,
+                "see [GitHub (opens in new tab)](https://example.com/x) now\n",
+            ),
+            (
+                serde_json::json!({"inline_data_media": "alt_text_only", "use_accessible_names": false}),
+                false,
+                "see [GitHub](https://example.com/x) now\n",
+            ),
+        ] {
+            let config: ConvertConfig = serde_json::from_value(config).expect("accessible-name policy is accepted");
+            let options = ConversionOptions::try_from(config).expect("valid options");
+            assert_eq!(options.use_accessible_names, enabled);
+            assert_eq!(
+                crate::convert(html, Some(options)).unwrap().content.as_deref(),
+                Some(expected)
+            );
+        }
+        let schema = serde_json::to_value(schemars::schema_for!(ConvertConfig)).unwrap();
+        assert_eq!(
+            schema["properties"]["use_accessible_names"]["type"],
+            serde_json::json!(["boolean", "null"])
+        );
     }
 
     #[test]
