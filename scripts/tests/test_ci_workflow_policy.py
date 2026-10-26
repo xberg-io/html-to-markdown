@@ -21,18 +21,19 @@ def test_docs_pushes_use_commit_specific_concurrency_groups() -> None:
     }
 
 
-def test_r_configure_changes_start_lint_for_pushes_and_pull_requests() -> None:
+def test_r_configure_changes_start_lint_only_for_main_pushes() -> None:
     workflow = _workflow("ci-lint.yaml")
 
-    for event in ("push", "pull_request"):
-        assert "packages/r/configure" in workflow["on"][event]["paths"]
+    assert workflow["on"]["push"]["branches"] == ["main"]
+    assert "packages/r/configure" in workflow["on"]["push"]["paths"]
+    assert not any(event.startswith("pull_request") for event in workflow["on"])
 
 
-def test_e2e_result_reports_for_every_push_and_pull_request() -> None:
+def test_e2e_result_reports_for_every_main_push() -> None:
     workflow = _workflow("ci-e2e.yaml")
 
-    for event in ("push", "pull_request"):
-        assert set(workflow["on"][event]) == {"branches"}
+    assert workflow["on"]["push"] == {"branches": ["main"]}
+    assert not any(event.startswith("pull_request") for event in workflow["on"])
 
 
 def test_lint_runs_the_quality_warning_gate_through_task() -> None:
