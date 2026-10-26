@@ -4,7 +4,7 @@
 version = 1
 ai_rulez_version = '5.7.0'
 scope = 'all'
-tree = 'sha256:bb6e7412947c11eab84a82728bc34a18b44dbc6318b0ae7fe2fa81640c5a7213'
+tree = 'sha256:f4901cb9785db8aac90ce4c85c9a6f09c6ccb52ccdecd067fcb554734c6c0b52'
 
 [[include]]
 name = 'xberg-cicd'
@@ -504,6 +504,12 @@ name = 'xberg-brand-and-docs'
 source = 'include:xberg-core/skills/xberg-brand-and-docs/SKILL.md'
 commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:552648a1d89cccb6bc3d47cb25f3b6355f75a104936fc70668fdb6167868c965'
+
+[[item]]
+kind = 'context'
+id = 'area-map'
+path = 'context/area-map.md'
+digest = 'sha256:ee36457c94eedee869cecfeda3255c074aab2841bfcd303b548b99d48b1ce804'
 
 [[item]]
 kind = 'rule'
