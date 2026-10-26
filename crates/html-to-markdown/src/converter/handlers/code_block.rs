@@ -104,7 +104,14 @@ pub fn open_code(
     };
     Open {
         scope: Some(Rc::new(code_ctx)),
-        close: Close::Capture(CaptureEnd::Code(CodeEnd { links, breaks })),
+        close: Close::Capture(CaptureEnd::Code(CodeEnd {
+            links,
+            breaks,
+            source_whitespace_only: children.iter().all(|child| {
+                matches!(child.get(parser), Some(tl::Node::Raw(raw))
+                    if crate::text::decode_html_entities_cow(&raw.as_utf8_str()).trim().is_empty())
+            }),
+        })),
     }
 }
 
@@ -112,6 +119,7 @@ pub fn open_code(
 pub struct CodeEnd {
     links: Rc<std::cell::RefCell<Vec<crate::converter::context::InlineCodeLink>>>,
     breaks: Rc<std::cell::Cell<usize>>,
+    source_whitespace_only: bool,
 }
 
 /// Write `content`, the text of the children of a code element, as inline code:
@@ -141,7 +149,32 @@ pub fn close_code(end: &CodeEnd, content: &str, mut handler: HandlerContext<'_>)
         }
         return;
     }
+    if end.source_whitespace_only
+        && content.bytes().all(|byte| byte == b'\n')
+        && end.breaks.get() == 0
+        && handler.options.whitespace_mode == crate::options::WhitespaceMode::Normalized
+    {
+        crate::converter::inline::wrapped::emit_whitespace_only_inline_body(content, handler.output);
+        return;
+    }
+    if end.breaks.get() > 0
+        && content.starts_with('\n')
+        && !handler.output.is_empty()
+        && crate::converter::utility::white_space::space_is_owed(handler.output)
+    {
+        emit_collected_code_break(&mut handler);
+    }
     emit_inline_code_with_links(content, &end.links.borrow(), &mut handler);
+    if end.breaks.get() > 0
+        && content.ends_with('\n')
+        && crate::converter::utility::siblings::following_sibling_content(
+            handler.node_handle.get_inner(),
+            handler.parser,
+            handler.dom_context,
+        ) == crate::converter::utility::siblings::FollowingContent::Inline
+    {
+        emit_collected_code_break(&mut handler);
+    }
 }
 
 /// Whether the element holds a link. An `<a>` with no `href` is no link: it is text of the code.

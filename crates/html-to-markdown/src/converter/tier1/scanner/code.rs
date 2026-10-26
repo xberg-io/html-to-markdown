@@ -49,6 +49,9 @@ fn close_code(
     // adjacent to a preceding sibling's closing backtick -- checked once, above,
     // against `buf[..content_start]` before this loop runs -- every later segment is
     // preceded by our own separator instead.
+    if !frame.prev_escape_ctx.contains(EscapeCtx::HEADING) && buf[content_start..].ends_with('\n') {
+        return Err(BailReason::Classifier);
+    }
     let (leading, content, trailing) = code_span_parts(&buf[content_start..], trim_boundary_whitespace);
     buf.truncate(content_start);
     // ~keep White space on both sides of the element start is one run: Tier-2's `push_inline_prefix`.
@@ -333,9 +336,8 @@ fn move_label_edges(
         return Err(BailReason::Classifier);
     }
     let suffix = if suffix.is_empty() { "" } else { " " };
-    let has_text = !label.is_empty();
     let mut label_start = label_start;
-    if has_text && !prefix.is_empty() && space_owed_before_link && dest.ends_with('[') {
+    if !content.is_empty() && !prefix.is_empty() && space_owed_before_link && dest.ends_with('[') {
         let bracket_pos = dest.len() - 1;
         dest.insert_str(bracket_pos, prefix);
         label_start += prefix.len();
