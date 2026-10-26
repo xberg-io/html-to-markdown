@@ -342,6 +342,7 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
     let mut last = 0;
     let mut output: Option<String> = None;
     let mut ends = None;
+    let mut math_slots = None;
 
     while idx < len {
         let Some(offset) = memchr::memchr(b'<', &bytes[idx..]) else {
@@ -358,6 +359,12 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
                 if let Some(remove_end) = hidden_element_removal_end(input, bytes, idx, tag_end, &mut ends) {
                     let out = output.get_or_insert_with(|| String::with_capacity(len));
                     out.push_str(&input[last..idx]);
+                    // ~keep Removing the first semantics child must not promote a hidden alternative (#938).
+                    let slots =
+                        math_slots.get_or_insert_with(|| crate::converter::utility::math::semantics_slots(input));
+                    if slots.contains(&idx) {
+                        out.push_str("<mrow></mrow>");
+                    }
                     last = remove_end;
                     idx = remove_end;
                     continue;

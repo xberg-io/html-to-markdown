@@ -1,0 +1,26 @@
+---
+type: Concept
+title: Area Map
+x-ai-rulez:
+  kind: context
+  id: area-map
+  metadata:
+    priority: high
+---
+
+# Area Map
+
+html-to-markdown is a Rust HTML-to-Markdown converter with polyglot bindings.
+
+- `crates/html-to-markdown/` — core converter (`core-conversion-architecture` skill)
+- `crates/html-to-markdown-cli/` — command-line binary
+- `crates/html-to-markdown-{py,node,php,wasm,ffi,rs-jni}/` — binding crates (`alef-generated-bindings` rule)
+- `packages/<lang>/` — generated language packages
+- `e2e/<lang>/`, `fixtures/` — generated e2e suites and fixtures
+- `test_apps/<lang>/` — suites for published packages
+- `fuzz/`, `tools/` — fuzz targets, benchmarks
+- `docs-site/`, `readme_templates/`, `templates/` — docs and templates
+- `skills/`, `plugin/` — published skills, agent plugin
+- `scripts/` — CI, packaging and release scripts
+
+Workspace layout and where code belongs: `crate-structure` skill.

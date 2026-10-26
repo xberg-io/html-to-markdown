@@ -26,7 +26,12 @@ paths = [
   "plugin/.opencode/skills/*/SKILL.md",
   "plugin/.pi/skills/*/SKILL.md",
   "plugin/skills/*/SKILL.md",
-  # The generated root skills/. A bare skills/ pattern also matches the authored skills. ~keep
-  "../../skills/*/SKILL.md",
+  "skills/*/SKILL.md",
 ]
 reason = "The generated harness and plugin copies repeat the source skill descriptions and names. ai-rulez counts each copy as a duplicate."
+
+# The CLI reference documents the product's own install channels; pinning a version there would go stale every release. ~keep
+[[lint.ignore_rules]]
+rules = ["AR021"]
+paths = ["**/references/cli-reference.md"]
+reason = "Install instructions for this project's own CLI, which track the latest release by design."

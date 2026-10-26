@@ -3381,9 +3381,9 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org/"
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@v1.27.1
+        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
         with:
-          ai-rulez-version: "5.6.0"
+          ai-rulez-version: "5.7.0"
       - name: Verify generated plugin bundles before publishing
         run: |
           ai-rulez verify --plugin
@@ -3480,11 +3480,11 @@ jobs:
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@v1.27.1
+        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
         with:
-          ai-rulez-version: "5.6.0"
+          ai-rulez-version: "5.7.0"
       - name: Verify plugin source and generated artifacts
-        uses: xberg-io/actions/verify-ai-rulez-plugin@v1.27.1
+        uses: xberg-io/actions/verify-ai-rulez-plugin@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
         with:
           config-directory: .ai-rulez
       - name: Install uv
@@ -3823,13 +3823,13 @@ jobs:
           ref: ${{ needs.prepare.outputs.tag }}
           fetch-depth: 0
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@v1.27.1
+        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
         with:
-          ai-rulez-version: "5.6.0"
+          ai-rulez-version: "5.7.0"
       - name: Verify public skill exports
         run: python3 scripts/sync_public_skills.py --check
       - name: Package all supported plugin runtimes
-        uses: xberg-io/actions/package-ai-rulez-plugin@v1.27.1
+        uses: xberg-io/actions/package-ai-rulez-plugin@66e9a172c28ae7e57496fe92de1ab74f2a604194
         with:
           cursor-marketplace: "true"
           tag: ${{ needs.prepare.outputs.tag }}

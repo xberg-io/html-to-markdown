@@ -2108,5 +2108,5 @@ exclude_languages = ["php"]
 [[workspace.poly.hooks-sources]]
 id = "ai-rulez"
 git = "https://github.com/Goldziher/ai-rulez.git"
-revision = "v5.6.0"
+revision = "v5.7.0"
 hooks = ["ai-rulez-validate", "ai-rulez-plugin-verify"]

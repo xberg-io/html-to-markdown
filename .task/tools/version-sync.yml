@@ -10,6 +10,7 @@ vars:
 tasks:
   sync:
     desc: "Synchronize version across all package manifests"
+    deps: [":ai-rulez:version:check"]
     cmds:
       # ~keep The pin check runs FIRST, before anything writes. CI installs the
       # ~keep `alef_version` from alef.toml, not whatever is on this machine, so regenerating
@@ -108,18 +109,21 @@ tasks:
 
   bump:major:
     desc: "Bump major version (X.0.0) and sync"
+    deps: [":ai-rulez:version:check"]
     cmds:
       - "{{.ALEF}} sync-versions --bump major"
       - task: sync
 
   bump:minor:
     desc: "Bump minor version (0.X.0) and sync"
+    deps: [":ai-rulez:version:check"]
     cmds:
       - "{{.ALEF}} sync-versions --bump minor"
       - task: sync
 
   bump:patch:
     desc: "Bump patch version (0.0.X) and sync"
+    deps: [":ai-rulez:version:check"]
     cmds:
       - "{{.ALEF}} sync-versions --bump patch"
       - task: sync

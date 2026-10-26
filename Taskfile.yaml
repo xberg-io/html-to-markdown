@@ -45,9 +45,8 @@ includes:
     flatten: true
 
 vars:
-  # One pin for every task that runs ai-rulez. Keep it equal to ai-rulez-version in the workflows. ~keep
-  AI_RULEZ_VERSION: "5.6.0"
-  AI_RULEZ: "uvx --from ai-rulez=={{.AI_RULEZ_VERSION}} ai-rulez"
+  AI_RULEZ_VERSION: "5.7.0"
+  AI_RULEZ: "ai-rulez"
 
 tasks:
   setup:
@@ -774,21 +773,14 @@ tasks:
 
   governance:hooks:install:
     desc: Provision machine preferences and install reviewed AI governance hooks
+    deps: [ai-rulez:version:check]
     cmds:
       - |
         python3 - <<'PYTHON'
         import pathlib
-        import shutil
         import subprocess
         import tomllib
 
-        wanted = "{{.AI_RULEZ_VERSION}}"
-        found = shutil.which("ai-rulez")
-        if found is None:
-            raise SystemExit("Install ai-rulez " + wanted + " before installing hooks: uv tool install ai-rulez==" + wanted)
-        version = subprocess.run([found, "--version"], capture_output=True, text=True, check=True).stdout.split()[-1]
-        if version != wanted:
-            raise SystemExit("Hooks need ai-rulez " + wanted + ", found " + version + ": uv tool install ai-rulez==" + wanted)
         preferences = pathlib.Path("poly.local.toml")
         text = preferences.read_text() if preferences.exists() else ""
         data = tomllib.loads(text)
@@ -804,8 +796,37 @@ tasks:
     cmds:
       - uv run --no-project --python 3.11 --with mcp==1.28.1 --with PyYAML==6.0.3 python scripts/tests/test_hermes_plugin.py
 
+  ai-rulez:version:check:
+    desc: Require the released ai-rulez version used by CI
+    cmds:
+      - |
+        expected="{{.AI_RULEZ_VERSION}}"
+        if ! identity=$({{.AI_RULEZ}} --version); then
+          echo "Install ai-rulez $expected: uv tool install ai-rulez==$expected" >&2
+          exit 1
+        fi
+        actual=$(printf '%s\n' "$identity" | awk 'NR == 1 { print $NF }')
+        if [ "$actual" != "$expected" ]; then
+          echo "This repository requires ai-rulez $expected, found $actual." >&2
+          echo "Install it with: uv tool install ai-rulez==$expected" >&2
+          exit 1
+        fi
+
+  ai-rulez:version:test:
+    desc: Verify governance tasks reject a mismatched generator before writing
+    cmds:
+      - python3 scripts/tests/test_ai_rulez_version_guard.py
+
+  governance:generate:
+    desc: Validate and regenerate local governance with the reviewed generator
+    deps: [ai-rulez:version:check]
+    cmds:
+      - "{{.AI_RULEZ}} validate --no-local"
+      - "{{.AI_RULEZ}} generate --no-local --strict-config"
+
   governance:check:
     desc: Check materialized local governance outputs against shared sources
+    deps: [ai-rulez:version:check]
     cmds:
       - "{{.AI_RULEZ}} generate --check --no-local --strict-config"
 
