@@ -12,9 +12,6 @@ paths:
   - "crates/html-to-markdown-rs-jni/**"
   - "fixtures/**"
   - "e2e/**"
-targets:
-  - ".claude/rules/"
-  - ".github/instructions/"
 x-ai-rulez:
   kind: rule
   id: alef-generated-bindings
