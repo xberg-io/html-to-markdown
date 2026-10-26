@@ -2,8 +2,6 @@
 # ~keep GitHub path filters are workflow-scoped, not job-scoped. Keeping this separate
 # ~keep lets the filter be exactly the set of files that can invalidate the symbol diff,
 # ~keep so a docs or config change that starts ci-lint does not also run this check.
-# ~keep The path list is duplicated below because GitHub Actions does not support YAML
-# ~keep anchors/aliases — keep the two lists in sync.
 name: FFI Symbols
 
 on:
@@ -26,25 +24,6 @@ on:
       - "scripts/check_ffi_symbols.py"
       - ".github/workflows/ci-ffi-symbols.yaml"
       - "Taskfile.yaml"
-  pull_request:
-    paths:
-      - "crates/html-to-markdown-ffi/**"
-      - "packages/csharp/**"
-      - "packages/zig/**"
-      - "packages/java/**"
-      - "packages/go/**"
-      - "crates/html-to-markdown-php/**"
-      - "test_apps/php_ext/**"
-      - "**/*.c"
-      - "**/*.h"
-      - "**/*.cs"
-      - "**/*.java"
-      - "**/*.go"
-      - "**/*.zig"
-      - "scripts/check_ffi_symbols.py"
-      - ".github/workflows/ci-ffi-symbols.yaml"
-      - "Taskfile.yaml"
-
 # ~keep `github.sha` not `github.ref` for pushes: a cancelled run reports neither pass
 # ~keep nor fail, and cancelling main's previous run is one of the two ways 3.15.0's R break shipped.
 concurrency:

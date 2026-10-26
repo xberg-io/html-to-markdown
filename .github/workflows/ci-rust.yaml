@@ -26,31 +26,6 @@ on:
       - "alef.toml"
       - ".alef-ownership.toml"
       - "poly.toml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/**"
-      - "packages/*/native/**"
-      - "packages/*/ext/**"
-      - "packages/*/src/**"
-      - "packages/*/rust/**"
-      - "tools/benchmark-harness/**"
-      - "e2e/rust/**"
-      - "e2e/go/**"
-      - "packages/go/go.mod"
-      - "packages/go/go.sum"
-      - ".task/languages/go.yml"
-      - ".task/languages/rust.yml"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "rust-toolchain.toml"
-      - "rustfmt.toml"
-      - ".cargo/config.toml"
-      - "fixtures/**"
-      - ".github/workflows/ci-rust.yaml"
-      - "alef.toml"
-      - ".alef-ownership.toml"
-      - "poly.toml"
   workflow_dispatch: {}
 
 # ~keep `github.sha` not `github.ref` for pushes: a cancelled run reports neither pass

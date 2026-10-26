@@ -16,21 +16,6 @@ on:
       - "package.json"
       - ".gitignore"
       - ".github/workflows/ai-rulez-validation.yml"
-  pull_request:
-    paths:
-      - ".ai-rulez/**"
-      - "modules/**"
-      - "plugin/**"
-      - "skills/**"
-      - ".agents/plugins/**"
-      - ".claude-plugin/**"
-      - ".codex/**"
-      - "scripts/sync*"
-      - "Cargo.toml"
-      - "pyproject.toml"
-      - "package.json"
-      - ".gitignore"
-      - ".github/workflows/ai-rulez-validation.yml"
 permissions:
   contents: read
 jobs:
