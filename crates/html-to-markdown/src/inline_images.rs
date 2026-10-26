@@ -247,6 +247,11 @@ impl InlineImageCollector {
         self.config.max_decoded_size_bytes
     }
 
+    /// The number of images extracted so far, which is also the index the next one takes.
+    pub(crate) const fn image_count(&self) -> usize {
+        self.images.len()
+    }
+
     pub(crate) const fn next_index(&mut self) -> usize {
         self.next_index += 1;
         self.next_index

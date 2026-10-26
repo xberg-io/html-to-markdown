@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   item and a space in a heading, so `Loose words<br>next line` is no longer recorded as `Loose wordsnext line`.
 - Record text outside a paragraph, heading or list item in the document structure, such as the text of
   `<div>Words</div>` or the text after a list or a table, so a consumer of the structure no longer loses it.
+- Set `image_index` on an image node in the document structure to the entry its extracted bytes take in
+  `images`, as documented, so a consumer can place an inline `data:` image where it stands in the document.
 
 ## [3.18.6] - 2026-10-22
 

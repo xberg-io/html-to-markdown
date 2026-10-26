@@ -530,6 +530,14 @@ impl StructureCollector {
     ///
     /// Returns the node index.
     pub fn push_image(&mut self, src: Option<&str>, alt: Option<&str>) -> u32 {
+        self.push_image_with_index(src, alt, None)
+    }
+
+    /// Record an image element whose bytes, when extracted, are entry `image_index` of
+    /// `ConversionResult::images`.
+    ///
+    /// Returns the node index.
+    pub fn push_image_with_index(&mut self, src: Option<&str>, alt: Option<&str>, image_index: Option<u32>) -> u32 {
         let parent = self.current_structural_parent();
         let label = src.unwrap_or("img");
         let id = Self::generate_id("image", label, self.nodes.len() as u32);
@@ -538,7 +546,7 @@ impl StructureCollector {
             content: NodeContent::Image {
                 description: alt.filter(|s| !s.is_empty()).map(str::to_string),
                 src: src.map(str::to_string),
-                image_index: None,
+                image_index,
             },
             parent,
             children: Vec::new(),
