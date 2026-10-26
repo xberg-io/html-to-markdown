@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `use_accessible_names` (default `true`) to omit link accessibility-name fallbacks and SVG labels
+  while retaining drawn text when disabled (#941).
+
 ### Fixed
 
 - Separate the text on either side of a `<br>` in the document structure, with a line break in a paragraph or list

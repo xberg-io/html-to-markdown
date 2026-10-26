@@ -5,7 +5,7 @@
 
 use crate::converter::utility::escaping::is_block_level_name;
 use crate::converter::utility::white_space::{FORM_FEED, is_collapsible, mark_edges, owed_part};
-use crate::options::HiddenContent;
+use crate::options::{ConversionOptions, HiddenContent};
 use crate::text;
 use std::borrow::Cow;
 #[cfg(feature = "visitor")]
@@ -400,10 +400,10 @@ pub fn collect_link_label_text(
     children: &[tl::NodeHandle],
     parser: &tl::Parser,
     dom_ctx: &DomContext,
-    hidden_content: HiddenContent,
+    options: &ConversionOptions,
 ) -> (LinkText, Vec<tl::NodeHandle>, bool) {
     let mut block_nodes = Vec::new();
-    let text = walk_link_text(children, parser, dom_ctx, hidden_content, |handle| {
+    let text = walk_link_text(children, parser, dom_ctx, options, |handle| {
         block_nodes.push(handle);
         false
     });
@@ -416,9 +416,9 @@ pub fn link_text_content(
     children: &[tl::NodeHandle],
     parser: &tl::Parser,
     dom_ctx: &DomContext,
-    hidden_content: HiddenContent,
+    options: &ConversionOptions,
 ) -> LinkText {
-    walk_link_text(children, parser, dom_ctx, hidden_content, |_| true)
+    walk_link_text(children, parser, dom_ctx, options, |_| true)
 }
 
 /// The name of a link apart from its content: its `aria-label`, else its `title`. A value of
@@ -445,7 +445,7 @@ fn walk_link_text(
     children: &[tl::NodeHandle],
     parser: &tl::Parser,
     dom_ctx: &DomContext,
-    hidden_content: HiddenContent,
+    options: &ConversionOptions,
     mut enter_block: impl FnMut(tl::NodeHandle) -> bool,
 ) -> LinkText {
     let mut text = String::new();
@@ -463,7 +463,7 @@ fn walk_link_text(
                 text.push_str(decoded.as_ref());
             }
             tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("svg") => {
-                text.push_str(&crate::converter::media::svg::graphic_text(tag, parser, hidden_content));
+                text.push_str(&crate::converter::media::svg::graphic_text(tag, parser, options));
             }
             tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("br") => {
                 breaks = Some((breaks.map_or(text.len(), |(first, _)| first), text.len()));

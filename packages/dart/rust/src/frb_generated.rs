@@ -1280,6 +1280,7 @@ const _: fn() = || {
         let _: Vec<String> = ConversionOptions.preserve_tags;
         let _: bool = ConversionOptions.skip_images;
         let _: crate::InlineDataMedia = ConversionOptions.inline_data_media;
+        let _: bool = ConversionOptions.use_accessible_names;
         let _: crate::HiddenContent = ConversionOptions.hidden_content;
         let _: crate::UrlEscapeStyle = ConversionOptions.url_escape_style;
         let _: crate::LinkStyle = ConversionOptions.link_style;
@@ -1333,6 +1334,7 @@ const _: fn() = || {
         let _: Option<Vec<String>> = ConversionOptionsUpdate.preserve_tags;
         let _: Option<bool> = ConversionOptionsUpdate.skip_images;
         let _: Option<crate::InlineDataMedia> = ConversionOptionsUpdate.inline_data_media;
+        let _: Option<bool> = ConversionOptionsUpdate.use_accessible_names;
         let _: Option<crate::HiddenContent> = ConversionOptionsUpdate.hidden_content;
         let _: Option<crate::UrlEscapeStyle> = ConversionOptionsUpdate.url_escape_style;
         let _: Option<crate::LinkStyle> = ConversionOptionsUpdate.link_style;
@@ -2283,6 +2285,7 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_preserveTags = <Vec<String>>::sse_decode(deserializer);
         let mut var_skipImages = <bool>::sse_decode(deserializer);
         let mut var_inlineDataMedia = <crate::InlineDataMedia>::sse_decode(deserializer);
+        let mut var_useAccessibleNames = <bool>::sse_decode(deserializer);
         let mut var_hiddenContent = <crate::HiddenContent>::sse_decode(deserializer);
         let mut var_urlEscapeStyle = <crate::UrlEscapeStyle>::sse_decode(deserializer);
         let mut var_linkStyle = <crate::LinkStyle>::sse_decode(deserializer);
@@ -2334,6 +2337,7 @@ impl SseDecode for crate::ConversionOptions {
             preserve_tags: var_preserveTags,
             skip_images: var_skipImages,
             inline_data_media: var_inlineDataMedia,
+            use_accessible_names: var_useAccessibleNames,
             hidden_content: var_hiddenContent,
             url_escape_style: var_urlEscapeStyle,
             link_style: var_linkStyle,
@@ -2391,6 +2395,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_preserveTags = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_skipImages = <Option<bool>>::sse_decode(deserializer);
         let mut var_inlineDataMedia = <Option<crate::InlineDataMedia>>::sse_decode(deserializer);
+        let mut var_useAccessibleNames = <Option<bool>>::sse_decode(deserializer);
         let mut var_hiddenContent = <Option<crate::HiddenContent>>::sse_decode(deserializer);
         let mut var_urlEscapeStyle = <Option<crate::UrlEscapeStyle>>::sse_decode(deserializer);
         let mut var_linkStyle = <Option<crate::LinkStyle>>::sse_decode(deserializer);
@@ -2442,6 +2447,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
             preserve_tags: var_preserveTags,
             skip_images: var_skipImages,
             inline_data_media: var_inlineDataMedia,
+            use_accessible_names: var_useAccessibleNames,
             hidden_content: var_hiddenContent,
             url_escape_style: var_urlEscapeStyle,
             link_style: var_linkStyle,
@@ -3921,6 +3927,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptions> {
             self.0.preserve_tags.into_into_dart().into_dart(),
             self.0.skip_images.into_into_dart().into_dart(),
             self.0.inline_data_media.into_into_dart().into_dart(),
+            self.0.use_accessible_names.into_into_dart().into_dart(),
             self.0.hidden_content.into_into_dart().into_dart(),
             self.0.url_escape_style.into_into_dart().into_dart(),
             self.0.link_style.into_into_dart().into_dart(),
@@ -3985,6 +3992,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptionsUpdate
             self.0.preserve_tags.into_into_dart().into_dart(),
             self.0.skip_images.into_into_dart().into_dart(),
             self.0.inline_data_media.into_into_dart().into_dart(),
+            self.0.use_accessible_names.into_into_dart().into_dart(),
             self.0.hidden_content.into_into_dart().into_dart(),
             self.0.url_escape_style.into_into_dart().into_dart(),
             self.0.link_style.into_into_dart().into_dart(),
@@ -5044,6 +5052,7 @@ impl SseEncode for crate::ConversionOptions {
         <Vec<String>>::sse_encode(self.preserve_tags, serializer);
         <bool>::sse_encode(self.skip_images, serializer);
         <crate::InlineDataMedia>::sse_encode(self.inline_data_media, serializer);
+        <bool>::sse_encode(self.use_accessible_names, serializer);
         <crate::HiddenContent>::sse_encode(self.hidden_content, serializer);
         <crate::UrlEscapeStyle>::sse_encode(self.url_escape_style, serializer);
         <crate::LinkStyle>::sse_encode(self.link_style, serializer);
@@ -5100,6 +5109,7 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<Vec<String>>>::sse_encode(self.preserve_tags, serializer);
         <Option<bool>>::sse_encode(self.skip_images, serializer);
         <Option<crate::InlineDataMedia>>::sse_encode(self.inline_data_media, serializer);
+        <Option<bool>>::sse_encode(self.use_accessible_names, serializer);
         <Option<crate::HiddenContent>>::sse_encode(self.hidden_content, serializer);
         <Option<crate::UrlEscapeStyle>>::sse_encode(self.url_escape_style, serializer);
         <Option<crate::LinkStyle>>::sse_encode(self.link_style, serializer);

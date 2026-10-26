@@ -519,6 +519,11 @@ class ConversionOptions {
   /// text alone, or nothing. See [`InlineDataMedia`] for the elements it covers.
   final InlineDataMedia inlineDataMedia;
 
+  /// Use link `aria-label` or `title` as fallback link text and include SVG `aria-label`,
+  /// `title` and `desc` in the graphic text (default `true`). Set to `false` to keep only
+  /// drawn SVG text and existing link content. Link title metadata and image alt text remain.
+  final bool useAccessibleNames;
+
   /// Which text that a browser does not show at first the output holds: none of it
   /// ([`HiddenContent::Drop`], the default), the text a reader can get to in the page, such as
   /// an inactive tab panel ([`HiddenContent::Reachable`]), or that text and the content of
@@ -667,6 +672,7 @@ class ConversionOptions {
     required this.preserveTags,
     required this.skipImages,
     required this.inlineDataMedia,
+    required this.useAccessibleNames,
     required this.hiddenContent,
     required this.urlEscapeStyle,
     required this.linkStyle,
@@ -721,6 +727,7 @@ class ConversionOptions {
       preserveTags.hashCode ^
       skipImages.hashCode ^
       inlineDataMedia.hashCode ^
+      useAccessibleNames.hashCode ^
       hiddenContent.hashCode ^
       urlEscapeStyle.hashCode ^
       linkStyle.hashCode ^
@@ -777,6 +784,7 @@ class ConversionOptions {
           preserveTags == other.preserveTags &&
           skipImages == other.skipImages &&
           inlineDataMedia == other.inlineDataMedia &&
+          useAccessibleNames == other.useAccessibleNames &&
           hiddenContent == other.hiddenContent &&
           urlEscapeStyle == other.urlEscapeStyle &&
           linkStyle == other.linkStyle &&
@@ -904,6 +912,9 @@ class ConversionOptionsUpdate {
   /// Optional override for [`ConversionOptions::inline_data_media`].
   final InlineDataMedia? inlineDataMedia;
 
+  /// Optional override for [`ConversionOptions::use_accessible_names`].
+  final bool? useAccessibleNames;
+
   /// Optional override for [`ConversionOptions::hidden_content`].
   final HiddenContent? hiddenContent;
 
@@ -985,6 +996,7 @@ class ConversionOptionsUpdate {
     this.preserveTags,
     this.skipImages,
     this.inlineDataMedia,
+    this.useAccessibleNames,
     this.hiddenContent,
     this.urlEscapeStyle,
     this.linkStyle,
@@ -1039,6 +1051,7 @@ class ConversionOptionsUpdate {
       preserveTags.hashCode ^
       skipImages.hashCode ^
       inlineDataMedia.hashCode ^
+      useAccessibleNames.hashCode ^
       hiddenContent.hashCode ^
       urlEscapeStyle.hashCode ^
       linkStyle.hashCode ^
@@ -1095,6 +1108,7 @@ class ConversionOptionsUpdate {
           preserveTags == other.preserveTags &&
           skipImages == other.skipImages &&
           inlineDataMedia == other.inlineDataMedia &&
+          useAccessibleNames == other.useAccessibleNames &&
           hiddenContent == other.hiddenContent &&
           urlEscapeStyle == other.urlEscapeStyle &&
           linkStyle == other.linkStyle &&

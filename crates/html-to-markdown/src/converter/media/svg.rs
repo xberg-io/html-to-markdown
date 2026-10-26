@@ -6,8 +6,8 @@ use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::serialization::escape_html_attribute_value;
 use crate::converter::utility::svg_attrs::canonical_svg_attr;
-use crate::options::HiddenContent;
 use crate::options::conversion::NATIVE_STACK_SAFE_DEPTH;
+use crate::options::{ConversionOptions, HiddenContent};
 // ~keep reason: BTreeMap is only used when the inline-images feature is active.
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
@@ -242,6 +242,7 @@ enum GraphicStep {
 /// Collects the parts of [`graphic_text`], each with its white space collapsed.
 #[derive(Default)]
 struct GraphicParts {
+    use_accessible_names: bool,
     label: Option<String>,
     parts: Vec<String>,
     current: String,
@@ -313,13 +314,17 @@ fn system_language_holds(tag: &tl::HTMLTag<'_>) -> bool {
 /// reference is not followed. An element with `display="none"` or `visibility="hidden"` gives
 /// nothing, unless `hidden_content` keeps hidden text. `aria-hidden="true"` removes the label,
 /// the title and the description, and keeps drawn text. A graphic with none of these gives the
-/// empty string.
-pub fn graphic_text(svg: &tl::HTMLTag<'_>, parser: &Parser<'_>, hidden_content: HiddenContent) -> String {
+/// empty string. When `use_accessible_names` is false, only drawn text is collected.
+pub fn graphic_text(svg: &tl::HTMLTag<'_>, parser: &Parser<'_>, options: &ConversionOptions) -> String {
+    let hidden_content = options.hidden_content;
     if is_hidden_in_graphic(svg, hidden_content) {
         return String::new();
     }
-    let named = !is_aria_hidden(svg);
-    let mut out = GraphicParts::default();
+    let named = options.use_accessible_names && !is_aria_hidden(svg);
+    let mut out = GraphicParts {
+        use_accessible_names: options.use_accessible_names,
+        ..GraphicParts::default()
+    };
     if named {
         if let Some(label) = crate::converter::utility::attributes::decoded_attribute(svg, "aria-label") {
             out.current.push_str(&label);
@@ -423,7 +428,7 @@ fn visit_graphic_tag(
         (GraphicScope::Html, "svg") => {
             out.end_part();
             stack.push(GraphicStep::EndPart);
-            push_graphic_children(stack, tag, nested_svg(true));
+            push_graphic_children(stack, tag, nested_svg(out.use_accessible_names));
         }
         (GraphicScope::Html, "br") => out.current.push(' '),
         (GraphicScope::Html, html_name) => {
@@ -470,7 +475,7 @@ pub fn handle_svg(
         return;
     }
 
-    let title = graphic_text(tag, parser, options.hidden_content);
+    let title = graphic_text(tag, parser, options);
     if ctx.in_code || ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
         super::record_text_label(&title, ctx);
     }
