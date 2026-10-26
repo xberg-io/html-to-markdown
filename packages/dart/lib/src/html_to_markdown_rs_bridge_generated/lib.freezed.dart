@@ -13,6 +13,385 @@ part of 'lib.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
+mixin _$AlefBridgeErrorWire {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AlefBridgeErrorWire);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'AlefBridgeErrorWire()';
+}
+
+
+}
+
+/// @nodoc
+class $AlefBridgeErrorWireCopyWith<$Res>  {
+$AlefBridgeErrorWireCopyWith(AlefBridgeErrorWire _, $Res Function(AlefBridgeErrorWire) __);
+}
+
+
+/// Adds pattern-matching-related methods to [AlefBridgeErrorWire].
+extension AlefBridgeErrorWirePatterns on AlefBridgeErrorWire {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AlefBridgeErrorWire_ConversionError value)?  conversionError,TResult Function( AlefBridgeErrorWire_InvalidInput value)?  invalidInput,TResult Function( AlefBridgeErrorWire_NativeFailure value)?  nativeFailure,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case AlefBridgeErrorWire_ConversionError() when conversionError != null:
+return conversionError(_that);case AlefBridgeErrorWire_InvalidInput() when invalidInput != null:
+return invalidInput(_that);case AlefBridgeErrorWire_NativeFailure() when nativeFailure != null:
+return nativeFailure(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AlefBridgeErrorWire_ConversionError value)  conversionError,required TResult Function( AlefBridgeErrorWire_InvalidInput value)  invalidInput,required TResult Function( AlefBridgeErrorWire_NativeFailure value)  nativeFailure,}){
+final _that = this;
+switch (_that) {
+case AlefBridgeErrorWire_ConversionError():
+return conversionError(_that);case AlefBridgeErrorWire_InvalidInput():
+return invalidInput(_that);case AlefBridgeErrorWire_NativeFailure():
+return nativeFailure(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AlefBridgeErrorWire_ConversionError value)?  conversionError,TResult? Function( AlefBridgeErrorWire_InvalidInput value)?  invalidInput,TResult? Function( AlefBridgeErrorWire_NativeFailure value)?  nativeFailure,}){
+final _that = this;
+switch (_that) {
+case AlefBridgeErrorWire_ConversionError() when conversionError != null:
+return conversionError(_that);case AlefBridgeErrorWire_InvalidInput() when invalidInput != null:
+return invalidInput(_that);case AlefBridgeErrorWire_NativeFailure() when nativeFailure != null:
+return nativeFailure(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( ConversionError error)?  conversionError,TResult Function( String message)?  invalidInput,TResult Function( String message)?  nativeFailure,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case AlefBridgeErrorWire_ConversionError() when conversionError != null:
+return conversionError(_that.error);case AlefBridgeErrorWire_InvalidInput() when invalidInput != null:
+return invalidInput(_that.message);case AlefBridgeErrorWire_NativeFailure() when nativeFailure != null:
+return nativeFailure(_that.message);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( ConversionError error)  conversionError,required TResult Function( String message)  invalidInput,required TResult Function( String message)  nativeFailure,}) {final _that = this;
+switch (_that) {
+case AlefBridgeErrorWire_ConversionError():
+return conversionError(_that.error);case AlefBridgeErrorWire_InvalidInput():
+return invalidInput(_that.message);case AlefBridgeErrorWire_NativeFailure():
+return nativeFailure(_that.message);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( ConversionError error)?  conversionError,TResult? Function( String message)?  invalidInput,TResult? Function( String message)?  nativeFailure,}) {final _that = this;
+switch (_that) {
+case AlefBridgeErrorWire_ConversionError() when conversionError != null:
+return conversionError(_that.error);case AlefBridgeErrorWire_InvalidInput() when invalidInput != null:
+return invalidInput(_that.message);case AlefBridgeErrorWire_NativeFailure() when nativeFailure != null:
+return nativeFailure(_that.message);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class AlefBridgeErrorWire_ConversionError extends AlefBridgeErrorWire {
+  const AlefBridgeErrorWire_ConversionError({required this.error}): super._();
+
+
+ final  ConversionError error;
+
+/// Create a copy of AlefBridgeErrorWire
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AlefBridgeErrorWire_ConversionErrorCopyWith<AlefBridgeErrorWire_ConversionError> get copyWith => _$AlefBridgeErrorWire_ConversionErrorCopyWithImpl<AlefBridgeErrorWire_ConversionError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AlefBridgeErrorWire_ConversionError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,error);
+}
+
+@override
+String toString() {
+    return 'AlefBridgeErrorWire.conversionError(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AlefBridgeErrorWire_ConversionErrorCopyWith<$Res> implements $AlefBridgeErrorWireCopyWith<$Res> {
+  factory $AlefBridgeErrorWire_ConversionErrorCopyWith(AlefBridgeErrorWire_ConversionError value, $Res Function(AlefBridgeErrorWire_ConversionError) _then) = _$AlefBridgeErrorWire_ConversionErrorCopyWithImpl;
+@useResult
+$Res call({
+ ConversionError error
+});
+
+
+$ConversionErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class _$AlefBridgeErrorWire_ConversionErrorCopyWithImpl<$Res>
+    implements $AlefBridgeErrorWire_ConversionErrorCopyWith<$Res> {
+  _$AlefBridgeErrorWire_ConversionErrorCopyWithImpl(this._self, this._then);
+
+  final AlefBridgeErrorWire_ConversionError _self;
+  final $Res Function(AlefBridgeErrorWire_ConversionError) _then;
+
+/// Create a copy of AlefBridgeErrorWire
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(AlefBridgeErrorWire_ConversionError(
+error: null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as ConversionError,
+  ));
+}
+
+/// Create a copy of AlefBridgeErrorWire
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ConversionErrorCopyWith<$Res> get error {
+
+  return $ConversionErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class AlefBridgeErrorWire_InvalidInput extends AlefBridgeErrorWire {
+  const AlefBridgeErrorWire_InvalidInput({required this.message}): super._();
+
+
+ final  String message;
+
+/// Create a copy of AlefBridgeErrorWire
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AlefBridgeErrorWire_InvalidInputCopyWith<AlefBridgeErrorWire_InvalidInput> get copyWith => _$AlefBridgeErrorWire_InvalidInputCopyWithImpl<AlefBridgeErrorWire_InvalidInput>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AlefBridgeErrorWire_InvalidInput&&(identical(other.message, message) || other.message == message));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,message);
+}
+
+@override
+String toString() {
+    return 'AlefBridgeErrorWire.invalidInput(message: $message)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AlefBridgeErrorWire_InvalidInputCopyWith<$Res> implements $AlefBridgeErrorWireCopyWith<$Res> {
+  factory $AlefBridgeErrorWire_InvalidInputCopyWith(AlefBridgeErrorWire_InvalidInput value, $Res Function(AlefBridgeErrorWire_InvalidInput) _then) = _$AlefBridgeErrorWire_InvalidInputCopyWithImpl;
+@useResult
+$Res call({
+ String message
+});
+
+
+
+
+}
+/// @nodoc
+class _$AlefBridgeErrorWire_InvalidInputCopyWithImpl<$Res>
+    implements $AlefBridgeErrorWire_InvalidInputCopyWith<$Res> {
+  _$AlefBridgeErrorWire_InvalidInputCopyWithImpl(this._self, this._then);
+
+  final AlefBridgeErrorWire_InvalidInput _self;
+  final $Res Function(AlefBridgeErrorWire_InvalidInput) _then;
+
+/// Create a copy of AlefBridgeErrorWire
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+  return _then(AlefBridgeErrorWire_InvalidInput(
+message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class AlefBridgeErrorWire_NativeFailure extends AlefBridgeErrorWire {
+  const AlefBridgeErrorWire_NativeFailure({required this.message}): super._();
+
+
+ final  String message;
+
+/// Create a copy of AlefBridgeErrorWire
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AlefBridgeErrorWire_NativeFailureCopyWith<AlefBridgeErrorWire_NativeFailure> get copyWith => _$AlefBridgeErrorWire_NativeFailureCopyWithImpl<AlefBridgeErrorWire_NativeFailure>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AlefBridgeErrorWire_NativeFailure&&(identical(other.message, message) || other.message == message));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,message);
+}
+
+@override
+String toString() {
+    return 'AlefBridgeErrorWire.nativeFailure(message: $message)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AlefBridgeErrorWire_NativeFailureCopyWith<$Res> implements $AlefBridgeErrorWireCopyWith<$Res> {
+  factory $AlefBridgeErrorWire_NativeFailureCopyWith(AlefBridgeErrorWire_NativeFailure value, $Res Function(AlefBridgeErrorWire_NativeFailure) _then) = _$AlefBridgeErrorWire_NativeFailureCopyWithImpl;
+@useResult
+$Res call({
+ String message
+});
+
+
+
+
+}
+/// @nodoc
+class _$AlefBridgeErrorWire_NativeFailureCopyWithImpl<$Res>
+    implements $AlefBridgeErrorWire_NativeFailureCopyWith<$Res> {
+  _$AlefBridgeErrorWire_NativeFailureCopyWithImpl(this._self, this._then);
+
+  final AlefBridgeErrorWire_NativeFailure _self;
+  final $Res Function(AlefBridgeErrorWire_NativeFailure) _then;
+
+/// Create a copy of AlefBridgeErrorWire
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+  return _then(AlefBridgeErrorWire_NativeFailure(
+message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$AnnotationKind {
 
 
@@ -141,7 +520,7 @@ return link(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  bold,TResult Function()?  italic,TResult Function()?  underline,TResult Function()?  strikethrough,TResult Function()?  code,TResult Function()?  subscript,TResult Function()?  superscript,TResult Function()?  highlight,TResult Function( String url,  String title)?  link,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  bold,TResult Function()?  italic,TResult Function()?  underline,TResult Function()?  strikethrough,TResult Function()?  code,TResult Function()?  subscript,TResult Function()?  superscript,TResult Function()?  highlight,TResult Function( String url,  String? title)?  link,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case AnnotationKind_Bold() when bold != null:
 return bold();case AnnotationKind_Italic() when italic != null:
@@ -170,7 +549,7 @@ return link(_that.url,_that.title);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  bold,required TResult Function()  italic,required TResult Function()  underline,required TResult Function()  strikethrough,required TResult Function()  code,required TResult Function()  subscript,required TResult Function()  superscript,required TResult Function()  highlight,required TResult Function( String url,  String title)  link,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  bold,required TResult Function()  italic,required TResult Function()  underline,required TResult Function()  strikethrough,required TResult Function()  code,required TResult Function()  subscript,required TResult Function()  superscript,required TResult Function()  highlight,required TResult Function( String url,  String? title)  link,}) {final _that = this;
 switch (_that) {
 case AnnotationKind_Bold():
 return bold();case AnnotationKind_Italic():
@@ -195,7 +574,7 @@ return link(_that.url,_that.title);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  bold,TResult? Function()?  italic,TResult? Function()?  underline,TResult? Function()?  strikethrough,TResult? Function()?  code,TResult? Function()?  subscript,TResult? Function()?  superscript,TResult? Function()?  highlight,TResult? Function( String url,  String title)?  link,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  bold,TResult? Function()?  italic,TResult? Function()?  underline,TResult? Function()?  strikethrough,TResult? Function()?  code,TResult? Function()?  subscript,TResult? Function()?  superscript,TResult? Function()?  highlight,TResult? Function( String url,  String? title)?  link,}) {final _that = this;
 switch (_that) {
 case AnnotationKind_Bold() when bold != null:
 return bold();case AnnotationKind_Italic() when italic != null:
@@ -474,7 +853,7 @@ String toString() {
 
 
 class AnnotationKind_Link extends AnnotationKind {
-  const AnnotationKind_Link({required this.url, required this.title}): super._();
+  const AnnotationKind_Link({required this.url, this.title}): super._();
 
 
 /// The URL from the `href` attribute, copied verbatim from the source HTML.
@@ -488,7 +867,7 @@ class AnnotationKind_Link extends AnnotationKind {
 ///
 /// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
 /// is copied verbatim — HTML entities within the title are not decoded.
- final  String title;
+ final  String? title;
 
 /// Create a copy of AnnotationKind
 /// with the given fields replaced by the non-null parameter values.
@@ -522,7 +901,7 @@ abstract mixin class $AnnotationKind_LinkCopyWith<$Res> implements $AnnotationKi
   factory $AnnotationKind_LinkCopyWith(AnnotationKind_Link value, $Res Function(AnnotationKind_Link) _then) = _$AnnotationKind_LinkCopyWithImpl;
 @useResult
 $Res call({
- String url, String title
+ String url, String? title
 });
 
 
@@ -539,11 +918,11 @@ class _$AnnotationKind_LinkCopyWithImpl<$Res>
 
 /// Create a copy of AnnotationKind
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? url = null,Object? title = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? url = null,Object? title = freezed,}) {
   return _then(AnnotationKind_Link(
 url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,
+as String,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -776,7 +1155,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.parseError(field0: $field0)';
+  return "HTML parsing error: " + field0.toString() + "";
 }
 
 
@@ -844,7 +1223,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.sanitizationError(field0: $field0)';
+  return "Sanitization error: " + field0.toString() + "";
 }
 
 
@@ -912,7 +1291,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.configError(field0: $field0)';
+  return "Invalid configuration: " + field0.toString() + "";
 }
 
 
@@ -980,7 +1359,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.ioError(field0: $field0)';
+  return "I/O error: " + field0.toString() + "";
 }
 
 
@@ -1048,7 +1427,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.panic(field0: $field0)';
+  return "Internal panic: " + field0.toString() + "";
 }
 
 
@@ -1116,7 +1495,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.invalidInput(field0: $field0)';
+  return "Invalid input: " + field0.toString() + "";
 }
 
 
@@ -1185,7 +1564,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.inputTooLarge(observedSize: $observedSize, maxSize: $maxSize)';
+  return "Input size " + observedSize.toString() + " bytes exceeds the configured maximum of " + maxSize.toString() + " bytes";
 }
 
 
@@ -1254,7 +1633,7 @@ int get hashCode {
 
 @override
 String toString() {
-    return 'ConversionError.other(field0: $field0)';
+  return "Conversion error: " + field0.toString() + "";
 }
 
 
@@ -1433,7 +1812,7 @@ return group(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( PlatformInt64 level,  String text)?  heading,TResult Function( String text)?  paragraph,TResult Function( bool ordered)?  list,TResult Function( String text)?  listItem,TResult Function( TableGrid grid)?  table,TResult Function( String description,  String src,  PlatformInt64 imageIndex)?  image,TResult Function( String text,  String language)?  code,TResult Function()?  quote,TResult Function()?  definitionList,TResult Function( String term,  String definition)?  definitionItem,TResult Function( String format,  String content)?  rawBlock,TResult Function( List<MetadataEntry> entries)?  metadataBlock,TResult Function( String label,  PlatformInt64 headingLevel,  String headingText)?  group,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( PlatformInt64 level,  String text)?  heading,TResult Function( String text)?  paragraph,TResult Function( bool ordered)?  list,TResult Function( String text)?  listItem,TResult Function( TableGrid grid)?  table,TResult Function( String? description,  String? src,  PlatformInt64? imageIndex)?  image,TResult Function( String text,  String? language)?  code,TResult Function()?  quote,TResult Function()?  definitionList,TResult Function( String term,  String definition)?  definitionItem,TResult Function( String format,  String content)?  rawBlock,TResult Function( List<MetadataEntry> entries)?  metadataBlock,TResult Function( String? label,  PlatformInt64? headingLevel,  String? headingText)?  group,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case NodeContent_Heading() when heading != null:
 return heading(_that.level,_that.text);case NodeContent_Paragraph() when paragraph != null:
@@ -1466,7 +1845,7 @@ return group(_that.label,_that.headingLevel,_that.headingText);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( PlatformInt64 level,  String text)  heading,required TResult Function( String text)  paragraph,required TResult Function( bool ordered)  list,required TResult Function( String text)  listItem,required TResult Function( TableGrid grid)  table,required TResult Function( String description,  String src,  PlatformInt64 imageIndex)  image,required TResult Function( String text,  String language)  code,required TResult Function()  quote,required TResult Function()  definitionList,required TResult Function( String term,  String definition)  definitionItem,required TResult Function( String format,  String content)  rawBlock,required TResult Function( List<MetadataEntry> entries)  metadataBlock,required TResult Function( String label,  PlatformInt64 headingLevel,  String headingText)  group,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( PlatformInt64 level,  String text)  heading,required TResult Function( String text)  paragraph,required TResult Function( bool ordered)  list,required TResult Function( String text)  listItem,required TResult Function( TableGrid grid)  table,required TResult Function( String? description,  String? src,  PlatformInt64? imageIndex)  image,required TResult Function( String text,  String? language)  code,required TResult Function()  quote,required TResult Function()  definitionList,required TResult Function( String term,  String definition)  definitionItem,required TResult Function( String format,  String content)  rawBlock,required TResult Function( List<MetadataEntry> entries)  metadataBlock,required TResult Function( String? label,  PlatformInt64? headingLevel,  String? headingText)  group,}) {final _that = this;
 switch (_that) {
 case NodeContent_Heading():
 return heading(_that.level,_that.text);case NodeContent_Paragraph():
@@ -1495,7 +1874,7 @@ return group(_that.label,_that.headingLevel,_that.headingText);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( PlatformInt64 level,  String text)?  heading,TResult? Function( String text)?  paragraph,TResult? Function( bool ordered)?  list,TResult? Function( String text)?  listItem,TResult? Function( TableGrid grid)?  table,TResult? Function( String description,  String src,  PlatformInt64 imageIndex)?  image,TResult? Function( String text,  String language)?  code,TResult? Function()?  quote,TResult? Function()?  definitionList,TResult? Function( String term,  String definition)?  definitionItem,TResult? Function( String format,  String content)?  rawBlock,TResult? Function( List<MetadataEntry> entries)?  metadataBlock,TResult? Function( String label,  PlatformInt64 headingLevel,  String headingText)?  group,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( PlatformInt64 level,  String text)?  heading,TResult? Function( String text)?  paragraph,TResult? Function( bool ordered)?  list,TResult? Function( String text)?  listItem,TResult? Function( TableGrid grid)?  table,TResult? Function( String? description,  String? src,  PlatformInt64? imageIndex)?  image,TResult? Function( String text,  String? language)?  code,TResult? Function()?  quote,TResult? Function()?  definitionList,TResult? Function( String term,  String definition)?  definitionItem,TResult? Function( String format,  String content)?  rawBlock,TResult? Function( List<MetadataEntry> entries)?  metadataBlock,TResult? Function( String? label,  PlatformInt64? headingLevel,  String? headingText)?  group,}) {final _that = this;
 switch (_that) {
 case NodeContent_Heading() when heading != null:
 return heading(_that.level,_that.text);case NodeContent_Paragraph() when paragraph != null:
@@ -1870,15 +2249,15 @@ as TableGrid,
 
 
 class NodeContent_Image extends NodeContent {
-  const NodeContent_Image({required this.description, required this.src, required this.imageIndex}): super._();
+  const NodeContent_Image({this.description, this.src, this.imageIndex}): super._();
 
 
 /// Alt text or caption.
- final  String description;
+ final  String? description;
 /// Image source URL.
- final  String src;
+ final  String? src;
 /// Index into `ConversionResult.images` when image extraction is enabled.
- final  PlatformInt64 imageIndex;
+ final  PlatformInt64? imageIndex;
 
 /// Create a copy of NodeContent
 /// with the given fields replaced by the non-null parameter values.
@@ -1912,7 +2291,7 @@ abstract mixin class $NodeContent_ImageCopyWith<$Res> implements $NodeContentCop
   factory $NodeContent_ImageCopyWith(NodeContent_Image value, $Res Function(NodeContent_Image) _then) = _$NodeContent_ImageCopyWithImpl;
 @useResult
 $Res call({
- String description, String src, PlatformInt64 imageIndex
+ String? description, String? src, PlatformInt64? imageIndex
 });
 
 
@@ -1929,12 +2308,12 @@ class _$NodeContent_ImageCopyWithImpl<$Res>
 
 /// Create a copy of NodeContent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? description = null,Object? src = null,Object? imageIndex = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? description = freezed,Object? src = freezed,Object? imageIndex = freezed,}) {
   return _then(NodeContent_Image(
-description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,src: null == src ? _self.src : src // ignore: cast_nullable_to_non_nullable
-as String,imageIndex: null == imageIndex ? _self.imageIndex : imageIndex // ignore: cast_nullable_to_non_nullable
-as PlatformInt64,
+description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,src: freezed == src ? _self.src : src // ignore: cast_nullable_to_non_nullable
+as String?,imageIndex: freezed == imageIndex ? _self.imageIndex : imageIndex // ignore: cast_nullable_to_non_nullable
+as PlatformInt64?,
   ));
 }
 
@@ -1945,13 +2324,13 @@ as PlatformInt64,
 
 
 class NodeContent_Code extends NodeContent {
-  const NodeContent_Code({required this.text, required this.language}): super._();
+  const NodeContent_Code({required this.text, this.language}): super._();
 
 
 /// The code text content.
  final  String text;
 /// Programming language (from class="language-*" or similar).
- final  String language;
+ final  String? language;
 
 /// Create a copy of NodeContent
 /// with the given fields replaced by the non-null parameter values.
@@ -1985,7 +2364,7 @@ abstract mixin class $NodeContent_CodeCopyWith<$Res> implements $NodeContentCopy
   factory $NodeContent_CodeCopyWith(NodeContent_Code value, $Res Function(NodeContent_Code) _then) = _$NodeContent_CodeCopyWithImpl;
 @useResult
 $Res call({
- String text, String language
+ String text, String? language
 });
 
 
@@ -2002,11 +2381,11 @@ class _$NodeContent_CodeCopyWithImpl<$Res>
 
 /// Create a copy of NodeContent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? text = null,Object? language = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? text = null,Object? language = freezed,}) {
   return _then(NodeContent_Code(
 text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
-as String,
+as String,language: freezed == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -2301,15 +2680,15 @@ as List<MetadataEntry>,
 
 
 class NodeContent_Group extends NodeContent {
-  const NodeContent_Group({required this.label, required this.headingLevel, required this.headingText}): super._();
+  const NodeContent_Group({this.label, this.headingLevel, this.headingText}): super._();
 
 
 /// Optional section label.
- final  String label;
+ final  String? label;
 /// The heading level that created this group.
- final  PlatformInt64 headingLevel;
+ final  PlatformInt64? headingLevel;
 /// The heading text that created this group.
- final  String headingText;
+ final  String? headingText;
 
 /// Create a copy of NodeContent
 /// with the given fields replaced by the non-null parameter values.
@@ -2343,7 +2722,7 @@ abstract mixin class $NodeContent_GroupCopyWith<$Res> implements $NodeContentCop
   factory $NodeContent_GroupCopyWith(NodeContent_Group value, $Res Function(NodeContent_Group) _then) = _$NodeContent_GroupCopyWithImpl;
 @useResult
 $Res call({
- String label, PlatformInt64 headingLevel, String headingText
+ String? label, PlatformInt64? headingLevel, String? headingText
 });
 
 
@@ -2360,12 +2739,12 @@ class _$NodeContent_GroupCopyWithImpl<$Res>
 
 /// Create a copy of NodeContent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? label = null,Object? headingLevel = null,Object? headingText = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? label = freezed,Object? headingLevel = freezed,Object? headingText = freezed,}) {
   return _then(NodeContent_Group(
-label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
-as String,headingLevel: null == headingLevel ? _self.headingLevel : headingLevel // ignore: cast_nullable_to_non_nullable
-as PlatformInt64,headingText: null == headingText ? _self.headingText : headingText // ignore: cast_nullable_to_non_nullable
-as String,
+label: freezed == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String?,headingLevel: freezed == headingLevel ? _self.headingLevel : headingLevel // ignore: cast_nullable_to_non_nullable
+as PlatformInt64?,headingText: freezed == headingText ? _self.headingText : headingText // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

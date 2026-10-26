@@ -34,6 +34,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Object
+  dco_decode_CustomSerializer_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAlefBridgeError(
+    dynamic raw,
+  );
+
+  @protected
   FutureOr<VisitResult> Function(NodeContext)
   dco_decode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
     dynamic raw,
@@ -133,6 +139,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  AlefBridgeErrorWire dco_decode_alef_bridge_error_wire(dynamic raw);
+
+  @protected
   AnnotationKind dco_decode_annotation_kind(dynamic raw);
 
   @protected
@@ -149,6 +158,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CodeBlockStyle dco_decode_box_autoadd_code_block_style(dynamic raw);
+
+  @protected
+  ConversionError dco_decode_box_autoadd_conversion_error(dynamic raw);
 
   @protected
   ConversionOptions dco_decode_box_autoadd_conversion_options(dynamic raw);
@@ -490,6 +502,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Object
+  sse_decode_CustomSerializer_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAlefBridgeError(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Object sse_decode_DartOpaque(SseDeserializer deserializer);
 
   @protected
@@ -505,6 +523,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
+
+  @protected
+  AlefBridgeErrorWire sse_decode_alef_bridge_error_wire(
+    SseDeserializer deserializer,
+  );
 
   @protected
   AnnotationKind sse_decode_annotation_kind(SseDeserializer deserializer);
@@ -523,6 +546,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CodeBlockStyle sse_decode_box_autoadd_code_block_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ConversionError sse_decode_box_autoadd_conversion_error(
     SseDeserializer deserializer,
   );
 
@@ -967,6 +995,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+  sse_encode_CustomSerializer_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAlefBridgeError(
+    Object self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
   sse_encode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
     FutureOr<VisitResult> Function(NodeContext) self,
     SseSerializer serializer,
@@ -1084,6 +1119,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_alef_bridge_error_wire(
+    AlefBridgeErrorWire self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_annotation_kind(
     AnnotationKind self,
     SseSerializer serializer,
@@ -1105,6 +1146,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_code_block_style(
     CodeBlockStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_conversion_error(
+    ConversionError self,
     SseSerializer serializer,
   );
 

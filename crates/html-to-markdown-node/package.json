@@ -10,7 +10,7 @@
     }
   ],
   "name": "@xberg-io/html-to-markdown",
-  "version": "3.18.6",
+  "version": "3.18.7",
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
   "repository": {
@@ -22,20 +22,21 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
+      "import": "./index.mjs",
       "require": "./index.js",
       "default": "./index.js"
     }
   },
-  "files": ["index.js", "index.d.ts", "*.node"],
+  "files": ["index.js", "binding.cjs", "index.mjs", "index.d.ts", "*.node"],
   "optionalDependencies": {
-    "@xberg-io/html-to-markdown-darwin-arm64": "3.18.6",
-    "@xberg-io/html-to-markdown-darwin-x64": "3.18.6",
-    "@xberg-io/html-to-markdown-linux-arm64-gnu": "3.18.6",
-    "@xberg-io/html-to-markdown-linux-arm64-musl": "3.18.6",
-    "@xberg-io/html-to-markdown-linux-x64-gnu": "3.18.6",
-    "@xberg-io/html-to-markdown-linux-x64-musl": "3.18.6",
-    "@xberg-io/html-to-markdown-win32-arm64-msvc": "3.18.6",
-    "@xberg-io/html-to-markdown-win32-x64-msvc": "3.18.6"
+    "@xberg-io/html-to-markdown-darwin-arm64": "3.18.7",
+    "@xberg-io/html-to-markdown-darwin-x64": "3.18.7",
+    "@xberg-io/html-to-markdown-linux-arm64-gnu": "3.18.7",
+    "@xberg-io/html-to-markdown-linux-arm64-musl": "3.18.7",
+    "@xberg-io/html-to-markdown-linux-x64-gnu": "3.18.7",
+    "@xberg-io/html-to-markdown-linux-x64-musl": "3.18.7",
+    "@xberg-io/html-to-markdown-win32-arm64-msvc": "3.18.7",
+    "@xberg-io/html-to-markdown-win32-x64-msvc": "3.18.7"
   },
   "napi": {
     "packageName": "@xberg-io/html-to-markdown",
@@ -52,7 +53,7 @@
     ]
   },
   "scripts": {
-    "build": "pnpm --package @napi-rs/cli@^3.7.3 dlx napi build --platform --release",
+    "build": "pnpm --package @napi-rs/cli@^3.7.3 dlx napi build --no-js --platform --release",
     "artifacts": "pnpm --package @napi-rs/cli@^3.7.3 dlx napi artifacts",
     "prepublishOnly": "pnpm --package @napi-rs/cli@^3.7.3 dlx napi prepublish -t npm --skip-optional-publish"
   },

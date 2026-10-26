@@ -110,32 +110,33 @@ if (!nativeBinding) {
   );
 }
 
-module.exports = nativeBinding;
+const binding = require("./binding.cjs")(nativeBinding);
+module.exports = binding;
 
 // --- BEGIN cjs named re-exports (issue #450) ---
 // Hand-maintained, and deliberately limited to the surface index.d.ts declares.
 // `module.exports = nativeBinding` alone gives Node's CJS named-export detection
 // nothing to see, so `import { convert } from ...` fails without these.
 // Keep in sync with index.d.ts; scripts/verify-loader-manifest.mjs enforces it.
-module.exports.convert = nativeBinding.convert;
-module.exports.CodeBlockStyle = nativeBinding.CodeBlockStyle;
-module.exports.HeadingStyle = nativeBinding.HeadingStyle;
-module.exports.HiddenContent = nativeBinding.HiddenContent;
-module.exports.HighlightStyle = nativeBinding.HighlightStyle;
-module.exports.ImageType = nativeBinding.ImageType;
-module.exports.InlineDataMedia = nativeBinding.InlineDataMedia;
-module.exports.LinkStyle = nativeBinding.LinkStyle;
-module.exports.LinkType = nativeBinding.LinkType;
-module.exports.ListIndentType = nativeBinding.ListIndentType;
-module.exports.NewlineStyle = nativeBinding.NewlineStyle;
-module.exports.NodeType = nativeBinding.NodeType;
-module.exports.OutputFormat = nativeBinding.OutputFormat;
-module.exports.PreprocessingPreset = nativeBinding.PreprocessingPreset;
-module.exports.StructuredDataType = nativeBinding.StructuredDataType;
-module.exports.TextDirection = nativeBinding.TextDirection;
-module.exports.TierStrategy = nativeBinding.TierStrategy;
-module.exports.UrlEscapeStyle = nativeBinding.UrlEscapeStyle;
-module.exports.VisitorHandle = nativeBinding.VisitorHandle;
-module.exports.VisitResult = nativeBinding.VisitResult;
-module.exports.WarningKind = nativeBinding.WarningKind;
-module.exports.WhitespaceMode = nativeBinding.WhitespaceMode;
+module.exports.convert = binding.convert;
+module.exports.CodeBlockStyle = binding.CodeBlockStyle;
+module.exports.HeadingStyle = binding.HeadingStyle;
+module.exports.HiddenContent = binding.HiddenContent;
+module.exports.HighlightStyle = binding.HighlightStyle;
+module.exports.ImageType = binding.ImageType;
+module.exports.InlineDataMedia = binding.InlineDataMedia;
+module.exports.LinkStyle = binding.LinkStyle;
+module.exports.LinkType = binding.LinkType;
+module.exports.ListIndentType = binding.ListIndentType;
+module.exports.NewlineStyle = binding.NewlineStyle;
+module.exports.NodeType = binding.NodeType;
+module.exports.OutputFormat = binding.OutputFormat;
+module.exports.PreprocessingPreset = binding.PreprocessingPreset;
+module.exports.StructuredDataType = binding.StructuredDataType;
+module.exports.TextDirection = binding.TextDirection;
+module.exports.TierStrategy = binding.TierStrategy;
+module.exports.UrlEscapeStyle = binding.UrlEscapeStyle;
+module.exports.VisitorHandle = binding.VisitorHandle;
+module.exports.VisitResult = binding.VisitResult;
+module.exports.WarningKind = binding.WarningKind;
+module.exports.WhitespaceMode = binding.WhitespaceMode;

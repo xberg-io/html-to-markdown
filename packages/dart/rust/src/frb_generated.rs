@@ -69,7 +69,7 @@ fn wire__crate__convert_impl(
             let api_options = <Option<crate::ConversionOptions>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
-                transform_result_sse::<_, String>((move || {
+                transform_result_sse::<_, AlefBridgeError>((move || {
                     let output_ok = crate::convert(api_html, api_options)?;
                     std::result::Result::Ok(output_ok)
                 })())
@@ -1210,7 +1210,7 @@ const _: fn() = || {
         crate::AnnotationKind::Highlight => {}
         crate::AnnotationKind::Link { url, title } => {
             let _: String = url;
-            let _: String = title;
+            let _: Option<String> = title;
         }
     }
     match None::<crate::ConversionError>.unwrap() {
@@ -1462,13 +1462,13 @@ const _: fn() = || {
             src,
             image_index,
         } => {
-            let _: String = description;
-            let _: String = src;
-            let _: i64 = image_index;
+            let _: Option<String> = description;
+            let _: Option<String> = src;
+            let _: Option<i64> = image_index;
         }
         crate::NodeContent::Code { text, language } => {
             let _: String = text;
-            let _: String = language;
+            let _: Option<String> = language;
         }
         crate::NodeContent::Quote => {}
         crate::NodeContent::DefinitionList => {}
@@ -1488,9 +1488,9 @@ const _: fn() = || {
             heading_level,
             heading_text,
         } => {
-            let _: String = label;
-            let _: i64 = heading_level;
-            let _: String = heading_text;
+            let _: Option<String> = label;
+            let _: Option<i64> = heading_level;
+            let _: Option<String> = heading_text;
         }
     }
     {
@@ -2103,6 +2103,14 @@ impl SseDecode for VisitorHandle {
     }
 }
 
+impl SseDecode for AlefBridgeError {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <crate::AlefBridgeErrorWire>::sse_decode(deserializer);
+        return crate::alef_decode_bridge_error(inner);
+    }
+}
+
 impl SseDecode for flutter_rust_bridge::DartOpaque {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2132,6 +2140,30 @@ impl SseDecode for String {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <Vec<u8>>::sse_decode(deserializer);
         return String::from_utf8(inner).unwrap();
+    }
+}
+
+impl SseDecode for crate::AlefBridgeErrorWire {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_error = <crate::ConversionError>::sse_decode(deserializer);
+                return crate::AlefBridgeErrorWire::ConversionError { error: var_error };
+            }
+            1 => {
+                let mut var_message = <String>::sse_decode(deserializer);
+                return crate::AlefBridgeErrorWire::InvalidInput { message: var_message };
+            }
+            2 => {
+                let mut var_message = <String>::sse_decode(deserializer);
+                return crate::AlefBridgeErrorWire::NativeFailure { message: var_message };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -2166,7 +2198,7 @@ impl SseDecode for crate::AnnotationKind {
             }
             8 => {
                 let mut var_url = <String>::sse_decode(deserializer);
-                let mut var_title = <String>::sse_decode(deserializer);
+                let mut var_title = <Option<String>>::sse_decode(deserializer);
                 return crate::AnnotationKind::Link {
                     url: var_url,
                     title: var_title,
@@ -3005,9 +3037,9 @@ impl SseDecode for crate::NodeContent {
                 return crate::NodeContent::Table { grid: var_grid };
             }
             5 => {
-                let mut var_description = <String>::sse_decode(deserializer);
-                let mut var_src = <String>::sse_decode(deserializer);
-                let mut var_imageIndex = <i64>::sse_decode(deserializer);
+                let mut var_description = <Option<String>>::sse_decode(deserializer);
+                let mut var_src = <Option<String>>::sse_decode(deserializer);
+                let mut var_imageIndex = <Option<i64>>::sse_decode(deserializer);
                 return crate::NodeContent::Image {
                     description: var_description,
                     src: var_src,
@@ -3016,7 +3048,7 @@ impl SseDecode for crate::NodeContent {
             }
             6 => {
                 let mut var_text = <String>::sse_decode(deserializer);
-                let mut var_language = <String>::sse_decode(deserializer);
+                let mut var_language = <Option<String>>::sse_decode(deserializer);
                 return crate::NodeContent::Code {
                     text: var_text,
                     language: var_language,
@@ -3049,9 +3081,9 @@ impl SseDecode for crate::NodeContent {
                 return crate::NodeContent::MetadataBlock { entries: var_entries };
             }
             12 => {
-                let mut var_label = <String>::sse_decode(deserializer);
-                let mut var_headingLevel = <i64>::sse_decode(deserializer);
-                let mut var_headingText = <String>::sse_decode(deserializer);
+                let mut var_label = <Option<String>>::sse_decode(deserializer);
+                let mut var_headingLevel = <Option<i64>>::sse_decode(deserializer);
+                let mut var_headingText = <Option<String>>::sse_decode(deserializer);
                 return crate::NodeContent::Group {
                     label: var_label,
                     heading_level: var_headingLevel,
@@ -3795,6 +3827,43 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<VisitorHandle>> for VisitorHan
     }
 }
 
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<AlefBridgeError> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        crate::alef_encode_bridge_error(self.0).into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<AlefBridgeError> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<AlefBridgeError>> for AlefBridgeError {
+    fn into_into_dart(self) -> FrbWrapper<AlefBridgeError> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::AlefBridgeErrorWire {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::AlefBridgeErrorWire::ConversionError { error } => {
+                [0.into_dart(), error.into_into_dart().into_dart()].into_dart()
+            }
+            crate::AlefBridgeErrorWire::InvalidInput { message } => {
+                [1.into_dart(), message.into_into_dart().into_dart()].into_dart()
+            }
+            crate::AlefBridgeErrorWire::NativeFailure { message } => {
+                [2.into_dart(), message.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::AlefBridgeErrorWire {}
+impl flutter_rust_bridge::IntoIntoDart<crate::AlefBridgeErrorWire> for crate::AlefBridgeErrorWire {
+    fn into_into_dart(self) -> crate::AlefBridgeErrorWire {
+        self
+    }
+}
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::AnnotationKind> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -4873,6 +4942,13 @@ impl SseEncode for VisitorHandle {
     }
 }
 
+impl SseEncode for AlefBridgeError {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::AlefBridgeErrorWire>::sse_encode(crate::alef_encode_bridge_error(self), serializer);
+    }
+}
+
 impl SseEncode for flutter_rust_bridge::DartOpaque {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4900,6 +4976,29 @@ impl SseEncode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Vec<u8>>::sse_encode(self.into_bytes(), serializer);
+    }
+}
+
+impl SseEncode for crate::AlefBridgeErrorWire {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::AlefBridgeErrorWire::ConversionError { error } => {
+                <i32>::sse_encode(0, serializer);
+                <crate::ConversionError>::sse_encode(error, serializer);
+            }
+            crate::AlefBridgeErrorWire::InvalidInput { message } => {
+                <i32>::sse_encode(1, serializer);
+                <String>::sse_encode(message, serializer);
+            }
+            crate::AlefBridgeErrorWire::NativeFailure { message } => {
+                <i32>::sse_encode(2, serializer);
+                <String>::sse_encode(message, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -4934,7 +5033,7 @@ impl SseEncode for crate::AnnotationKind {
             crate::AnnotationKind::Link { url, title } => {
                 <i32>::sse_encode(8, serializer);
                 <String>::sse_encode(url, serializer);
-                <String>::sse_encode(title, serializer);
+                <Option<String>>::sse_encode(title, serializer);
             }
             _ => {
                 unimplemented!("");
@@ -5597,14 +5696,14 @@ impl SseEncode for crate::NodeContent {
                 image_index,
             } => {
                 <i32>::sse_encode(5, serializer);
-                <String>::sse_encode(description, serializer);
-                <String>::sse_encode(src, serializer);
-                <i64>::sse_encode(image_index, serializer);
+                <Option<String>>::sse_encode(description, serializer);
+                <Option<String>>::sse_encode(src, serializer);
+                <Option<i64>>::sse_encode(image_index, serializer);
             }
             crate::NodeContent::Code { text, language } => {
                 <i32>::sse_encode(6, serializer);
                 <String>::sse_encode(text, serializer);
-                <String>::sse_encode(language, serializer);
+                <Option<String>>::sse_encode(language, serializer);
             }
             crate::NodeContent::Quote => {
                 <i32>::sse_encode(7, serializer);
@@ -5632,9 +5731,9 @@ impl SseEncode for crate::NodeContent {
                 heading_text,
             } => {
                 <i32>::sse_encode(12, serializer);
-                <String>::sse_encode(label, serializer);
-                <i64>::sse_encode(heading_level, serializer);
-                <String>::sse_encode(heading_text, serializer);
+                <Option<String>>::sse_encode(label, serializer);
+                <Option<i64>>::sse_encode(heading_level, serializer);
+                <Option<String>>::sse_encode(heading_text, serializer);
             }
             _ => {
                 unimplemented!("");

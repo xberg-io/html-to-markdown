@@ -33,6 +33,8 @@ owned_paths = [
   "crates/html-to-markdown-node/.gitignore",
   "crates/html-to-markdown-node/LICENSE",
   "crates/html-to-markdown-node/README.md",
+  "crates/html-to-markdown-node/binding.cjs",
+  "crates/html-to-markdown-node/index.mjs",
   "crates/html-to-markdown-node/npm/darwin-arm64/package.json",
   "crates/html-to-markdown-node/npm/darwin-x64/package.json",
   "crates/html-to-markdown-node/npm/linux-arm64-gnu/package.json",

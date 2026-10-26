@@ -378,6 +378,7 @@ tasks:
     # `html-to-markdown-monorepo-*` packages that are never published. ~keep
     cmds:
       - node crates/html-to-markdown-node/scripts/verify-loader-manifest.mjs
+      - node --test crates/html-to-markdown-node/scripts/loader-errors.test.mjs
 
   node:e2e:
     desc: "Build Node binding and run e2e/node fixture tests"

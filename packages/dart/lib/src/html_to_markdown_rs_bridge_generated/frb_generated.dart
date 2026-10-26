@@ -517,7 +517,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_conversion_result,
-          decodeErrorData: sse_decode_String,
+          decodeErrorData:
+              sse_decode_CustomSerializer_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAlefBridgeError,
         ),
         constMeta: kCrateConvertConstMeta,
         argValues: [html, options],
@@ -2456,6 +2457,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Object
+  dco_decode_CustomSerializer_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAlefBridgeError(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return switch (dco_decode_alef_bridge_error_wire(raw)) {
+      AlefBridgeErrorWire_ConversionError(:final error) => error,
+      AlefBridgeErrorWire_InvalidInput(:final message) => ArgumentError(
+        message,
+      ),
+      AlefBridgeErrorWire_NativeFailure(:final message) => StateError(message),
+    };
+  }
+
+  @protected
   FutureOr<VisitResult> Function(NodeContext)
   dco_decode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
     dynamic raw,
@@ -2612,6 +2628,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AlefBridgeErrorWire dco_decode_alef_bridge_error_wire(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return AlefBridgeErrorWire_ConversionError(
+          error: dco_decode_box_autoadd_conversion_error(raw[1]),
+        );
+      case 1:
+        return AlefBridgeErrorWire_InvalidInput(
+          message: dco_decode_String(raw[1]),
+        );
+      case 2:
+        return AlefBridgeErrorWire_NativeFailure(
+          message: dco_decode_String(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
   AnnotationKind dco_decode_annotation_kind(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
@@ -2634,7 +2671,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 8:
         return AnnotationKind_Link(
           url: dco_decode_String(raw[1]),
-          title: dco_decode_String(raw[2]),
+          title: dco_decode_opt_String(raw[2]),
         );
       default:
         throw Exception("unreachable");
@@ -2668,6 +2705,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CodeBlockStyle dco_decode_box_autoadd_code_block_style(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_code_block_style(raw);
+  }
+
+  @protected
+  ConversionError dco_decode_box_autoadd_conversion_error(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_conversion_error(raw);
   }
 
   @protected
@@ -3294,14 +3337,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         );
       case 5:
         return NodeContent_Image(
-          description: dco_decode_String(raw[1]),
-          src: dco_decode_String(raw[2]),
-          imageIndex: dco_decode_i_64(raw[3]),
+          description: dco_decode_opt_String(raw[1]),
+          src: dco_decode_opt_String(raw[2]),
+          imageIndex: dco_decode_opt_box_autoadd_i_64(raw[3]),
         );
       case 6:
         return NodeContent_Code(
           text: dco_decode_String(raw[1]),
-          language: dco_decode_String(raw[2]),
+          language: dco_decode_opt_String(raw[2]),
         );
       case 7:
         return NodeContent_Quote();
@@ -3323,9 +3366,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         );
       case 12:
         return NodeContent_Group(
-          label: dco_decode_String(raw[1]),
-          headingLevel: dco_decode_i_64(raw[2]),
-          headingText: dco_decode_String(raw[3]),
+          label: dco_decode_opt_String(raw[1]),
+          headingLevel: dco_decode_opt_box_autoadd_i_64(raw[2]),
+          headingText: dco_decode_opt_String(raw[3]),
         );
       default:
         throw Exception("unreachable");
@@ -3724,6 +3767,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Object
+  sse_decode_CustomSerializer_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAlefBridgeError(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_alef_bridge_error_wire(deserializer);
+    return switch (inner) {
+      AlefBridgeErrorWire_ConversionError(:final error) => error,
+      AlefBridgeErrorWire_InvalidInput(:final message) => ArgumentError(
+        message,
+      ),
+      AlefBridgeErrorWire_NativeFailure(:final message) => StateError(message),
+    };
+  }
+
+  @protected
   Object sse_decode_DartOpaque(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_isize(deserializer);
@@ -3759,6 +3818,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AlefBridgeErrorWire sse_decode_alef_bridge_error_wire(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_error = sse_decode_box_autoadd_conversion_error(deserializer);
+        return AlefBridgeErrorWire_ConversionError(error: var_error);
+      case 1:
+        var var_message = sse_decode_String(deserializer);
+        return AlefBridgeErrorWire_InvalidInput(message: var_message);
+      case 2:
+        var var_message = sse_decode_String(deserializer);
+        return AlefBridgeErrorWire_NativeFailure(message: var_message);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
   AnnotationKind sse_decode_annotation_kind(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -3782,7 +3863,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return AnnotationKind_Highlight();
       case 8:
         var var_url = sse_decode_String(deserializer);
-        var var_title = sse_decode_String(deserializer);
+        var var_title = sse_decode_opt_String(deserializer);
         return AnnotationKind_Link(url: var_url, title: var_title);
       default:
         throw UnimplementedError('');
@@ -3818,6 +3899,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_code_block_style(deserializer));
+  }
+
+  @protected
+  ConversionError sse_decode_box_autoadd_conversion_error(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_conversion_error(deserializer));
   }
 
   @protected
@@ -4736,9 +4825,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_grid = sse_decode_box_autoadd_table_grid(deserializer);
         return NodeContent_Table(grid: var_grid);
       case 5:
-        var var_description = sse_decode_String(deserializer);
-        var var_src = sse_decode_String(deserializer);
-        var var_imageIndex = sse_decode_i_64(deserializer);
+        var var_description = sse_decode_opt_String(deserializer);
+        var var_src = sse_decode_opt_String(deserializer);
+        var var_imageIndex = sse_decode_opt_box_autoadd_i_64(deserializer);
         return NodeContent_Image(
           description: var_description,
           src: var_src,
@@ -4746,7 +4835,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         );
       case 6:
         var var_text = sse_decode_String(deserializer);
-        var var_language = sse_decode_String(deserializer);
+        var var_language = sse_decode_opt_String(deserializer);
         return NodeContent_Code(text: var_text, language: var_language);
       case 7:
         return NodeContent_Quote();
@@ -4767,9 +4856,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_entries = sse_decode_list_metadata_entry(deserializer);
         return NodeContent_MetadataBlock(entries: var_entries);
       case 12:
-        var var_label = sse_decode_String(deserializer);
-        var var_headingLevel = sse_decode_i_64(deserializer);
-        var var_headingText = sse_decode_String(deserializer);
+        var var_label = sse_decode_opt_String(deserializer);
+        var var_headingLevel = sse_decode_opt_box_autoadd_i_64(deserializer);
+        var var_headingText = sse_decode_opt_String(deserializer);
         return NodeContent_Group(
           label: var_label,
           headingLevel: var_headingLevel,
@@ -5335,6 +5424,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+  sse_encode_CustomSerializer_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAlefBridgeError(
+    Object self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_alef_bridge_error_wire(switch (self) {
+      ConversionError error => AlefBridgeErrorWire.conversionError(
+        error: error,
+      ),
+      ArgumentError error => AlefBridgeErrorWire.invalidInput(
+        message: error.message.toString(),
+      ),
+      StateError error => AlefBridgeErrorWire.nativeFailure(
+        message: error.message,
+      ),
+      _ => throw ArgumentError.value(self, 'error', 'Unsupported bridge error'),
+    }, serializer);
+  }
+
+  @protected
+  void
   sse_encode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
     FutureOr<VisitResult> Function(NodeContext) self,
     SseSerializer serializer,
@@ -5591,6 +5701,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_alef_bridge_error_wire(
+    AlefBridgeErrorWire self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case AlefBridgeErrorWire_ConversionError(error: final error):
+        sse_encode_i_32(0, serializer);
+        sse_encode_box_autoadd_conversion_error(error, serializer);
+      case AlefBridgeErrorWire_InvalidInput(message: final message):
+        sse_encode_i_32(1, serializer);
+        sse_encode_String(message, serializer);
+      case AlefBridgeErrorWire_NativeFailure(message: final message):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(message, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_annotation_kind(
     AnnotationKind self,
     SseSerializer serializer,
@@ -5616,7 +5745,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case AnnotationKind_Link(url: final url, title: final title):
         sse_encode_i_32(8, serializer);
         sse_encode_String(url, serializer);
-        sse_encode_String(title, serializer);
+        sse_encode_opt_String(title, serializer);
     }
   }
 
@@ -5652,6 +5781,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_code_block_style(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_conversion_error(
+    ConversionError self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_conversion_error(self, serializer);
   }
 
   @protected
@@ -6408,13 +6546,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         imageIndex: final imageIndex,
       ):
         sse_encode_i_32(5, serializer);
-        sse_encode_String(description, serializer);
-        sse_encode_String(src, serializer);
-        sse_encode_i_64(imageIndex, serializer);
+        sse_encode_opt_String(description, serializer);
+        sse_encode_opt_String(src, serializer);
+        sse_encode_opt_box_autoadd_i_64(imageIndex, serializer);
       case NodeContent_Code(text: final text, language: final language):
         sse_encode_i_32(6, serializer);
         sse_encode_String(text, serializer);
-        sse_encode_String(language, serializer);
+        sse_encode_opt_String(language, serializer);
       case NodeContent_Quote():
         sse_encode_i_32(7, serializer);
       case NodeContent_DefinitionList():
@@ -6439,9 +6577,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         headingText: final headingText,
       ):
         sse_encode_i_32(12, serializer);
-        sse_encode_String(label, serializer);
-        sse_encode_i_64(headingLevel, serializer);
-        sse_encode_String(headingText, serializer);
+        sse_encode_opt_String(label, serializer);
+        sse_encode_opt_box_autoadd_i_64(headingLevel, serializer);
+        sse_encode_opt_String(headingText, serializer);
     }
   }
 

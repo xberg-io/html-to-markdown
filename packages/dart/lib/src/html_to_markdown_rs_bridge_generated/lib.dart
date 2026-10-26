@@ -11,7 +11,7 @@ part 'lib.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `try_convert_annotation_kind_from_core`, `try_convert_image_type_from_core`, `try_convert_link_type_from_core`, `try_convert_node_content_from_core`, `try_convert_node_type_from_core`, `try_convert_structured_data_type_from_core`, `try_convert_text_direction_from_core`, `try_convert_tier_strategy_from_core`, `try_convert_visit_result_from_core`, `try_convert_warning_kind_from_core`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `HtmlVisitorDartImpl`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `try_from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
 /// Convert HTML to Markdown, Djot, or plain text.
 ///
@@ -266,6 +266,19 @@ Future<ConversionOptions> createConversionOptionsFromJsonWithVisitor({
 abstract class VisitorHandle implements RustOpaqueInterface {}
 
 @freezed
+sealed class AlefBridgeErrorWire with _$AlefBridgeErrorWire {
+  const AlefBridgeErrorWire._();
+
+  const factory AlefBridgeErrorWire.conversionError({
+    required ConversionError error,
+  }) = AlefBridgeErrorWire_ConversionError;
+  const factory AlefBridgeErrorWire.invalidInput({required String message}) =
+      AlefBridgeErrorWire_InvalidInput;
+  const factory AlefBridgeErrorWire.nativeFailure({required String message}) =
+      AlefBridgeErrorWire_NativeFailure;
+}
+
+@freezed
 sealed class AnnotationKind with _$AnnotationKind {
   const AnnotationKind._();
 
@@ -307,7 +320,7 @@ sealed class AnnotationKind with _$AnnotationKind {
     ///
     /// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
     /// is copied verbatim — HTML entities within the title are not decoded.
-    required String title,
+    String? title,
   }) = AnnotationKind_Link;
 }
 
@@ -1973,13 +1986,13 @@ sealed class NodeContent with _$NodeContent {
   /// An image element.
   const factory NodeContent.image({
     /// Alt text or caption.
-    required String description,
+    String? description,
 
     /// Image source URL.
-    required String src,
+    String? src,
 
     /// Index into `ConversionResult.images` when image extraction is enabled.
-    required PlatformInt64 imageIndex,
+    PlatformInt64? imageIndex,
   }) = NodeContent_Image;
 
   /// A code block or inline code.
@@ -1988,7 +2001,7 @@ sealed class NodeContent with _$NodeContent {
     required String text,
 
     /// Programming language (from class="language-*" or similar).
-    required String language,
+    String? language,
   }) = NodeContent_Code;
 
   /// A block quote container.
@@ -2024,13 +2037,13 @@ sealed class NodeContent with _$NodeContent {
   /// A section grouping container (auto-generated from heading hierarchy).
   const factory NodeContent.group({
     /// Optional section label.
-    required String label,
+    String? label,
 
     /// The heading level that created this group.
-    required PlatformInt64 headingLevel,
+    PlatformInt64? headingLevel,
 
     /// The heading text that created this group.
-    required String headingText,
+    String? headingText,
   }) = NodeContent_Group;
 }
 

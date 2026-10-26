@@ -7,17 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.7] - 2026-10-26
+
 ### Added
 
 - Add `use_accessible_names` (default `true`) to omit link accessibility-name fallbacks and SVG labels
   while retaining drawn text when disabled (#941).
 
+### Changed
+
+- Regenerate language bindings, package scaffolding, documentation, and test suites with Alef 0.114.2.
+- Require released ai-rulez 5.7.0 for local tooling, generated hooks, and CI (#939).
+- Run automatic CI on main while retaining scheduled and manual workflows.
+
 ### Fixed
 
+- Preserve separators around whitespace-only links and inline elements without exposing link destinations (#932, #933).
+- Preserve no-break spaces at nested emphasis boundaries and whitespace before nested list blocks (#934, #935).
+- Separate adjacent links containing block elements and retain boundary breaks in code and labels (#936, #937).
+- Select the presentation branch of MathML semantics without duplicating annotations, and preserve fraction and
+  power structure (#938, #940).
+- Preserve structured native error properties through Node CommonJS and ECMAScript module entry points.
 - Separate the text on either side of a `<br>` in the document structure, with a line break in a paragraph or list
   item and a space in a heading, so `Loose words<br>next line` is no longer recorded as `Loose wordsnext line`.
 - Record text outside a paragraph, heading or list item in the document structure, such as the text of
   `<div>Words</div>` or the text after a list or a table, so a consumer of the structure no longer loses it.
+
+### Security
+
+- Update ctutils to 0.4.6 to address RUSTSEC-2026-0385 and refresh Rust dependency locks.
+- Refresh PHP consumer-test development dependencies to remove Guzzle and PSR-7 security advisories.
 
 ## [3.18.6] - 2026-10-22
 

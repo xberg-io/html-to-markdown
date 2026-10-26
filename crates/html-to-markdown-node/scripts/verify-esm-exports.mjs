@@ -9,7 +9,9 @@
 // local/e2e `build` (which builds for the host via `--platform`), never in the
 // cross-compiling publish pipeline.
 
+import assert from "node:assert/strict";
 import { convert, OutputFormat } from "../index.js";
+import { convert as esmConvert } from "../index.mjs";
 
 if (typeof convert !== "function") {
   throw new Error(`#450 regression: named ESM export 'convert' is ${typeof convert}, expected function`);
@@ -24,4 +26,11 @@ if (markdown !== "# Hi\n") {
   throw new Error(`#450 regression: convert('<h1>Hi</h1>') returned ${JSON.stringify(markdown)}, expected "# Hi\\n"`);
 }
 
-console.log("verify-esm-exports: named ESM import of convert/OutputFormat works");
+for (const convertEntry of [convert, esmConvert]) {
+  assert.throws(() => convertEntry("too large", { maxInputSize: 1 }), {
+    kind: "InputTooLarge",
+    errorCode: 2,
+  });
+}
+
+console.log("verify-esm-exports: named imports and structured native errors work through both entries");

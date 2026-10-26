@@ -5,7 +5,7 @@ description: Extract structured HTML metadata
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:658cd078254249ff5c09c0555b942b038c47d078ef71754ea190d3c532ca5916
-Source-Hash: blake3:4237e14c4d547597faf915235dde5b5d71e8c9d84681d23919d03302b738a0b4
+Source-Hash: blake3:571c1187fac6e0cfcc2bd10e17d375c8c48b543c2c61d7688ab801e93d286c0d
 Schema-Version: v1
 -->
 
