@@ -393,11 +393,10 @@ impl LinkData {
             .dom_context
             .children_of(handler.node_handle.get_inner())
             .map_or_else(|| tag.children().top().iter().copied().collect(), ToOwned::to_owned);
-        let hidden_content = handler.options.hidden_content;
         let (inline_text, _, saw_block) =
-            collect_link_label_text(&children, handler.parser, handler.dom_context, hidden_content);
+            collect_link_label_text(&children, handler.parser, handler.dom_context, handler.options);
         let text_source = if saw_block {
-            link_text_content(&children, handler.parser, handler.dom_context, hidden_content)
+            link_text_content(&children, handler.parser, handler.dom_context, handler.options)
         } else {
             inline_text.clone()
         };
@@ -691,7 +690,7 @@ fn apply_label_fallbacks(tag: &tl::HTMLTag<'_>, data: &LinkData, label: &mut Str
     // ~keep too: its icon comes from a style sheet. Its own address is the last label, for a link
     // ~keep that has content and no name; a link that holds only empty text wrappers keeps an
     // ~keep empty label (#771). A link that `leads_nowhere_else` is not named: it is left out.
-    if label.is_empty() && !data.leads_nowhere_else() {
+    if handler.options.use_accessible_names && label.is_empty() && !data.leads_nowhere_else() {
         let aria_label = crate::converter::utility::attributes::decoded_attribute(tag, "aria-label");
         let title = link_title(tag);
         if let Some(name) = link_accessible_name(aria_label.as_deref(), title.as_deref()) {
