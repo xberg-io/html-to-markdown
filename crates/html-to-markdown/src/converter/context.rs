@@ -168,8 +168,8 @@ pub struct Context {
     pub(crate) in_code_block: bool,
     /// ~keep Link ranges refer to the raw inline-code buffer, before delimiters are emitted (#813).
     pub(super) inline_code_links: Option<Rc<RefCell<Vec<InlineCodeLink>>>>,
-    /// ~keep Direct BR emissions distinguish code split markers from authored newlines (#921, #868).
-    pub(crate) inline_code_breaks: Option<(u32, Rc<Cell<usize>>)>,
+    /// ~keep Direct BR offsets distinguish retained edge breaks from authored newlines (#937, #921, #868).
+    pub(crate) inline_code_breaks: Option<(u32, Rc<RefCell<Vec<usize>>>)>,
     /// ~keep Rendered media labels own a word boundary; recursive walks save their parent state.
     pub(crate) media_boundary: Option<Rc<Cell<MediaBoundaryState>>>,
     /// Output offsets of real `<br>` nodes while a table-cell `<pre>` is collected. ~keep

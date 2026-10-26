@@ -89,7 +89,7 @@ pub fn open_code(
         return Open::children_only();
     }
     let links = Rc::new(std::cell::RefCell::new(Vec::new()));
-    let breaks = Rc::new(std::cell::Cell::new(0));
+    let breaks = Rc::new(std::cell::RefCell::new(Vec::new()));
     let code_ctx = Context {
         in_code: true,
         inline_code_breaks: Some((node_handle.get_inner(), breaks.clone())),
@@ -118,7 +118,7 @@ pub fn open_code(
 /// What [`open_code`] leaves for [`close_code`]: the links that the children wrote.
 pub struct CodeEnd {
     links: Rc<std::cell::RefCell<Vec<crate::converter::context::InlineCodeLink>>>,
-    breaks: Rc<std::cell::Cell<usize>>,
+    breaks: Rc<std::cell::RefCell<Vec<usize>>>,
     source_whitespace_only: bool,
 }
 
@@ -143,21 +143,25 @@ pub fn close_code(end: &CodeEnd, content: &str, mut handler: HandlerContext<'_>)
     }
     // ~keep Empty source line endings also reach this buffer (#868). Only retained BR
     // ~keep emissions can turn a newline-only body into actual hard breaks (#921).
-    if content.bytes().all(|byte| byte == b'\n') && end.breaks.get() > 0 {
-        for _ in 0..end.breaks.get() {
+    if content.bytes().all(|byte| byte == b'\n') && !end.breaks.borrow().is_empty() {
+        for _ in 0..end.breaks.borrow().len() {
             emit_collected_code_break(&mut handler);
         }
         return;
     }
     if end.source_whitespace_only
         && content.bytes().all(|byte| byte == b'\n')
-        && end.breaks.get() == 0
+        && end.breaks.borrow().is_empty()
         && handler.options.whitespace_mode == crate::options::WhitespaceMode::Normalized
     {
         crate::converter::inline::wrapped::emit_whitespace_only_inline_body(content, handler.output);
         return;
     }
-    if end.breaks.get() > 0
+    if end
+        .breaks
+        .borrow()
+        .first()
+        .is_some_and(|offset| content[..*offset].bytes().all(|byte| byte == b'\n'))
         && content.starts_with('\n')
         && !handler.output.is_empty()
         && crate::converter::utility::white_space::space_is_owed(handler.output)
@@ -165,7 +169,11 @@ pub fn close_code(end: &CodeEnd, content: &str, mut handler: HandlerContext<'_>)
         emit_collected_code_break(&mut handler);
     }
     emit_inline_code_with_links(content, &end.links.borrow(), &mut handler);
-    if end.breaks.get() > 0
+    if end
+        .breaks
+        .borrow()
+        .last()
+        .is_some_and(|offset| content[*offset + 1..].bytes().all(|byte| byte == b'\n'))
         && content.ends_with('\n')
         && crate::converter::utility::siblings::following_sibling_content(
             handler.node_handle.get_inner(),

@@ -34,22 +34,22 @@ pub fn handle(node_handle: &NodeHandle, parser: &Parser, output: &mut String, ha
         return;
     }
 
-    // ~keep Nested-wrapper BRs keep the established empty-boundary policy (#868).
-    // ~keep Only a retained direct code child opts into the break-only correction (#921).
-    if ctx.in_code
-        && !ctx.in_code_block
-        && let Some((owner, breaks)) = &ctx.inline_code_breaks
-        && handler.dom_ctx.parent_of(node_handle.get_inner()) == Some(*owner)
-    {
-        breaks.set(breaks.get().saturating_add(1));
-    }
-
     if let Some(rule_like_text) = &ctx.djot_rule_like_text {
         rule_like_text.advance();
     }
 
     record_structure_break(ctx);
     if write_special_break(output, ctx) {
+        // ~keep Heading/cell code can fold BR to space; record only actual split markers (#937).
+        // ~keep Nested-wrapper BRs retain the established empty-boundary policy (#868).
+        if ctx.in_code
+            && !ctx.in_code_block
+            && output.ends_with('\n')
+            && let Some((owner, breaks)) = &ctx.inline_code_breaks
+            && handler.dom_ctx.parent_of(node_handle.get_inner()) == Some(*owner)
+        {
+            breaks.borrow_mut().push(output.len() - 1);
+        }
         return;
     }
     write_flow_break(output, options, ctx);

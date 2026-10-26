@@ -623,7 +623,7 @@ fn begin_tag<'a>(
         #[cfg(feature = "visitor")]
         output_start: element_output_start,
         #[cfg(feature = "visitor")]
-        code_break_start: ctx.inline_code_breaks.as_ref().map(|(_, breaks)| breaks.get()),
+        code_break_start: ctx.inline_code_breaks.as_ref().map(|(_, breaks)| breaks.borrow().len()),
         #[cfg(not(feature = "visitor"))]
         marker: std::marker::PhantomData,
     })
@@ -721,7 +721,7 @@ fn finish_tag(
                     handler.ctx.inline_code_breaks.as_ref().zip(capture.code_break_start)
                 && handler.dom_ctx.parent_of(capture.node_id) == Some(*owner)
             {
-                breaks.set(before);
+                breaks.borrow_mut().truncate(before);
             }
             // ~keep Only replacing leading output invalidates a label's first-button boundary.
             if matches!(action, VisitAction::Skip | VisitAction::Custom)

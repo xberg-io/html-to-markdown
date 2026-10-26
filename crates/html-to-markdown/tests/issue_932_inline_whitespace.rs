@@ -115,6 +115,8 @@ fn should_keep_edge_breaks_in_code_and_labels() {
     for (html, expected) in [
         ("<p><code>alpha<br></code>omega</p>", "`alpha`  \nomega\n"),
         ("<p>alpha<code><br>omega</code></p>", "alpha  \n`omega`\n"),
+        ("<p>alpha<code>\n<br>omega</code></p>", "alpha  \n`omega`\n"),
+        ("<p><code>alpha<br>\n</code>omega</p>", "`alpha`  \nomega\n"),
         ("<p><label>alpha<br></label>omega</p>", "alpha  \nomega\n"),
         ("<p>alpha<label><br>omega</label></p>", "alpha  \nomega\n"),
     ] {
@@ -126,5 +128,37 @@ fn should_keep_edge_breaks_in_code_and_labels() {
         ] {
             assert_eq!(converted(html, tier), expected, "html: {html}, tier: {tier:?}");
         }
+    }
+}
+
+#[test]
+fn should_not_promote_source_newlines_to_code_edge_breaks() {
+    for (html, expected) in [
+        (
+            "<p>before<code>\n<span>alpha</span><br>beta</code>after</p>",
+            "before`alpha`  \n`beta`after\n",
+        ),
+        (
+            "<p>before<code>alpha<br><span>beta</span>\n</code>after</p>",
+            "before`alpha`  \n`beta`after\n",
+        ),
+    ] {
+        for tier in [TierStrategy::Auto, TierStrategy::Tier2] {
+            assert_eq!(converted(html, tier), expected, "html: {html}, tier: {tier:?}");
+        }
+    }
+}
+
+#[test]
+fn should_keep_code_break_offsets_valid_in_headings_and_cells() {
+    for (html, expected) in [
+        ("<h1>before<code>a  <br></code>after</h1>", "# before`a `after\n"),
+        ("<h1>before<code>λ  <br></code>after</h1>", "# before`λ `after\n"),
+        (
+            "<table><tr><td>before<code>λ  <br></code>after</td></tr></table>",
+            "| before`λ `after |\n| --------------- |\n",
+        ),
+    ] {
+        assert_eq!(converted(html, TierStrategy::Tier2), expected, "html: {html}");
     }
 }
