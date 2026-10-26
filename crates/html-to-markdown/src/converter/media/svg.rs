@@ -598,7 +598,7 @@ pub fn handle_math(
     use crate::converter::utility::content::get_math_text_content;
     use crate::text;
 
-    let text_content = get_math_text_content(node_handle, parser, dom_ctx);
+    let text_content = get_math_text_content(node_handle, parser, dom_ctx, options.hidden_content);
 
     if text_content.is_empty() {
         return;
