@@ -15,16 +15,6 @@ on:
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - ".github/workflows/ci-security.yaml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "deny.toml"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - ".github/workflows/ci-security.yaml"
   workflow_dispatch: {}
   schedule:
     # Catch newly-published advisories against unchanged dependencies.
