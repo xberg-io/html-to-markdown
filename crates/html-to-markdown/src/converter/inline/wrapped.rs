@@ -419,6 +419,20 @@ fn strict_blank_separator<'a>(content: &'a str, site: InlineSite<'_>) -> &'a str
     }
 }
 
+fn inline_edges<'a>(content: &'a str, options: &crate::options::ConversionOptions) -> (&'a str, &'a str, &'a str) {
+    use crate::converter::chomp_inline;
+    let (mut prefix, mut suffix, trimmed) = chomp_inline(content);
+    if options.whitespace_mode == crate::options::WhitespaceMode::Normalized && !trimmed.is_empty() {
+        if content.starts_with(crate::text::is_unicode_space) {
+            prefix = " ";
+        }
+        if content.ends_with(crate::text::is_unicode_space) {
+            suffix = " ";
+        }
+    }
+    (prefix, suffix, trimmed)
+}
+
 /// Emit `content` wrapped in `delimiters`, handling delimiter-run adjacency with a preceding
 /// sibling and a body that is non-empty but entirely whitespace.
 pub fn emit_wrapped_inline(
@@ -441,21 +455,13 @@ pub fn emit_wrapped_inline(
         sibling_tag_names,
     } = *delimiters;
     use crate::converter::utility::siblings::get_previous_sibling_tag;
-    use crate::converter::{append_inline_suffix, chomp_inline, merge_adjacent_emphasis};
+    use crate::converter::{append_inline_suffix, merge_adjacent_emphasis};
 
     let moved = move_leading_hard_breaks(output, strict_blank_separator(content, site), ctx, options);
     // ~keep A blank wrapper after real strong markup remains a separator (#502/#504).
     // DOM provenance plus the configured close marker excludes marker-looking prose.
     let content = strong_separator_content(output, moved, keeps_hard_break(content, site), site);
-    let (mut prefix, mut suffix, trimmed) = chomp_inline(content);
-    if options.whitespace_mode == crate::options::WhitespaceMode::Normalized && !trimmed.is_empty() {
-        if content.starts_with(crate::text::is_unicode_space) {
-            prefix = " ";
-        }
-        if content.ends_with(crate::text::is_unicode_space) {
-            suffix = " ";
-        }
-    }
+    let (prefix, suffix, trimmed) = inline_edges(content, options);
     if emit_break_sentinel(output, content, ctx, options) {
         return;
     }

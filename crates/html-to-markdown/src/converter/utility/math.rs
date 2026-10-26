@@ -38,7 +38,7 @@ pub(super) fn text_content(
                     output.push_str(&token.split_ascii_whitespace().collect::<Vec<_>>().join(" "));
                     continue;
                 }
-                push_children(&mut stack, handle, tag, parser, dom_ctx, hidden_content, in_math);
+                push_children(&mut stack, handle, parser, dom_ctx, hidden_content, in_math);
             }
             _ => {}
         }
@@ -53,12 +53,14 @@ fn is_token(name: &str) -> bool {
 fn push_children(
     stack: &mut Vec<Step>,
     handle: NodeHandle,
-    tag: &tl::HTMLTag,
     parser: &Parser,
     dom_ctx: &DomContext,
     hidden_content: HiddenContent,
     in_math: bool,
 ) {
+    let Some(Node::Tag(tag)) = handle.get(parser) else {
+        return;
+    };
     let children = dom_ctx
         .children_of(handle.get_inner())
         .cloned()
