@@ -1364,6 +1364,13 @@ int32_t htm_conversion_options_skip_images(HTMAlefHandle handle);
 HTMAlefHandle htm_conversion_options_inline_data_media(HTMAlefHandle handle);
 
 /**
+ * Get the `use_accessible_names` field from a `ConversionOptions`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t htm_conversion_options_use_accessible_names(HTMAlefHandle handle);
+
+/**
  * Get the `hidden_content` field from a `ConversionOptions`.
  * A non-null returned handle is owned by the caller.
  * It must be freed with `htm_hidden_content_free`.
@@ -2043,6 +2050,26 @@ int32_t htm_conversion_options_update_has_skip_images(HTMAlefHandle handle);
  * Pointer must be a valid handle returned by this library.
  */
 HTMAlefHandle htm_conversion_options_update_inline_data_media(HTMAlefHandle handle);
+
+/**
+ * Get the `use_accessible_names` field from a `ConversionOptionsUpdate`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t htm_conversion_options_update_use_accessible_names(HTMAlefHandle handle);
+
+/**
+ * Report whether the `use_accessible_names` field on a `ConversionOptionsUpdate` is `Some`.
+ *
+ * `htm_conversion_options_update_use_accessible_names` cannot distinguish a `None` field from a
+ * legitimate zero-valued `Some` at the C ABI boundary -- there is no null representation for a
+ * numeric return, so both collapse to the same sentinel. Call this function first: `1` means
+ * the field getter's return value is meaningful, `0` means the field is absent and the getter's
+ * sentinel must be ignored, `-1` reports an invalid handle (see `htm_last_error_code`).
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t htm_conversion_options_update_has_use_accessible_names(HTMAlefHandle handle);
 
 /**
  * Get the `hidden_content` field from a `ConversionOptionsUpdate`.

@@ -175,6 +175,10 @@ pub struct ConversionOptions {
     /// `data:` URL: the URL with its payload ([`InlineDataMedia::Keep`], the default), the alt
     /// text alone, or nothing. See [`InlineDataMedia`] for the elements it covers.
     pub inline_data_media: InlineDataMedia,
+    /// Use link `aria-label` or `title` as fallback link text and include SVG `aria-label`,
+    /// `title` and `desc` in the graphic text (default `true`). Set to `false` to keep only
+    /// drawn SVG text and existing link content. Link title metadata and image alt text remain.
+    pub use_accessible_names: bool,
     /// Which text that a browser does not show at first the output holds: none of it
     /// ([`HiddenContent::Drop`], the default), the text a reader can get to in the page, such as
     /// an inactive tab panel ([`HiddenContent::Reachable`]), or that text and the content of
@@ -325,6 +329,7 @@ impl Default for ConversionOptions {
             preserve_tags: Vec::new(),
             skip_images: false,
             inline_data_media: InlineDataMedia::Keep,
+            use_accessible_names: true,
             hidden_content: HiddenContent::Drop,
             url_escape_style: UrlEscapeStyle::default(),
             link_style: LinkStyle::default(),
@@ -444,6 +449,7 @@ impl ConversionOptionsBuilder {
     builder_setter!(convert_as_inline, bool);
     builder_setter!(skip_images, bool);
     builder_setter!(inline_data_media, InlineDataMedia);
+    builder_setter!(use_accessible_names, bool);
     builder_setter!(hidden_content, HiddenContent);
     builder_setter!(url_escape_style, UrlEscapeStyle);
 
@@ -599,6 +605,8 @@ pub struct ConversionOptionsUpdate {
     pub skip_images: Option<bool>,
     /// Optional override for [`ConversionOptions::inline_data_media`].
     pub inline_data_media: Option<InlineDataMedia>,
+    /// Optional override for [`ConversionOptions::use_accessible_names`].
+    pub use_accessible_names: Option<bool>,
     /// Optional override for [`ConversionOptions::hidden_content`].
     pub hidden_content: Option<HiddenContent>,
     /// Optional override for [`ConversionOptions::url_escape_style`].
@@ -678,6 +686,7 @@ impl ConversionOptions {
         apply!(preserve_tags);
         apply!(skip_images);
         apply!(inline_data_media);
+        apply!(use_accessible_names);
         apply!(hidden_content);
         apply!(url_escape_style);
         apply!(link_style);
