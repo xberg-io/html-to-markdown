@@ -72,6 +72,29 @@ include_outputs = false
 # ~keep Alef publishes the canonical html-to-markdown MCP reference as the mcp skill.
 allow_overrides = ["claude:mcp", "python-conventions"]
 
+# Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
+[[lint.ignore_rules]]
+rules = ["AR701"]
+paths = [
+  ".claude/skills/*/SKILL.md",
+  ".codex/skills/*/SKILL.md",
+  ".github/skills/*/SKILL.md",
+  "plugin/.cursor-plugin/skills/*/SKILL.md",
+  "plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/*/SKILL.md",
+  "plugin/.hermes/plugins/html-to-markdown/skills/*/SKILL.md",
+  "plugin/.opencode/skills/*/SKILL.md",
+  "plugin/.pi/skills/*/SKILL.md",
+  "plugin/skills/*/SKILL.md",
+  "skills/*/SKILL.md",
+]
+reason = "The generated harness and plugin copies repeat the source skill descriptions and names. ai-rulez counts each copy as a duplicate."
+
+# The CLI reference documents the product's own install channels; pinning a version there would go stale every release. ~keep
+[[lint.ignore_rules]]
+rules = ["AR021"]
+paths = ["**/references/cli-reference.md"]
+reason = "Install instructions for this project's own CLI, which track the latest release by design."
+
 [rules]
 # ~keep Glob-scoped rules stay out of AGENTS.md: rule files for Claude, path-gated skills for Codex.
 scoped_fallback = "skill"
