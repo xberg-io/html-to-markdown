@@ -228,36 +228,9 @@ pub(in crate::converter) fn get_math_text_content(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     dom_ctx: &DomContext,
+    hidden_content: HiddenContent,
 ) -> String {
-    let mut text = String::new();
-    let mut stack = vec![*node_handle];
-    while let Some(handle) = stack.pop() {
-        match handle.get(parser) {
-            Some(tl::Node::Raw(bytes)) => {
-                let raw = bytes.as_utf8_str();
-                let decoded = text::decode_html_entities_cow(raw.as_ref());
-                // ~keep MathML ignores indentation between elements, while token text keeps its word spaces (#925).
-                text.push_str(&decoded.split_ascii_whitespace().collect::<Vec<_>>().join(" "));
-            }
-            Some(tl::Node::Tag(tag)) => {
-                let name = tag.name().as_utf8_str();
-                if matches!(name.as_ref(), "mi" | "mo" | "mn" | "mtext" | "ms") {
-                    let token = get_text_content(&handle, parser, dom_ctx);
-                    text.push_str(&token.split_ascii_whitespace().collect::<Vec<_>>().join(" "));
-                    continue;
-                }
-                if let Some(children) = dom_ctx.children_of(handle.get_inner()) {
-                    stack.extend(children.iter().rev().copied());
-                } else {
-                    let start = stack.len();
-                    stack.extend(tag.children().top().iter().copied());
-                    stack[start..].reverse();
-                }
-            }
-            _ => {}
-        }
-    }
-    text
+    super::math::text_content(node_handle, parser, dom_ctx, hidden_content)
 }
 
 /// Writes the white space that an inline element starts with (`prefix` of [`chomp_inline`])
