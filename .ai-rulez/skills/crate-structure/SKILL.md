@@ -1,7 +1,7 @@
 ---
 type: Playbook
 title: Crate Structure
-description: Map of the html-to-markdown workspace — the seven `crates/` (core, cli, ffi, py, node, php, wasm) with the unsafe_code forbid/override rule, the out-of-workspace language packages under `packages/`, and the primary `convert()` API with its ConversionResult shape, feature flags, and dual parser. Load when navigating crates/packages, deciding where code belongs, or working with the core conversion API.
+description: "Map of the html-to-markdown workspace: crates/, packages/ and the convert() API with its result shape and feature flags. Use when navigating crates or packages, deciding where code belongs, or calling convert()."
 x-ai-rulez:
   kind: skill
   id: crate-structure
@@ -11,24 +11,25 @@ x-ai-rulez:
 
 # Crate & Package Structure
 
-## Workspace crates (`crates/`)
+## Workspace members (root `Cargo.toml`)
 
-- `html-to-markdown` — core library, primary Rust API, `unsafe_code = "forbid"` at workspace level
-- `html-to-markdown-cli` — CLI binary (clap)
-- `html-to-markdown-ffi` — C FFI bridge, cbindgen headers, **only crate that overrides unsafe_code lint**
-- `html-to-markdown-py` — PyO3 Python binding
-- `html-to-markdown-node` — NAPI-RS Node/TypeScript binding
-- `html-to-markdown-php` — ext-php-rs PHP binding
-- `html-to-markdown-wasm` — wasm-bindgen WebAssembly binding
+- `crates/html-to-markdown` — core library and primary Rust API
+- `crates/html-to-markdown-cli` — CLI binary (clap)
+- `crates/html-to-markdown-ffi` — C FFI bridge with cbindgen headers
+- `crates/html-to-markdown-py` — PyO3 Python binding
+- `crates/html-to-markdown-node` — NAPI-RS Node/TypeScript binding
+- `crates/html-to-markdown-php` — ext-php-rs PHP binding
+- `crates/html-to-markdown-rs-jni` — JNI binding
+- `crates/html-to-markdown-wasm` — wasm-bindgen WebAssembly binding
+- `packages/dart/rust`, `packages/swift/rust`, `tools/benchmark-harness`
+- Workspace lints set `unsafe_code = "forbid"`; only the core and CLI crates inherit them (`[lints] workspace = true`).
 
-## Out-of-workspace packages (`packages/`)
+## Language packages (`packages/`)
 
-- `csharp/`, `elixir/`, `go/`, `java/`, `r/`, `ruby/` — language-native packages wrapping the FFI crate
-- `php/`, `python/`, `typescript/`, `wasm/` — distribution packages
+- `csharp/`, `dart/`, `elixir/`, `go/`, `java/`, `kotlin-android/`, `php/`, `python/`, `r/`, `ruby/`, `swift/`, `zig/`
 
 ## Primary API
 
-- `convert(&str, Option<ConversionOptions>) -> Result<ConversionResult, ConversionError>`
-- `ConversionResult`: `content`, `warnings`, optionally `metadata` and `inline_images` (feature-gated)
-- Feature flags: `inline-images`, `metadata`, `visitor` (custom traversal), `serde`
-- Dual parser: html5ever (spec-compliance) and astral-tl (performance), selectable via `ConversionOptions`
+- `convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Result<ConversionResult>` in `crates/html-to-markdown/src/convert_api.rs`
+- `ConversionResult`: `content`, `document`, `tables`, `warnings`; `metadata` with the `metadata` feature, `images` with `inline-images`
+- Feature flags: `metadata` (default), `inline-images`, `visitor` (caller traversal hooks), `serde`, `mcp`, `mcp-http`, `full`
