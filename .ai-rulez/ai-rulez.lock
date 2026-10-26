@@ -4,46 +4,46 @@
 version = 1
 ai_rulez_version = '5.7.0'
 scope = 'all'
-tree = 'sha256:b562a35dcffe1a63b2fa65ac74694942713c41ecc4d423e86c73ab2e41686edc'
+tree = 'sha256:bb6e7412947c11eab84a82728bc34a18b44dbc6318b0ae7fe2fa81640c5a7213'
 
 [[include]]
 name = 'xberg-cicd'
 source = 'https://github.com/xberg-io/agent-conventions.git'
 path = 'modules/cicd'
-ref = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+ref = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:3a8e6bea6870669f4c43fb7c16b7ee8b9f3c5227d93dcbd465a74f3b263cc787'
 
 [[include]]
 name = 'xberg-core'
 source = 'https://github.com/xberg-io/agent-conventions.git'
 path = 'modules/core'
-ref = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
-digest = 'sha256:9e6831f807e1c1f4c129a801cf5130ac2c7d904da9e05b33c21efdb38292f624'
+ref = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
+digest = 'sha256:807e77f45c0eb5401f7ea11fbe4d27bd5dc138526644f27102b76fba735197e6'
 
 [[include]]
 name = 'xberg-e2e-generator'
 source = 'https://github.com/xberg-io/agent-conventions.git'
 path = 'modules/e2e-generator'
-ref = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+ref = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:71009a636ff4988bc9ea8f2a133d855e640ed1e667fe7db41f8b645c1e677150'
 
 [[include]]
 name = 'xberg-infrastructure'
 source = 'https://github.com/xberg-io/agent-conventions.git'
 path = 'modules/infrastructure'
-ref = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+ref = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:9648eac9619ddec04bb1d4da47fba7e030d0e90af5201d06d6d415e2dc061f00'
 
 [[include]]
 name = 'xberg-languages'
 source = 'https://github.com/xberg-io/agent-conventions.git'
 path = 'modules/languages'
-ref = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+ref = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:6848ab0dafe833b9cef35c31f5b6e4098e4fa47c404f89de9cc5c8426ff7a96d'
 
 [[skill]]
@@ -57,13 +57,13 @@ digest = 'sha256:180c32522454d3c8c1517abdef159205b8d84d2a79347e6719e8aaa23d478c0
 [[served]]
 name = 'add-language-generator'
 source = 'include:xberg-e2e-generator/skills/add-language-generator/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:af453ae8b748948f3c7622c3dcaa5a043f00aab2794851ecb1c92aaa8e890368'
 
 [[served]]
 name = 'agent-coordination'
 source = 'include:xberg-core/skills/agent-coordination/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:30ea1d640c9a49c62038c7393ca4509b79fe9a864bf93f80650422de835e27f6'
 
 [[served]]
@@ -76,26 +76,56 @@ digest = 'sha256:7f4e0fb460d0828eab16f4f7e5a8495ec1c13a2df5a1f3beb120e74e98f604f
 [[served]]
 name = 'alef-workflow'
 source = 'include:xberg-core/skills/alef-workflow/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:b19e7c27b904796b5526bbf06df35f067259a0ee89606de97bcea6c71bcef38d'
+
+[[served]]
+name = 'api'
+source = '.agents/skills/api'
+commit = ''
+digest = 'sha256:e32d926b6f0a4abb615fc50032f3c754cd6e6269a86fb72f97a6fc32eb3bfea8'
 
 [[served]]
 name = 'basemind-tools'
 source = 'include:xberg-core/skills/basemind-tools/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:2fe74c0c9cc8d1e73024cb80c747de336ec01841b78d54133353b255186d33e7'
 
 [[served]]
 name = 'binding-architecture'
 source = 'include:xberg-core/skills/binding-architecture/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:e7cc85d44a7233bdf078d4ca612a2e692849ba05434d63ad25be8179d2a5e045'
 
 [[served]]
 name = 'cicd-pipeline-standards'
 source = 'include:xberg-cicd/skills/cicd-pipeline-standards/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:c28dc18d729b6694d34eb9cc85d3845360fdc170f17cfa12a8c21cae0b072073'
+
+[[served]]
+name = 'claude.skills.api'
+source = '.claude/skills/api'
+commit = ''
+digest = 'sha256:e8ed5346f55fe17b5c043742712cb5256242553a3cca85202ddb21b4032a82bc'
+
+[[served]]
+name = 'claude.skills.cli'
+source = '.claude/skills/cli'
+commit = ''
+digest = 'sha256:bd3f0dc2dc2ffc3f12c2928cb704c32eef7f8da787484e5546c61da9540aabc2'
+
+[[served]]
+name = 'claude.skills.mcp'
+source = '.claude/skills/mcp'
+commit = ''
+digest = 'sha256:bbe059eeab34e90660506948141f2b24463732f83c271d2f56010d08424a2ea1'
+
+[[served]]
+name = 'cli'
+source = '.agents/skills/cli'
+commit = ''
+digest = 'sha256:08b4d228cdb2fccc9bebd65a319ca99f322a9add341d15c0c9d47fac328c22eb'
 
 [[served]]
 name = 'code-quality-standards'
@@ -112,13 +142,13 @@ digest = 'sha256:31adedeec2e2f4e7e0cc802f32467ad38d6db4034df698dac1ee9b52b747fd0
 [[served]]
 name = 'consumer-release-gates'
 source = 'include:xberg-cicd/skills/consumer-release-gates/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:2771e0eede80e54ce3a1d5be2375ece50b965ae20d7d4cbe935749b7d1202b82'
 
 [[served]]
 name = 'containerization-docker'
 source = 'include:xberg-infrastructure/skills/containerization-docker/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:2a09247d65e936b055a2cde9f4aae3bd92195b702bd4fcdd5bb276a9dcd9d6ac'
 
 [[served]]
@@ -136,7 +166,7 @@ digest = 'sha256:a411663247725978a781a5eb39b41d436bd99a0cf537899329b3ae560148a49
 [[served]]
 name = 'create-e2e-fixture'
 source = 'include:xberg-e2e-generator/skills/create-e2e-fixture/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:01b910c035d3359bd0d84f52eeac8e26837c131b6f2aa3148b79c2c30b7f5f95'
 
 [[served]]
@@ -148,7 +178,7 @@ digest = 'sha256:8f41215233c26441abed2b18f35575ce6b5614f91d9bef4885d550322542d4a
 [[served]]
 name = 'e2e-generator-conventions'
 source = 'include:xberg-e2e-generator/skills/e2e-generator-conventions/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:5f63fa5e71656d4ace7ff7f71634b2f49fdee12aba55726790dfd4423cd86697'
 
 [[served]]
@@ -160,26 +190,80 @@ digest = 'sha256:fbc7d452c7171e71341578b6c7a56fc2c87031c0ce15d35884bc3260e04ff68
 [[served]]
 name = 'feature-flag-conventions'
 source = 'include:xberg-core/skills/feature-flag-conventions/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:2de39f639c38a6fc839c172413e5bc208de3ca62480dc65728be937a5f2871a3'
 
 [[served]]
 name = 'fixture-schema-design'
 source = 'include:xberg-e2e-generator/skills/fixture-schema-design/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:6edaa670fbd3a681bb5d66f3f26e7f6c3eb658595ee6521d7effa07c4b4284b5'
 
 [[served]]
 name = 'gcloud-conventions'
 source = 'include:xberg-infrastructure/skills/gcloud-conventions/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:74f1047f01ef589fe108057789eff20170ceee2bbb8840e693d6af91c82d9d04'
 
 [[served]]
 name = 'gh-workflows'
 source = 'include:xberg-cicd/skills/gh-workflows/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:d6d845b396eb32b6392b2fb1c1cf48dfa92d3155a86c6ef51342c7d520b45013'
+
+[[served]]
+name = 'github.skills.api'
+source = '.github/skills/api'
+commit = ''
+digest = 'sha256:9c83c3d33c354750da77c92a26404090dcee6e092ca52247adeda00db81a7fc5'
+
+[[served]]
+name = 'github.skills.cli'
+source = '.github/skills/cli'
+commit = ''
+digest = 'sha256:b19e1017c113b68a42d74e595e3c25b50e879583ff4e1871e59ff376a33f53d5'
+
+[[served]]
+name = 'github.skills.mcp'
+source = '.github/skills/mcp'
+commit = ''
+digest = 'sha256:b83ad7e807c2a5d223c7cc188d50b44c1050c6144f4761522b96a9413d79ce58'
+
+[[served]]
+name = 'html-to-markdown'
+source = 'skills/html-to-markdown'
+commit = ''
+digest = 'sha256:9621ef85b7dabfd98a7eb246b698a54f992ad3e393a2fea2a57490cb83102e90'
+
+[[served]]
+name = 'html-to-markdown-converting-html'
+source = 'skills/html-to-markdown-converting-html'
+commit = ''
+digest = 'sha256:319950d35203a85330d3f475757886a898a21534d9e0cb6448e7476b8c58c3a0'
+
+[[served]]
+name = 'html-to-markdown-extracting-metadata'
+source = 'skills/html-to-markdown-extracting-metadata'
+commit = ''
+digest = 'sha256:ccd29c875aa7c652f981f4d72f4387323bd7722deb95088b11170933170a2624'
+
+[[served]]
+name = 'html-to-markdown-extracting-tables'
+source = 'skills/html-to-markdown-extracting-tables'
+commit = ''
+digest = 'sha256:57e222c0b0487c240dd9a23e784bad6d7049d3cb4fb3446eb81f6fd823571acb'
+
+[[served]]
+name = 'html-to-markdown-fetching-and-converting-urls'
+source = 'skills/html-to-markdown-fetching-and-converting-urls'
+commit = ''
+digest = 'sha256:2d89198b58cb4280005b755f46803b640ecec9d9f0d5c64d3839f6c3bcaa0f10'
+
+[[served]]
+name = 'html-to-markdown-using-the-mcp-server'
+source = 'skills/html-to-markdown-using-the-mcp-server'
+commit = ''
+digest = 'sha256:63b1a422db57a0700384dae00a66b86eac95accb68f4b503b17a34cb8bdddc7d'
 
 [[served]]
 name = 'incremental-approach'
@@ -194,9 +278,15 @@ commit = ''
 digest = 'sha256:5cb87728d1449fadda6d8557501fcc0823509c60a37058ce4d2dda123296f67c'
 
 [[served]]
+name = 'mcp'
+source = '.agents/skills/mcp'
+commit = ''
+digest = 'sha256:d274de677788db06f013736b3fde09433a36350f337f7614330016b27433dea1'
+
+[[served]]
 name = 'monitoring-observability'
 source = 'include:xberg-infrastructure/skills/monitoring-observability/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:6efc7965795869b92e35f64f39ac0f96cf3dfed2cbe8e1446c105e9fb4def36e'
 
 [[served]]
@@ -212,21 +302,165 @@ commit = ''
 digest = 'sha256:2700d984ba10baa2e16ed19b48cc8fd5f7351776f2ce03f6712394d3912f91cb'
 
 [[served]]
+name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown'
+source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown'
+commit = ''
+digest = 'sha256:3b9420b48721625e174f2f4908366d69cfc2cd9f75cafceb0be0d47a2aaf11b8'
+
+[[served]]
+name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-converting-html'
+source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-converting-html'
+commit = ''
+digest = 'sha256:fa22ad97235cef3db8449a900378d86b31f12a002c9222dfdd7f5d09c17ee02d'
+
+[[served]]
+name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-extracting-metadata'
+source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-extracting-metadata'
+commit = ''
+digest = 'sha256:9a1dc13994471d35cc4af95041ad26dc17c6d889b0f50b383c57cd2c18b60d7f'
+
+[[served]]
+name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-extracting-tables'
+source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-extracting-tables'
+commit = ''
+digest = 'sha256:8cb0f62aedcf5a9a31f13523dec3a3fa66d23c49f8e4d04cc3da6ee0c16d98a3'
+
+[[served]]
+name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-fetching-and-converting-urls'
+source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-fetching-and-converting-urls'
+commit = ''
+digest = 'sha256:a2aae3f7bf55a3c0f1ae63d82a8ce534e9d0ffd378964175c3ec71f7dbe97606'
+
+[[served]]
+name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-using-the-mcp-server'
+source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-using-the-mcp-server'
+commit = ''
+digest = 'sha256:8c557f143200a4f46d0633875352996541a21bff8b4773a1b5a57ced6754df9a'
+
+[[served]]
+name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown'
+source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown'
+commit = ''
+digest = 'sha256:b0d70391cd9f87cdae34ff9250da1110873a5b178eb07f34991dac522f9eeb6e'
+
+[[served]]
+name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-converting-html'
+source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-converting-html'
+commit = ''
+digest = 'sha256:5f834a2c507da4b974400550ba66a3f5045e570594cc73e2525cf02ec2824898'
+
+[[served]]
+name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-extracting-metadata'
+source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-extracting-metadata'
+commit = ''
+digest = 'sha256:d3678f9ba9c073b355f4d1743b399de21174e047e6a533ca34d4b754dda08ffb'
+
+[[served]]
+name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-extracting-tables'
+source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-extracting-tables'
+commit = ''
+digest = 'sha256:2ebc62db71a11c454ab87402463b5f4c7e2279cb19e27922f7af5e1466c70e5a'
+
+[[served]]
+name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-fetching-and-converting-urls'
+source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-fetching-and-converting-urls'
+commit = ''
+digest = 'sha256:586fb7c694231e1650c0819e2922087566018eee885cfe3a760c2b0726d77490'
+
+[[served]]
+name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-using-the-mcp-server'
+source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-using-the-mcp-server'
+commit = ''
+digest = 'sha256:43022ef8bd7fa4792426d37db4e86ba94983ec6e54acc1da7b9a819eeee0075a'
+
+[[served]]
+name = 'plugin.opencode.skills.html-to-markdown'
+source = 'plugin/.opencode/skills/html-to-markdown'
+commit = ''
+digest = 'sha256:41a3a79b498acc7ca0a0dbd1fb2e25a9640f3964dd0adb21d42b2851522499ca'
+
+[[served]]
+name = 'plugin.opencode.skills.html-to-markdown-converting-html'
+source = 'plugin/.opencode/skills/html-to-markdown-converting-html'
+commit = ''
+digest = 'sha256:ee6d0fb849e8be69bfca685bbdf17279ad9358a6c1af1412ec768e23ace5b1fc'
+
+[[served]]
+name = 'plugin.opencode.skills.html-to-markdown-extracting-metadata'
+source = 'plugin/.opencode/skills/html-to-markdown-extracting-metadata'
+commit = ''
+digest = 'sha256:ea71792ca18280013f537ad083edeee1d21c32686d180d31db52f108faca2c86'
+
+[[served]]
+name = 'plugin.opencode.skills.html-to-markdown-extracting-tables'
+source = 'plugin/.opencode/skills/html-to-markdown-extracting-tables'
+commit = ''
+digest = 'sha256:8bad5ab95c0e6ffef0d6ee8337ffb4ecf0eace5b29f86f4dfc621ab150de87f3'
+
+[[served]]
+name = 'plugin.opencode.skills.html-to-markdown-fetching-and-converting-urls'
+source = 'plugin/.opencode/skills/html-to-markdown-fetching-and-converting-urls'
+commit = ''
+digest = 'sha256:f5ab75ccdd31a500e9ef9815cf128c85805c5e8ac46c7f168129cd7abdfc6822'
+
+[[served]]
+name = 'plugin.opencode.skills.html-to-markdown-using-the-mcp-server'
+source = 'plugin/.opencode/skills/html-to-markdown-using-the-mcp-server'
+commit = ''
+digest = 'sha256:32305cf44d5eb931c6cafc8ac0ae22689d494e241dc230b9b82541fa509e59d4'
+
+[[served]]
+name = 'plugin.skills.html-to-markdown'
+source = 'plugin/skills/html-to-markdown'
+commit = ''
+digest = 'sha256:44c403645338feab5a08607616c8b93a9e000308f14bdcb0951a7a2015abeb65'
+
+[[served]]
+name = 'plugin.skills.html-to-markdown-converting-html'
+source = 'plugin/skills/html-to-markdown-converting-html'
+commit = ''
+digest = 'sha256:860b76281e1b0462245290dc8db1620cb1e3d4f14bb5856b71b7e5679ec64d1e'
+
+[[served]]
+name = 'plugin.skills.html-to-markdown-extracting-metadata'
+source = 'plugin/skills/html-to-markdown-extracting-metadata'
+commit = ''
+digest = 'sha256:1fc1017993b1266825c9365ac540c4ed2030563a29102a71247f74216b80d6d8'
+
+[[served]]
+name = 'plugin.skills.html-to-markdown-extracting-tables'
+source = 'plugin/skills/html-to-markdown-extracting-tables'
+commit = ''
+digest = 'sha256:b3f6a284d5225742f0de78963039af615247cfac9db2a9557e904bd0615b8ef3'
+
+[[served]]
+name = 'plugin.skills.html-to-markdown-fetching-and-converting-urls'
+source = 'plugin/skills/html-to-markdown-fetching-and-converting-urls'
+commit = ''
+digest = 'sha256:e551c1d7f2f7349c5cdce9c5ce6ac4514312feffc223ba3e349c700be3438821'
+
+[[served]]
+name = 'plugin.skills.html-to-markdown-using-the-mcp-server'
+source = 'plugin/skills/html-to-markdown-using-the-mcp-server'
+commit = ''
+digest = 'sha256:ea8548fa8fa5181cf9a837ab5865f9002dbc18ffe2b34107970636cc2cb8277a'
+
+[[served]]
 name = 'poly-lint-format'
 source = 'include:xberg-core/skills/poly-lint-format/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:37e225c8dfdab9a71522d9ec9718ee8f41881bab149618e58467534827488dd3'
 
 [[served]]
 name = 'release-workflow'
 source = 'include:xberg-core/skills/release-workflow/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:aa68a45c3048919d797ccb16245cc1feaf721bab8c1102519793eb9cf523c821'
 
 [[served]]
 name = 'scoop-distribution'
 source = 'include:xberg-cicd/skills/scoop-distribution/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:d8c9426f9d9c6e4b99a8810ce937813d8750bdca5a807844707b0dd7a084d3a1'
 
 [[served]]
@@ -244,7 +478,7 @@ digest = 'sha256:c57056e3a74a261b3a9d47638726c7d1f64c76b255838b6aaa3e635f3ffa861
 [[served]]
 name = 'taskfile-structure'
 source = 'include:xberg-core/skills/taskfile-structure/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:af754c1d0b31ec1c9e8a68f1c67d9a2c63afb24b49bd82c3f7b66d6f1d78ca05'
 
 [[served]]
@@ -262,13 +496,13 @@ digest = 'sha256:f406604437e2998fc756a0a5b6a08cd832b871c188f76ee5ecbfef33184e965
 [[served]]
 name = 'tracing-conventions'
 source = 'include:xberg-core/skills/tracing-conventions/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:1a78706b01bfacec5f36b3563dca41cdb73edc978d34902f4d5cb204c74c552f'
 
 [[served]]
 name = 'xberg-brand-and-docs'
 source = 'include:xberg-core/skills/xberg-brand-and-docs/SKILL.md'
-commit = '3f83b4c2d85b67f1ffdb0c95b688411a6960f0a0'
+commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:552648a1d89cccb6bc3d47cb25f3b6355f75a104936fc70668fdb6167868c965'
 
 [[item]]
