@@ -296,7 +296,6 @@ poly.local.toml
 bin/
 
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
-.ai-rulez/local/
 .mcp.json
 .opencode/agents/
 .opencode/commands/
