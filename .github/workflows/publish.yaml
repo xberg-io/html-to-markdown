@@ -185,10 +185,13 @@ jobs:
         working-directory: release-source
         env:
           VERSION: ${{ steps.version.outputs.version }}
+          RECOVERY_SHA: ${{ inputs.nuget_managed_source_sha }}
         run: |
           dotnet restore packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj
           dotnet pack packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj \
-            -c Release "-p:Version=$VERSION" -o dist/nuget-runtimes
+            -c Release "-p:Version=$VERSION" \
+            "-p:RepositoryCommit=$RECOVERY_SHA" "-p:SourceRevisionId=$RECOVERY_SHA" \
+            -o dist/nuget-runtimes
           python3 - <<'PY'
           from pathlib import Path
           packages = list(Path('dist/nuget-runtimes').glob('*.nupkg'))

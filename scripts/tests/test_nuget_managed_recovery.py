@@ -2,6 +2,7 @@
 
 import importlib.util
 import os
+import shlex
 import subprocess
 from pathlib import Path
 
@@ -108,3 +109,13 @@ def test_managed_recovery_verifies_before_packing_and_publishes_only_nuget() -> 
     assert any(step.get("uses", "").startswith("xberg-io/actions/publish-nuget@") for step in steps)
     assert all("retag" not in step.get("uses", "") for step in steps)
     assert "!inputs.nuget_runtime_run_id" in workflow["jobs"]["prepare"]["if"]
+
+
+def test_managed_package_provenance_tracks_repaired_source() -> None:
+    workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
+    steps = workflow["jobs"]["recover-nuget-runtimes"]["steps"]
+    managed = next(step for step in steps if step.get("name") == "Pack verified managed repair")
+    arguments = shlex.split(managed["run"].partition("python3 - <<")[0])
+    assert "-p:SourceRevisionId=$RECOVERY_SHA" in arguments
+    assert "-p:RepositoryCommit=$RECOVERY_SHA" in arguments
+    assert managed["env"]["RECOVERY_SHA"] == "${{ inputs.nuget_managed_source_sha }}"
