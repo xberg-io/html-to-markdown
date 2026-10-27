@@ -98,7 +98,12 @@ pub fn run_with_base(
     )
 }
 
-pub(crate) fn run_with_policy(
+/// ~keep Run Tier-1 with explicit per-call accessible-name handling.
+///
+/// # Errors
+///
+/// Returns a bail reason when Tier-1 cannot handle the input.
+pub fn run_with_policy(
     html: &str,
     _report: &PrescanReport,
     options: &ConversionOptions,

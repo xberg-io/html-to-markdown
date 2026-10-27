@@ -7,7 +7,12 @@ pub fn scan(
     scan_with_policy(html, options, effective_base, Default::default())
 }
 
-pub(crate) fn scan_with_policy(
+/// ~keep Scan with explicit per-call accessible-name handling.
+///
+/// # Errors
+///
+/// Returns a bail reason when the scanner cannot handle the input.
+pub fn scan_with_policy(
     html: &str,
     options: &ConversionOptions,
     effective_base: Option<std::rc::Rc<url::Url>>,
