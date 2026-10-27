@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.19.0] - 2026-10-27
+
+### Changed
+
+- Move accessible-name policy from `ConversionOptions`, its builder, and updates to
+  `convert_with_accessible_names(html, use_accessible_names, options)`, restoring the 3.18.6 exhaustive
+  Rust struct shape (#958). Existing `convert` calls keep the enabled default.
+- Require 3.18.7 field users to migrate Rust, JSON, C, and generated binding calls to the separate
+  boolean argument; remove the corresponding options accessors and document the 3.19.0 migration.
+
 ### Fixed
 
+- Preserve Alef TypeScript declarations when building the native Node package.
 - Set `image_index` on an image node in the document structure to the entry its extracted bytes take in
   `images`, as documented, so a consumer can place an inline `data:` image where it stands in the document.
 

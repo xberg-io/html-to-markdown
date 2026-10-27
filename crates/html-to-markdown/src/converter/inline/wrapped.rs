@@ -628,6 +628,7 @@ mod tests {
         let mut context = Context::new(
             &options,
             ContextParameters {
+                accessible_names: Default::default(),
                 inline_collector: None,
                 #[cfg(feature = "metadata")]
                 metadata_collector: None,

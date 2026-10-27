@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1173341130;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1135786093;
 
 // Section: executor
 
@@ -71,6 +71,37 @@ fn wire__crate__convert_impl(
             move |context| {
                 transform_result_sse::<_, AlefBridgeError>((move || {
                     let output_ok = crate::convert(api_html, api_options)?;
+                    std::result::Result::Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__convert_with_accessible_names_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "convert_with_accessible_names",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_html = <String>::sse_decode(&mut deserializer);
+            let api_use_accessible_names = <bool>::sse_decode(&mut deserializer);
+            let api_options = <Option<crate::ConversionOptions>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, AlefBridgeError>((move || {
+                    let output_ok =
+                        crate::convert_with_accessible_names(api_html, api_use_accessible_names, api_options)?;
                     std::result::Result::Ok(output_ok)
                 })())
             }
@@ -1280,7 +1311,6 @@ const _: fn() = || {
         let _: Vec<String> = ConversionOptions.preserve_tags;
         let _: bool = ConversionOptions.skip_images;
         let _: crate::InlineDataMedia = ConversionOptions.inline_data_media;
-        let _: bool = ConversionOptions.use_accessible_names;
         let _: crate::HiddenContent = ConversionOptions.hidden_content;
         let _: crate::UrlEscapeStyle = ConversionOptions.url_escape_style;
         let _: crate::LinkStyle = ConversionOptions.link_style;
@@ -1334,7 +1364,6 @@ const _: fn() = || {
         let _: Option<Vec<String>> = ConversionOptionsUpdate.preserve_tags;
         let _: Option<bool> = ConversionOptionsUpdate.skip_images;
         let _: Option<crate::InlineDataMedia> = ConversionOptionsUpdate.inline_data_media;
-        let _: Option<bool> = ConversionOptionsUpdate.use_accessible_names;
         let _: Option<crate::HiddenContent> = ConversionOptionsUpdate.hidden_content;
         let _: Option<crate::UrlEscapeStyle> = ConversionOptionsUpdate.url_escape_style;
         let _: Option<crate::LinkStyle> = ConversionOptionsUpdate.link_style;
@@ -2317,7 +2346,6 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_preserveTags = <Vec<String>>::sse_decode(deserializer);
         let mut var_skipImages = <bool>::sse_decode(deserializer);
         let mut var_inlineDataMedia = <crate::InlineDataMedia>::sse_decode(deserializer);
-        let mut var_useAccessibleNames = <bool>::sse_decode(deserializer);
         let mut var_hiddenContent = <crate::HiddenContent>::sse_decode(deserializer);
         let mut var_urlEscapeStyle = <crate::UrlEscapeStyle>::sse_decode(deserializer);
         let mut var_linkStyle = <crate::LinkStyle>::sse_decode(deserializer);
@@ -2369,7 +2397,6 @@ impl SseDecode for crate::ConversionOptions {
             preserve_tags: var_preserveTags,
             skip_images: var_skipImages,
             inline_data_media: var_inlineDataMedia,
-            use_accessible_names: var_useAccessibleNames,
             hidden_content: var_hiddenContent,
             url_escape_style: var_urlEscapeStyle,
             link_style: var_linkStyle,
@@ -2427,7 +2454,6 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_preserveTags = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_skipImages = <Option<bool>>::sse_decode(deserializer);
         let mut var_inlineDataMedia = <Option<crate::InlineDataMedia>>::sse_decode(deserializer);
-        let mut var_useAccessibleNames = <Option<bool>>::sse_decode(deserializer);
         let mut var_hiddenContent = <Option<crate::HiddenContent>>::sse_decode(deserializer);
         let mut var_urlEscapeStyle = <Option<crate::UrlEscapeStyle>>::sse_decode(deserializer);
         let mut var_linkStyle = <Option<crate::LinkStyle>>::sse_decode(deserializer);
@@ -2479,7 +2505,6 @@ impl SseDecode for crate::ConversionOptionsUpdate {
             preserve_tags: var_preserveTags,
             skip_images: var_skipImages,
             inline_data_media: var_inlineDataMedia,
-            use_accessible_names: var_useAccessibleNames,
             hidden_content: var_hiddenContent,
             url_escape_style: var_urlEscapeStyle,
             link_style: var_linkStyle,
@@ -3749,52 +3774,53 @@ fn pde_ffi_dispatcher_primary_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
         1 => wire__crate__convert_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire__crate__create_annotation_kind_from_json_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire__crate__create_conversion_options_from_json_impl(port, ptr, rust_vec_len, data_len),
-        4 => wire__crate__create_conversion_options_from_json_with_visitor_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__create_conversion_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__create_conversion_result_from_json_impl(port, ptr, rust_vec_len, data_len),
+        2 => wire__crate__convert_with_accessible_names_impl(port, ptr, rust_vec_len, data_len),
+        3 => wire__crate__create_annotation_kind_from_json_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__create_conversion_options_from_json_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__create_conversion_options_from_json_with_visitor_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__create_conversion_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__create_conversion_result_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        7 => wire__crate__create_document_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__create_document_node_from_json_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__create_document_structure_from_json_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire__crate__create_grid_cell_from_json_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__create_document_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__create_document_node_from_json_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__create_document_structure_from_json_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__create_grid_cell_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        11 => wire__crate__create_header_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire__crate__create_header_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        12 => wire__crate__create_html_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__create_html_visitor_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__create_image_dimensions_from_json_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__create_html_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__create_html_visitor_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__create_image_dimensions_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        15 => wire__crate__create_image_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__create_image_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        16 => wire__crate__create_image_type_from_json_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__create_image_type_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        17 => wire__crate__create_link_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__create_link_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        18 => wire__crate__create_link_type_from_json_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__create_metadata_entry_from_json_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__create_node_content_from_json_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__create_link_type_from_json_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__create_metadata_entry_from_json_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__create_node_content_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "visitor")]
-        21 => wire__crate__create_node_context_from_json_impl(port, ptr, rust_vec_len, data_len),
+        22 => wire__crate__create_node_context_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "visitor")]
-        22 => wire__crate__create_node_type_from_json_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__create_preprocessing_options_from_json_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__create_preprocessing_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__create_processing_warning_from_json_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__create_node_type_from_json_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__create_preprocessing_options_from_json_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__create_preprocessing_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__create_processing_warning_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        26 => wire__crate__create_structured_data_from_json_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__create_structured_data_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        27 => wire__crate__create_structured_data_type_from_json_impl(port, ptr, rust_vec_len, data_len),
-        28 => wire__crate__create_table_data_from_json_impl(port, ptr, rust_vec_len, data_len),
-        29 => wire__crate__create_table_grid_from_json_impl(port, ptr, rust_vec_len, data_len),
-        30 => wire__crate__create_text_annotation_from_json_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire__crate__create_structured_data_type_from_json_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire__crate__create_table_data_from_json_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire__crate__create_table_grid_from_json_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__create_text_annotation_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "metadata")]
-        31 => wire__crate__create_text_direction_from_json_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__create_tier_strategy_from_json_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__create_text_direction_from_json_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__create_tier_strategy_from_json_impl(port, ptr, rust_vec_len, data_len),
         #[cfg(feature = "visitor")]
-        33 => wire__crate__create_visit_result_from_json_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__create_warning_kind_from_json_impl(port, ptr, rust_vec_len, data_len),
+        34 => wire__crate__create_visit_result_from_json_impl(port, ptr, rust_vec_len, data_len),
+        35 => wire__crate__create_warning_kind_from_json_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -3996,7 +4022,6 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptions> {
             self.0.preserve_tags.into_into_dart().into_dart(),
             self.0.skip_images.into_into_dart().into_dart(),
             self.0.inline_data_media.into_into_dart().into_dart(),
-            self.0.use_accessible_names.into_into_dart().into_dart(),
             self.0.hidden_content.into_into_dart().into_dart(),
             self.0.url_escape_style.into_into_dart().into_dart(),
             self.0.link_style.into_into_dart().into_dart(),
@@ -4061,7 +4086,6 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptionsUpdate
             self.0.preserve_tags.into_into_dart().into_dart(),
             self.0.skip_images.into_into_dart().into_dart(),
             self.0.inline_data_media.into_into_dart().into_dart(),
-            self.0.use_accessible_names.into_into_dart().into_dart(),
             self.0.hidden_content.into_into_dart().into_dart(),
             self.0.url_escape_style.into_into_dart().into_dart(),
             self.0.link_style.into_into_dart().into_dart(),
@@ -5151,7 +5175,6 @@ impl SseEncode for crate::ConversionOptions {
         <Vec<String>>::sse_encode(self.preserve_tags, serializer);
         <bool>::sse_encode(self.skip_images, serializer);
         <crate::InlineDataMedia>::sse_encode(self.inline_data_media, serializer);
-        <bool>::sse_encode(self.use_accessible_names, serializer);
         <crate::HiddenContent>::sse_encode(self.hidden_content, serializer);
         <crate::UrlEscapeStyle>::sse_encode(self.url_escape_style, serializer);
         <crate::LinkStyle>::sse_encode(self.link_style, serializer);
@@ -5208,7 +5231,6 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<Vec<String>>>::sse_encode(self.preserve_tags, serializer);
         <Option<bool>>::sse_encode(self.skip_images, serializer);
         <Option<crate::InlineDataMedia>>::sse_encode(self.inline_data_media, serializer);
-        <Option<bool>>::sse_encode(self.use_accessible_names, serializer);
         <Option<crate::HiddenContent>>::sse_encode(self.hidden_content, serializer);
         <Option<crate::UrlEscapeStyle>>::sse_encode(self.url_escape_style, serializer);
         <Option<crate::LinkStyle>>::sse_encode(self.link_style, serializer);

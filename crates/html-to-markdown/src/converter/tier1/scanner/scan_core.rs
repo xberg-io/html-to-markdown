@@ -4,13 +4,23 @@ pub fn scan(
     options: &ConversionOptions,
     effective_base: Option<std::rc::Rc<url::Url>>,
 ) -> Result<ScanOutput, BailReason> {
-    Tier1Scanner::new(html, options, effective_base).run()
+    scan_with_policy(html, options, effective_base, Default::default())
+}
+
+pub(crate) fn scan_with_policy(
+    html: &str,
+    options: &ConversionOptions,
+    effective_base: Option<std::rc::Rc<url::Url>>,
+    policy: crate::convert_api::AccessibleNamePolicy,
+) -> Result<ScanOutput, BailReason> {
+    Tier1Scanner::new(html, options, effective_base, policy).run()
 }
 
 struct Tier1Scanner<'a> {
     html: &'a str,
     bytes: &'a [u8],
     options: &'a ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
     state: Tier1State,
     table_probes: Vec<TableLayoutProbe>,
     pos: usize,
@@ -18,11 +28,17 @@ struct Tier1Scanner<'a> {
 }
 
 impl<'a> Tier1Scanner<'a> {
-    fn new(html: &'a str, options: &'a ConversionOptions, effective_base: Option<std::rc::Rc<url::Url>>) -> Self {
+    fn new(
+        html: &'a str,
+        options: &'a ConversionOptions,
+        effective_base: Option<std::rc::Rc<url::Url>>,
+        policy: crate::convert_api::AccessibleNamePolicy,
+    ) -> Self {
         Self {
             html,
             bytes: html.as_bytes(),
             options,
+            policy,
             state: Tier1State::new(html.len(), effective_base),
             table_probes: Vec::new(),
             pos: 0,
@@ -412,6 +428,7 @@ impl<'a> Tier1Scanner<'a> {
             tag_open_start,
             &mut self.state,
             self.options,
+            self.policy,
         )?;
         self.state.end_document_start_if_written(written_from);
         self.pos = svg_end;

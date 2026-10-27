@@ -401,9 +401,10 @@ pub fn collect_link_label_text(
     parser: &tl::Parser,
     dom_ctx: &DomContext,
     options: &ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
 ) -> (LinkText, Vec<tl::NodeHandle>, bool) {
     let mut block_nodes = Vec::new();
-    let text = walk_link_text(children, parser, dom_ctx, options, |handle| {
+    let text = walk_link_text(children, parser, dom_ctx, options, policy, |handle| {
         block_nodes.push(handle);
         false
     });
@@ -417,8 +418,9 @@ pub fn link_text_content(
     parser: &tl::Parser,
     dom_ctx: &DomContext,
     options: &ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
 ) -> LinkText {
-    walk_link_text(children, parser, dom_ctx, options, |_| true)
+    walk_link_text(children, parser, dom_ctx, options, policy, |_| true)
 }
 
 /// The name of a link apart from its content: its `aria-label`, else its `title`. A value of
@@ -446,6 +448,7 @@ fn walk_link_text(
     parser: &tl::Parser,
     dom_ctx: &DomContext,
     options: &ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
     mut enter_block: impl FnMut(tl::NodeHandle) -> bool,
 ) -> LinkText {
     let mut text = String::new();
@@ -463,7 +466,9 @@ fn walk_link_text(
                 text.push_str(decoded.as_ref());
             }
             tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("svg") => {
-                text.push_str(&crate::converter::media::svg::graphic_text(tag, parser, options));
+                text.push_str(&crate::converter::media::svg::graphic_text(
+                    tag, parser, options, policy,
+                ));
             }
             tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("br") => {
                 breaks = Some((breaks.map_or(text.len(), |(first, _)| first), text.len()));

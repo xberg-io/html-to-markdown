@@ -1,0 +1,306 @@
+[
+  {
+    "id": "options_accessible_names_link_auto_enabled",
+    "description": "Auto link conversion with accessible names enabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
+      "options": {
+        "tier_strategy": "Auto",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": true
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "see [GitHub (opens in new tab)](https://example.com/x) now\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_link_auto_enabled",
+      "title": "Auto link conversion with accessible names enabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_svg_auto_enabled",
+    "description": "Auto svg conversion with accessible names enabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Auto",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": true
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Name Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_svg_auto_enabled",
+      "title": "Auto svg conversion with accessible names enabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_plain_auto_enabled",
+    "description": "Auto plain conversion with accessible names enabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Auto",
+        "inline_data_media": "AltTextOnly",
+        "output_format": "Plain"
+      },
+      "use_accessible_names": true
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Name Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_plain_auto_enabled",
+      "title": "Auto plain conversion with accessible names enabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_link_auto_disabled",
+    "description": "Auto link conversion with accessible names disabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
+      "options": {
+        "tier_strategy": "Auto",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": false
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "see [GitHub](https://example.com/x) now\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_link_auto_disabled",
+      "title": "Auto link conversion with accessible names disabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_svg_auto_disabled",
+    "description": "Auto svg conversion with accessible names disabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Auto",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": false
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_svg_auto_disabled",
+      "title": "Auto svg conversion with accessible names disabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_plain_auto_disabled",
+    "description": "Auto plain conversion with accessible names disabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Auto",
+        "inline_data_media": "AltTextOnly",
+        "output_format": "Plain"
+      },
+      "use_accessible_names": false
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_plain_auto_disabled",
+      "title": "Auto plain conversion with accessible names disabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_link_tier2_enabled",
+    "description": "Tier2 link conversion with accessible names enabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
+      "options": {
+        "tier_strategy": "Tier2",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": true
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "see [GitHub (opens in new tab)](https://example.com/x) now\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_link_tier2_enabled",
+      "title": "Tier2 link conversion with accessible names enabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_svg_tier2_enabled",
+    "description": "Tier2 svg conversion with accessible names enabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Tier2",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": true
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Name Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_svg_tier2_enabled",
+      "title": "Tier2 svg conversion with accessible names enabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_plain_tier2_enabled",
+    "description": "Tier2 plain conversion with accessible names enabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Tier2",
+        "inline_data_media": "AltTextOnly",
+        "output_format": "Plain"
+      },
+      "use_accessible_names": true
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Name Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_plain_tier2_enabled",
+      "title": "Tier2 plain conversion with accessible names enabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_link_tier2_disabled",
+    "description": "Tier2 link conversion with accessible names disabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
+      "options": {
+        "tier_strategy": "Tier2",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": false
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "see [GitHub](https://example.com/x) now\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_link_tier2_disabled",
+      "title": "Tier2 link conversion with accessible names disabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_svg_tier2_disabled",
+    "description": "Tier2 svg conversion with accessible names disabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Tier2",
+        "inline_data_media": "AltTextOnly"
+      },
+      "use_accessible_names": false
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_svg_tier2_disabled",
+      "title": "Tier2 svg conversion with accessible names disabled"
+    }
+  },
+  {
+    "id": "options_accessible_names_plain_tier2_disabled",
+    "description": "Tier2 plain conversion with accessible names disabled",
+    "call": "accessible_names",
+    "input": {
+      "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
+      "options": {
+        "tier_strategy": "Tier2",
+        "inline_data_media": "AltTextOnly",
+        "output_format": "Plain"
+      },
+      "use_accessible_names": false
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Drawn\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_accessible_names_plain_tier2_disabled",
+      "title": "Tier2 plain conversion with accessible names disabled"
+    }
+  }
+]

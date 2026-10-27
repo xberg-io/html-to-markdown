@@ -119,6 +119,7 @@ module.exports = binding;
 // nothing to see, so `import { convert } from ...` fails without these.
 // Keep in sync with index.d.ts; scripts/verify-loader-manifest.mjs enforces it.
 module.exports.convert = binding.convert;
+module.exports.convertWithAccessibleNames = binding.convertWithAccessibleNames;
 module.exports.CodeBlockStyle = binding.CodeBlockStyle;
 module.exports.HeadingStyle = binding.HeadingStyle;
 module.exports.HiddenContent = binding.HiddenContent;

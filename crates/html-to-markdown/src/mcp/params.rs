@@ -364,7 +364,6 @@ impl ConvertConfig {
         update.strip_tags = self.strip_tags.take();
         update.preserve_tags = self.preserve_tags.take();
         update.skip_images = self.skip_images.take();
-        update.use_accessible_names = self.use_accessible_names.take();
         update.inline_data_media = validated_enum(
             "inline_data_media",
             self.inline_data_media.take(),
@@ -486,16 +485,20 @@ mod tests {
     /// Drift guard: every settable `ConversionOptions` field must be mirrored by
     /// `ConvertConfig`. `ConversionOptions` serialises every field except the
     /// serde-skipped `visitor`, and `ConvertConfig` serialises every field as
-    /// `null` (no `skip_serializing_if`), so the key sets must match exactly.
+    /// `null` (no `skip_serializing_if`). The wire-only accessible-name policy is the
+    /// sole extra key; all remaining keys must match exactly.
     /// Fails loudly, naming the offending field, if a core option is added
     /// without being mirrored here.
     #[test]
     fn mirror_covers_all_core_fields() {
         let core = serde_json::to_value(ConversionOptions::default()).unwrap();
         let mirror = serde_json::to_value(ConvertConfig::default()).unwrap();
+        let mut mirror_keys = json_keys(&mirror);
+        assert!(mirror_keys.remove("use_accessible_names"));
+        assert!(!json_keys(&core).contains("use_accessible_names"));
         assert_eq!(
             json_keys(&core),
-            json_keys(&mirror),
+            mirror_keys,
             "ConvertConfig drifted from ConversionOptions — add/remove the mismatched field(s)"
         );
     }
@@ -715,10 +718,13 @@ mod tests {
             ),
         ] {
             let config: ConvertConfig = serde_json::from_value(config).expect("accessible-name policy is accepted");
+            assert_eq!(config.use_accessible_names.unwrap_or(true), enabled);
             let options = ConversionOptions::try_from(config).expect("valid options");
-            assert_eq!(options.use_accessible_names, enabled);
             assert_eq!(
-                crate::convert(html, Some(options)).unwrap().content.as_deref(),
+                crate::convert_with_accessible_names(html, enabled, Some(options))
+                    .unwrap()
+                    .content
+                    .as_deref(),
                 Some(expected)
             );
         }

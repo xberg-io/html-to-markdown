@@ -129,7 +129,7 @@ pub use types::{
 #[cfg(feature = "visitor")]
 pub use visitor::{NodeContext, NodeType, VisitResult, VisitorHandle};
 
-pub use convert_api::convert;
+pub use convert_api::{convert, convert_with_accessible_names};
 
 #[cfg(feature = "mcp")]
 pub mod mcp;

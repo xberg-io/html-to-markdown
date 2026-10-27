@@ -4,7 +4,7 @@
 version = 1
 ai_rulez_version = '5.7.0'
 scope = 'all'
-tree = 'sha256:f3e9539851a025302f7ed80f3c33b3dd681097f1e3e783130785d371e269ac18'
+tree = 'sha256:57a49952a93950c0d1fc3f791d1c2bfd05f55a797c1393f8dc77188e98e3c4ac'
 
 [[include]]
 name = 'xberg-bindings'
@@ -177,37 +177,37 @@ digest = 'sha256:5578adecb89ad919225f1cd118db1a475b6c95bddc01e6cf2085e36f075bbe3
 name = 'html-to-markdown'
 source = 'skills/html-to-markdown'
 commit = ''
-digest = 'sha256:51115ea03baee62fe6012a5e9963a2fb982ef774b9ac6bb8419b94fa1c84f2da'
+digest = 'sha256:b77a845a500cfd2054423aea02305c7c5b1266493c76f61e75801a0f4c045118'
 
 [[served]]
 name = 'html-to-markdown-converting-html'
 source = 'skills/html-to-markdown-converting-html'
 commit = ''
-digest = 'sha256:144472621c540a608cbd1f67bf196cff66e639e86f0f35e4f8fdc6aec1497b3d'
+digest = 'sha256:334797601089324b3541a7329cc39ac5ab375c0f4c88d09d6f545040857bbff7'
 
 [[served]]
 name = 'html-to-markdown-extracting-metadata'
 source = 'skills/html-to-markdown-extracting-metadata'
 commit = ''
-digest = 'sha256:9cedca1bde23762544db156c870fc9516dc0033a900e7e6a83fa25893258b184'
+digest = 'sha256:1640ad99f10e2a9400b0d6b7803e45d45b3a54d31abfffc555d6c413ff6a2a98'
 
 [[served]]
 name = 'html-to-markdown-extracting-tables'
 source = 'skills/html-to-markdown-extracting-tables'
 commit = ''
-digest = 'sha256:c62aec0a82775a67cba35590e30c11392fb960c32a8c91660e059a23d74a0c77'
+digest = 'sha256:e1a5ae235d84c7e7b74be2727d6297d25b63822bbd12a6dcf811f70b66ab9a48'
 
 [[served]]
 name = 'html-to-markdown-fetching-and-converting-urls'
 source = 'skills/html-to-markdown-fetching-and-converting-urls'
 commit = ''
-digest = 'sha256:9703cfc7d71f083a63256d4b0775173242f2a749c70cbb1d1e610510867d732c'
+digest = 'sha256:ad7e590069fef484333d9bfde4f883442a210937e076c4a9f0b1e7b2d8b35306'
 
 [[served]]
 name = 'html-to-markdown-using-the-mcp-server'
 source = 'skills/html-to-markdown-using-the-mcp-server'
 commit = ''
-digest = 'sha256:93b9fe1fc2c03ca20abaf246cd75d8c09cb2b0db55fb13fc10d4b3436752fdf3'
+digest = 'sha256:adc9fd8d7b25c59a24002f30e78674111a40366e20b9bcbd8e1ee028d8b16b48'
 
 [[served]]
 name = 'incremental-approach'
@@ -243,145 +243,145 @@ digest = 'sha256:2700d984ba10baa2e16ed19b48cc8fd5f7351776f2ce03f6712394d3912f91c
 name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown'
 source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown'
 commit = ''
-digest = 'sha256:c3282a3b09e71147b9ced311ac9fcc981669c70a862d4f77a53534500a413cfa'
+digest = 'sha256:57ff22da96448f55ae36f95d9d2e9b8a549e5c9f73bc9cf3f3c67b53df36ed36'
 
 [[served]]
 name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-converting-html'
 source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-converting-html'
 commit = ''
-digest = 'sha256:22f652cf76b6c049643ab05a5b0dd71b46a838f1500193fb3bfc845c40356226'
+digest = 'sha256:f54f1cc507efb0c036478c19aac681d38b7c283aa671883cc6f9b97a15931950'
 
 [[served]]
 name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-extracting-metadata'
 source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-extracting-metadata'
 commit = ''
-digest = 'sha256:15787ca6d705e3eda17c28b4454209eb407f08fda286f4e4f73398c6ccfa0e66'
+digest = 'sha256:59c1c11fc6921934a032d3cd5737e9842990fc8fefba204b4fd2859ddbf9ae49'
 
 [[served]]
 name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-extracting-tables'
 source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-extracting-tables'
 commit = ''
-digest = 'sha256:3d9bdbeb8e7c667675749703bad4b80189b80e2bcb1baeefb872785361cd091d'
+digest = 'sha256:c7945e83b8037669d6d6d0ce9ff94a96d7ab02bb74825cf53be5a5fc46e055bf'
 
 [[served]]
 name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-fetching-and-converting-urls'
 source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-fetching-and-converting-urls'
 commit = ''
-digest = 'sha256:19d56271fb9a5c3cb752724c6814b8bb73cc5bdca1cd8282036ef5351f683121'
+digest = 'sha256:a816d16d7900f90923fe2570b17c1bba2d782520b335366fac67324698430ffb'
 
 [[served]]
 name = 'plugin.hermes.package.src.html_to_markdown_hermes_plugin.skills.html-to-markdown-using-the-mcp-server'
 source = 'plugin/.hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-using-the-mcp-server'
 commit = ''
-digest = 'sha256:87d43bcbb43303a7c379f54ff095b5568624d5e8b7414db038d2b23869377097'
+digest = 'sha256:ae0968ff5369ca55c76dcc7468d0efc2f10eb07c5fa3e568665e0e184669f956'
 
 [[served]]
 name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown'
 source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown'
 commit = ''
-digest = 'sha256:44ccb3f56f1a54479bf5ec403527adf34b299a9f7c3f88596ce844e8e1d71c2a'
+digest = 'sha256:8153ab5282afed52a0e4b085851795c2a2430e521db7021c76ddccbd11aebb2d'
 
 [[served]]
 name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-converting-html'
 source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-converting-html'
 commit = ''
-digest = 'sha256:3414742811086c80a514e67e47ca88f9ba29bbd7a692362699514dcc80a512b0'
+digest = 'sha256:d270ad77bdfcd4d2a2134c2b5138cc3b937df53601e4a17e528ec6016162d774'
 
 [[served]]
 name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-extracting-metadata'
 source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-extracting-metadata'
 commit = ''
-digest = 'sha256:8c03cb53df8dac4366c44ddd6a476072acd5693430be3e53ad9cc4c9184a5442'
+digest = 'sha256:8065e71bb453d647c78629f234bd8cb12ac5e72f8aa39408e5f6bf1e80011060'
 
 [[served]]
 name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-extracting-tables'
 source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-extracting-tables'
 commit = ''
-digest = 'sha256:22310d17221a62403a9ccc9993f327e8f0c80389886be7d7b0792681db67fd8f'
+digest = 'sha256:1484c4807c09714be116307850fc1c0446bc55cffadc350f22996572d243391a'
 
 [[served]]
 name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-fetching-and-converting-urls'
 source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-fetching-and-converting-urls'
 commit = ''
-digest = 'sha256:4dcd9188024b87fd8a3c187e84d9516b02315ccd53f30f22fedf6d022c52d9de'
+digest = 'sha256:de24b555d0166131f18279afc5b6a567ae8b2414f9cf2306fa1421396f7a7d7b'
 
 [[served]]
 name = 'plugin.hermes.plugins.html-to-markdown.skills.html-to-markdown-using-the-mcp-server'
 source = 'plugin/.hermes/plugins/html-to-markdown/skills/html-to-markdown-using-the-mcp-server'
 commit = ''
-digest = 'sha256:7eff6db894170b1b55a1859504582b74411fac81aaca133547d6bcf720b29002'
+digest = 'sha256:e85d60de1c62b1702ec440b1ba4c97eac7327d4f90024f276c5f21d1385f8cf8'
 
 [[served]]
 name = 'plugin.opencode.skills.html-to-markdown'
 source = 'plugin/.opencode/skills/html-to-markdown'
 commit = ''
-digest = 'sha256:f45f22d9bcfc51820406a11dd2be79745b7b520a62577df8b40051aa9596226b'
+digest = 'sha256:69b02d6e86a72d3d9fb28165e7ae92b474844c504a1787f53ee90f20d85ac52d'
 
 [[served]]
 name = 'plugin.opencode.skills.html-to-markdown-converting-html'
 source = 'plugin/.opencode/skills/html-to-markdown-converting-html'
 commit = ''
-digest = 'sha256:95b7c912c56b89f62577967ef2569a373ef46808d4efcd1b9673740be6449650'
+digest = 'sha256:051795eac72f5438fffacc63f3b0fe2c91569a7824d13f9c24a878d67a863ea9'
 
 [[served]]
 name = 'plugin.opencode.skills.html-to-markdown-extracting-metadata'
 source = 'plugin/.opencode/skills/html-to-markdown-extracting-metadata'
 commit = ''
-digest = 'sha256:79f92133dcf102d68d8fe157250020874bd9b64d9a9d89f5b7ec8e3d43b7d39e'
+digest = 'sha256:5cae4ad55f753c3ad05e9c5c77554cf19d420f2f12eee58ea4da36ccbd7c8749'
 
 [[served]]
 name = 'plugin.opencode.skills.html-to-markdown-extracting-tables'
 source = 'plugin/.opencode/skills/html-to-markdown-extracting-tables'
 commit = ''
-digest = 'sha256:f0fe4502bf2d1bf318337b6456029a7c2660aed55a9e81e56c16c77c172845be'
+digest = 'sha256:b0ea2ccea7de0e946a66e8b63f7cd2c04efa4b6c4423b662e46a209b7e535e94'
 
 [[served]]
 name = 'plugin.opencode.skills.html-to-markdown-fetching-and-converting-urls'
 source = 'plugin/.opencode/skills/html-to-markdown-fetching-and-converting-urls'
 commit = ''
-digest = 'sha256:7ffe8b92f766cda1afea853e629e1cd666cbfe8396f6eb2c2e963ce1c1e98a52'
+digest = 'sha256:0d579ecbff7ba24cb3d8f968ab06e654cc1a628c493d8253438a49af1f75e0af'
 
 [[served]]
 name = 'plugin.opencode.skills.html-to-markdown-using-the-mcp-server'
 source = 'plugin/.opencode/skills/html-to-markdown-using-the-mcp-server'
 commit = ''
-digest = 'sha256:6a34f5074061d789f824d12d0481cdcc1775426acafdfc69dc04cbd83b7f5d61'
+digest = 'sha256:d02e09774971693ff03d1c966e903ee8351971a6cd972fcedd29e000b6ef0fd7'
 
 [[served]]
 name = 'plugin.skills.html-to-markdown'
 source = 'plugin/skills/html-to-markdown'
 commit = ''
-digest = 'sha256:9e6603ceac730c504d1e8a035fb00b876b008cb45c26f1879b3d60ae981fd1f9'
+digest = 'sha256:7e14068739e2cf4089e13163cec68aee1d4602a657d99b666c9923f0eae8fa3c'
 
 [[served]]
 name = 'plugin.skills.html-to-markdown-converting-html'
 source = 'plugin/skills/html-to-markdown-converting-html'
 commit = ''
-digest = 'sha256:189523d1a271c6d29712d669cd008b2a74959254ed100f43ef5bddbbcd60ec4e'
+digest = 'sha256:4e7da7c93643dfc7d7ddd70fb508640a68e32d23bc2b643a2ed814d4d904899c'
 
 [[served]]
 name = 'plugin.skills.html-to-markdown-extracting-metadata'
 source = 'plugin/skills/html-to-markdown-extracting-metadata'
 commit = ''
-digest = 'sha256:dabd967535a9948ea2a944129c88980656af9a4a69f93716f9c73ba5ad088f57'
+digest = 'sha256:b2d26b27fb76ae77cf6c6b01ac51f267f6726ac0536a4efb2839b75cad3f560a'
 
 [[served]]
 name = 'plugin.skills.html-to-markdown-extracting-tables'
 source = 'plugin/skills/html-to-markdown-extracting-tables'
 commit = ''
-digest = 'sha256:71d43f4d332de13696079f31f801be38aeb9e136463ef99f63492f0bbd099902'
+digest = 'sha256:d0e05c5fabb8fa13a5593a50c9f95ad9bcc74ac30e319792ce606cd9a8c11451'
 
 [[served]]
 name = 'plugin.skills.html-to-markdown-fetching-and-converting-urls'
 source = 'plugin/skills/html-to-markdown-fetching-and-converting-urls'
 commit = ''
-digest = 'sha256:ab41ff3e08bd20c59a547a34cd14f5adf9cb8380bca0554f2d34550c341f2bb7'
+digest = 'sha256:7e7f6f4fff5931fac5c338d233b7985bcb696f7cc5c3c4d60bf735e879d30f00'
 
 [[served]]
 name = 'plugin.skills.html-to-markdown-using-the-mcp-server'
 source = 'plugin/skills/html-to-markdown-using-the-mcp-server'
 commit = ''
-digest = 'sha256:e0bb3c1a855f1490620488759b0e7a4011793ed5e50a4a8f63386d78d4b28375'
+digest = 'sha256:cd78e3af31cb5ac895e82b39c58840db4229a67734b10e2f4659896e38195d20'
 
 [[served]]
 name = 'poly-lint-format'

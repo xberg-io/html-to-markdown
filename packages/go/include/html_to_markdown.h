@@ -1364,13 +1364,6 @@ int32_t htm_conversion_options_skip_images(HTMAlefHandle handle);
 HTMAlefHandle htm_conversion_options_inline_data_media(HTMAlefHandle handle);
 
 /**
- * Get the `use_accessible_names` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-int32_t htm_conversion_options_use_accessible_names(HTMAlefHandle handle);
-
-/**
  * Get the `hidden_content` field from a `ConversionOptions`.
  * A non-null returned handle is owned by the caller.
  * It must be freed with `htm_hidden_content_free`.
@@ -2050,26 +2043,6 @@ int32_t htm_conversion_options_update_has_skip_images(HTMAlefHandle handle);
  * Pointer must be a valid handle returned by this library.
  */
 HTMAlefHandle htm_conversion_options_update_inline_data_media(HTMAlefHandle handle);
-
-/**
- * Get the `use_accessible_names` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-int32_t htm_conversion_options_update_use_accessible_names(HTMAlefHandle handle);
-
-/**
- * Report whether the `use_accessible_names` field on a `ConversionOptionsUpdate` is `Some`.
- *
- * `htm_conversion_options_update_use_accessible_names` cannot distinguish a `None` field from a
- * legitimate zero-valued `Some` at the C ABI boundary -- there is no null representation for a
- * numeric return, so both collapse to the same sentinel. Call this function first: `1` means
- * the field getter's return value is meaningful, `0` means the field is absent and the getter's
- * sentinel must be ignored, `-1` reports an invalid handle (see `htm_last_error_code`).
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-int32_t htm_conversion_options_update_has_use_accessible_names(HTMAlefHandle handle);
 
 /**
  * Get the `hidden_content` field from a `ConversionOptionsUpdate`.
@@ -4347,6 +4320,20 @@ void htm_whitespace_mode_free(HTMAlefHandle handle);
  */
 HTMAlefHandle htm_convert(const char *html,
                           HTMAlefHandle options);
+
+/**
+ * Convert HTML with an explicit accessible-name policy for this call.
+ *
+ * When `use_accessible_names` is false, SVG labels, titles and descriptions and
+ * fallback link labels are omitted. Drawn SVG text, visible link content, image
+ * alt text and link title metadata remain. `convert` enables names by default.
+ * \note Returns the same input validation and conversion errors as `convert`.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+HTMAlefHandle htm_convert_with_accessible_names(const char *html,
+                                                int32_t use_accessible_names,
+                                                HTMAlefHandle options);
 
 /**
  * Attach a vtable visitor bridge to a `ConversionOptions` options handle.

@@ -56,6 +56,19 @@ use crate::{HtmlMetadata, MetadataConfig};
 /// field names are part of the public observability contract and are kept stable across
 /// releases. This crate never installs a `tracing` subscriber — attach one in the consuming
 /// application to observe these spans and events.
+pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Result<ConversionResult> {
+    convert_with_accessible_names(html, true, options)
+}
+
+/// Convert HTML with an explicit accessible-name policy for this call.
+///
+/// When `use_accessible_names` is false, SVG labels, titles and descriptions and
+/// fallback link labels are omitted. Drawn SVG text, visible link content, image
+/// alt text and link title metadata remain. [`convert`] enables names by default.
+///
+/// # Errors
+///
+/// Returns the same input validation and conversion errors as [`convert`].
 #[tracing::instrument(
     level = "info",
     name = "html_to_markdown::convert",
@@ -69,7 +82,11 @@ use crate::{HtmlMetadata, MetadataConfig};
         tier_strategy = tracing::field::Empty,
     )
 )]
-pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Result<ConversionResult> {
+pub fn convert_with_accessible_names(
+    html: &str,
+    use_accessible_names: bool,
+    options: impl Into<Option<ConversionOptions>>,
+) -> Result<ConversionResult> {
     let options = options.into().unwrap_or_default();
 
     let span = tracing::Span::current();
@@ -82,7 +99,17 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
     // ~keep Thin generic wrapper. Delegates to the non-generic `convert_inner` so the
     // ~keep large body monomorphises exactly once instead of once per `Into` impl
     // ~keep the caller picks. See xberg-io/html-to-markdown#398.
-    convert_inner(html, options)
+    convert_inner(html, options, AccessibleNamePolicy(use_accessible_names))
+}
+
+/// ~keep Internal default contexts retain accessible names without adding a public options field.
+#[derive(Clone, Copy)]
+pub struct AccessibleNamePolicy(pub bool);
+
+impl Default for AccessibleNamePolicy {
+    fn default() -> Self {
+        Self(true)
+    }
 }
 
 struct PreparedConversion<'a> {
@@ -112,10 +139,10 @@ type ConvertOutput = (
     Option<crate::types::ProcessingWarning>,
 );
 
-fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionResult> {
+fn convert_inner(html: &str, options: ConversionOptions, policy: AccessibleNamePolicy) -> Result<ConversionResult> {
     validate_input_size(html, options.max_input_size)?;
     let prepared = prepare_conversion(html, &options)?;
-    if let Some(result) = try_tier1(&prepared, &options) {
+    if let Some(result) = try_tier1(&prepared, &options, policy) {
         return Ok(result);
     }
     if !options.wrap
@@ -126,7 +153,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
             ..ConversionResult::default()
         });
     }
-    run_tier2(prepared, options)
+    run_tier2(prepared, options, policy)
 }
 
 fn validate_input_size(html: &str, max_size: Option<u64>) -> Result<()> {
@@ -330,7 +357,11 @@ fn repair_head(html: &str, hidden_content: crate::options::HiddenContent) -> Hea
     crate::converter::repair_head_content_outside_head(html, hidden_content)
 }
 
-fn try_tier1(prepared: &PreparedConversion<'_>, options: &ConversionOptions) -> Option<ConversionResult> {
+fn try_tier1(
+    prepared: &PreparedConversion<'_>,
+    options: &ConversionOptions,
+    policy: AccessibleNamePolicy,
+) -> Option<ConversionResult> {
     if !options.preserve_tags.is_empty() || !prepared.inert_bodies.is_empty() {
         return None;
     }
@@ -345,14 +376,14 @@ fn try_tier1(prepared: &PreparedConversion<'_>, options: &ConversionOptions) -> 
         crate::options::TierStrategy::Auto => {
             let decision = crate::converter::tier1::router::classify(&report, options);
             if decision == crate::converter::tier1::RouterDecision::Tier1 {
-                run_tier1(prepared, options, &report)
+                run_tier1(prepared, options, &report, policy)
             } else {
                 tracing::debug!(target: "html_to_markdown::convert", "router selected tier-2 conversion path directly");
                 None
             }
         }
         #[cfg(any(test, feature = "testkit"))]
-        crate::options::TierStrategy::Tier1 => run_tier1(prepared, options, &report),
+        crate::options::TierStrategy::Tier1 => run_tier1(prepared, options, &report, policy),
     }
 }
 
@@ -360,13 +391,15 @@ fn run_tier1(
     prepared: &PreparedConversion<'_>,
     options: &ConversionOptions,
     report: &crate::converter::prescan::PrescanReport,
+    policy: AccessibleNamePolicy,
 ) -> Option<ConversionResult> {
-    match crate::converter::tier1::run_with_base(
+    match crate::converter::tier1::run_with_policy(
         prepared.html.as_ref(),
         report,
         options,
         prepared.effective_base.clone(),
         prepared.metadata_base_href.as_deref(),
+        policy,
     ) {
         Ok(markdown) => {
             tracing::debug!(target: "html_to_markdown::convert", output_len = markdown.len(), "tier-1 fast-path conversion completed");
@@ -388,9 +421,13 @@ fn run_tier1(
     }
 }
 
-fn run_tier2(prepared: PreparedConversion<'_>, options: ConversionOptions) -> Result<ConversionResult> {
+fn run_tier2(
+    prepared: PreparedConversion<'_>,
+    options: ConversionOptions,
+    policy: AccessibleNamePolicy,
+) -> Result<ConversionResult> {
     let collectors = create_collectors(&options)?;
-    let outcome = invoke_converter(&prepared, &options, &collectors);
+    let outcome = invoke_converter(&prepared, &options, &collectors, policy);
     let (markdown, document, tables, depth_warning) = match outcome {
         Ok(result) => result?,
         Err(panic_payload) => {
@@ -440,9 +477,10 @@ fn invoke_converter(
     prepared: &PreparedConversion<'_>,
     options: &ConversionOptions,
     collectors: &Tier2Collectors,
+    policy: AccessibleNamePolicy,
 ) -> std::thread::Result<Result<ConvertOutput>> {
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        call_converter(prepared, options, collectors)
+        call_converter(prepared, options, collectors, policy)
     }))
 }
 
@@ -450,6 +488,7 @@ fn call_converter(
     prepared: &PreparedConversion<'_>,
     options: &ConversionOptions,
     collectors: &Tier2Collectors,
+    policy: AccessibleNamePolicy,
 ) -> Result<ConvertOutput> {
     #[cfg(feature = "visitor")]
     let visitor = options.visitor.clone();
@@ -460,6 +499,7 @@ fn call_converter(
         prepared.html.as_ref(),
         options,
         crate::converter::main::ConversionParameters {
+            accessible_names: policy,
             inert_bodies: &prepared.inert_bodies,
             inline_collector: image_collector(collectors),
             #[cfg(feature = "metadata")]

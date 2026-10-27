@@ -186,6 +186,18 @@
     "c/metadata/structured_data_multiple_json_ld.md",
     "c/metadata/twitter_card_tags.md",
     "c/options/issue_396_backticks_blank_line_after_fence.md",
+    "c/options/options_accessible_names_link_auto_disabled.md",
+    "c/options/options_accessible_names_link_auto_enabled.md",
+    "c/options/options_accessible_names_link_tier2_disabled.md",
+    "c/options/options_accessible_names_link_tier2_enabled.md",
+    "c/options/options_accessible_names_plain_auto_disabled.md",
+    "c/options/options_accessible_names_plain_auto_enabled.md",
+    "c/options/options_accessible_names_plain_tier2_disabled.md",
+    "c/options/options_accessible_names_plain_tier2_enabled.md",
+    "c/options/options_accessible_names_svg_auto_disabled.md",
+    "c/options/options_accessible_names_svg_auto_enabled.md",
+    "c/options/options_accessible_names_svg_tier2_disabled.md",
+    "c/options/options_accessible_names_svg_tier2_enabled.md",
     "c/options/options_autolinks_false.md",
     "c/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "c/options/options_br_in_tables_false.md",
@@ -532,6 +544,18 @@
     "csharp/metadata/structured_data_multiple_json_ld.md",
     "csharp/metadata/twitter_card_tags.md",
     "csharp/options/issue_396_backticks_blank_line_after_fence.md",
+    "csharp/options/options_accessible_names_link_auto_disabled.md",
+    "csharp/options/options_accessible_names_link_auto_enabled.md",
+    "csharp/options/options_accessible_names_link_tier2_disabled.md",
+    "csharp/options/options_accessible_names_link_tier2_enabled.md",
+    "csharp/options/options_accessible_names_plain_auto_disabled.md",
+    "csharp/options/options_accessible_names_plain_auto_enabled.md",
+    "csharp/options/options_accessible_names_plain_tier2_disabled.md",
+    "csharp/options/options_accessible_names_plain_tier2_enabled.md",
+    "csharp/options/options_accessible_names_svg_auto_disabled.md",
+    "csharp/options/options_accessible_names_svg_auto_enabled.md",
+    "csharp/options/options_accessible_names_svg_tier2_disabled.md",
+    "csharp/options/options_accessible_names_svg_tier2_enabled.md",
     "csharp/options/options_autolinks_false.md",
     "csharp/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "csharp/options/options_br_in_tables_false.md",
@@ -878,6 +902,18 @@
     "dart/metadata/structured_data_multiple_json_ld.md",
     "dart/metadata/twitter_card_tags.md",
     "dart/options/issue_396_backticks_blank_line_after_fence.md",
+    "dart/options/options_accessible_names_link_auto_disabled.md",
+    "dart/options/options_accessible_names_link_auto_enabled.md",
+    "dart/options/options_accessible_names_link_tier2_disabled.md",
+    "dart/options/options_accessible_names_link_tier2_enabled.md",
+    "dart/options/options_accessible_names_plain_auto_disabled.md",
+    "dart/options/options_accessible_names_plain_auto_enabled.md",
+    "dart/options/options_accessible_names_plain_tier2_disabled.md",
+    "dart/options/options_accessible_names_plain_tier2_enabled.md",
+    "dart/options/options_accessible_names_svg_auto_disabled.md",
+    "dart/options/options_accessible_names_svg_auto_enabled.md",
+    "dart/options/options_accessible_names_svg_tier2_disabled.md",
+    "dart/options/options_accessible_names_svg_tier2_enabled.md",
     "dart/options/options_autolinks_false.md",
     "dart/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "dart/options/options_br_in_tables_false.md",
@@ -1224,6 +1260,18 @@
     "elixir/metadata/structured_data_multiple_json_ld.md",
     "elixir/metadata/twitter_card_tags.md",
     "elixir/options/issue_396_backticks_blank_line_after_fence.md",
+    "elixir/options/options_accessible_names_link_auto_disabled.md",
+    "elixir/options/options_accessible_names_link_auto_enabled.md",
+    "elixir/options/options_accessible_names_link_tier2_disabled.md",
+    "elixir/options/options_accessible_names_link_tier2_enabled.md",
+    "elixir/options/options_accessible_names_plain_auto_disabled.md",
+    "elixir/options/options_accessible_names_plain_auto_enabled.md",
+    "elixir/options/options_accessible_names_plain_tier2_disabled.md",
+    "elixir/options/options_accessible_names_plain_tier2_enabled.md",
+    "elixir/options/options_accessible_names_svg_auto_disabled.md",
+    "elixir/options/options_accessible_names_svg_auto_enabled.md",
+    "elixir/options/options_accessible_names_svg_tier2_disabled.md",
+    "elixir/options/options_accessible_names_svg_tier2_enabled.md",
     "elixir/options/options_autolinks_false.md",
     "elixir/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "elixir/options/options_br_in_tables_false.md",
@@ -1570,6 +1618,18 @@
     "go/metadata/structured_data_multiple_json_ld.md",
     "go/metadata/twitter_card_tags.md",
     "go/options/issue_396_backticks_blank_line_after_fence.md",
+    "go/options/options_accessible_names_link_auto_disabled.md",
+    "go/options/options_accessible_names_link_auto_enabled.md",
+    "go/options/options_accessible_names_link_tier2_disabled.md",
+    "go/options/options_accessible_names_link_tier2_enabled.md",
+    "go/options/options_accessible_names_plain_auto_disabled.md",
+    "go/options/options_accessible_names_plain_auto_enabled.md",
+    "go/options/options_accessible_names_plain_tier2_disabled.md",
+    "go/options/options_accessible_names_plain_tier2_enabled.md",
+    "go/options/options_accessible_names_svg_auto_disabled.md",
+    "go/options/options_accessible_names_svg_auto_enabled.md",
+    "go/options/options_accessible_names_svg_tier2_disabled.md",
+    "go/options/options_accessible_names_svg_tier2_enabled.md",
     "go/options/options_autolinks_false.md",
     "go/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "go/options/options_br_in_tables_false.md",
@@ -1916,6 +1976,18 @@
     "java/metadata/structured_data_multiple_json_ld.md",
     "java/metadata/twitter_card_tags.md",
     "java/options/issue_396_backticks_blank_line_after_fence.md",
+    "java/options/options_accessible_names_link_auto_disabled.md",
+    "java/options/options_accessible_names_link_auto_enabled.md",
+    "java/options/options_accessible_names_link_tier2_disabled.md",
+    "java/options/options_accessible_names_link_tier2_enabled.md",
+    "java/options/options_accessible_names_plain_auto_disabled.md",
+    "java/options/options_accessible_names_plain_auto_enabled.md",
+    "java/options/options_accessible_names_plain_tier2_disabled.md",
+    "java/options/options_accessible_names_plain_tier2_enabled.md",
+    "java/options/options_accessible_names_svg_auto_disabled.md",
+    "java/options/options_accessible_names_svg_auto_enabled.md",
+    "java/options/options_accessible_names_svg_tier2_disabled.md",
+    "java/options/options_accessible_names_svg_tier2_enabled.md",
     "java/options/options_autolinks_false.md",
     "java/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "java/options/options_br_in_tables_false.md",
@@ -2257,6 +2329,18 @@
     "kotlin-android/metadata/structured_data_multiple_json_ld.md",
     "kotlin-android/metadata/twitter_card_tags.md",
     "kotlin-android/options/issue_396_backticks_blank_line_after_fence.md",
+    "kotlin-android/options/options_accessible_names_link_auto_disabled.md",
+    "kotlin-android/options/options_accessible_names_link_auto_enabled.md",
+    "kotlin-android/options/options_accessible_names_link_tier2_disabled.md",
+    "kotlin-android/options/options_accessible_names_link_tier2_enabled.md",
+    "kotlin-android/options/options_accessible_names_plain_auto_disabled.md",
+    "kotlin-android/options/options_accessible_names_plain_auto_enabled.md",
+    "kotlin-android/options/options_accessible_names_plain_tier2_disabled.md",
+    "kotlin-android/options/options_accessible_names_plain_tier2_enabled.md",
+    "kotlin-android/options/options_accessible_names_svg_auto_disabled.md",
+    "kotlin-android/options/options_accessible_names_svg_auto_enabled.md",
+    "kotlin-android/options/options_accessible_names_svg_tier2_disabled.md",
+    "kotlin-android/options/options_accessible_names_svg_tier2_enabled.md",
     "kotlin-android/options/options_autolinks_false.md",
     "kotlin-android/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "kotlin-android/options/options_br_in_tables_false.md",
@@ -2549,6 +2633,18 @@
     "php/metadata/structured_data_multiple_json_ld.md",
     "php/metadata/twitter_card_tags.md",
     "php/options/issue_396_backticks_blank_line_after_fence.md",
+    "php/options/options_accessible_names_link_auto_disabled.md",
+    "php/options/options_accessible_names_link_auto_enabled.md",
+    "php/options/options_accessible_names_link_tier2_disabled.md",
+    "php/options/options_accessible_names_link_tier2_enabled.md",
+    "php/options/options_accessible_names_plain_auto_disabled.md",
+    "php/options/options_accessible_names_plain_auto_enabled.md",
+    "php/options/options_accessible_names_plain_tier2_disabled.md",
+    "php/options/options_accessible_names_plain_tier2_enabled.md",
+    "php/options/options_accessible_names_svg_auto_disabled.md",
+    "php/options/options_accessible_names_svg_auto_enabled.md",
+    "php/options/options_accessible_names_svg_tier2_disabled.md",
+    "php/options/options_accessible_names_svg_tier2_enabled.md",
     "php/options/options_autolinks_false.md",
     "php/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "php/options/options_br_in_tables_false.md",
@@ -2846,6 +2942,18 @@
     "python/metadata/structured_data_multiple_json_ld.md",
     "python/metadata/twitter_card_tags.md",
     "python/options/issue_396_backticks_blank_line_after_fence.md",
+    "python/options/options_accessible_names_link_auto_disabled.md",
+    "python/options/options_accessible_names_link_auto_enabled.md",
+    "python/options/options_accessible_names_link_tier2_disabled.md",
+    "python/options/options_accessible_names_link_tier2_enabled.md",
+    "python/options/options_accessible_names_plain_auto_disabled.md",
+    "python/options/options_accessible_names_plain_auto_enabled.md",
+    "python/options/options_accessible_names_plain_tier2_disabled.md",
+    "python/options/options_accessible_names_plain_tier2_enabled.md",
+    "python/options/options_accessible_names_svg_auto_disabled.md",
+    "python/options/options_accessible_names_svg_auto_enabled.md",
+    "python/options/options_accessible_names_svg_tier2_disabled.md",
+    "python/options/options_accessible_names_svg_tier2_enabled.md",
     "python/options/options_autolinks_false.md",
     "python/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "python/options/options_br_in_tables_false.md",
@@ -3192,6 +3300,18 @@
     "r/metadata/structured_data_multiple_json_ld.md",
     "r/metadata/twitter_card_tags.md",
     "r/options/issue_396_backticks_blank_line_after_fence.md",
+    "r/options/options_accessible_names_link_auto_disabled.md",
+    "r/options/options_accessible_names_link_auto_enabled.md",
+    "r/options/options_accessible_names_link_tier2_disabled.md",
+    "r/options/options_accessible_names_link_tier2_enabled.md",
+    "r/options/options_accessible_names_plain_auto_disabled.md",
+    "r/options/options_accessible_names_plain_auto_enabled.md",
+    "r/options/options_accessible_names_plain_tier2_disabled.md",
+    "r/options/options_accessible_names_plain_tier2_enabled.md",
+    "r/options/options_accessible_names_svg_auto_disabled.md",
+    "r/options/options_accessible_names_svg_auto_enabled.md",
+    "r/options/options_accessible_names_svg_tier2_disabled.md",
+    "r/options/options_accessible_names_svg_tier2_enabled.md",
     "r/options/options_autolinks_false.md",
     "r/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "r/options/options_br_in_tables_false.md",
@@ -3538,6 +3658,18 @@
     "ruby/metadata/structured_data_multiple_json_ld.md",
     "ruby/metadata/twitter_card_tags.md",
     "ruby/options/issue_396_backticks_blank_line_after_fence.md",
+    "ruby/options/options_accessible_names_link_auto_disabled.md",
+    "ruby/options/options_accessible_names_link_auto_enabled.md",
+    "ruby/options/options_accessible_names_link_tier2_disabled.md",
+    "ruby/options/options_accessible_names_link_tier2_enabled.md",
+    "ruby/options/options_accessible_names_plain_auto_disabled.md",
+    "ruby/options/options_accessible_names_plain_auto_enabled.md",
+    "ruby/options/options_accessible_names_plain_tier2_disabled.md",
+    "ruby/options/options_accessible_names_plain_tier2_enabled.md",
+    "ruby/options/options_accessible_names_svg_auto_disabled.md",
+    "ruby/options/options_accessible_names_svg_auto_enabled.md",
+    "ruby/options/options_accessible_names_svg_tier2_disabled.md",
+    "ruby/options/options_accessible_names_svg_tier2_enabled.md",
     "ruby/options/options_autolinks_false.md",
     "ruby/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "ruby/options/options_br_in_tables_false.md",
@@ -3884,6 +4016,18 @@
     "rust/metadata/structured_data_multiple_json_ld.md",
     "rust/metadata/twitter_card_tags.md",
     "rust/options/issue_396_backticks_blank_line_after_fence.md",
+    "rust/options/options_accessible_names_link_auto_disabled.md",
+    "rust/options/options_accessible_names_link_auto_enabled.md",
+    "rust/options/options_accessible_names_link_tier2_disabled.md",
+    "rust/options/options_accessible_names_link_tier2_enabled.md",
+    "rust/options/options_accessible_names_plain_auto_disabled.md",
+    "rust/options/options_accessible_names_plain_auto_enabled.md",
+    "rust/options/options_accessible_names_plain_tier2_disabled.md",
+    "rust/options/options_accessible_names_plain_tier2_enabled.md",
+    "rust/options/options_accessible_names_svg_auto_disabled.md",
+    "rust/options/options_accessible_names_svg_auto_enabled.md",
+    "rust/options/options_accessible_names_svg_tier2_disabled.md",
+    "rust/options/options_accessible_names_svg_tier2_enabled.md",
     "rust/options/options_autolinks_false.md",
     "rust/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "rust/options/options_br_in_tables_false.md",
@@ -4230,6 +4374,18 @@
     "swift/metadata/structured_data_multiple_json_ld.md",
     "swift/metadata/twitter_card_tags.md",
     "swift/options/issue_396_backticks_blank_line_after_fence.md",
+    "swift/options/options_accessible_names_link_auto_disabled.md",
+    "swift/options/options_accessible_names_link_auto_enabled.md",
+    "swift/options/options_accessible_names_link_tier2_disabled.md",
+    "swift/options/options_accessible_names_link_tier2_enabled.md",
+    "swift/options/options_accessible_names_plain_auto_disabled.md",
+    "swift/options/options_accessible_names_plain_auto_enabled.md",
+    "swift/options/options_accessible_names_plain_tier2_disabled.md",
+    "swift/options/options_accessible_names_plain_tier2_enabled.md",
+    "swift/options/options_accessible_names_svg_auto_disabled.md",
+    "swift/options/options_accessible_names_svg_auto_enabled.md",
+    "swift/options/options_accessible_names_svg_tier2_disabled.md",
+    "swift/options/options_accessible_names_svg_tier2_enabled.md",
     "swift/options/options_autolinks_false.md",
     "swift/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "swift/options/options_br_in_tables_false.md",
@@ -4576,6 +4732,18 @@
     "typescript/metadata/structured_data_multiple_json_ld.md",
     "typescript/metadata/twitter_card_tags.md",
     "typescript/options/issue_396_backticks_blank_line_after_fence.md",
+    "typescript/options/options_accessible_names_link_auto_disabled.md",
+    "typescript/options/options_accessible_names_link_auto_enabled.md",
+    "typescript/options/options_accessible_names_link_tier2_disabled.md",
+    "typescript/options/options_accessible_names_link_tier2_enabled.md",
+    "typescript/options/options_accessible_names_plain_auto_disabled.md",
+    "typescript/options/options_accessible_names_plain_auto_enabled.md",
+    "typescript/options/options_accessible_names_plain_tier2_disabled.md",
+    "typescript/options/options_accessible_names_plain_tier2_enabled.md",
+    "typescript/options/options_accessible_names_svg_auto_disabled.md",
+    "typescript/options/options_accessible_names_svg_auto_enabled.md",
+    "typescript/options/options_accessible_names_svg_tier2_disabled.md",
+    "typescript/options/options_accessible_names_svg_tier2_enabled.md",
     "typescript/options/options_autolinks_false.md",
     "typescript/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "typescript/options/options_br_in_tables_false.md",
@@ -4922,6 +5090,18 @@
     "wasm/metadata/structured_data_multiple_json_ld.md",
     "wasm/metadata/twitter_card_tags.md",
     "wasm/options/issue_396_backticks_blank_line_after_fence.md",
+    "wasm/options/options_accessible_names_link_auto_disabled.md",
+    "wasm/options/options_accessible_names_link_auto_enabled.md",
+    "wasm/options/options_accessible_names_link_tier2_disabled.md",
+    "wasm/options/options_accessible_names_link_tier2_enabled.md",
+    "wasm/options/options_accessible_names_plain_auto_disabled.md",
+    "wasm/options/options_accessible_names_plain_auto_enabled.md",
+    "wasm/options/options_accessible_names_plain_tier2_disabled.md",
+    "wasm/options/options_accessible_names_plain_tier2_enabled.md",
+    "wasm/options/options_accessible_names_svg_auto_disabled.md",
+    "wasm/options/options_accessible_names_svg_auto_enabled.md",
+    "wasm/options/options_accessible_names_svg_tier2_disabled.md",
+    "wasm/options/options_accessible_names_svg_tier2_enabled.md",
     "wasm/options/options_autolinks_false.md",
     "wasm/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "wasm/options/options_br_in_tables_false.md",
@@ -5268,6 +5448,18 @@
     "zig/metadata/structured_data_multiple_json_ld.md",
     "zig/metadata/twitter_card_tags.md",
     "zig/options/issue_396_backticks_blank_line_after_fence.md",
+    "zig/options/options_accessible_names_link_auto_disabled.md",
+    "zig/options/options_accessible_names_link_auto_enabled.md",
+    "zig/options/options_accessible_names_link_tier2_disabled.md",
+    "zig/options/options_accessible_names_link_tier2_enabled.md",
+    "zig/options/options_accessible_names_plain_auto_disabled.md",
+    "zig/options/options_accessible_names_plain_auto_enabled.md",
+    "zig/options/options_accessible_names_plain_tier2_disabled.md",
+    "zig/options/options_accessible_names_plain_tier2_enabled.md",
+    "zig/options/options_accessible_names_svg_auto_disabled.md",
+    "zig/options/options_accessible_names_svg_auto_enabled.md",
+    "zig/options/options_accessible_names_svg_tier2_disabled.md",
+    "zig/options/options_accessible_names_svg_tier2_enabled.md",
     "zig/options/options_autolinks_false.md",
     "zig/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "zig/options/options_br_in_tables_false.md",
@@ -7645,6 +7837,150 @@
         "language": "c"
       },
       "path": "c/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_link_auto_disabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_link_auto_enabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "c"
+      },
+      "path": "c/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -11805,6 +12141,150 @@
     },
     {
       "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_link_auto_disabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_link_auto_enabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_accessible_names_svg_tier2_enabled.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_autolinks_false",
         "language": "csharp"
       },
@@ -15949,6 +16429,150 @@
         "language": "dart"
       },
       "path": "dart/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_link_auto_disabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_link_auto_enabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "dart"
+      },
+      "path": "dart/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -20109,6 +20733,150 @@
     },
     {
       "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_link_auto_disabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_link_auto_enabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_accessible_names_svg_tier2_enabled.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_autolinks_false",
         "language": "elixir"
       },
@@ -24253,6 +25021,150 @@
         "language": "go"
       },
       "path": "go/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_link_auto_disabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_link_auto_enabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "go"
+      },
+      "path": "go/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -28413,6 +29325,150 @@
     },
     {
       "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_link_auto_disabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_link_auto_enabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "java"
+      },
+      "path": "java/options/options_accessible_names_svg_tier2_enabled.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_autolinks_false",
         "language": "java"
       },
@@ -32505,6 +33561,150 @@
     },
     {
       "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_link_auto_disabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_link_auto_enabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_accessible_names_svg_tier2_enabled.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_autolinks_false",
         "language": "kotlin_android"
       },
@@ -36001,6 +37201,150 @@
         "language": "php"
       },
       "path": "php/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_link_auto_disabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_link_auto_enabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "php"
+      },
+      "path": "php/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -39565,6 +40909,150 @@
         "language": "python"
       },
       "path": "python/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_link_auto_disabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_link_auto_enabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "python"
+      },
+      "path": "python/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -43725,6 +45213,150 @@
     },
     {
       "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_link_auto_disabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_link_auto_enabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "r"
+      },
+      "path": "r/options/options_accessible_names_svg_tier2_enabled.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_autolinks_false",
         "language": "r"
       },
@@ -47869,6 +49501,150 @@
         "language": "ruby"
       },
       "path": "ruby/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_link_auto_disabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_link_auto_enabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -52085,6 +53861,174 @@
         "language": "rust"
       },
       "path": "rust/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_link_auto_disabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_link_auto_enabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "rust"
+      },
+      "path": "rust/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -56547,6 +58491,150 @@
     },
     {
       "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_link_auto_disabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_link_auto_enabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "swift"
+      },
+      "path": "swift/options/options_accessible_names_svg_tier2_enabled.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_autolinks_false",
         "language": "swift"
       },
@@ -60691,6 +62779,150 @@
         "language": "node"
       },
       "path": "typescript/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_link_auto_disabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_link_auto_enabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "node"
+      },
+      "path": "typescript/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -64851,6 +67083,150 @@
     },
     {
       "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_link_auto_disabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_link_auto_enabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_accessible_names_svg_tier2_enabled.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_autolinks_false",
         "language": "wasm"
       },
@@ -68995,6 +71371,150 @@
         "language": "zig"
       },
       "path": "zig/options/issue_396_backticks_blank_line_after_fence.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_disabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_link_auto_disabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_auto_enabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_link_auto_enabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_disabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_link_tier2_disabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_link_tier2_enabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_link_tier2_enabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_disabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_plain_auto_disabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_auto_enabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_plain_auto_enabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_disabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_plain_tier2_disabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_plain_tier2_enabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_plain_tier2_enabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_disabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_svg_auto_disabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_auto_enabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_svg_auto_enabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_disabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_svg_tier2_disabled.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_accessible_names_svg_tier2_enabled",
+        "language": "zig"
+      },
+      "path": "zig/options/options_accessible_names_svg_tier2_enabled.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -79381,6 +81901,774 @@
     },
     {
       "fixture_id": "og_multiple_tags",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
       "language": "zig"
     },
     {
@@ -101095,6 +104383,774 @@
     },
     {
       "fixture_id": "og_multiple_tags",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_auto_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_link_tier2_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_auto_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_plain_tier2_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_auto_enabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_disabled",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_accessible_names_svg_tier2_enabled",
       "language": "zig"
     },
     {

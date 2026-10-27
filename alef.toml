@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.114.2"
+alef_version = "0.115.4"
 languages = [
   "python",
   "node",
@@ -777,7 +777,7 @@ exclude_functions = ["visitor"]
 [crates.elixir]
 app_name = "html_to_markdown"
 exclude_types = ["ConversionOptionsBuilder"]
-cpu_bound_functions = ["convert"]
+cpu_bound_functions = ["convert", "convert_with_accessible_names"]
 
 [crates.ffi]
 prefix = "htm"
@@ -868,7 +868,7 @@ types = [
   "NodeContext",
   "VisitResult",
 ]
-functions = ["convert"]
+functions = ["convert", "convert_with_accessible_names"]
 
 [crates.test.python]
 precondition = "command -v uv >/dev/null 2>&1"
@@ -1266,6 +1266,230 @@ module = "html_to_markdown"
 function = "convert"
 result_is_json_struct = true
 
+[crates.e2e.calls.accessible_names]
+function = "convert_with_accessible_names"
+module = "html_to_markdown_rs"
+result_var = "result"
+options_type = "ConversionOptions"
+args = [
+  { name = "html", field = "html", type = "string" },
+  { name = "use_accessible_names", field = "use_accessible_names", type = "bool" },
+  { name = "options", field = "options", type = "json_object", optional = true },
+]
+
+[crates.e2e.calls.accessible_names.overrides.rust]
+crate_name = "html_to_markdown_rs"
+module = "html_to_markdown_rs"
+function = "convert_with_accessible_names"
+options_type = "ConversionOptions"
+wrap_options_in_some = true
+returns_result = true
+visitor_trait = "HtmlVisitor"
+
+[crates.e2e.calls.accessible_names.overrides.python]
+module = "html_to_markdown"
+function = "convert_with_accessible_names"
+options_type = "ConversionOptions"
+enum_module = "html_to_markdown.options"
+
+[crates.e2e.calls.accessible_names.overrides.python.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.node]
+module = "@xberg-io/html-to-markdown"
+function = "convertWithAccessibleNames"
+options_type = "ConversionOptions"
+
+[crates.e2e.calls.accessible_names.overrides.node.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.go]
+module = "github.com/xberg-io/html-to-markdown/packages/go/v3"
+function = "ConvertWithAccessibleNames"
+alias = "htmd"
+options_type = "ConversionOptions"
+returns_result = true
+options_ptr = true
+
+[crates.e2e.calls.accessible_names.overrides.java]
+class = "io.xberg.htmltomarkdown.HtmlToMarkdownRs"
+function = "convertWithAccessibleNames"
+options_type = "ConversionOptions"
+nested_types_optional = false
+
+[crates.e2e.calls.accessible_names.overrides.java.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.java.nested_types]
+preprocessing = "PreprocessingOptions"
+
+[crates.e2e.calls.accessible_names.overrides.csharp]
+class = "HtmlToMarkdownRs"
+function = "ConvertWithAccessibleNames"
+options_type = "ConversionOptions"
+
+[crates.e2e.calls.accessible_names.overrides.csharp.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.csharp.nested_types]
+preprocessing = "PreprocessingOptions"
+
+[crates.e2e.calls.accessible_names.overrides.php]
+module = "HtmlToMarkdown"
+class = "HtmlToMarkdown"
+function = "convertWithAccessibleNames"
+options_type = "ConversionOptions"
+options_via = "from_json"
+
+[crates.e2e.calls.accessible_names.overrides.php.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.ruby]
+function = "convert_with_accessible_names"
+module = "html_to_markdown"
+# Bare, NOT `HtmlToMarkdownRs::ConversionOptions`. The ruby emitter qualifies `options_type` with
+# the binding's own module, so a value that is already namespaced comes out double-qualified as
+# `HtmlToMarkdown::HtmlToMarkdownRs::ConversionOptions` -- and `HtmlToMarkdownRs` is defined by
+# `ruby.define_module("HtmlToMarkdownRs")` at TOP level, never nested under `HtmlToMarkdown`, so
+# that path raises `NameError: uninitialized constant HtmlToMarkdown::HtmlToMarkdownRs`. Measured
+# against 0.67.6 output: 227 call sites over 118 files -- 112 generated doc snippets, 5 e2e/ruby
+# specs and 1 test_apps/ruby spec. The bare name
+# resolves through the `ConversionOptions = HtmlToMarkdownRs.const_get(:ConversionOptions)`
+# re-export in packages/ruby/lib/html_to_markdown/native.rb and yields the same class. ~keep
+options_type = "ConversionOptions"
+
+[crates.e2e.calls.accessible_names.overrides.ruby.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.elixir]
+module = "HtmlToMarkdown"
+function = "convert_with_accessible_names"
+options_type = "ConversionOptions"
+returns_result = true
+
+[crates.e2e.calls.accessible_names.overrides.elixir.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.r]
+module = "html_to_markdown"
+function = "convert_with_accessible_names"
+options_type = "ConversionOptions"
+result_is_r_list = true
+
+[crates.e2e.calls.accessible_names.overrides.wasm]
+function = "convertWithAccessibleNames"
+options_type = "WasmConversionOptions"
+bigint_fields = ["maxImageSize"]
+
+[crates.e2e.calls.accessible_names.overrides.wasm.enum_fields]
+headingStyle = "WasmHeadingStyle"
+codeBlockStyle = "WasmCodeBlockStyle"
+listIndentType = "WasmListIndentType"
+newlineStyle = "WasmNewlineStyle"
+whitespaceMode = "WasmWhitespaceMode"
+highlightStyle = "WasmHighlightStyle"
+linkStyle = "WasmLinkStyle"
+outputFormat = "WasmOutputFormat"
+urlEscapeStyle = "WasmUrlEscapeStyle"
+preset = "WasmPreprocessingPreset"
+
+[crates.e2e.calls.accessible_names.overrides.wasm.nested_types]
+preprocessing = "WasmPreprocessingOptions"
+
+[crates.e2e.calls.accessible_names.overrides.c]
+header = "html_to_markdown.h"
+function = "htm_convert_with_accessible_names"
+prefix = "htm"
+result_type = "ConversionResult"
+
+[crates.e2e.calls.accessible_names.overrides.kotlin_android]
+class = "io.xberg.android.HtmlToMarkdown"
+function = "convertWithAccessibleNames"
+options_type = "ConversionOptions"
+
+[crates.e2e.calls.accessible_names.overrides.kotlin_android.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
+
+[crates.e2e.calls.accessible_names.overrides.swift]
+module = "HtmlToMarkdown"
+function = "convertWithAccessibleNames"
+options_type = "ConversionOptions"
+options_via = "from_json"
+
+[crates.e2e.calls.accessible_names.overrides.dart]
+module = "h2m"
+function = "convertWithAccessibleNames"
+options_type = "ConversionOptions"
+
+[crates.e2e.calls.accessible_names.overrides.zig]
+module = "html_to_markdown"
+function = "convert_with_accessible_names"
+result_is_json_struct = true
+
 [crates.e2e.registry]
 github_repo = "https://github.com/xberg-io/html-to-markdown"
 output = "test_apps"
@@ -1273,78 +1497,78 @@ categories = ["smoke", "conversion"]
 
 [crates.e2e.registry.packages.python]
 name = "html-to-markdown"
-version = ">=3.18.7"
+version = ">=3.19.0"
 
 [crates.e2e.registry.packages.node]
 name = "@xberg-io/html-to-markdown"
-version = "^3.18.7"
+version = "^3.19.0"
 
 [crates.e2e.registry.packages.rust]
 name = "html-to-markdown-rs"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/xberg-io/html-to-markdown/packages/go/v3"
-version = "v3.18.7"
+version = "v3.19.0"
 
 [crates.e2e.registry.packages.java]
 name = "io.xberg:html-to-markdown"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.csharp]
 name = "XbergIo.HtmlToMarkdown"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.php]
 name = "xberg-io/html-to-markdown"
-version = ">=3.18.7"
+version = ">=3.19.0"
 
 [crates.e2e.registry.packages.ruby]
 name = "html-to-markdown"
-version = "~> 3.18.7"
+version = "~> 3.19.0"
 
 [crates.e2e.registry.packages.elixir]
 name = "html_to_markdown"
-version = "~> 3.18.7"
+version = "~> 3.19.0"
 
 [crates.e2e.registry.packages.wasm]
 name = "@xberg-io/html-to-markdown-wasm"
-version = "^3.18.7"
+version = "^3.19.0"
 
 [crates.e2e.registry.packages.r]
 name = "htmltomarkdown"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.c]
 name = "html-to-markdown-rs-ffi"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.kotlin_android]
 name = "io.xberg:html-to-markdown-android"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.swift]
 name = "HtmlToMarkdown"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.dart]
 name = "h2m"
-version = "^3.18.7"
+version = "^3.19.0"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
-version = "3.18.7"
-hash = "html_to_markdown_rs-3.18.7-QtXyW6p0AQARDHIsBKu1XVrpRf5J7ornocJZf2alzaq5"
+version = "3.19.0"
+hash = "html_to_markdown_rs-3.19.0-QtXyW6p0AQARDHIsBKu1XVrpRf5J7ornocJZf2alzaq5"
 
 [crates.e2e.registry.packages.php_ext]
 name = "xberg-io/html-to-markdown"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "xberg-io/tap"
 cli_formula = "html-to-markdown"
 ffi_formula = "libhtml-to-markdown"
-version = "3.18.7"
+version = "3.19.0"
 
 [crates.e2e.packages.rust]
 path = "../../crates/html-to-markdown"
@@ -1360,7 +1584,7 @@ path = "../../crates/html-to-markdown-node"
 [crates.e2e.packages.go]
 module = "github.com/xberg-io/html-to-markdown/packages/go/v3"
 path = "../../packages/go"
-version = "v3.18.7"
+version = "v3.19.0"
 
 [crates.e2e.packages.php]
 name = "xberg-io/html-to-markdown"

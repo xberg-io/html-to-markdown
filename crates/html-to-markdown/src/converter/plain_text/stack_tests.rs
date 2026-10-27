@@ -27,7 +27,11 @@ fn should_walk_deep_plain_text_on_a_256_kib_stack() {
                         max_depth: Some(1024),
                         ..Default::default()
                     };
-                    assert_eq!(extract_plain_text(&dom, dom.parser(), &options), expected, "{open}");
+                    assert_eq!(
+                        extract_plain_text(&dom, dom.parser(), &options, Default::default()),
+                        expected,
+                        "{open}"
+                    );
                 }
                 "deep\n".to_owned()
             })
@@ -72,7 +76,7 @@ fn should_keep_plain_capture_output_and_callbacks_at_deep_nesting() {
             ..Default::default()
         };
         let dom = tl::parse(html, tl::ParserOptions::default()).expect("parse captures");
-        let text = extract_plain_text(&dom, dom.parser(), &options);
+        let text = extract_plain_text(&dom, dom.parser(), &options, Default::default());
         let callbacks = recorder.lock().expect("callback recorder").0.clone();
         (text, callbacks)
     };

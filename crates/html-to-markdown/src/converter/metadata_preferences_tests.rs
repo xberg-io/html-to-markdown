@@ -32,6 +32,7 @@ fn collect(config: MetadataConfig) -> [usize; 5] {
     let collector = Rc::new(RefCell::new(MetadataCollector::new(config)));
     let inert_bodies = std::collections::HashMap::new();
     let parameters = ConversionParameters {
+        accessible_names: Default::default(),
         inert_bodies: &inert_bodies,
         inline_collector: None,
         metadata_collector: Some(Rc::clone(&collector)),

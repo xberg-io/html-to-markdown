@@ -4,6 +4,66 @@ title: Migrating to v3
 
 import { Content as Snip_feedback } from "../../snippets/feedback.md";
 
+## Migrating from 3.18.7 to 3.19.0
+
+Version 3.18.7 added `use_accessible_names` to `ConversionOptions`. That addition
+broke Rust callers that construct the public struct by listing every field.
+Version 3.19.0 restores the 3.18.6 field set and moves this policy to a separate
+conversion function. Existing `convert` calls still use accessible names by default.
+
+### Rust options and builders
+
+An exhaustive `ConversionOptions` literal written for 3.18.6 compiles again
+without adding a field. Callers that adopted the 3.18.7 field must remove it from
+struct literals, `ConversionOptionsUpdate`, and builder calls, then pass the policy
+as the second argument to `convert_with_accessible_names`:
+
+```rust
+use html_to_markdown_rs::{ConversionOptions, convert_with_accessible_names};
+
+let html = "<p>Hello</p>";
+let options = ConversionOptions::default();
+let result = convert_with_accessible_names(html, false, Some(options))?;
+```
+
+This replaces setting `use_accessible_names: false` in an options literal or
+calling `.use_accessible_names(false)` on its builder. Pass `true`, or keep using
+`convert(html, Some(options))`, to retain accessible-name fallbacks. Disabling the
+policy keeps visible text and SVG drawn text while excluding accessibility labels.
+The choice belongs to one call and does not change other conversions.
+
+### JSON and generated language bindings
+
+Remove `use_accessible_names` from serialized options and options-update objects.
+The 3.19.0 options deserializer rejects that key as an unknown field. Pass the
+boolean separately to the new function exposed by your binding:
+
+| Binding | Function |
+| --- | --- |
+| Python, Ruby, Elixir, R, Zig | `convert_with_accessible_names` |
+| TypeScript/Node, WebAssembly, Java, Kotlin Android, Swift, Dart, PHP | `convertWithAccessibleNames` |
+| Go, C# | `ConvertWithAccessibleNames` |
+| C | `htm_convert_with_accessible_names` |
+
+The argument order is HTML, the boolean policy, then optional conversion options. The
+function returns the same `ConversionResult` as `convert`; binding-specific error
+and ownership conventions still apply. The MCP server continues accepting its
+`use_accessible_names` configuration flag and applies it to individual conversions.
+
+### C ABI consumers
+
+Rebuild native consumers against the 3.19.0 generated header and library together.
+The options handle API no longer exports
+`htm_conversion_options_use_accessible_names`,
+`htm_conversion_options_update_use_accessible_names`, or
+`htm_conversion_options_update_has_use_accessible_names`. Use
+`htm_convert_with_accessible_names` with a separate boolean instead of reading the
+policy from an options handle. Keep `htm_convert` for the default enabled policy.
+
+This release restores the old Rust struct shape but changes the 3.18.7 options
+API in Rust, JSON, C, and generated bindings. The minor version identifies that
+migration; it does not make code using the removed field or symbols compatible.
+
 ## Background
 
 html-to-markdown began as a Python library — a fork of

@@ -1,15 +1,12 @@
 //! Accessible-name policy for links and drawn SVG text.
 
-#![cfg(any(feature = "serde", feature = "metadata"))]
-
-use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
+use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert, convert_with_accessible_names};
 
 fn visible_text_options() -> ConversionOptions {
-    serde_json::from_value(serde_json::json!({
-        "inline_data_media": "alt_text_only",
-        "use_accessible_names": false
-    }))
-    .expect("accessible-name opt-out should deserialize")
+    ConversionOptions {
+        inline_data_media: html_to_markdown_rs::InlineDataMedia::AltTextOnly,
+        ..ConversionOptions::default()
+    }
 }
 
 #[test]
@@ -34,7 +31,13 @@ fn should_exclude_accessible_names_from_the_three_reported_icon_links() {
                 tier_strategy,
                 ..visible_text_options()
             };
-            assert_eq!(convert(html, Some(options)).unwrap().content.unwrap(), expected);
+            assert_eq!(
+                convert_with_accessible_names(html, false, Some(options))
+                    .unwrap()
+                    .content
+                    .unwrap(),
+                expected
+            );
         }
     }
 }
@@ -43,7 +46,10 @@ fn should_exclude_accessible_names_from_the_three_reported_icon_links() {
 fn should_keep_drawn_svg_text_but_exclude_labels_and_tooltips() {
     let html = r#"<p><svg aria-label="Accessible"><title>Tooltip</title><desc>Description</desc><text>Drawn</text><svg><title>Nested tooltip</title><text>Nested drawn</text></svg><foreignObject><svg><title>HTML tooltip</title><text>HTML drawn</text></svg></foreignObject></svg></p>"#;
     assert_eq!(
-        convert(html, Some(visible_text_options())).unwrap().content.unwrap(),
+        convert_with_accessible_names(html, false, Some(visible_text_options()))
+            .unwrap()
+            .content
+            .unwrap(),
         "Drawn Nested drawn HTML drawn\n"
     );
 }
@@ -51,7 +57,7 @@ fn should_keep_drawn_svg_text_but_exclude_labels_and_tooltips() {
 #[test]
 fn should_keep_accessible_names_by_default() {
     let html = r##"<p>see <a href="https://example.com/x">GitHub<svg aria-label="(opens in new tab)"><use href="#ext"></use></svg></a> now</p>"##;
-    let options = serde_json::from_value(serde_json::json!({"inline_data_media": "alt_text_only"})).unwrap();
+    let options = visible_text_options();
     assert_eq!(
         convert(html, Some(options)).unwrap().content.unwrap(),
         "see [GitHub (opens in new tab)](https://example.com/x) now\n"
@@ -64,36 +70,38 @@ fn should_exclude_svg_names_from_plain_text_output() {
     options.output_format = html_to_markdown_rs::OutputFormat::Plain;
     let html =
         r#"<p><svg aria-label="Accessible"><title>Tooltip</title><desc>Description</desc><text>Drawn</text></svg></p>"#;
-    assert_eq!(convert(html, Some(options)).unwrap().content.unwrap(), "Drawn\n");
+    assert_eq!(
+        convert_with_accessible_names(html, false, Some(options))
+            .unwrap()
+            .content
+            .unwrap(),
+        "Drawn\n"
+    );
 }
 
+#[cfg(any(feature = "serde", feature = "metadata"))]
 #[test]
-fn should_support_building_serializing_and_updating_the_name_policy() {
-    use html_to_markdown_rs::ConversionOptionsUpdate;
-
-    let mut options = ConversionOptions::builder().use_accessible_names(false).build();
-    assert!(!options.use_accessible_names);
-    let serialized = serde_json::to_value(&options).unwrap();
-    assert_eq!(serialized["use_accessible_names"], false);
-    let restored: ConversionOptions = serde_json::from_value(serialized).unwrap();
-    assert!(!restored.use_accessible_names);
-    options.apply_update(ConversionOptionsUpdate::default());
-    assert!(!options.use_accessible_names);
-    let update = serde_json::from_value(serde_json::json!({"use_accessible_names": true})).unwrap();
-    options.apply_update(update);
-    assert!(options.use_accessible_names);
-    assert!(
-        serde_json::from_value::<ConversionOptions>(serde_json::json!({}))
-            .unwrap()
-            .use_accessible_names
-    );
+fn should_keep_accessible_policy_outside_serialized_options() {
+    let options = serde_json::to_value(ConversionOptions::default()).unwrap();
+    assert!(options.get("use_accessible_names").is_none());
+    let update = serde_json::to_value(html_to_markdown_rs::ConversionOptionsUpdate::default()).unwrap();
+    assert!(update.get("use_accessible_names").is_none());
+    let old_key = serde_json::json!({"use_accessible_names": false});
+    let options_error = serde_json::from_value::<ConversionOptions>(old_key.clone()).unwrap_err();
+    let update_error = serde_json::from_value::<html_to_markdown_rs::ConversionOptionsUpdate>(old_key).unwrap_err();
+    for error in [options_error, update_error] {
+        assert!(error.to_string().contains("unknown field `use_accessible_names`"));
+    }
 }
 
 #[test]
 fn should_preserve_visible_link_text_image_alt_text_and_link_title_metadata() {
     let html = r#"<p><a href="https://example.com" aria-label="Accessible" title="Tooltip">Visible</a> <img src="data:image/png;base64,AA==" alt="Image alt"></p>"#;
     assert_eq!(
-        convert(html, Some(visible_text_options())).unwrap().content.unwrap(),
+        convert_with_accessible_names(html, false, Some(visible_text_options()))
+            .unwrap()
+            .content
+            .unwrap(),
         "[Visible](https://example.com \"Tooltip\") Image alt\n"
     );
 }
@@ -102,16 +110,102 @@ fn should_preserve_visible_link_text_image_alt_text_and_link_title_metadata() {
 #[test]
 fn should_omit_accessible_svg_image_captions_in_both_conversion_tiers() {
     let html = r#"<svg aria-label="Accessible"><title>Tooltip</title><desc>Description</desc><text>Drawn</text></svg>"#;
-    let options = ConversionOptions::builder().use_accessible_names(false).build();
-    let scanned =
-        html_to_markdown_rs::tier1::run(html, &html_to_markdown_rs::prescan::PrescanReport::default(), &options)
-            .expect("the SVG scanner must run without falling back to Tier-2");
-    let options = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2,
-        ..options
-    };
-    let walked = convert(html, Some(options)).unwrap().content.unwrap();
-    for content in [scanned, walked] {
+    for tier_strategy in [TierStrategy::Tier1, TierStrategy::Tier2] {
+        let options = ConversionOptions {
+            tier_strategy,
+            ..ConversionOptions::default()
+        };
+        let content = convert_with_accessible_names(html, false, options)
+            .unwrap()
+            .content
+            .unwrap();
         assert_eq!(content.split_once("](data:image/svg+xml;base64,").unwrap().0, "![Drawn");
+    }
+}
+
+#[test]
+fn should_isolate_opposite_policies_across_concurrent_calls() {
+    let html = r#"<p><svg aria-label="Name"><text>Drawn</text></svg></p>"#;
+    let workers: Vec<_> = (0..8)
+        .map(|index| {
+            std::thread::spawn(move || {
+                let enabled = index % 2 == 0;
+                for _ in 0..20 {
+                    let result = convert_with_accessible_names(html, enabled, visible_text_options()).unwrap();
+                    assert_eq!(
+                        result.content.as_deref(),
+                        Some(if enabled { "Name Drawn\n" } else { "Drawn\n" })
+                    );
+                }
+            })
+        })
+        .collect();
+    for worker in workers {
+        worker.join().unwrap();
+    }
+}
+
+#[cfg(feature = "visitor")]
+#[test]
+fn should_preserve_outer_policy_when_a_visitor_reenters_conversion() {
+    use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
+    use std::sync::{Arc, Mutex};
+
+    #[derive(Debug)]
+    struct ReentrantVisitor(bool);
+    impl HtmlVisitor for ReentrantVisitor {
+        fn visit_text(&mut self, _: &NodeContext<'_>, _: &str) -> VisitResult {
+            let inner = convert_with_accessible_names(
+                r#"<svg aria-label="Inner"><text>Drawn</text></svg>"#,
+                !self.0,
+                visible_text_options(),
+            )
+            .unwrap();
+            assert_eq!(
+                inner.content.as_deref(),
+                Some(if self.0 { "Drawn\n" } else { "Inner Drawn\n" })
+            );
+            VisitResult::Continue
+        }
+    }
+    for enabled in [false, true] {
+        let visitor: VisitorHandle = Arc::new(Mutex::new(ReentrantVisitor(enabled)));
+        let options = ConversionOptions {
+            visitor: Some(visitor),
+            ..visible_text_options()
+        };
+        let outer = convert_with_accessible_names(
+            r#"<p>Before <svg aria-label="Outer"><text>Drawn</text></svg> after</p>"#,
+            enabled,
+            options,
+        )
+        .unwrap();
+        assert_eq!(
+            outer.content.as_deref(),
+            Some(if enabled {
+                "Before Outer Drawn after\n"
+            } else {
+                "Before Drawn after\n"
+            })
+        );
+    }
+}
+
+#[test]
+fn should_apply_explicit_and_default_policies_to_plain_text_rewalk() {
+    use html_to_markdown_rs::OutputFormat;
+    let html = r#"<p><svg aria-label="Name"><title>Tooltip</title><text>Drawn</text><svg><title>Nested</title><text>Child</text></svg></svg></p>"#;
+    for tier_strategy in [TierStrategy::Auto, TierStrategy::Tier2] {
+        let options = ConversionOptions {
+            output_format: OutputFormat::Plain,
+            tier_strategy,
+            ..visible_text_options()
+        };
+        let enabled = convert_with_accessible_names(html, true, options.clone()).unwrap();
+        let default = convert(html, options.clone()).unwrap();
+        let disabled = convert_with_accessible_names(html, false, options).unwrap();
+        assert_eq!(enabled.content.as_deref(), Some("Name Tooltip Drawn Nested Child\n"));
+        assert_eq!(default.content, enabled.content);
+        assert_eq!(disabled.content.as_deref(), Some("Drawn Child\n"));
     }
 }

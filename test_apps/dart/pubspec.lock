@@ -141,10 +141,10 @@ packages:
     dependency: "direct main"
     description:
       name: h2m
-      sha256: f3256913df698a19b0fbb16859f03f862fe7c4a667673c1b3897dc88ed1d8cad
+      sha256: "382ab4458fc747fa7cb916acfb43d6cf32cc1812d99577c4d53188a51868c5bb"
       url: "https://pub.dev"
     source: hosted
-    version: "3.18.3"
+    version: "3.18.7"
   http:
     dependency: "direct dev"
     description:

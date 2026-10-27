@@ -83,15 +83,33 @@ pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> R
 /// handle.  The dispatcher falls back to Tier-2 transparently.
 pub fn run_with_base(
     html: &str,
-    _report: &PrescanReport,
+    report: &PrescanReport,
     options: &ConversionOptions,
     effective_base: Option<std::rc::Rc<url::Url>>,
     document_base_href: Option<&str>,
 ) -> Result<String, bail::BailReason> {
+    run_with_policy(
+        html,
+        report,
+        options,
+        effective_base,
+        document_base_href,
+        Default::default(),
+    )
+}
+
+pub(crate) fn run_with_policy(
+    html: &str,
+    _report: &PrescanReport,
+    options: &ConversionOptions,
+    effective_base: Option<std::rc::Rc<url::Url>>,
+    document_base_href: Option<&str>,
+    policy: crate::convert_api::AccessibleNamePolicy,
+) -> Result<String, bail::BailReason> {
     if !options.exclude_selectors.is_empty() {
         return Err(bail::BailReason::Classifier);
     }
-    let scanner::ScanOutput { body, .. } = scanner::scan(html, options, effective_base)?;
+    let scanner::ScanOutput { body, .. } = scanner::scan_with_policy(html, options, effective_base, policy)?;
 
     // ~keep Prepend YAML frontmatter when metadata extraction is requested.
     // ~keep The metadata reader parses the shared head prefix, including an implicit head.
@@ -115,4 +133,26 @@ pub fn run_with_base(
     }
 
     Ok(body)
+}
+
+#[cfg(test)]
+mod accessible_name_tests {
+    use super::*;
+
+    #[test]
+    fn should_apply_explicit_svg_policy_without_tier2_fallback() {
+        let html = r#"<svg aria-label="Name"><title>Tooltip</title><text>Drawn</text></svg>"#;
+        for (enabled, caption) in [(true, "![Name Tooltip Drawn"), (false, "![Drawn")] {
+            let output = run_with_policy(
+                html,
+                &PrescanReport::default(),
+                &ConversionOptions::default(),
+                None,
+                None,
+                crate::convert_api::AccessibleNamePolicy(enabled),
+            )
+            .expect("the scanner must finish without falling back");
+            assert_eq!(output.split_once("](data:image/svg+xml;base64,").unwrap().0, caption);
+        }
+    }
 }

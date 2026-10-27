@@ -33,9 +33,9 @@
     <dependency>
       <groupId>io.xberg</groupId>
       <artifactId>html-to-markdown</artifactId>
-      <version>3.18.7</version>
+      <version>3.19.0</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-3.18.7.jar</systemPath>
+      <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-3.19.0.jar</systemPath>
     </dependency>
 
     <dependency>
@@ -192,7 +192,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.6.1</version>
         <configuration>
           <argLine>--enable-preview --enable-native-access=ALL-UNNAMED -Djava.library.path=${project.basedir}/../../target/release</argLine>
         </configuration>

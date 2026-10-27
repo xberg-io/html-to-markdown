@@ -14,6 +14,7 @@ pub(super) fn create_conversion_context(
     Context::new(
         options,
         ContextParameters {
+            accessible_names: parameters.accessible_names,
             inline_collector: parameters.inline_collector,
             #[cfg(feature = "metadata")]
             metadata_collector: parameters.metadata_collector,

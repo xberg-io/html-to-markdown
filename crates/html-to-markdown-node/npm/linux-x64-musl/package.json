@@ -10,7 +10,7 @@
     }
   ],
   "name": "@xberg-io/html-to-markdown-linux-x64-musl",
-  "version": "3.18.7",
+  "version": "3.19.0",
   "license": "MIT",
   "repository": {
     "type": "git",

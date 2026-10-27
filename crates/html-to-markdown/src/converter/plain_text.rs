@@ -83,6 +83,7 @@ const BLOCK_TAGS: &[&str] = &[
 #[derive(Clone, Copy)]
 struct WalkState<'a> {
     options: &'a ConversionOptions,
+    accessible_names: crate::convert_api::AccessibleNamePolicy,
     excluded_node_ids: &'a HashSet<u32>,
     /// Inside a list item, the item's buffer length right after its marker, so a block that
     /// follows the marker directly starts on its line. A table cell starts its own buffer with `None`.
@@ -102,6 +103,7 @@ impl WalkState<'_> {
     const fn descend(&self) -> Self {
         WalkState {
             options: self.options,
+            accessible_names: self.accessible_names,
             excluded_node_ids: self.excluded_node_ids,
             item_marker_end: self.item_marker_end,
             in_pre: self.in_pre,
@@ -143,7 +145,12 @@ impl WalkState<'_> {
 /// - Nodes matching `excluded_node_ids` (from `exclude_selectors`) are dropped entirely
 /// - When a visitor is configured, `visit_element_start`, `visit_element_end`, and
 ///   `visit_text` callbacks are fired and their results are honoured.
-pub fn extract_plain_text(dom: &tl::VDom, parser: &tl::Parser, options: &ConversionOptions) -> String {
+pub fn extract_plain_text(
+    dom: &tl::VDom,
+    parser: &tl::Parser,
+    options: &ConversionOptions,
+    accessible_names: crate::convert_api::AccessibleNamePolicy,
+) -> String {
     let excluded_node_ids: HashSet<u32> = if options.exclude_selectors.is_empty() {
         HashSet::new()
     } else {
@@ -160,6 +167,7 @@ pub fn extract_plain_text(dom: &tl::VDom, parser: &tl::Parser, options: &Convers
 
     let state = WalkState {
         options,
+        accessible_names,
         excluded_node_ids: &excluded_node_ids,
         item_marker_end: None,
         in_pre: false,

@@ -17,6 +17,7 @@ fn emit_svg_from_slice(
     svg_start_offset: usize,
     state: &mut Tier1State,
     options: &ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
 ) -> Result<(), BailReason> {
     // ~keep CDATA inside SVG cannot be processed correctly without the prescan's
     // entity-escaping transformation.  Bail to Tier-2 so it sees the
@@ -65,7 +66,7 @@ fn emit_svg_from_slice(
     let Some(tl::Node::Tag(svg)) = handle.get(parser) else {
         return Ok(());
     };
-    let title = crate::converter::media::svg::graphic_text(svg, parser, options);
+    let title = crate::converter::media::svg::graphic_text(svg, parser, options, policy);
 
     let svg_html = serialize_element(&handle, parser);
     let base64_svg = STANDARD.encode(svg_html.as_bytes());

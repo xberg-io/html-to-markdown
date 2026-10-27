@@ -48,7 +48,12 @@ impl<'a> Walker<'a> {
             "img" => super::super::emit_plain_image(tag, buf, scope.state.options),
             "svg" => {
                 if !scope.state.options.skip_images {
-                    buf.push_text(&graphic_text(tag, parser, scope.state.options));
+                    buf.push_text(&graphic_text(
+                        tag,
+                        parser,
+                        scope.state.options,
+                        scope.state.accessible_names,
+                    ));
                 }
             }
             _ => return false,

@@ -56,6 +56,7 @@ type ConversionOutput = (
 );
 
 pub struct ConversionParameters<'a> {
+    pub accessible_names: crate::convert_api::AccessibleNamePolicy,
     pub inert_bodies: &'a std::collections::HashMap<String, String>,
     pub inline_collector: Option<InlineCollectorHandle>,
     #[cfg(feature = "metadata")]
@@ -81,6 +82,7 @@ pub fn convert_html_impl(
     options: &ConversionOptions,
     parameters: ConversionParameters<'_>,
 ) -> Result<ConversionOutput> {
+    let accessible_names = parameters.accessible_names;
     let inert_bodies = parameters.inert_bodies;
     let structure_collector = parameters.structure_collector.as_ref().map(std::rc::Rc::clone);
     let document_base_href = parameters.document_base_href;
@@ -97,7 +99,6 @@ pub fn convert_html_impl(
     let kept_scripts = finish_dom_parse(&mut dom, &mut dom_ctx, inert_bodies, preprocessed_len, kept_scripts)?;
     let parser = dom.parser();
     let mut output = String::with_capacity(preprocessed_len.saturating_add(preprocessed_len / 4));
-    let is_plain_text = options.output_format == OutputFormat::Plain;
     let frontmatter = prepare_frontmatter(
         &dom,
         parser,
@@ -138,7 +139,7 @@ pub fn convert_html_impl(
     drop(ctx);
 
     append_references(&mut output, reference_collector);
-    let output = finalize_output(&dom, parser, options, output, &frontmatter, is_plain_text);
+    let output = finalize_output(&dom, parser, options, output, &frontmatter, accessible_names);
     let (document, tables) = finish_structure_collector(structure_collector);
     trace_render_complete(&output, &tables);
     Ok((output, document, tables, depth_warning))
@@ -252,10 +253,10 @@ fn finalize_output(
     options: &ConversionOptions,
     mut output: String,
     frontmatter: &str,
-    is_plain_text: bool,
+    accessible_names: crate::convert_api::AccessibleNamePolicy,
 ) -> String {
-    if is_plain_text {
-        output = extract_plain_text(dom, parser, options);
+    if options.output_format == OutputFormat::Plain {
+        output = extract_plain_text(dom, parser, options, accessible_names);
     } else {
         trim_line_end_whitespace(&mut output, options.code_block_style);
         collapse_excess_blank_lines(&mut output, options.code_block_style);

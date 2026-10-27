@@ -315,14 +315,19 @@ fn system_language_holds(tag: &tl::HTMLTag<'_>) -> bool {
 /// nothing, unless `hidden_content` keeps hidden text. `aria-hidden="true"` removes the label,
 /// the title and the description, and keeps drawn text. A graphic with none of these gives the
 /// empty string. When `use_accessible_names` is false, only drawn text is collected.
-pub fn graphic_text(svg: &tl::HTMLTag<'_>, parser: &Parser<'_>, options: &ConversionOptions) -> String {
+pub fn graphic_text(
+    svg: &tl::HTMLTag<'_>,
+    parser: &Parser<'_>,
+    options: &ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
+) -> String {
     let hidden_content = options.hidden_content;
     if is_hidden_in_graphic(svg, hidden_content) {
         return String::new();
     }
-    let named = options.use_accessible_names && !is_aria_hidden(svg);
+    let named = policy.0 && !is_aria_hidden(svg);
     let mut out = GraphicParts {
-        use_accessible_names: options.use_accessible_names,
+        use_accessible_names: policy.0,
         ..GraphicParts::default()
     };
     if named {
@@ -475,7 +480,7 @@ pub fn handle_svg(
         return;
     }
 
-    let title = graphic_text(tag, parser, options);
+    let title = graphic_text(tag, parser, options, ctx.accessible_names);
     if ctx.in_code || ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
         super::record_text_label(&title, ctx);
     }
