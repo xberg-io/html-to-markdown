@@ -7,6 +7,10 @@ on:
         description: Existing release tag to attach plugin artifacts to
         required: true
         type: string
+      source_sha:
+        description: Optional immutable commit with only served lock digest repairs relative to the tag
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -21,13 +25,28 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ github.workflow_sha }}
+      - name: Check out release source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha || inputs.tag }}
+          path: release-source
           fetch-depth: 0
+      - name: Verify immutable release source
+        working-directory: release-source
+        env:
+          PLUGIN_TAG: ${{ inputs.tag }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          python3 "$GITHUB_WORKSPACE/scripts/ci/verify_plugin_recovery_source.py" \
+            "$PLUGIN_TAG" "$SOURCE_SHA" > "$RUNNER_TEMP/plugin-source-provenance.json"
+          cat "$RUNNER_TEMP/plugin-source-provenance.json"
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
         with:
           ai-rulez-version: "5.7.0"
       - name: Verify public skill exports
+        working-directory: release-source
         run: python3 scripts/sync_public_skills.py --check
       - name: Package all supported plugin runtimes
         uses: xberg-io/actions/package-ai-rulez-plugin@66e9a172c28ae7e57496fe92de1ab74f2a604194
@@ -36,7 +55,9 @@ jobs:
           tag: ${{ inputs.tag }}
           config-directory: .ai-rulez
           version-sync-script: scripts/sync_plugin_version.py
+          working-directory: release-source
       - name: Archive verified runtime bundles and marketplace indexes
+        working-directory: release-source
         shell: bash
         env:
           PLUGIN_TAG: ${{ inputs.tag }}
@@ -44,6 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$PLUGIN_TAG"
+          cp "$RUNNER_TEMP/plugin-source-provenance.json" dist/plugin/source-provenance.json
           bundle="dist/${PLUGIN_PRODUCT}-plugins-${PLUGIN_TAG//\//-}.tar.gz"
           tar --sort=name --mtime="@$(git show -s --format=%ct HEAD)" \
             --owner=0 --group=0 --numeric-owner -cf - -C dist/plugin . | gzip -n > "$bundle"
@@ -52,6 +74,7 @@ jobs:
         uses: xberg-io/actions/upload-release-assets@v1
         with:
           tag: ${{ inputs.tag }}
+          clobber: "false"
           assets: |
-            dist/*-plugins-*.tar.gz
-            dist/*-plugins-*.tar.gz.sha256
+            release-source/dist/*-plugins-*.tar.gz
+            release-source/dist/*-plugins-*.tar.gz.sha256
