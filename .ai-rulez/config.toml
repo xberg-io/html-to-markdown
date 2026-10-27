@@ -13,6 +13,7 @@ builtins = [
   "!git-workflow",
   "!testing/test-alongside-code",
   "default-commands",
+  "polyglot-bindings",
 ]
 
 compact = true
