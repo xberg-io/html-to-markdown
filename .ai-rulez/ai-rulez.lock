@@ -4,7 +4,7 @@
 version = 1
 ai_rulez_version = '5.7.0'
 scope = 'all'
-tree = 'sha256:a952ff1b5d2d9cded91752d5fd4fc026c0878b3c9fe6409ec99cb9a7ed0fb151'
+tree = 'sha256:d7e991719cdf6ab77ad969c90ebc3f5b8d1b59b717d6cacb13fa97b1d0aa8d68'
 
 [[include]]
 name = 'xberg-cicd'
@@ -210,24 +210,6 @@ name = 'gh-workflows'
 source = 'include:xberg-cicd/skills/gh-workflows/SKILL.md'
 commit = '923818e1ce9b71ebe68306c7a551caeaf7b27106'
 digest = 'sha256:d6d845b396eb32b6392b2fb1c1cf48dfa92d3155a86c6ef51342c7d520b45013'
-
-[[served]]
-name = 'github.skills.api'
-source = '.github/skills/api'
-commit = ''
-digest = 'sha256:48339dc9bdcaf64ab645bf555f6307945fba8056fe267cc0f816071ee370be61'
-
-[[served]]
-name = 'github.skills.cli'
-source = '.github/skills/cli'
-commit = ''
-digest = 'sha256:b19e1017c113b68a42d74e595e3c25b50e879583ff4e1871e59ff376a33f53d5'
-
-[[served]]
-name = 'github.skills.mcp'
-source = '.github/skills/mcp'
-commit = ''
-digest = 'sha256:b83ad7e807c2a5d223c7cc188d50b44c1050c6144f4761522b96a9413d79ce58'
 
 [[served]]
 name = 'html-to-markdown'

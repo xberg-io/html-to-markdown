@@ -137,50 +137,6 @@
     ".codex/agents/security-auditor.toml",
     ".codex/agents/test-writer.toml",
     ".codex/config.toml",
-    ".gemini/agents/code-reviewer.md",
-    ".gemini/agents/devops-engineer.md",
-    ".gemini/agents/docs-writer.md",
-    ".gemini/agents/e2e-generator-engineer.md",
-    ".gemini/agents/ffi-engineer.md",
-    ".gemini/agents/performance-engineer.md",
-    ".gemini/agents/polyglot-architect.md",
-    ".gemini/agents/release-engineer.md",
-    ".gemini/agents/rust-core-engineer.md",
-    ".gemini/agents/security-auditor.md",
-    ".gemini/agents/test-writer.md",
-    ".gemini/settings.json",
-    ".github/agents/code-reviewer.agent.md",
-    ".github/agents/devops-engineer.agent.md",
-    ".github/agents/docs-writer.agent.md",
-    ".github/agents/e2e-generator-engineer.agent.md",
-    ".github/agents/ffi-engineer.agent.md",
-    ".github/agents/performance-engineer.agent.md",
-    ".github/agents/polyglot-architect.agent.md",
-    ".github/agents/release-engineer.agent.md",
-    ".github/agents/rust-core-engineer.agent.md",
-    ".github/agents/security-auditor.agent.md",
-    ".github/agents/test-writer.agent.md",
-    ".github/instructions/alef-generated-bindings.instructions.md",
-    ".github/instructions/c-ffi.instructions.md",
-    ".github/instructions/csharp.instructions.md",
-    ".github/instructions/dart.instructions.md",
-    ".github/instructions/elixir.instructions.md",
-    ".github/instructions/generated-code-policy.instructions.md",
-    ".github/instructions/go.instructions.md",
-    ".github/instructions/java.instructions.md",
-    ".github/instructions/kotlin-android.instructions.md",
-    ".github/instructions/logging-tracing.instructions.md",
-    ".github/instructions/php.instructions.md",
-    ".github/instructions/python.instructions.md",
-    ".github/instructions/r.instructions.md",
-    ".github/instructions/ruby.instructions.md",
-    ".github/instructions/rust.instructions.md",
-    ".github/instructions/swift.instructions.md",
-    ".github/instructions/typescript.instructions.md",
-    ".github/instructions/wasm.instructions.md",
-    ".github/instructions/zig.instructions.md",
-    ".github/prompts/iterate.prompt.md",
-    ".github/prompts/parallelize.prompt.md",
     ".mcp.json",
     ".opencode/agents/code-reviewer.md",
     ".opencode/agents/devops-engineer.md",
@@ -195,21 +151,6 @@
     ".opencode/agents/test-writer.md",
     ".opencode/commands/iterate.md",
     ".opencode/commands/parallelize.md",
-    ".pi/agents/code-reviewer.md",
-    ".pi/agents/devops-engineer.md",
-    ".pi/agents/docs-writer.md",
-    ".pi/agents/e2e-generator-engineer.md",
-    ".pi/agents/ffi-engineer.md",
-    ".pi/agents/performance-engineer.md",
-    ".pi/agents/polyglot-architect.md",
-    ".pi/agents/release-engineer.md",
-    ".pi/agents/rust-core-engineer.md",
-    ".pi/agents/security-auditor.md",
-    ".pi/agents/test-writer.md",
-    ".pi/mcp.json",
-    ".pi/prompts/iterate.md",
-    ".pi/prompts/parallelize.md",
-    ".vscode/mcp.json",
     "AGENTS.md",
     "CLAUDE.md",
     "opencode.json"
@@ -217,10 +158,7 @@
   "merged": {
     ".claude/settings.json": [],
     ".codex/config.toml": [],
-    ".gemini/settings.json": [],
     ".mcp.json": [],
-    ".pi/mcp.json": [],
-    ".vscode/mcp.json": [],
     "opencode.json": []
   },
   "servers": {
@@ -230,27 +168,11 @@
         "playwright"
       ]
     ],
-    ".gemini/settings.json": [
-      [
-        "mcpServers",
-        "ai-rulez"
-      ],
-      [
-        "mcpServers",
-        "playwright"
-      ]
-    ],
     ".mcp.json": [
       [
         "mcpServers",
         "ai-rulez"
       ],
-      [
-        "mcpServers",
-        "playwright"
-      ]
-    ],
-    ".pi/mcp.json": [
       [
         "mcpServers",
         "playwright"

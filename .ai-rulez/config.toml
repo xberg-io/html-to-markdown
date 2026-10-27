@@ -6,7 +6,7 @@ description = 'High-performance HTML to Markdown converter with active Python, T
 gitignore = true
 # ~keep The manifest is committed so CI can detect stale generated files.
 gitignore_exclude = [".ai-rulez/.generated-manifest.json"]
-presets = ["claude", "codex", "opencode", "pi", "hermes", "gemini", "copilot"]
+presets = ["claude", "codex", "opencode"]
 builtins = ["!agent-delegation", "!git-workflow", "default-commands"]
 
 compact = true
