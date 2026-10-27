@@ -54,7 +54,8 @@ jobs:
       - name: Verify plugin version tracks core
         run: python3 scripts/sync_plugin_version.py --check
       # Byte-verify the ai-rulez-generated bundles under plugin/ match plugin/.ai-rulez.
-      # Pinned to the ai-rulez version that generates them; bump in lockstep. ~keep
+      # ai-rulez is the latest release; a release that changes bundle bytes turns this red
+      # until `task plugin:generate` is rerun. ~keep
       - name: Verify generated plugin bundles are current
         run: ai-rulez verify --recursive --plugin --if-configured
       - uses: actions/setup-node@v7
