@@ -17,4 +17,4 @@ x-ai-rulez:
 - Each file under `fixtures/<topic>/` holds a JSON array of fixtures; the directory is the topic and matches `docs.topic`. Topics: `conversion`, `options`, `metadata`, `visitor`, `edge-cases`, `structure`, `result`, `real-world`, `smoke`. There is no `category` or `skip` field in practice.
 - Fields: `id`, `description`, `docs {topic, stem, title}`, `input`, `assertions`, and `visitor` for visitor fixtures.
 - Every fixture runs the single call `convert(html, options)`: `input.html` is the document, `input.options` an optional `ConversionOptions` object.
-- Assertion types in use: `contains_all`, `contains`, `not_contains`, `not_empty`, `equals`, `count_min`, `count_equals`. Each assertion is `{type, field, value}` (`values` for `contains_all`); `field` is a dotted path into the call result. Most assert on `content`.
+- Assertion types in use: `contains_all`, `contains`, `not_contains`, `not_empty`, `equals`, `count_min`, `count_equals`. Most assert on `content`.
