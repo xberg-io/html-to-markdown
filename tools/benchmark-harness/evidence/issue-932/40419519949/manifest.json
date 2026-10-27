@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "issue": 932,
+  "capture_sha": "e2cb27c50805182a2f7fa8dcb24d189673f299af",
+  "campaign_id": "e2cb27c50805182a2f7fa8dcb24d189673f299af:2026-10-27T00:24:22.784214129Z",
+  "workflow_run": {
+    "id": 40419519949,
+    "url": "https://github.com/xberg-io/html-to-markdown/actions/runs/40419519949"
+  },
+  "artifact": {
+    "id": 12698719665,
+    "name": "benchmark-calibration-40419519949",
+    "url": "https://github.com/xberg-io/html-to-markdown/actions/runs/40419519949/artifacts/12698719665",
+    "size_bytes": 207604,
+    "sha256": "621fe00785cfe8e72c7f69119b54c307d753c9d35e7707833731b511f822d35d",
+    "retained_archive": "tools/benchmark-harness/evidence/issue-932/40419519949/raw.zip"
+  },
+  "captures": {
+    "expected_count": 40,
+    "actual_count": 40,
+    "fixtures_per_capture": 29,
+    "samples_per_fixture": 9,
+    "first": "0001.json",
+    "last": "0040.json"
+  },
+  "provenance": {
+    "os": "linux",
+    "arch": "x86_64",
+    "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpu_count": 4,
+    "rustc_verbose": "rustc 1.95.0 (59807616e 2026-04-14)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.95.0\nLLVM version: 22.1.2",
+    "rustc_host": "x86_64-unknown-linux-gnu",
+    "cargo_version": "cargo 1.95.0 (f2d3ce0bd 2026-03-21)",
+    "profile": "release",
+    "build_flags": "-D warnings -A unpredictable-function-pointer-comparisons -A mismatched-lifetime-syntaxes",
+    "measurement_mode": "nine-batch-median-mad-v2",
+    "tier_strategy": "auto",
+    "visitor_mode": "disabled",
+    "iteration_override": null,
+    "warmup_iterations": 20,
+    "calibration_target_ms": 50,
+    "calibration_timeout_ms": 2000,
+    "core_features": ["inline-images", "metadata", "serde", "visitor"],
+    "runner_image": "ubuntu24",
+    "runner_class": "github-hosted"
+  }
+}
