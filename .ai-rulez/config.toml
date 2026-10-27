@@ -12,6 +12,12 @@ builtins = [
   "!ai-governance/agent-workflow",
   "!git-workflow",
   "!testing/test-alongside-code",
+  "!testing/tdd-workflow",
+  "!token-efficiency/output-awareness",
+  "!ai-governance/explain-reasoning",
+  "!security/least-privilege",
+  "!security/input-validation",
+  "!polyglot-bindings/rust-polyglot-conventions",
   "default-commands",
   "polyglot-bindings",
 ]
