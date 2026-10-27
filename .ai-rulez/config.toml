@@ -48,6 +48,13 @@ version = "^1"
 path = 'modules/bindings'
 merge_strategy = 'local-override'
 
+[[includes]]
+name = 'xberg-docs-sites'
+source = 'https://github.com/xberg-io/agent-conventions.git'
+version = "^1"
+path = 'modules/docs-sites'
+merge_strategy = 'local-override'
+
 [[installed_skills]]
 name = 'alef'
 source = 'https://github.com/xberg-io/alef.git'
