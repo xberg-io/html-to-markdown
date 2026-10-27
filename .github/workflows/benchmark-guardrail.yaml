@@ -1,7 +1,7 @@
 name: Benchmark Guardrail
 
 # ~keep Nightly and manual, never per-push. The comparison is only meaningful on a quiet runner,
-# and the quiet gate below costs several minutes of deliberate idling that every push should not
+# and continuous quiet-runner observation costs several minutes of deliberate idling every push should not
 # pay. The per-push content gate lives in ci-rust.yaml as "Benchmark: Output snapshots", which is
 # deterministic and needs no such settling.
 on:
@@ -41,16 +41,8 @@ jobs:
         run: task bench:build
         shell: bash
 
-      # ~keep The same gate `bench:calibration:collect` runs, from the same task, so the baseline
-      # and the run checked against it are measured under matching conditions. Without it the
-      # baseline is unreachable by this job: run 35086411684 read every fixture ~29% slow on
-      # hardware identical to the baseline's, purely because it measured straight after a build.
-      - name: Wait for a quiet runner
-        run: task bench:quiet-gate LOGS_DIR=benchmark-guardrail/logs
-        shell: bash
-
-      - name: Run benchmark harness
-        run: task bench:run:built
+      - name: Capture with continuous quiet-runner telemetry
+        run: task bench:guardrail:collect
         shell: bash
 
       # ~keep Uploaded before the comparison and with always(), because the run this job produces
@@ -64,6 +56,7 @@ jobs:
           path: |
             tools/benchmark-harness/results/latest.json
             benchmark-guardrail/logs
+            benchmark-guardrail/runs
           retention-days: 14
 
       # ~keep ALLOW_HOST_MISMATCH is passed here and nowhere else. `ubuntu-24.04` is one label over

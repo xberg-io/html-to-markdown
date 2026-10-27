@@ -44,7 +44,8 @@ runners now draw.
 ## Calibration and baseline promotion
 
 A calibration campaign requires exactly 40 schema-v2, full-corpus captures from one commit on one quiet, pinned
-runner. Name captures in acquisition order (`0001.json` through `0040.json`) because adjacent captures form the 20
+runner, retaining the sibling `logs/telemetry.jsonl` beside `runs/`. `task bench:calibration:collect`
+collects this layout on GitHub-hosted Linux. Name captures in acquisition order (`0001.json` through `0040.json`) because adjacent captures form the 20
 pairs used by calibration. Then run:
 
 ```sh
@@ -95,10 +96,26 @@ requirement above still applies; the flag is not an approval.
 
 ## Quiet-runner gate
 
-Capture calibration or A/B evidence only when the runner is pinned, on external power, thermally stable, and has no
-competing compiler, test, indexing, or benchmark workload. The five-minute load average must stay below 25% of the
+For GitHub-hosted Linux VMs, physical power and thermal conditions are managed by GitHub, not observable guest
+telemetry. The approved hosted policy records that boundary explicitly as `physical_policy=github-managed`; it does
+not claim measured external power or thermal stability. Pin the same guest boot ID, CPU model/count, runner identity,
+image and workflow attempt for the entire campaign. Physical runners still require observable external-power and
+thermal-stability evidence and are not supported by this hosted collector.
+
+Capture calibration or A/B evidence only with no competing compiler, test, indexing, or benchmark workload. The five-minute load average must stay below 25% of the
 logical CPU count before the first capture and throughout the campaign. Abort and retain no floors if any condition
-fails.
+fails. The shared collector samples `/proc/loadavg`'s five-minute value and the full live `/proc` process inventory
+every five seconds, first allowing up to 30 minutes for build load to settle, then requiring five uninterrupted quiet
+minutes before capture. It continues throughout every capture, allowing only the exact collector and benchmark
+PID/start-time/executable/argument identities; child workloads receive no blanket exclusion. Background process CPU
+usage above 5% of total logical CPU capacity also aborts. Missing, malformed or more-than-ten-second-gapped evidence
+is invalid. A failed observation terminates the benchmark process group and leaves diagnosis and raw captures, never
+promotable timing floors. Retain the complete artifact, not just the capture JSON files.
+
+Both calibration and guardrail use this collector. Before baseline promotion, `task bench:calibrate` independently
+revalidates the raw records, quiet preflight, continuous capture coverage, guest/process identity and SHA-256 binding of
+every capture. A collector success marker alone is insufficient. The Rust calibration's exact 40 captures, inventory,
+provenance and nine-sample checks remain mandatory. Historical captures without this telemetry cannot be promoted.
 
 Issue #461 A/B evidence belongs under `evidence/issue-461/<campaign>/`. Build both revisions first with separate target
 directories and identical toolchain/features, then collect at least 20 full-corpus rounds in A/B/B/A order. Retain every

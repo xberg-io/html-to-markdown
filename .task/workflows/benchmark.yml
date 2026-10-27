@@ -76,6 +76,9 @@ tasks:
       ACCEPT_OUTPUT_CHANGE: '{{.ACCEPT_OUTPUT_CHANGE | default ""}}'
     cmds:
       - >-
+        python3 scripts/benchmark_telemetry.py validate
+        --telemetry "{{.RUNS_DIR}}/../logs/telemetry.jsonl" --runs-dir "{{.RUNS_DIR}}" --count 40
+      - >-
         cargo run --release -p html-to-markdown-bench -- calibrate
         --runs-dir {{.RUNS_DIR}}
         --baseline tools/benchmark-harness/baselines/baseline.json
@@ -123,26 +126,13 @@ tasks:
         logs_dir="{{.LOGS_DIR}}"
         cargo build --release -p html-to-markdown-bench --bin htmbench 2>&1 | tee "$logs_dir/build.log"
         test -x "{{.BENCH_BIN}}"
-      - task: quiet-gate
-        vars:
-          LOGS_DIR: '{{.LOGS_DIR}}'
-      - |
-        set -euo pipefail
-        artifact_dir="{{.ARTIFACT_DIR}}"
-        runs_dir="{{.RUNS_DIR}}"
-        logs_dir="{{.LOGS_DIR}}"
-        readonly calibration_runs=40
-        capture_log="$logs_dir/captures.log"
-        for run in $(seq 1 "$calibration_runs"); do
-          output="$runs_dir/$(printf '%04d.json' "$run")"
-          printf '%s capture %04d start\n' "$(date --iso-8601=seconds)" "$run" >> "$capture_log"
-          "{{.BENCH_BIN}}" run --output "$output" >> "$capture_log" 2>&1
-          jq -e '.schema == 2 and (.runs | length > 0)' "$output" >/dev/null
-          printf '%s capture %04d complete\n' "$(date --iso-8601=seconds)" "$run" >> "$capture_log"
-        done
-        capture_count="$(find "$runs_dir" -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9].json' | wc -l)"
-        test "$capture_count" -eq "$calibration_runs"
-        printf 'captures=%s\n' "$capture_count" > "$artifact_dir/summary.log"
+      - >-
+        python3 scripts/benchmark_telemetry.py collect
+        --telemetry "{{.LOGS_DIR}}/telemetry.jsonl" --runs-dir "{{.RUNS_DIR}}"
+        --binary "{{.BENCH_BIN}}" --count 40
+      - >-
+        python3 scripts/benchmark_telemetry.py validate
+        --telemetry "{{.LOGS_DIR}}/telemetry.jsonl" --runs-dir "{{.RUNS_DIR}}" --count 40
 
   oracle:
     desc: "Verify oracle snapshots match current output"
@@ -166,71 +156,26 @@ tasks:
       - cargo run --release -p html-to-markdown-bench --features html-to-markdown-bench/compare-mdream -- run --mdream --output tools/benchmark-harness/results/latest-mdream.json
 
 
-  quiet-gate:
-    desc: "Block until the runner is measurably quiet enough to time on"
-    # ~keep Shared by `calibration:collect` and the nightly regression guardrail so both
-    # measure under identical conditions. They diverged once: the baseline was calibrated
-    # behind this gate while `bench:compare` ran straight after a cargo build, making the
-    # baseline unreachable by the job checking against it -- every fixture read ~29% slow on
-    # identical hardware (run 35086411684). That gate had only ever passed because the older
-    # baseline came from slower hardware whose inflated numbers left accidental slack.
+  guardrail:collect:
+    desc: "Capture one prebuilt benchmark with the same continuous telemetry policy as calibration"
     platforms: [linux]
+    env:
+      HTMBENCH_LOG: htmbench=info,html_to_markdown=error
     vars:
-      LOGS_DIR: '{{.LOGS_DIR | default "benchmark-guardrail/logs"}}'
+      ARTIFACT_DIR: '{{.ARTIFACT_DIR | default "benchmark-guardrail"}}'
+      BENCH_BIN: '{{.BENCH_BIN | default "target/release/htmbench"}}'
     cmds:
-      - |
-        set -euo pipefail
-        logs_dir="{{.LOGS_DIR}}"
-        mkdir -p "$logs_dir"
-        readonly quiet_checks=5
-        # ~keep The first interval is measured but NOT gated. /proc/loadavg's 1-minute figure is a
-        # trailing average, so it still carries the `cargo build` in the step immediately above
-        # while the CPU is already idle -- runs 35080931276 and 35082358152 both failed check 1 on
-        # load (1.19 and 1.43 against a 1.00 limit) while reporting 99.85% and 99.60% idle for that
-        # same window, then passed every later check. Gating on it rejects a quiet runner for work
-        # the job itself did.
-        readonly warmup_checks=1
-        readonly quiet_interval_seconds=60
-        readonly max_load_fraction=0.25
-        readonly min_idle_percent=80
-        printf 'check\tgated\tload_1\tload_limit\tidle_pct\n' > "$logs_dir/quiet-gate.tsv"
-        logical_cpus="$(getconf _NPROCESSORS_ONLN)"
-        load_limit="$(
-          awk -v cpus="$logical_cpus" -v fraction="$max_load_fraction" \
-            'BEGIN { printf "%.2f", cpus * fraction }'
-        )"
-        quiet=1
-        for check in $(seq 1 "$((warmup_checks + quiet_checks))"); do
-          read -r idle_before total_before < <(
-            awk '/^cpu / { idle=$5; for (field=2; field<=9; field++) total += $field; print idle, total; exit }' /proc/stat
-          )
-          sleep "$quiet_interval_seconds"
-          read -r idle_after total_after < <(
-            awk '/^cpu / { idle=$5; for (field=2; field<=9; field++) total += $field; print idle, total; exit }' /proc/stat
-          )
-          idle_pct="$(
-            awk -v idle_before="$idle_before" -v idle_after="$idle_after" \
-              -v total_before="$total_before" -v total_after="$total_after" \
-              'BEGIN { printf "%.2f", 100 * (idle_after - idle_before) / (total_after - total_before) }'
-          )"
-          load_one="$(awk '{ print $1 }' /proc/loadavg)"
-          if test "$check" -le "$warmup_checks"; then
-            gated=no
-          else
-            gated=yes
-          fi
-          printf '%s\t%s\t%s\t%s\t%s\n' "$check" "$gated" "$load_one" "$load_limit" "$idle_pct" \
-            | tee -a "$logs_dir/quiet-gate.tsv"
-          if test "$gated" = "no"; then
-            continue
-          fi
-          if ! awk -v observed_load="$load_one" -v limit="$load_limit" \
-            -v idle="$idle_pct" -v minimum="$min_idle_percent" \
-            'BEGIN { exit !(observed_load <= limit && idle >= minimum) }'; then
-            quiet=0
-          fi
-        done
-        if test "$quiet" -ne 1; then
-          echo "runner was not quiet for all $quiet_checks checks" | tee -a "$logs_dir/quiet-gate.tsv" >&2
-          exit 1
-        fi
+      - >-
+        python3 scripts/benchmark_telemetry.py collect
+        --telemetry "{{.ARTIFACT_DIR}}/logs/telemetry.jsonl" --runs-dir "{{.ARTIFACT_DIR}}/runs"
+        --binary "{{.BENCH_BIN}}" --count 1
+      - >-
+        python3 scripts/benchmark_telemetry.py validate
+        --telemetry "{{.ARTIFACT_DIR}}/logs/telemetry.jsonl" --runs-dir "{{.ARTIFACT_DIR}}/runs" --count 1
+      - mkdir -p tools/benchmark-harness/results
+      - cp "{{.ARTIFACT_DIR}}/runs/0001.json" tools/benchmark-harness/results/latest.json
+
+  telemetry:test:
+    desc: "Exercise telemetry boundaries, invalid evidence controls and real subprocess aborts"
+    cmds:
+      - uv run --no-sync python -m pytest scripts/tests/test_benchmark_telemetry.py -q

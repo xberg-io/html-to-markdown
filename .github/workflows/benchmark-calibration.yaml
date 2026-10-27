@@ -30,6 +30,15 @@ jobs:
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
 
+      - uses: xberg-io/actions/setup-python-env@v1
+        with:
+          python-version: "3.13"
+          install-command: "uv sync --no-install-project --no-install-workspace"
+
+      - name: Verify telemetry rejection controls
+        run: task bench:telemetry:test
+        shell: bash
+
       - name: Collect calibration captures
         run: task bench:calibration:collect
         shell: bash
