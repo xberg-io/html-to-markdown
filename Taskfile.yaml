@@ -45,7 +45,7 @@ includes:
     flatten: true
 
 vars:
-  AI_RULEZ_VERSION: "5.7.0"
+  AI_RULEZ_MIN_VERSION: "5.7.0"
   AI_RULEZ: "ai-rulez"
 
 tasks:
@@ -798,23 +798,24 @@ tasks:
       - uv run --no-project --python 3.11 --with mcp==1.28.1 --with PyYAML==6.0.3 python scripts/tests/test_hermes_plugin.py
 
   ai-rulez:version:check:
-    desc: Require the released ai-rulez version used by CI
+    desc: Require ai-rulez at or above the minimum release (CI installs the latest)
     cmds:
       - |
-        expected="{{.AI_RULEZ_VERSION}}"
+        minimum="{{.AI_RULEZ_MIN_VERSION}}"
         if ! identity=$({{.AI_RULEZ}} --version); then
-          echo "Install ai-rulez $expected: uv tool install ai-rulez==$expected" >&2
+          echo "Install ai-rulez $minimum or newer: uv tool install --upgrade ai-rulez" >&2
           exit 1
         fi
         actual=$(printf '%s\n' "$identity" | awk 'NR == 1 { print $NF }')
-        if [ "$actual" != "$expected" ]; then
-          echo "This repository requires ai-rulez $expected, found $actual." >&2
-          echo "Install it with: uv tool install ai-rulez==$expected" >&2
+        lowest=$(printf '%s\n%s\n' "$minimum" "$actual" | sort -V | head -n 1)
+        if [ -z "$actual" ] || [ "$lowest" != "$minimum" ]; then
+          echo "This repository requires ai-rulez $minimum or newer, found $actual." >&2
+          echo "Upgrade it with: uv tool install --upgrade ai-rulez" >&2
           exit 1
         fi
 
   ai-rulez:version:test:
-    desc: Verify governance tasks reject a mismatched generator before writing
+    desc: Verify governance tasks reject a generator below the minimum before writing
     cmds:
       - python3 scripts/tests/test_ai_rulez_version_guard.py
 
