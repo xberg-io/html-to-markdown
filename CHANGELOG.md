@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Set `image_index` on an image node in the document structure to the entry its extracted bytes take in
+  `images`, as documented, so a consumer can place an inline `data:` image where it stands in the document.
+
 ## [3.18.7] - 2026-10-26
 
 ### Added

@@ -50,7 +50,9 @@ pub fn handle_img(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     #[cfg(feature = "metadata")]
     let metadata = handler.context.metadata_wants.images.then(|| image_metadata(tag));
     #[cfg(feature = "inline-images")]
-    collect_inline_image(tag, &data, handler.context);
+    let image_index = collect_inline_image(tag, &data, handler.context);
+    #[cfg(not(feature = "inline-images"))]
+    let image_index = None;
     let inline_data = handler
         .context
         .inline_data_treatment(handler.options.inline_data_media, &data.src);
@@ -77,7 +79,7 @@ pub fn handle_img(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     }
     #[cfg(feature = "metadata")]
     record_image_metadata(&data, metadata, handler.context);
-    record_image_structure(&data, inline_data, handler.context);
+    record_image_structure(&data, inline_data, image_index, handler.context);
 }
 
 // ~keep An absent image has no inline boundary: adjacent normalized whitespace folds once
@@ -169,13 +171,13 @@ fn image_metadata(tag: &tl::HTMLTag<'_>) -> ImageMetadataPayload {
     (attributes, width, height)
 }
 
+/// Gives a `data:` image to the collector of inline images, and returns the index its bytes take
+/// in `ConversionResult::images`, or `None` when none were extracted.
 #[cfg(feature = "inline-images")]
-fn collect_inline_image(tag: &tl::HTMLTag<'_>, data: &ImageData<'_>, context: &Context) {
-    let Some(collector) = context.inline_collector.as_ref() else {
-        return;
-    };
+fn collect_inline_image(tag: &tl::HTMLTag<'_>, data: &ImageData<'_>, context: &Context) -> Option<u32> {
+    let collector = context.inline_collector.as_ref()?;
     if !is_inline_data(&data.src) {
-        return;
+        return None;
     }
     let mut attributes = BTreeMap::new();
     for (key, value) in tag.attributes().iter() {
@@ -185,6 +187,9 @@ fn collect_inline_image(tag: &tl::HTMLTag<'_>, data: &ImageData<'_>, context: &C
             attributes.insert(key, value.map(|value| value.to_string()).unwrap_or_default());
         }
     }
+    // ~keep A payload that does not decode is skipped with a warning, so only a new entry means
+    // ~keep this image's bytes were extracted.
+    let extracted_before = collector.borrow().image_count();
     handle_inline_data_image(
         collector,
         data.src.as_ref(),
@@ -192,6 +197,9 @@ fn collect_inline_image(tag: &tl::HTMLTag<'_>, data: &ImageData<'_>, context: &C
         data.title.as_deref(),
         attributes,
     );
+    (collector.borrow().image_count() > extracted_before)
+        .then(|| u32::try_from(extracted_before).ok())
+        .flatten()
 }
 
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
@@ -334,9 +342,15 @@ fn record_image_metadata(data: &ImageData<'_>, metadata: Option<ImageMetadataPay
     );
 }
 
-fn record_image_structure(data: &ImageData<'_>, inline_data: InlineDataMedia, context: &Context) {
+fn record_image_structure(
+    data: &ImageData<'_>,
+    inline_data: InlineDataMedia,
+    image_index: Option<u32>,
+    context: &Context,
+) {
     // ~keep The structure shows the image the markdown shows: no node for a dropped element, and no
-    // ~keep address when only the alt text is written.
+    // ~keep address when only the alt text is written. A node keeps the index of its extracted
+    // ~keep bytes either way, so a consumer can place them where the image stands.
     if let Some(ref sc) = context.structure_collector {
         if inline_data != InlineDataMedia::DropElement {
             let src_opt = if data.src.is_empty() || inline_data == InlineDataMedia::AltTextOnly {
@@ -349,7 +363,7 @@ fn record_image_structure(data: &ImageData<'_>, inline_data: InlineDataMedia, co
             } else {
                 Some(data.alt.as_ref())
             };
-            sc.borrow_mut().push_image(src_opt, alt_opt);
+            sc.borrow_mut().push_image_with_index(src_opt, alt_opt, image_index);
         }
     }
 }
