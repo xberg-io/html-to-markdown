@@ -37,6 +37,10 @@ on:
         description: "Recover missing NuGet runtime packages from an existing release run; skip other targets"
         required: false
         type: string
+      nuget_managed_source_sha:
+        description: "Optional frozen commit containing only the verified managed bool ABI repair"
+        required: false
+        type: string
   release:
     types: [published]
   repository_dispatch:
@@ -141,6 +145,25 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
+      - name: Verify and stage managed ABI repair
+        if: ${{ inputs.nuget_managed_source_sha != '' }}
+        shell: bash
+        working-directory: release-source
+        env:
+          RECOVERY_SHA: ${{ inputs.nuget_managed_source_sha }}
+        run: |
+          [[ "$RECOVERY_SHA" =~ ^[0-9a-f]{40}$ ]]
+          git fetch --depth=1 origin "$RECOVERY_SHA"
+          python3 "$GITHUB_WORKSPACE/scripts/ci/csharp/stage_managed_recovery.py" \
+            "$RECOVERY_SHA" > "$GITHUB_WORKSPACE/managed-recovery-provenance.json"
+
+      - name: Render managed recovery runtime graph
+        if: ${{ inputs.nuget_managed_source_sha != '' }}
+        uses: xberg-io/actions/render-runtime-json@v1
+        with:
+          template-path: release-source/packages/csharp/HtmlToMarkdown/runtime.json.template
+          version: ${{ steps.version.outputs.version }}
+
       - name: Pack only missing runtime package candidates
         shell: bash
         working-directory: release-source
@@ -155,6 +178,30 @@ jobs:
           # Every concrete RID is packed, and RequireRuntimeAssets rejects a missing artifact.
           # This directory deliberately contains no managed package.
           bash "$GITHUB_WORKSPACE/scripts/ci/csharp/pack-runtimes.sh" "$VERSION" dist/nuget-runtimes
+
+      - name: Pack verified managed repair
+        if: ${{ inputs.nuget_managed_source_sha != '' }}
+        shell: bash
+        working-directory: release-source
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          dotnet restore packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj
+          dotnet pack packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj \
+            -c Release "-p:Version=$VERSION" -o dist/nuget-runtimes
+          python3 - <<'PY'
+          from pathlib import Path
+          packages = list(Path('dist/nuget-runtimes').glob('*.nupkg'))
+          if len(packages) != 7:
+              raise SystemExit(f'Expected 7 managed/runtime packages, found {len(packages)}')
+          PY
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ inputs.nuget_managed_source_sha != '' }}
+        with:
+          name: managed-recovery-provenance
+          path: managed-recovery-provenance.json
+          if-no-files-found: error
 
       - uses: xberg-io/actions/publish-nuget@v1
         with:
