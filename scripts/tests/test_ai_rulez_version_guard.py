@@ -64,8 +64,8 @@ class AiRulezVersionTests(unittest.TestCase):
                 assert not (self.root / "generator-ran").exists()
 
     def test_should_reject_versions_below_the_minimum_compared_numerically(self) -> None:
-        """Older releases fail the guard with the minimum named in the message."""
-        for version in ("5.6.10", "4.99.0"):
+        """Older releases and non-release identities fail the guard with the minimum named in the message."""
+        for version in ("5.6.10", "4.99.0", "dev", "5.7.0-rc1"):
             with self.subTest(version=version):
                 result = self.run_task("ai-rulez:version:check", version)
                 assert result.returncode != 0

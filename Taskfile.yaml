@@ -806,9 +806,13 @@ tasks:
           echo "Install ai-rulez $minimum or newer: uv tool install --upgrade ai-rulez" >&2
           exit 1
         fi
-        actual=$(printf '%s\n' "$identity" | awk 'NR == 1 { print $NF }')
-        lowest=$(printf '%s\n%s\n' "$minimum" "$actual" | sort -V | head -n 1)
-        if [ -z "$actual" ] || [ "$lowest" != "$minimum" ]; then
+        actual=$(printf '%s\n' "$identity" | awk 'NR == 1 { if ($NF ~ /^v[0-9]/) $NF = substr($NF, 2); print $NF }')
+        if ! printf '%s\n' "$actual" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+' ||
+          ! awk -v found="$actual" -v wanted="$minimum" 'BEGIN {
+            split(found, f, "."); split(wanted, w, ".")
+            for (i = 1; i <= 3; i++) { if (f[i] + 0 != w[i] + 0) exit !(f[i] + 0 > w[i] + 0) }
+            exit 0
+          }'; then
           echo "This repository requires ai-rulez $minimum or newer, found $actual." >&2
           echo "Upgrade it with: uv tool install --upgrade ai-rulez" >&2
           exit 1
