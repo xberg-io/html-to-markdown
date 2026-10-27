@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        uses: xberg-io/actions/setup-ai-rulez@v1
         with:
           ai-rulez-version: "latest"
       # Plugin version must track the core crate version (task version:sync keeps it pinned).

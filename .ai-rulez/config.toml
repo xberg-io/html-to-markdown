@@ -23,28 +23,28 @@ style = 'minimal'
 [[includes]]
 name = 'xberg-core'
 source = 'https://github.com/xberg-io/agent-conventions.git'
-ref = "6e7f6a6793ea7380b916367e10a8acd13c3afbc3"
+version = "^1"
 path = 'modules/core'
 merge_strategy = 'local-override'
 
 [[includes]]
 name = 'xberg-languages'
 source = 'https://github.com/xberg-io/agent-conventions.git'
-ref = "6e7f6a6793ea7380b916367e10a8acd13c3afbc3"
+version = "^1"
 path = 'modules/languages'
 merge_strategy = 'local-override'
 
 [[includes]]
 name = 'xberg-cicd'
 source = 'https://github.com/xberg-io/agent-conventions.git'
-ref = "6e7f6a6793ea7380b916367e10a8acd13c3afbc3"
+version = "^1"
 path = 'modules/cicd'
 merge_strategy = 'local-override'
 
 [[includes]]
 name = 'xberg-bindings'
 source = 'https://github.com/xberg-io/agent-conventions.git'
-ref = "6e7f6a6793ea7380b916367e10a8acd13c3afbc3"
+version = "^1"
 path = 'modules/bindings'
 merge_strategy = 'local-override'
 

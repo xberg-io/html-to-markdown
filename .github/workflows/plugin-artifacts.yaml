@@ -42,7 +42,7 @@ jobs:
             "$PLUGIN_TAG" "$SOURCE_SHA" > "$RUNNER_TEMP/plugin-source-provenance.json"
           cat "$RUNNER_TEMP/plugin-source-provenance.json"
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        uses: xberg-io/actions/setup-ai-rulez@v1
         with:
           ai-rulez-version: "latest"
       - name: Verify public skill exports

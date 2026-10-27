@@ -3431,7 +3431,7 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org/"
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        uses: xberg-io/actions/setup-ai-rulez@v1
         with:
           ai-rulez-version: "latest"
       - name: Verify generated plugin bundles before publishing
@@ -3530,11 +3530,11 @@ jobs:
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        uses: xberg-io/actions/setup-ai-rulez@v1
         with:
           ai-rulez-version: "latest"
       - name: Verify plugin source and generated artifacts
-        uses: xberg-io/actions/verify-ai-rulez-plugin@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        uses: xberg-io/actions/verify-ai-rulez-plugin@v1
         with:
           config-directory: .ai-rulez
       - name: Install uv
@@ -3873,7 +3873,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.tag }}
           fetch-depth: 0
       - name: Install ai-rulez
-        uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+        uses: xberg-io/actions/setup-ai-rulez@v1
         with:
           ai-rulez-version: "latest"
       - name: Verify public skill exports

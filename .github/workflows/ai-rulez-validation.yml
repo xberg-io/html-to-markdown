@@ -23,16 +23,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: xberg-io/actions/setup-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+      - uses: xberg-io/actions/setup-ai-rulez@v1
         with:
           ai-rulez-version: "latest"
-      - uses: xberg-io/actions/validate-ai-rulez@98adf87f1ed4c62a57ff56f9010d62faf42d4db6
+      - uses: xberg-io/actions/validate-ai-rulez@v1
         with:
           expected-config-count: "2"
           additional-config-directories: "plugin/.ai-rulez"
           verify-plugin: "true"
       # ~keep Budgets: the --measure-mcp ai-rulez measurement plus about 5%; re-measure on every pin bump.
-      - uses: xberg-io/agent-conventions/actions/context-exposure@6e7f6a6793ea7380b916367e10a8acd13c3afbc3
+      - uses: xberg-io/agent-conventions/actions/context-exposure@v1
         with:
           budgets: |
             claude=5700
