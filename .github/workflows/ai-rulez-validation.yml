@@ -31,8 +31,8 @@ jobs:
           expected-config-count: "2"
           additional-config-directories: "plugin/.ai-rulez"
           verify-plugin: "true"
-      - uses: xberg-io/agent-conventions/actions/context-exposure@923818e1ce9b71ebe68306c7a551caeaf7b27106
+      - uses: xberg-io/agent-conventions/actions/context-exposure@6e7f6a6793ea7380b916367e10a8acd13c3afbc3
         with:
           budgets: |
-            claude=5900
-            codex=6100
+            claude=5100
+            codex=5650
