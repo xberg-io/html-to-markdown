@@ -64,7 +64,7 @@ jobs:
         run: node --test scripts/tests/opencode-plugin.test.mjs
 
       - name: Install uv for Hermes contract tests
-        uses: astral-sh/setup-uv@v10.3.0
+        uses: astral-sh/setup-uv@v10.3.2
       - name: Validate Hermes distribution metadata
         shell: bash
         run: |

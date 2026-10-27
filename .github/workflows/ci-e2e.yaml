@@ -203,7 +203,7 @@ jobs:
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
       - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
-      - { "name": "Install uv", "uses": "astral-sh/setup-uv@v10.3.0", "with": { "enable-cache": true } }
+      - { "name": "Install uv", "uses": "astral-sh/setup-uv@v10.3.2", "with": { "enable-cache": true } }
       - {
           "name": "Set up Python",
           "uses": "actions/setup-python@v7",
@@ -265,7 +265,7 @@ jobs:
         }
       - {
           "name": "Setup Node.js workspace",
-          "uses": "xberg-io/actions/setup-node-workspace@59f1b4d0d2e6186a995f4b8a543951c39ac5edd2",
+          "uses": "xberg-io/actions/setup-node-workspace@v1",
         }
       - {
           "name": "Setup Bun",
@@ -396,7 +396,7 @@ jobs:
       - {
           "name": "Setup Ruby (Unix)",
           "if": "runner.os != 'Windows'",
-          "uses": "ruby/setup-ruby@v1",
+          "uses": "ruby/setup-ruby@v1.335.0",
           "with": {
             "ruby-version": "${{ matrix.ruby }}",
             "bundler": "4.0.3",
@@ -407,7 +407,7 @@ jobs:
       - {
           "name": "Setup Ruby (Windows)",
           "if": "runner.os == 'Windows'",
-          "uses": "ruby/setup-ruby@v1",
+          "uses": "ruby/setup-ruby@v1.335.0",
           "with": {
             "ruby-version": "${{ matrix.ruby }}",
             "bundler": "4.0.3",
@@ -472,7 +472,7 @@ jobs:
       - { "name": "Capture php-config path", "run": "scripts/ci/php/set-php-config.sh", "shell": "bash" }
       - {
           "name": "Install root Composer dependencies",
-          "uses": "ramsey/composer-install@v4",
+          "uses": "ramsey/composer-install@4.0.0",
           "with": { "dependency-versions": "locked" },
           "env": { "COMPOSER_AUTH": "{\"github-oauth\":{\"github.com\":\"${{ secrets.GITHUB_TOKEN }}\"}}" },
         }
@@ -575,7 +575,7 @@ jobs:
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
-      - { "name": "Install uv", "uses": "astral-sh/setup-uv@v10.3.0", "with": { "enable-cache": true } }
+      - { "name": "Install uv", "uses": "astral-sh/setup-uv@v10.3.2", "with": { "enable-cache": true } }
       - {
           "name": "Set up Python",
           "uses": "actions/setup-python@v7",
@@ -627,7 +627,7 @@ jobs:
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - {
           "name": "Setup Node.js workspace",
-          "uses": "xberg-io/actions/setup-node-workspace@59f1b4d0d2e6186a995f4b8a543951c39ac5edd2",
+          "uses": "xberg-io/actions/setup-node-workspace@v1",
         }
       - {
           "name": "Setup Bun",

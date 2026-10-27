@@ -30,9 +30,7 @@ class ReleaseReportingTests(unittest.TestCase):
         steps = workflow["jobs"]["release-scripts"]["steps"]
         tests = next(index for index, step in enumerate(steps) if step.get("name") == "Test release helpers")
         installers = [
-            index
-            for index, step in enumerate(steps)
-            if step.get("uses") == "xberg-io/actions/install-task@2d3e217104ad1edf519be3e38703c14e3ed48aa4"
+            index for index, step in enumerate(steps) if step.get("uses") == "xberg-io/actions/install-task@v1"
         ]
         assert len(installers) == 1
         assert installers[0] < tests

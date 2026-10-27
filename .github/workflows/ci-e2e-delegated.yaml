@@ -118,7 +118,7 @@ jobs:
       - {
           "name": "Setup Ruby (Unix)",
           "if": "runner.os != 'Windows'",
-          "uses": "ruby/setup-ruby@v1",
+          "uses": "ruby/setup-ruby@v1.335.0",
           "with": {
             "ruby-version": "${{ inputs.ruby }}",
             "bundler": "4.0.3",
@@ -129,7 +129,7 @@ jobs:
       - {
           "name": "Setup Ruby (Windows)",
           "if": "runner.os == 'Windows'",
-          "uses": "ruby/setup-ruby@v1",
+          "uses": "ruby/setup-ruby@v1.335.0",
           "with": {
             "ruby-version": "${{ inputs.ruby }}",
             "bundler": "4.0.3",
@@ -371,7 +371,7 @@ jobs:
       - { "name": "Capture php-config path", "run": "scripts/ci/php/set-php-config.sh", "shell": "bash" }
       - {
           "name": "Install root Composer dependencies",
-          "uses": "ramsey/composer-install@v4",
+          "uses": "ramsey/composer-install@4.0.0",
           "with": { "dependency-versions": "locked" },
           "env": { "COMPOSER_AUTH": "{\"github-oauth\":{\"github.com\":\"${{ secrets.GITHUB_TOKEN }}\"}}" },
         }

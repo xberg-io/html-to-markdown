@@ -90,7 +90,7 @@ jobs:
         with:
           python-version: "3.13"
           install-command: "uv sync --no-install-project --no-install-workspace"
-      - uses: xberg-io/actions/install-task@2d3e217104ad1edf519be3e38703c14e3ed48aa4
+      - uses: xberg-io/actions/install-task@v1
       - name: Test release helpers
         run: task test:release-scripts
 
@@ -98,11 +98,11 @@ jobs:
     name: Reject quality warning regressions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: xberg-io/actions/install-task@2d3e217104ad1edf519be3e38703c14e3ed48aa4
-      - uses: Goldziher/poly@601463a7592beb1e3f00b18816aea4e15b0d7007
+      - uses: xberg-io/actions/install-task@v1
+      - uses: Goldziher/poly@v0
       - run: task check:quality-warnings
         env:
           QUALITY_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}

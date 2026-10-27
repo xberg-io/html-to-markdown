@@ -1207,7 +1207,7 @@ jobs:
         with:
           cache-key-prefix: publish-ruby-${{ matrix.label }}
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.3"
           bundler: "4.0.3"
@@ -2116,7 +2116,7 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1.335.0
         with:
           ruby-version: "3.3"
           bundler-cache: false
@@ -3203,7 +3203,7 @@ jobs:
             sleep 5
           done
 
-      - uses: xberg-io/actions/install-task@2d3e217104ad1edf519be3e38703c14e3ed48aa4
+      - uses: xberg-io/actions/install-task@v1
 
       - name: Update release notes with artifact URL
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
@@ -3229,7 +3229,9 @@ jobs:
         with:
           r-version: "release"
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
 
       - name: Install system deps
         run: |
@@ -3538,7 +3540,7 @@ jobs:
         with:
           config-directory: .ai-rulez
       - name: Install uv
-        uses: astral-sh/setup-uv@v10.2.0
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: "3.13"
       # ~keep Same rendered-bundle gap as the npm job, but silent: this job had no guard at
