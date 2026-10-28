@@ -103,6 +103,9 @@ jobs:
           fetch-depth: 0
       - uses: xberg-io/actions/install-task@v1
       - uses: Goldziher/poly@v0
+        with:
+          # poly 0.30.0 lints Python as 3.11+ whatever target-version says (Goldziher/poly#42). ~keep
+          version: "0.29.0"
       - run: task check:quality-warnings
         env:
           QUALITY_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}

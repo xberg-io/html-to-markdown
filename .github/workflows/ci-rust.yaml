@@ -104,6 +104,9 @@ jobs:
       # Without Poly it cannot validate those bytes and can report formatted Markdown as raw drift.
       - name: Install poly
         uses: Goldziher/poly@v0
+        with:
+          # poly 0.30.0 lints Python as 3.11+ whatever target-version says (Goldziher/poly#42). ~keep
+          version: "0.29.0"
 
       - name: Setup Go for module freshness
         uses: actions/setup-go@v7
