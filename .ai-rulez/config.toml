@@ -90,6 +90,10 @@ include_outputs = false
 # ~keep Alef publishes the canonical html-to-markdown MCP reference as the mcp skill.
 allow_overrides = ["claude:mcp", "python-conventions"]
 
+[lint.load_budgets]
+# ~keep AR964 also counts the plugin bundle and public skill mirrors, which Codex does not list; measured plus about 5%.
+codex-skill-listing = 20800
+
 # Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
 [[lint.ignore_rules]]
 rules = ["AR701"]
@@ -116,3 +120,5 @@ reason = "Install instructions for this project's own CLI, which track the lates
 [rules]
 # ~keep Glob-scoped rules stay out of AGENTS.md: rule files for Claude, path-gated skills for Codex.
 scoped_fallback = "skill"
+# ~keep One fallback skill per directory keeps the Codex skill listing short (AR964).
+scoped_fallback_group = "directory"
