@@ -274,7 +274,7 @@ jobs:
           fi
         shell: bash
   # ~keep The FFI crate is the shared cross-compile base for the C, Go, Java, and
-  # C# publish legs, all of which build it for macos-15-intel (darwin x64) and
+  # C# publish legs, all of which build it for macos-26-intel (darwin x64) and
   # windows-11-arm (windows arm64) too. Those two targets were previously only
   # ever compiled at publish time — cover them here so a cross-compile break
   # surfaces on the commit that causes it, not at tag time.
@@ -655,7 +655,7 @@ jobs:
   test-swift:
     name: "Test: Swift"
     if: inputs.task == 'test-swift'
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }

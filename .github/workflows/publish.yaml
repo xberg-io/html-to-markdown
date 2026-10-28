@@ -697,8 +697,8 @@ jobs:
         include:
           - { os: ubuntu-latest, rid: linux-x64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, rid: linux-arm64, target: aarch64-unknown-linux-gnu }
-          - { os: macos-latest, rid: macos-arm64, target: aarch64-apple-darwin }
-          - { os: macos-15-intel, rid: macos-x64, target: x86_64-apple-darwin }
+          - { os: macos-26, rid: macos-arm64, target: aarch64-apple-darwin }
+          - { os: macos-26-intel, rid: macos-x64, target: x86_64-apple-darwin }
           - { os: windows-latest, rid: windows-x64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, rid: windows-arm64, target: aarch64-pc-windows-msvc }
     steps:
@@ -843,7 +843,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-15-intel]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-26, macos-26-intel]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -982,14 +982,14 @@ jobs:
       matrix:
         include:
           - {
-              os: macos-latest,
+              os: macos-26,
               target: aarch64-apple-darwin,
               rust_target: "",
               use_napi_cross: false,
               use_zig_cross: false,
             }
           - {
-              os: macos-15-intel,
+              os: macos-26-intel,
               target: x86_64-apple-darwin,
               rust_target: "",
               use_napi_cross: false,
@@ -1157,8 +1157,8 @@ jobs:
         include:
           - { os: ubuntu-latest, label: linux }
           - { os: ubuntu-24.04-arm, label: linux-aarch64 }
-          - { os: macos-latest, label: macos-arm64 }
-          - { os: macos-15-intel, label: macos-x86_64 }
+          - { os: macos-26, label: macos-arm64 }
+          - { os: macos-26-intel, label: macos-x86_64 }
           - { os: ubuntu-latest, label: windows-x64, dock_platform: x64-mingw-ucrt }
     steps:
       - uses: actions/checkout@v7
@@ -1316,7 +1316,7 @@ jobs:
         platform:
           - { os: ubuntu-latest, label: linux-x86_64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, label: linux-arm64, target: aarch64-unknown-linux-gnu }
-          - { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
+          - { os: macos-26, label: macos-arm64, target: aarch64-apple-darwin }
           - { os: windows-latest, label: windows-x86_64, target: x86_64-pc-windows-msvc }
     steps:
       - uses: actions/checkout@v7
@@ -1388,8 +1388,8 @@ jobs:
         include:
           - { os: ubuntu-latest, platform: linux-x64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, platform: linux-arm64, target: aarch64-unknown-linux-gnu }
-          - { os: macos-latest, platform: darwin-arm64, target: aarch64-apple-darwin }
-          - { os: macos-15-intel, platform: darwin-x64, target: x86_64-apple-darwin }
+          - { os: macos-26, platform: darwin-arm64, target: aarch64-apple-darwin }
+          - { os: macos-26-intel, platform: darwin-x64, target: x86_64-apple-darwin }
           - { os: windows-latest, platform: windows-x64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, platform: windows-arm64, target: aarch64-pc-windows-msvc }
     steps:
@@ -1448,8 +1448,8 @@ jobs:
         include:
           - { os: ubuntu-latest, platform: linux-x64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, platform: linux-arm64, target: aarch64-unknown-linux-gnu }
-          - { os: macos-latest, platform: darwin-arm64, target: aarch64-apple-darwin }
-          - { os: macos-15-intel, platform: darwin-x64, target: x86_64-apple-darwin }
+          - { os: macos-26, platform: darwin-arm64, target: aarch64-apple-darwin }
+          - { os: macos-26-intel, platform: darwin-x64, target: x86_64-apple-darwin }
           - { os: windows-latest, platform: windows-x64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, platform: windows-arm64, target: aarch64-pc-windows-msvc }
     steps:
@@ -1490,7 +1490,7 @@ jobs:
     name: Build Swift Artifact Bundle
     needs: [prepare]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true' }}
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v7
@@ -1548,8 +1548,8 @@ jobs:
         include:
           - { os: ubuntu-latest, platform: linux-x86_64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, platform: linux-aarch64, target: aarch64-unknown-linux-gnu }
-          - { os: macos-latest, platform: macos-arm64, target: aarch64-apple-darwin }
-          - { os: macos-15-intel, platform: macos-x86_64, target: x86_64-apple-darwin }
+          - { os: macos-26, platform: macos-arm64, target: aarch64-apple-darwin }
+          - { os: macos-26-intel, platform: macos-x86_64, target: x86_64-apple-darwin }
           - { os: windows-latest, platform: windows-x86_64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, platform: windows-aarch64, target: aarch64-pc-windows-msvc }
     steps:
@@ -1600,8 +1600,8 @@ jobs:
         include:
           - { os: ubuntu-latest, rid: linux-x64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, rid: linux-arm64, target: aarch64-unknown-linux-gnu }
-          - { os: macos-latest, rid: osx-arm64, target: aarch64-apple-darwin }
-          - { os: macos-15-intel, rid: osx-x64, target: x86_64-apple-darwin }
+          - { os: macos-26, rid: osx-arm64, target: aarch64-apple-darwin }
+          - { os: macos-26-intel, rid: osx-x64, target: x86_64-apple-darwin }
           - { os: windows-latest, rid: win-x64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, rid: win-arm64, target: aarch64-pc-windows-msvc }
     steps:
@@ -1652,8 +1652,8 @@ jobs:
         include:
           - { os: ubuntu-latest, label: linux-x86_64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, label: linux-aarch64, target: aarch64-unknown-linux-gnu }
-          - { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
-          - { os: macos-15-intel, label: macos-x86_64, target: x86_64-apple-darwin }
+          - { os: macos-26, label: macos-arm64, target: aarch64-apple-darwin }
+          - { os: macos-26-intel, label: macos-x86_64, target: x86_64-apple-darwin }
     steps:
       - uses: actions/checkout@v7
         with:
@@ -2928,7 +2928,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-latest, bottle_tag: arm64_sonoma, install_brew: false }
+          - { os: macos-26, bottle_tag: arm64_tahoe, install_brew: false }
           - { os: ubuntu-latest, bottle_tag: x86_64_linux, install_brew: true }
           - { os: ubuntu-24.04-arm, bottle_tag: arm64_linux, install_brew: true }
     steps:

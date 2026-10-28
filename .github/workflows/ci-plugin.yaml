@@ -87,7 +87,7 @@ jobs:
         # Both, because the launcher probes the host for npx, uvx and brew and resolves a
         # platform triple from `uname`. A Linux-only job would never execute the macOS arm of
         # either decision. ~keep
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-26]
     steps:
       - uses: actions/checkout@v7
 
