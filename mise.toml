@@ -74,42 +74,9 @@ run = ["mise install", { task = "rust:install" }, "alef setup", { task = "govern
 description = "Build Rust core library only"
 run = [{ task = "build:core" }]
 
-[tasks."build:dev"]
-description = "Build all in debug mode"
-run = [{ task = "rust:build:dev" }]
-
-[tasks."build:release"]
-description = "Build Rust core in release mode"
-run = [{ task = "rust:build:release" }]
-
-[tasks."build:ci"]
-description = "Build Rust core in CI mode"
-run = [{ task = "rust:build:ci" }]
-
 [tasks."build:core"]
 description = "Build Rust core library only"
 run = [{ task = "rust:build" }]
-
-[tasks."build:bindings"]
-description = "Build all language bindings"
-run = [{ task = "alef:build" }]
-
-[tasks."build:all"]
-description = "Build Rust core library and all language bindings"
-run = [{ task = "build:core" }, { task = "build:bindings" }]
-
-[tasks."build:cli"]
-description = "Build the html-to-markdown CLI binary"
-run = [{ task = "rust:build:release" }]
-
-[tasks."build:demo"]
-description = "Build the GitHub Pages demo"
-run = "./scripts/build-demo.sh"
-
-[tasks."serve:demo"]
-description = "Serve the GitHub Pages demo locally on port 8000"
-dir = "docs"
-run = "python3 -m http.server 8000"
 
 [tasks.test]
 description = "Run Rust core test suite only"
@@ -118,10 +85,6 @@ run = [{ task = "rust:test" }]
 [tasks."test:bindings"]
 description = "Run binding test suites only (skip Rust core)"
 run = "alef test"
-
-[tasks."test:all"]
-description = "Run all test suites across all languages"
-run = [{ task = "test" }, { task = "test:bindings" }, { task = "test:scripts" }]
 
 [tasks."test:scripts:lib:sync"]
 description = "Refresh the vendored Bats helper library from xberg-io/actions"
@@ -155,29 +118,13 @@ run = "poly fmt --check ."
 description = "Run all checks (format + lint, no modifications)"
 run = [{ task = "format:check" }, { task = "lint:check" }, { task = "node:verify-loader" }]
 
-[tasks."check:ffi-symbols"]
-description = "Diff exported htm_* FFI symbols against the symbols bindings call"
-run = "python3 scripts/check_ffi_symbols.py"
-
 [tasks."check:ffi-symbols:known"]
-description = "check:ffi-symbols, treating the known-missing allowlist as non-blocking"
+description = "Diff exported htm_* FFI symbols against the symbols bindings call, treating the known-missing allowlist as non-blocking"
 run = "python3 scripts/check_ffi_symbols.py --allow-known"
 
 [tasks."check:quality-warnings"]
 description = "Fail on unsuppressed poly quality warnings"
 run = "python3 scripts/check_quality_warnings.py"
-
-[tasks."check:binding-parse"]
-description = "Parse every generated binding with its own language front end"
-run = "python3 scripts/check_binding_parse.py"
-
-[tasks."check:binding-parse:strict"]
-description = "check:binding-parse, treating a skipped language as a failure (CI)"
-run = "python3 scripts/check_binding_parse.py --strict"
-
-[tasks."check:binding-parse:self-test"]
-description = "Prove each binding-parse checker rejects deliberately invalid syntax"
-run = "python3 scripts/check_binding_parse.py --self-test"
 
 [tasks.update]
 description = "Update all dependencies (within major versions)"
@@ -186,14 +133,6 @@ run = ["alef update", "gau --update .", "mise run deps update"]
 [tasks.upgrade]
 description = "Upgrade all dependencies to latest (including breaking changes)"
 run = ["alef update --latest", "gau --update .", "mise run deps upgrade"]
-
-[tasks.audit]
-description = "Check dependencies for known vulnerabilities and license/advisory violations"
-run = [{ task = "rust:audit" }, { task = "node:audit" }]
-
-[tasks."cov:rust"]
-description = "Generate Rust coverage report"
-run = [{ task = "rust:coverage" }]
 
 [tasks."cov:all"]
 description = "Generate coverage for all languages"
@@ -212,10 +151,6 @@ run = ["ai-rulez validate --no-local", "ai-rulez generate --no-local --strict-co
 [tasks."governance:check"]
 description = "Check materialized local governance outputs against shared sources"
 run = "ai-rulez generate --check --no-local --strict-config"
-
-[tasks."ai-rulez:version:test"]
-description = "Verify every CI ai-rulez installation takes the latest release"
-run = "python3 scripts/tests/test_ai_rulez_version_guard.py"
 
 # Coding-agent plugin (Claude Code, Cursor, Codex, Gemini, Kimi, OpenCode, Factory,
 # Hermes, Pi). Single source of truth: plugin/.ai-rulez/config.plugins.toml + plugin/.ai-rulez/skills.
@@ -245,18 +180,6 @@ run = ["python3 scripts/tests/test_public_skills.py", "python3 scripts/sync_publ
 description = "Verify npm launcher preserves caller directory and relative configuration"
 run = "python3 scripts/tests/test_mcp_launcher_cwd.py"
 
-[tasks."pre-commit:install"]
-description = "Install poly git hooks for commit and commit-msg"
-run = "poly hooks install"
-
-[tasks."pre-commit:run"]
-description = "Run poly git hooks on all files"
-run = "poly hooks run"
-
-[tasks."pre-commit:uninstall"]
-description = "Uninstall poly git hooks"
-run = "poly hooks uninstall || true"
-
 # ---- Versions and publishing -------------------------------------------------------------------
 
 [tasks."version:sync"]
@@ -274,10 +197,6 @@ run = [
   "python3 scripts/sync_public_skills.py",
   { task = "alef:verify:strict" },
 ]
-
-[tasks."version:check"]
-description = "Check if versions are synchronized (dry-run)"
-run = ["python3 scripts/sync_consumer_versions.py --check", { task = "version:show" }]
 
 [tasks."version:show"]
 description = "Show current version from Cargo.toml"
@@ -366,22 +285,9 @@ run = ["pnpm --dir docs-site install --frozen-lockfile", "pnpm --dir docs-site b
 description = "Serve documentation locally with live reload"
 run = ["pnpm --dir docs-site install", "pnpm --dir docs-site dev"]
 
-[tasks."docs:generate"]
-description = "Generate API reference documentation using alef"
-run = "alef docs"
-
-[tasks."docs:lint:links"]
-description = "Check links with lychee"
-run = "lychee --offline docs-site/src/content/docs README.md"
-
 [tasks."docs:lint:prose"]
 description = "Lint prose with textlint"
 run = "pnpm exec textlint 'docs-site/src/content/docs/**/*.{md,mdx}'"
-
-[tasks."docs:snippets:validate:lang"]
-description = "Validate snippets for one language (dart, kotlin, swift, ...)"
-usage = 'arg "<lang>" help="Snippet language to validate"'
-run = 'alef snippets validate --snippets docs-site/src/snippets --level syntax --languages "$usage_lang" --timeout 120 -j 4'
 
 [tasks."docs:snippets:list"]
 description = "List all discovered snippets"
@@ -397,10 +303,6 @@ description = "Report snippet coverage gaps (missing variants, unreferenced file
 run = """\
   alef snippets gaps --snippets docs-site/src/snippets --docs docs-site/src/content/docs \
   --required-languages rust,python,typescript,go,ruby,php,java,csharp,elixir,r,c,swift,dart,zig"""
-
-[tasks."docs:snippets:check"]
-description = "Generate and strictly validate fixture-driven documentation snippets"
-run = ["alef e2e generate", "alef snippets check --strict --cache off"]
 
 [tasks."docs:snippets:audit"]
 description = "Run structural audit (frontmatter, fences, includes)"
@@ -419,19 +321,6 @@ run = "cargo deny check"
 [tasks."rust:build"]
 description = "Build all Rust crates with the BUILD_PROFILE profile (default: release)"
 run = 'cargo build --workspace --profile "${BUILD_PROFILE:-release}"'
-
-[tasks."rust:build:dev"]
-description = "Build all Rust crates in debug mode"
-run = "cargo build --workspace"
-
-[tasks."rust:build:release"]
-description = "Build all Rust crates in release mode"
-run = "cargo build --workspace --release"
-
-[tasks."rust:build:ci"]
-description = "Build for CI with debug info enabled (no strip)"
-env = { CARGO_PROFILE_RELEASE_DEBUG = "2", CARGO_PROFILE_RELEASE_STRIP = "none" }
-run = "cargo build --workspace --exclude html-to-markdown-php --release"
 
 # ~keep The CI coverage job previously only generated rust-coverage.lcov and
 # uploaded it as an artifact — nothing ever read the number, so the job passed
@@ -454,10 +343,6 @@ run = """\
   cargo test --locked --release -p html-to-markdown-rs --features full,testkit \
   --test stray_closing_tags_complexity -- --nocapture"""
 
-[tasks."rust:lint"]
-description = "Lint Rust code WITH auto-fix (cargo fmt + cargo clippy --fix)"
-run = ["cargo fmt --all", "cargo clippy --workspace --fix --allow-dirty --allow-staged"]
-
 [tasks."rust:lint:check"]
 description = "Lint Rust code WITHOUT auto-fix (check-only)"
 run = ["cargo fmt --all --check", "cargo clippy --workspace -- -D warnings"]
@@ -474,66 +359,16 @@ run = "cargo fmt --all --check"
 description = "Clean Rust build artifacts"
 run = "cargo clean"
 
-[tasks."rust:doc"]
-description = "Generate and open Rust documentation"
-run = "cargo doc --workspace --all-features --no-deps --open"
-
-[tasks."rust:e2e:generate"]
-description = "Generate E2E tests from fixtures using alef"
-run = "alef e2e generate --lang rust"
-
 [tasks."rust:e2e:test"]
 description = "Run Rust E2E tests in e2e/rust directory"
 run = "cargo test --manifest-path e2e/rust/Cargo.toml"
 
 # ---- Python ------------------------------------------------------------------------------------
 
-[tasks."python:install"]
-description = "Install Python dependencies with uv"
-dir = "packages/python"
-run = ["uv sync --no-install-project --no-install-workspace", "uv pip install -e ."]
-
 [tasks."python:build"]
 description = "Build Python bindings with maturin (release unless BUILD_PROFILE says otherwise)"
 dir = "packages/python"
 run = 'if [ "${BUILD_PROFILE:-release}" = release ]; then maturin develop --release; else maturin develop; fi'
-
-[tasks."python:build:dev"]
-description = "Build Python bindings in debug mode"
-dir = "packages/python"
-run = "maturin develop"
-
-[tasks."python:build:release"]
-description = "Build Python bindings in release mode"
-dir = "packages/python"
-run = "maturin develop --release"
-
-[tasks."python:build:ci"]
-description = "Build Python bindings for CI (release with debug info)"
-dir = "packages/python"
-run = "maturin develop --release"
-
-[tasks."python:wheel"]
-description = "Build Python wheel distribution"
-dir = "packages/python"
-run = "maturin build --release"
-
-[tasks."python:coverage"]
-description = "Generate Python code coverage report (lcov format)"
-dir = "packages/python"
-run = "uv run pytest -v --cov=. --cov-report=lcov:coverage.lcov tests/"
-
-[tasks."python:e2e"]
-description = "Build Python binding and run e2e/python fixture tests"
-run = "alef test --e2e --lang python"
-
-[tasks."python:clean"]
-description = "Clean Python build artifacts"
-dir = "packages/python"
-run = """\
-  python3 -c "import glob, shutil; [shutil.rmtree(d, ignore_errors=True) for d in \
-  ['__pycache__', '.pytest_cache', '.ruff_cache', 'dist', 'build', '.maturin'] + glob.glob('*.egg-info')]" \
-  || true"""
 
 # ---- Node --------------------------------------------------------------------------------------
 
@@ -574,52 +409,19 @@ run = ["alef test --e2e --lang node", { task = "node:verify-esm" }]
 
 # ---- Other bindings ----------------------------------------------------------------------------
 
-[tasks."go:lint"]
-description = "Lint Go bindings with golangci-lint"
-dir = "packages/go"
-run = "golangci-lint run ./... --config .golangci.yml"
-
-[tasks."ruby:lint"]
-description = "Lint Ruby bindings with rubocop and steep"
-run = "alef lint --lang ruby"
-
-[tasks."csharp:lint"]
-description = "Lint C# bindings with dotnet format"
-run = "alef lint --lang csharp"
-
 [tasks."r:docs:verify"]
 description = "Check committed R reference pages against a fresh roxygen2 render"
 run = "scripts/ci/r/verify-reference.sh"
 
 # ---- E2E ---------------------------------------------------------------------------------------
 
-[tasks."e2e:all"]
-description = "Build all bindings and run all local e2e fixture tests"
-run = [{ task = "e2e:build" }, { task = "e2e:test" }]
-
-[tasks."e2e:quick"]
-description = "Run quick E2E tests (Rust only)"
-run = [{ task = "rust:e2e:test" }]
-
 [tasks."e2e:generate"]
 description = "Generate E2E tests for all languages from fixtures"
 run = "alef e2e generate"
 
-[tasks."e2e:build"]
-description = "Build all language bindings for E2E tests"
-run = [{ task = "alef:build" }]
-
 [tasks."e2e:test"]
 description = "Run E2E tests for all languages"
 run = "alef test --e2e"
-
-[tasks."e2e:lint"]
-description = "Lint generated E2E test code"
-run = "alef lint"
-
-[tasks."e2e:verify"]
-description = "Full E2E pipeline - generate, lint, and test all suites"
-run = [{ task = "e2e:generate" }, { task = "e2e:lint" }, { task = "e2e:test" }]
 
 # ---- Benchmarks --------------------------------------------------------------------------------
 
@@ -627,199 +429,10 @@ run = [{ task = "e2e:generate" }, { task = "e2e:lint" }, { task = "e2e:test" }]
 description = "Build the benchmark harness before settling the runner"
 run = "cargo build --release -p html-to-markdown-bench --bin htmbench"
 
-[tasks."bench:test"]
-description = "Run benchmark harness unit tests"
-run = "cargo test --release -p html-to-markdown-bench"
-
 [tasks."bench:telemetry:test"]
 description = "Exercise telemetry boundaries, invalid evidence controls and real subprocess aborts"
 run = "uv run --no-sync python -m pytest scripts/tests/test_benchmark_telemetry.py -q"
 
-[tasks."bench:lint"]
-description = "Check benchmark harness with Clippy"
-run = "cargo clippy --release -p html-to-markdown-bench --all-targets -- -D warnings"
-
-[tasks."bench:format"]
-description = "Format benchmark harness Rust sources"
-run = "cargo fmt -p html-to-markdown-bench"
-
-[tasks."bench:format:check"]
-description = "Check benchmark harness Rust formatting"
-run = "cargo fmt -p html-to-markdown-bench -- --check"
-
 [tasks."bench:oracle"]
 description = "Verify oracle snapshots match current output"
 run = "cargo run --release -p html-to-markdown-bench -- oracle"
-
-[tasks."bench:oracle:bless"]
-description = "Regenerate oracle snapshots from current output"
-run = "cargo run --release -p html-to-markdown-bench -- oracle --bless"
-
-[tasks."bench:survey"]
-description = "Print fixture corpus feature-coverage survey"
-run = "cargo run --release -p html-to-markdown-bench -- survey"
-
-[tasks."bench:mdream"]
-description = "Run benchmark with mdream side-by-side (requires compare-mdream feature and /tmp/mdream)"
-run = """\
-  mkdir -p tools/benchmark-harness/results && \
-  cargo run --release -p html-to-markdown-bench --features html-to-markdown-bench/compare-mdream -- \
-  run --mdream --output tools/benchmark-harness/results/latest-mdream.json"""
-
-# ---- Per-language dependency refreshes and e2e suites ------------------------------------------
-
-[tasks."rust:update"]
-description = "Update Rust dependencies within major versions (cargo update)"
-run = ["mise run deps update rust"]
-
-[tasks."rust:upgrade"]
-description = "Upgrade Rust dependencies to latest including breaking changes (cargo upgrade --incompatible + cargo update)"
-run = ["mise run deps upgrade rust"]
-
-[tasks."python:update"]
-description = "Update Python dependencies within major versions (uv sync)"
-run = ["mise run deps update python"]
-
-[tasks."python:upgrade"]
-description = "Upgrade Python dependencies to latest including breaking changes (uv sync --upgrade)"
-run = ["mise run deps upgrade python"]
-
-[tasks."node:update"]
-description = "Update Node.js dependencies within major versions (pnpm up)"
-run = ["mise run deps update node"]
-
-[tasks."node:upgrade"]
-description = "Upgrade Node.js dependencies to latest including breaking changes (pnpm up --latest)"
-run = ["mise run deps upgrade node"]
-
-[tasks."ruby:update"]
-description = "Update Ruby dependencies within major versions (bundle update --conservative)"
-run = ["mise run deps update ruby"]
-
-[tasks."ruby:upgrade"]
-description = "Upgrade Ruby dependencies to latest including breaking changes (bundle update)"
-run = ["mise run deps upgrade ruby"]
-
-[tasks."php:update"]
-description = "Update PHP dependencies within major versions (composer update --with-dependencies)"
-run = ["mise run deps update php"]
-
-[tasks."php:upgrade"]
-description = "Upgrade PHP dependencies to latest including breaking changes (composer update --with-all-dependencies)"
-run = ["mise run deps upgrade php"]
-
-[tasks."go:update"]
-description = "Update Go dependencies within major versions (go get -u=patch + go mod tidy)"
-run = ["mise run deps update go"]
-
-[tasks."go:upgrade"]
-description = "Upgrade Go dependencies to latest including breaking changes (go get -u + go mod tidy)"
-run = ["mise run deps upgrade go"]
-
-[tasks."java:update"]
-description = "Update Java dependencies within major versions (mvnw versions:use-next-versions)"
-run = ["mise run deps update java"]
-
-[tasks."java:upgrade"]
-description = "Upgrade Java dependencies to latest including breaking changes (mvnw versions:use-latest-releases)"
-run = ["mise run deps upgrade java"]
-
-[tasks."csharp:update"]
-description = "Update C# dependencies within major versions (dotnet outdated -u --version-lock Minor)"
-run = ["mise run deps update csharp"]
-
-[tasks."csharp:upgrade"]
-description = "Upgrade C# dependencies to latest including breaking changes (dotnet outdated -u)"
-run = ["mise run deps upgrade csharp"]
-
-[tasks."elixir:update"]
-description = "Update Elixir dependencies within major versions (mix deps.update --all)"
-run = ["mise run deps update elixir"]
-
-[tasks."elixir:upgrade"]
-description = "Upgrade Elixir dependencies to latest including breaking changes (mix hex.outdated + mix deps.update)"
-run = ["mise run deps upgrade elixir"]
-
-[tasks."dart:update"]
-description = "Update Dart dependencies within major versions (dart pub upgrade)"
-run = ["mise run deps update dart"]
-
-[tasks."dart:upgrade"]
-description = "Upgrade Dart dependencies to latest including breaking changes (dart pub upgrade --major-versions)"
-run = ["mise run deps upgrade dart"]
-
-[tasks."swift:update"]
-description = "Update Swift dependencies (swift package update; SPM has no conservative flag)"
-run = ["mise run deps update swift"]
-
-[tasks."swift:upgrade"]
-description = "Upgrade Swift dependencies (swift package update; SPM has no major-version flag)"
-run = ["mise run deps upgrade swift"]
-
-[tasks."kotlin-android:update"]
-description = "Update Kotlin/Android dependencies (skipped: ben-manes versions plugin incompatible with Gradle 9.x)"
-run = ["mise run deps update kotlin-android"]
-
-[tasks."kotlin-android:upgrade"]
-description = "Report Kotlin/Android dependency upgrades (skipped: ben-manes versions plugin incompatible with Gradle 9.x)"
-run = ["mise run deps upgrade kotlin-android"]
-
-[tasks."zig:update"]
-description = "Update Zig dependencies (re-fetch each URL pinned in build.zig.zon)"
-run = ["mise run deps update zig"]
-
-[tasks."zig:upgrade"]
-description = "Upgrade Zig dependencies (re-fetch each URL pinned in build.zig.zon; SemVer pinning is per-URL)"
-run = ["mise run deps upgrade zig"]
-
-[tasks."ruby:e2e"]
-description = "Build Ruby binding and run e2e/ruby fixture tests"
-run = "alef test --e2e --lang ruby"
-
-[tasks."php:e2e"]
-description = "Build PHP extension and run e2e/php fixture tests"
-run = "alef test --e2e --lang php"
-
-[tasks."go:e2e"]
-description = "Build FFI and run e2e/go fixture tests"
-run = "alef test --e2e --lang go"
-
-[tasks."java:e2e"]
-description = "Build FFI and run e2e/java fixture tests"
-run = "alef test --e2e --lang java"
-
-[tasks."csharp:e2e"]
-description = "Build FFI and run e2e/csharp fixture tests"
-run = "alef test --e2e --lang csharp"
-
-[tasks."elixir:e2e"]
-description = "Build Elixir NIF and run e2e/elixir fixture tests"
-run = "alef test --e2e --lang elixir"
-
-[tasks."wasm:e2e"]
-description = "Build WASM and run e2e/wasm fixture tests"
-run = "alef test --e2e --lang wasm"
-
-[tasks."r:e2e"]
-description = "Run e2e/r fixture tests"
-run = "alef test --e2e --lang r"
-
-[tasks."c:e2e"]
-description = "Build FFI and run e2e/c fixture tests"
-run = "alef test --e2e --lang c"
-
-[tasks."dart:e2e"]
-description = "Build Dart binding and run e2e/dart fixture tests"
-run = "alef test --e2e --lang dart"
-
-[tasks."swift:e2e"]
-description = "Build Swift bridge and run e2e/swift_e2e fixture tests"
-run = "alef test --e2e --lang swift"
-
-[tasks."zig:e2e"]
-description = "Build FFI and run e2e/zig fixture tests"
-run = "alef test --e2e --lang zig"
-
-[tasks."kotlin-android:e2e"]
-description = "Build JNI and run e2e/kotlin_android fixture tests (host JVM)"
-run = "alef test --e2e --lang kotlin_android"
