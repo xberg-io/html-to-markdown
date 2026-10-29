@@ -1,0 +1,24 @@
+# Versions follow the xberg-io/toolchains baseline named in toolchains.toml. Rust is pinned by
+# rust-toolchain.toml, and alef by alef_version in alef.toml, not here. ~keep
+[settings]
+lockfile = true
+lockfile_platforms = ["linux-x64", "linux-arm64", "macos-arm64", "macos-x64", "windows-x64"]
+
+[tools]
+python = "3.13.18"
+uv = "0.13.6"
+node = "26.12.1"
+pnpm = "12.11.2"
+go = "1.27.3"
+java = "temurin-25.0.5+8.0.LTS"
+ruby = "3.4.12"
+zig = "0.16.0"
+"github:Goldziher/poly" = "0.31.2"
+"github:Goldziher/ai-rulez" = "5.9.2"
+cargo-deny = "0.20.2"
+"github:taiki-e/cargo-llvm-cov" = "0.9.1"
+gh = "2.103.3"
+jq = "1.8.2"
+actionlint = "1.7.12"
+bats = "1.14.0"
+lychee = "0.24.2"
