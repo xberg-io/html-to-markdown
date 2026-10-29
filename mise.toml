@@ -181,11 +181,11 @@ run = "python3 scripts/check_binding_parse.py --self-test"
 
 [tasks.update]
 description = "Update all dependencies (within major versions)"
-run = ["alef update", "gau --update .", { task = "deps update" }]
+run = ["alef update", "gau --update .", "mise run deps update"]
 
 [tasks.upgrade]
 description = "Upgrade all dependencies to latest (including breaking changes)"
-run = ["alef update --latest", "gau --update .", { task = "deps upgrade" }]
+run = ["alef update --latest", "gau --update .", "mise run deps upgrade"]
 
 [tasks.audit]
 description = "Check dependencies for known vulnerabilities and license/advisory violations"
@@ -670,107 +670,107 @@ run = """\
 
 [tasks."rust:update"]
 description = "Update Rust dependencies within major versions (cargo update)"
-run = [{ task = "deps update rust" }]
+run = ["mise run deps update rust"]
 
 [tasks."rust:upgrade"]
 description = "Upgrade Rust dependencies to latest including breaking changes (cargo upgrade --incompatible + cargo update)"
-run = [{ task = "deps upgrade rust" }]
+run = ["mise run deps upgrade rust"]
 
 [tasks."python:update"]
 description = "Update Python dependencies within major versions (uv sync)"
-run = [{ task = "deps update python" }]
+run = ["mise run deps update python"]
 
 [tasks."python:upgrade"]
 description = "Upgrade Python dependencies to latest including breaking changes (uv sync --upgrade)"
-run = [{ task = "deps upgrade python" }]
+run = ["mise run deps upgrade python"]
 
 [tasks."node:update"]
 description = "Update Node.js dependencies within major versions (pnpm up)"
-run = [{ task = "deps update node" }]
+run = ["mise run deps update node"]
 
 [tasks."node:upgrade"]
 description = "Upgrade Node.js dependencies to latest including breaking changes (pnpm up --latest)"
-run = [{ task = "deps upgrade node" }]
+run = ["mise run deps upgrade node"]
 
 [tasks."ruby:update"]
 description = "Update Ruby dependencies within major versions (bundle update --conservative)"
-run = [{ task = "deps update ruby" }]
+run = ["mise run deps update ruby"]
 
 [tasks."ruby:upgrade"]
 description = "Upgrade Ruby dependencies to latest including breaking changes (bundle update)"
-run = [{ task = "deps upgrade ruby" }]
+run = ["mise run deps upgrade ruby"]
 
 [tasks."php:update"]
 description = "Update PHP dependencies within major versions (composer update --with-dependencies)"
-run = [{ task = "deps update php" }]
+run = ["mise run deps update php"]
 
 [tasks."php:upgrade"]
 description = "Upgrade PHP dependencies to latest including breaking changes (composer update --with-all-dependencies)"
-run = [{ task = "deps upgrade php" }]
+run = ["mise run deps upgrade php"]
 
 [tasks."go:update"]
 description = "Update Go dependencies within major versions (go get -u=patch + go mod tidy)"
-run = [{ task = "deps update go" }]
+run = ["mise run deps update go"]
 
 [tasks."go:upgrade"]
 description = "Upgrade Go dependencies to latest including breaking changes (go get -u + go mod tidy)"
-run = [{ task = "deps upgrade go" }]
+run = ["mise run deps upgrade go"]
 
 [tasks."java:update"]
 description = "Update Java dependencies within major versions (mvnw versions:use-next-versions)"
-run = [{ task = "deps update java" }]
+run = ["mise run deps update java"]
 
 [tasks."java:upgrade"]
 description = "Upgrade Java dependencies to latest including breaking changes (mvnw versions:use-latest-releases)"
-run = [{ task = "deps upgrade java" }]
+run = ["mise run deps upgrade java"]
 
 [tasks."csharp:update"]
 description = "Update C# dependencies within major versions (dotnet outdated -u --version-lock Minor)"
-run = [{ task = "deps update csharp" }]
+run = ["mise run deps update csharp"]
 
 [tasks."csharp:upgrade"]
 description = "Upgrade C# dependencies to latest including breaking changes (dotnet outdated -u)"
-run = [{ task = "deps upgrade csharp" }]
+run = ["mise run deps upgrade csharp"]
 
 [tasks."elixir:update"]
 description = "Update Elixir dependencies within major versions (mix deps.update --all)"
-run = [{ task = "deps update elixir" }]
+run = ["mise run deps update elixir"]
 
 [tasks."elixir:upgrade"]
 description = "Upgrade Elixir dependencies to latest including breaking changes (mix hex.outdated + mix deps.update)"
-run = [{ task = "deps upgrade elixir" }]
+run = ["mise run deps upgrade elixir"]
 
 [tasks."dart:update"]
 description = "Update Dart dependencies within major versions (dart pub upgrade)"
-run = [{ task = "deps update dart" }]
+run = ["mise run deps update dart"]
 
 [tasks."dart:upgrade"]
 description = "Upgrade Dart dependencies to latest including breaking changes (dart pub upgrade --major-versions)"
-run = [{ task = "deps upgrade dart" }]
+run = ["mise run deps upgrade dart"]
 
 [tasks."swift:update"]
 description = "Update Swift dependencies (swift package update; SPM has no conservative flag)"
-run = [{ task = "deps update swift" }]
+run = ["mise run deps update swift"]
 
 [tasks."swift:upgrade"]
 description = "Upgrade Swift dependencies (swift package update; SPM has no major-version flag)"
-run = [{ task = "deps upgrade swift" }]
+run = ["mise run deps upgrade swift"]
 
 [tasks."kotlin-android:update"]
 description = "Update Kotlin/Android dependencies (skipped: ben-manes versions plugin incompatible with Gradle 9.x)"
-run = [{ task = "deps update kotlin-android" }]
+run = ["mise run deps update kotlin-android"]
 
 [tasks."kotlin-android:upgrade"]
 description = "Report Kotlin/Android dependency upgrades (skipped: ben-manes versions plugin incompatible with Gradle 9.x)"
-run = [{ task = "deps upgrade kotlin-android" }]
+run = ["mise run deps upgrade kotlin-android"]
 
 [tasks."zig:update"]
 description = "Update Zig dependencies (re-fetch each URL pinned in build.zig.zon)"
-run = [{ task = "deps update zig" }]
+run = ["mise run deps update zig"]
 
 [tasks."zig:upgrade"]
 description = "Upgrade Zig dependencies (re-fetch each URL pinned in build.zig.zon; SemVer pinning is per-URL)"
-run = [{ task = "deps upgrade zig" }]
+run = ["mise run deps upgrade zig"]
 
 [tasks."ruby:e2e"]
 description = "Build Ruby binding and run e2e/ruby fixture tests"
