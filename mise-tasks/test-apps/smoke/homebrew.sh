@@ -3,7 +3,7 @@
 #MISE dir="{{config_root}}/test_apps/homebrew"
 set -euo pipefail
 
-version="$(cd ../.. && "$MISE_CONFIG_ROOT/mise-tasks/.lib/cargo-version.sh")"
+version="$(mise run -q version:show)"
 brew bundle install --file=Brewfile
 test "$("$(brew --prefix html-to-markdown)/bin/html-to-markdown" --version)" = "html-to-markdown $version"
 ffi_prefix="$(brew --prefix libhtml-to-markdown)"

@@ -27,16 +27,16 @@ bats = "1.14.0"
 lychee = "0.24.2"
 
 # ---- Shared task bodies ------------------------------------------------------------------------
-# Repository-neutral scripts under mise-tasks/.lib; this file supplies their repo specifics. ~keep
+# Shared tasks from the xberg-io/toolchains task library; this file supplies their repo specifics. ~keep
 
 [tasks."governance:hooks:install"]
 description = "Provision machine preferences and install reviewed AI governance hooks"
-file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.4.0/tasks/governance/hooks-install.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/governance/hooks-install.sh"
 
 [tasks.deps]
 description = "Update or upgrade one ecosystem's dependencies, or every ecosystem"
 hide = true
-file = "mise-tasks/.lib/deps.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/deps/refresh.sh"
 env.DEPS_LANGS = "rust python node ruby php go java csharp elixir dart swift kotlin-android zig"
 env.DEPS_RUST_MANIFESTS = """\
   packages/ruby/ext/html_to_markdown_rb/native/Cargo.toml \
@@ -48,17 +48,17 @@ env.DEPS_PHP_DIR = "crates/html-to-markdown-php/src"
 [tasks."alef:pin:check"]
 description = "Fail unless the alef on PATH is the clean release alef.toml pins"
 hide = true
-file = "mise-tasks/.lib/alef-pin-check.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/alef/pin-check.sh"
 
 [tasks."alef:regenerate"]
 description = "Regenerate every alef output that carries the version"
 hide = true
-file = "mise-tasks/.lib/alef-regenerate.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/alef/regenerate.sh"
 
 [tasks."alef:verify:strict"]
 description = "Run alef verify and fail on drifted frozen paths too"
 hide = true
-file = "mise-tasks/.lib/alef-verify-strict.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/alef/verify-strict.sh"
 
 # ---- Entry points ------------------------------------------------------------------------------
 
@@ -281,7 +281,7 @@ run = ["python3 scripts/sync_consumer_versions.py --check", { task = "version:sh
 
 [tasks."version:show"]
 description = "Show current version from Cargo.toml"
-file = "mise-tasks/.lib/cargo-version.sh"
+file = "https://raw.githubusercontent.com/xberg-io/toolchains/v1.5.0/tasks/version/cargo.sh"
 
 [tasks."version:bump:major"]
 description = "Bump major version (X.0.0) and sync"
