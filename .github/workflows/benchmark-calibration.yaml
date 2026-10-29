@@ -18,6 +18,9 @@ jobs:
     name: "Benchmark: Collect calibration campaign"
     runs-on: ubuntu-24.04
     timeout-minutes: 360
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
+      UV_PYTHON_PREFERENCE: only-system
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -27,8 +30,10 @@ jobs:
         with:
           cache-key-prefix: benchmark-calibration
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: uv
 
       - uses: xberg-io/actions/setup-python-env@v1
         with:
@@ -36,11 +41,11 @@ jobs:
           install-command: "uv sync --no-install-project --no-install-workspace"
 
       - name: Verify telemetry rejection controls
-        run: task bench:telemetry:test
+        run: mise run bench:telemetry:test
         shell: bash
 
       - name: Collect calibration captures
-        run: task bench:calibration:collect
+        run: mise run bench:calibration:collect
         shell: bash
 
       - name: Upload raw calibration campaign

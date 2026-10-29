@@ -84,28 +84,37 @@ jobs:
   release-scripts:
     name: Verify release helper regressions
     runs-on: ubuntu-latest
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
+      UV_PYTHON_PREFERENCE: only-system
     steps:
       - uses: actions/checkout@v7
       - uses: xberg-io/actions/setup-python-env@v1
         with:
           python-version: "3.13"
           install-command: "uv sync --no-install-project --no-install-workspace"
-      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: uv
       - name: Test release helpers
-        run: task test:release-scripts
+        run: mise run test:release-scripts
 
   quality-warnings:
     name: Reject quality warning regressions
     runs-on: ubuntu-latest
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: python
       - uses: Goldziher/poly@v0
         with:
           version: "0.31.2"
-      - run: task check:quality-warnings
+      - run: mise run check:quality-warnings
         env:
           QUALITY_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
 

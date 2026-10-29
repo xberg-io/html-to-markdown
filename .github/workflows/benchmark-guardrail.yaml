@@ -24,6 +24,8 @@ jobs:
     name: "Benchmark: Regression guardrail"
     runs-on: ubuntu-24.04
     timeout-minutes: 90
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -34,15 +36,17 @@ jobs:
         with:
           cache-key-prefix: benchmark-guardrail
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: jq
 
       - name: Build benchmark harness
-        run: task bench:build
+        run: mise run bench:build
         shell: bash
 
       - name: Capture with continuous quiet-runner telemetry
-        run: task bench:guardrail:collect
+        run: mise run bench:guardrail:collect
         shell: bash
 
       # ~keep Uploaded before the comparison and with always(), because the run this job produces
@@ -59,7 +63,7 @@ jobs:
             benchmark-guardrail/runs
           retention-days: 14
 
-      # ~keep ALLOW_HOST_MISMATCH is passed here and nowhere else. `ubuntu-24.04` is one label over
+      # ~keep --allow-host-mismatch is passed here and nowhere else. `ubuntu-24.04` is one label over
       # a mixed pool, and the calibration campaign is dispatch-only, so it can only be captured on
       # whichever host it drew. On a CPU other than the calibrated one no timing is scored, and the
       # flag lets that unscored run succeed with a "Benchmark timings not scored" warning on the
@@ -67,7 +71,7 @@ jobs:
       # flag, feature set, or runner class still hard-fails -- nor the fixture inventory, and on a
       # runner whose CPU matches the baseline it changes nothing, so a real regression still fails.
       - name: Compare against baseline (fails on regression beyond threshold)
-        run: task bench:compare ALLOW_HOST_MISMATCH=true
+        run: mise run bench:compare --allow-host-mismatch
         shell: bash
 
       - name: Cleanup Rust cache

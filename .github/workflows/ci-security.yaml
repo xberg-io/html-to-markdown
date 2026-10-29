@@ -34,6 +34,8 @@ jobs:
     name: "Audit: Rust dependencies (cargo-deny)"
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -43,31 +45,33 @@ jobs:
         with:
           cache-key-prefix: security-rust-audit
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
-
-      - name: Install cargo-deny
-        run: cargo install cargo-deny --locked
-        shell: bash
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: cargo-deny
 
       - name: cargo deny check
-        run: task rust:audit
+        run: mise run rust:audit
         shell: bash
 
   node-audit:
     name: "Audit: Node.js dependencies (pnpm audit)"
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: pnpm
 
       - name: Setup Node.js workspace
         uses: xberg-io/actions/setup-node-workspace@v1
 
       - name: pnpm audit
-        run: task node:audit
+        run: mise run node:audit
         shell: bash

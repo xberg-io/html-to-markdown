@@ -28,18 +28,22 @@ jobs:
     name: "Verify: snippet coverage"
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: jq
 
       - name: Install alef
         uses: xberg-io/actions/install-alef@v1
 
       - name: Fail on snippet coverage gaps
-        run: task docs:snippets:gaps
+        run: mise run docs:snippets:gaps
         shell: bash
 
   docs:

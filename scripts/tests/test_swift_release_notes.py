@@ -23,7 +23,6 @@ def test_workflow_preserves_notes_and_updates_swift_idempotently(tmp_path: Path,
     script = next(step["run"] for step in steps if step.get("name") == "Update release notes with artifact URL")
     tooling = tmp_path / ".release-tooling"
     shutil.copytree(ROOT / "scripts", tooling / "scripts")
-    shutil.copy(ROOT / "Taskfile.yaml", tooling / "Taskfile.yaml")
     body = tmp_path / "body.md"
     body.write_text(existing)
     executable = tmp_path / "gh"

@@ -65,6 +65,8 @@ jobs:
               - "Cargo.toml"
               - "Cargo.lock"
               - "rust-toolchain.toml"
+              - "mise.toml"
+              - "mise.lock"
               - ".cargo/config.toml"
               - "fixtures/**"
               - "alef.toml"
@@ -195,6 +197,8 @@ jobs:
     if: needs.changes.outputs.run-build-python == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
+    env:
+      UV_PYTHON_PREFERENCE: only-system
     strategy:
       fail-fast: false
       matrix:
@@ -202,8 +206,7 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
-      - { "name": "Install uv", "uses": "astral-sh/setup-uv@v10.3.2", "with": { "enable-cache": true } }
+      - { "name": "Install uv", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "uv" } }
       - {
           "name": "Set up Python",
           "uses": "actions/setup-python@v7",
@@ -247,6 +250,8 @@ jobs:
     if: needs.changes.outputs.run-build-node == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     strategy:
       fail-fast: false
       matrix:
@@ -257,7 +262,6 @@ jobs:
             runtime: bun
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -274,6 +278,12 @@ jobs:
           "with": { "bun-version": "latest" },
         }
       - {
+          "name": "Setup mise",
+          "if": "matrix.runtime == 'bun'",
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "install-args": "jq" },
+        }
+      - {
           "name": "Build NAPI-RS Bindings (Node.js)",
           "if": "matrix.runtime == 'node'",
           "uses": "xberg-io/actions/build-node-napi@v1",
@@ -282,13 +292,13 @@ jobs:
       - {
           "name": "Install workspace dependencies (Bun)",
           "if": "matrix.runtime == 'bun'",
-          "run": "task node:install:bun",
+          "run": "mise run node:install:bun",
           "shell": "bash",
         }
       - {
           "name": "Build NAPI-RS Bindings (Bun)",
           "if": "matrix.runtime == 'bun'",
-          "run": "task node:build:bun",
+          "run": "mise run node:build:bun",
           "shell": "bash",
         }
       - {
@@ -325,7 +335,7 @@ jobs:
           "uses": "xberg-io/actions/setup-node-workspace@v1",
           "with": { "node-version": "24" },
         }
-      - { "name": "Setup Zig", "uses": "xberg-io/actions/setup-zig@v1", "with": { "version": "0.16.0" } }
+      - { "name": "Setup Zig", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "zig" } }
       - {
           "name": "Install cargo-zigbuild",
           "shell": "bash",
@@ -510,7 +520,6 @@ jobs:
         os: [ubuntu-latest, macos-26, windows-latest]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -567,6 +576,8 @@ jobs:
     if: always() && !cancelled() && needs.changes.outputs.run-test-python == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
+    env:
+      UV_PYTHON_PREFERENCE: only-system
     strategy:
       fail-fast: false
       matrix:
@@ -574,8 +585,7 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
-      - { "name": "Install uv", "uses": "astral-sh/setup-uv@v10.3.2", "with": { "enable-cache": true } }
+      - { "name": "Install uv", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "uv" } }
       - {
           "name": "Set up Python",
           "uses": "actions/setup-python@v7",
@@ -613,6 +623,8 @@ jobs:
     if: always() && !cancelled() && needs.changes.outputs.run-test-node == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     strategy:
       fail-fast: false
       matrix:
@@ -623,7 +635,6 @@ jobs:
             runtime: bun
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - {
           "name": "Setup Node.js workspace",
@@ -636,6 +647,12 @@ jobs:
           "with": { "bun-version": "latest" },
         }
       - {
+          "name": "Setup mise",
+          "if": "matrix.runtime == 'bun'",
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "install-args": "jq" },
+        }
+      - {
           "name": "Build NAPI-RS Bindings (Node.js)",
           "if": "matrix.runtime == 'node'",
           "uses": "xberg-io/actions/build-node-napi@v1",
@@ -644,13 +661,13 @@ jobs:
       - {
           "name": "Install workspace dependencies (Bun)",
           "if": "matrix.runtime == 'bun'",
-          "run": "task node:install:bun",
+          "run": "mise run node:install:bun",
           "shell": "bash",
         }
       - {
           "name": "Build NAPI-RS Bindings (Bun)",
           "if": "matrix.runtime == 'bun'",
-          "run": "task node:build:bun",
+          "run": "mise run node:build:bun",
           "shell": "bash",
         }
       - { "name": "Install alef", "if": "matrix.runtime == 'node'", "uses": "xberg-io/actions/install-alef@v1" }
@@ -693,7 +710,6 @@ jobs:
         os: [ubuntu-latest, macos-26, windows-latest]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -766,7 +782,6 @@ jobs:
             "java-version": "${{ matrix.java }}",
           },
         }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Install alef", "if": "matrix.os != 'windows-latest'", "uses": "xberg-io/actions/install-alef@v1" }
       - {
           "name": "Run E2E tests (Linux + macOS)",

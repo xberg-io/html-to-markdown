@@ -36,8 +36,8 @@ def test_e2e_result_reports_for_every_main_push() -> None:
     assert not any(event.startswith("pull_request") for event in workflow["on"])
 
 
-def test_lint_runs_the_quality_warning_gate_through_task() -> None:
+def test_lint_runs_the_quality_warning_gate_through_mise() -> None:
     workflow = _workflow("ci-lint.yaml")
     job = workflow["jobs"]["quality-warnings"]
 
-    assert [step["run"] for step in job["steps"] if "run" in step] == ["task check:quality-warnings"]
+    assert [step["run"] for step in job["steps"] if "run" in step] == ["mise run check:quality-warnings"]

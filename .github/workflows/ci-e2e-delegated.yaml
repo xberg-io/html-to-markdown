@@ -185,7 +185,6 @@ jobs:
           "shell": "pwsh",
           "run": "../../scripts/ci/ruby/run-rspec-windows.ps1",
         }
-      - { "name": "Install Task", "if": "runner.os != 'Windows'", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Install alef", "if": "runner.os != 'Windows'", "uses": "xberg-io/actions/install-alef@v1" }
       - {
           "name": "Run E2E tests (Unix only)",
@@ -225,6 +224,8 @@ jobs:
     if: inputs.task == 'e2e-freshness'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       - {
@@ -243,7 +244,7 @@ jobs:
           "uses": "erlef/setup-beam@v1",
           "with": { "elixir-version": "1.19", "otp-version": "28.1" },
         }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
+      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "jq" } }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       # ~keep Alef runs Dart's formatter during generation; without it the freshness check reports formatting drift.
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }
@@ -262,7 +263,7 @@ jobs:
       # ~keep Alef runs `dart format` on the generated suite; omitting Dart makes freshness
       # compare unformatted output with committed formatted files.
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }
-      - { "name": "Regenerate e2e suites", "run": "task e2e:generate", "shell": "bash" }
+      - { "name": "Regenerate e2e suites", "run": "mise run e2e:generate", "shell": "bash" }
       - name: Fail if generated e2e/ drifted from committed output
         # ~keep `git diff` reports only tracked paths, so a regeneration that ADDS a new suite
         # left the gate at exit 0 — it could not fail on the defect it exists to catch. Use
@@ -270,7 +271,7 @@ jobs:
         run: |
           drift="$(git status --porcelain --untracked-files=all -- e2e/)"
           if [ -n "$drift" ]; then
-            echo "::error::e2e/ is stale — regenerating from fixtures/ changed the tree. Run 'task e2e:generate' and commit the result."
+            echo "::error::e2e/ is stale — regenerating from fixtures/ changed the tree. Run 'mise run e2e:generate' and commit the result."
             printf '%s\n' "$drift"
             git diff -- e2e/
             exit 1
@@ -395,7 +396,6 @@ jobs:
           "shell": "bash",
           "env": { "EXTENSION_PATH": "${{ steps.build-php-extension.outputs.extension-path }}" },
         }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - {
           "name": "Run E2E tests",
@@ -411,11 +411,7 @@ jobs:
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
-      - {
-          "name": "Setup Go",
-          "uses": "actions/setup-go@v7",
-          "with": { "go-version": "${{ env.GO_VERSION }}", "check-latest": true },
-        }
+      - { "name": "Setup Go", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "go" } }
       - {
           "name": "Build FFI library",
           "run": "cargo build --release --locked -p html-to-markdown-ffi",
@@ -442,7 +438,6 @@ jobs:
             echo "=== Linting $module ==="
             (cd "$module" && "${{ github.workspace }}/scripts/ci/go/run-golangci-lint.sh")
           done
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - { "name": "Run E2E tests", "run": "alef test --e2e --lang go", "shell": "bash" }
   test-elixir:
@@ -477,7 +472,6 @@ jobs:
           "run": "../../scripts/ci/elixir/run-credo.sh",
           "shell": "bash",
         }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - { "name": "Run E2E tests", "run": "alef test --e2e --lang elixir", "shell": "bash" }
   test-r:
@@ -485,6 +479,8 @@ jobs:
     if: inputs.task == 'test-r'
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       - {
@@ -505,8 +501,8 @@ jobs:
           "run": "../../scripts/ci/r/run-lintr.sh",
           "shell": "bash",
         }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
-      - { "name": "Verify R reference pages are fresh", "run": "task r:docs:verify", "shell": "bash" }
+      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "jq" } }
+      - { "name": "Verify R reference pages are fresh", "run": "mise run r:docs:verify", "shell": "bash" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - { "name": "Run E2E tests", "run": "alef test --e2e --lang r", "shell": "bash" }
   test-c-ffi-windows:
@@ -645,7 +641,6 @@ jobs:
           "uses": "actions/setup-java@v6",
           "with": { "distribution": "temurin", "java-version": "17" },
         }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - {
           "name": "Compile and test Kotlin Android binding (host JVM)",
@@ -664,7 +659,6 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1", "with": { "cache-key-prefix": "swift" } }
       - { "name": "Setup Swift", "uses": "xberg-io/actions/setup-swift@v1", "with": { "version": "6.0" } }
       - { "name": "Setup PHP", "uses": "shivammathur/setup-php@v2", "with": { "php-version": "8.3" } }
@@ -678,7 +672,6 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1", "with": { "cache-key-prefix": "dart" } }
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
@@ -691,9 +684,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
-      - { "name": "Install Task", "uses": "xberg-io/actions/install-task@v1" }
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1", "with": { "cache-key-prefix": "zig" } }
-      - { "name": "Setup Zig", "uses": "xberg-io/actions/setup-zig@v1", "with": { "version": "0.16.0" } }
+      - { "name": "Setup Zig", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "zig" } }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - { "name": "Run E2E tests", "run": "alef test --e2e --lang zig", "shell": "bash" }
       - { "name": "Cleanup Rust cache", "if": "always()", "uses": "xberg-io/actions/cleanup-rust-cache@v1" }

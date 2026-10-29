@@ -903,9 +903,10 @@ jobs:
           submodules: recursive
 
       - uses: xberg-io/actions/setup-rust@v1
-      - uses: actions/setup-python@v7
+      - uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.13"
+          install-args: python
+          config-ref: ${{ github.sha }}
 
       - name: Build and bundle CLI binary
         shell: bash
@@ -1070,9 +1071,10 @@ jobs:
       # setup steps.
       - name: Setup Zig (musl cross-compile)
         if: matrix.use_zig_cross
-        uses: xberg-io/actions/setup-zig@v1
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          version: "0.16.0"
+          install-args: zig
+          config-ref: ${{ github.sha }}
 
       - name: Install cargo-zigbuild (musl cross-compile)
         if: matrix.use_zig_cross
@@ -3203,8 +3205,6 @@ jobs:
             sleep 5
           done
 
-      - uses: xberg-io/actions/install-task@v1
-
       - name: Update release notes with artifact URL
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         env:
@@ -3212,7 +3212,7 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           CHECKSUM=$(cat swift-checksums/*.checksum | tr -d '[:space:]')
-          task --taskfile .release-tooling/scripts/ci/swift/Taskfile.yaml notes -- "${CHECKSUM}" "${VERSION}"
+          python3 .release-tooling/scripts/ci/swift/update_release_notes.py "${CHECKSUM}" "${VERSION}"
 
   build-r-package:
     name: Build R source tarball
@@ -3462,7 +3462,7 @@ jobs:
           expected="${VERSION%%-dryrun-*}"
           if [[ "${actual}" != "${expected}" ]]; then
             echo "::error::plugin/package.json declares ${actual} but the release is ${expected};" \
-              "regenerate the plugin bundle (task version:sync) before tagging"
+              "regenerate the plugin bundle (mise run version:sync) before tagging"
             exit 1
           fi
           echo "plugin/package.json matches the release at ${expected}"
@@ -3524,6 +3524,8 @@ jobs:
       && needs.validate-versions.result == 'success' }}
     runs-on: ubuntu-latest
     environment: pypi
+    env:
+      UV_PYTHON_PREFERENCE: only-system
     permissions:
       contents: read
       id-token: write
@@ -3539,10 +3541,11 @@ jobs:
         uses: xberg-io/actions/verify-ai-rulez-plugin@v1
         with:
           config-directory: .ai-rulez
-      - name: Install uv
-        uses: astral-sh/setup-uv@v10.3.2
+      - name: Install Python and uv
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          python-version: "3.13"
+          install-args: python uv
+          config-ref: ${{ github.sha }}
       # ~keep Same rendered-bundle gap as the npm job, but silent: this job had no guard at
       # all, and publish-pypi's skip-existing is not one — a stale
       # plugin/.hermes/package/pyproject.toml rebuilds an already-published wheel version,
@@ -3565,7 +3568,7 @@ jobs:
             | sed -E 's/-alpha\.?([0-9]+)$/a\1/; s/-beta\.?([0-9]+)$/b\1/; s/-([A-Za-z]+)\.?([0-9]+)$/\1\2/')"
           if [[ "${actual}" != "${expected}" ]]; then
             echo "::error::${pyproject} declares ${actual} but the release is ${expected};" \
-              "regenerate the plugin bundle (task version:sync) before tagging"
+              "regenerate the plugin bundle (mise run version:sync) before tagging"
             exit 1
           fi
           echo "${pyproject} matches the release at ${expected}"

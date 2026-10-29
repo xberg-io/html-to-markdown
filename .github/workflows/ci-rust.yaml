@@ -14,8 +14,9 @@ on:
       - "e2e/go/**"
       - "packages/go/go.mod"
       - "packages/go/go.sum"
-      - ".task/languages/go.yml"
-      - ".task/languages/rust.yml"
+      - "mise.toml"
+      - "mise.lock"
+      - "mise-tasks/**"
       - "Cargo.toml"
       - "Cargo.lock"
       - "rust-toolchain.toml"
@@ -39,6 +40,7 @@ env:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: short
   BUILD_PROFILE: "ci"
+  MISE_TASK_RUN_AUTO_INSTALL: "false"
 
 permissions:
   contents: read
@@ -57,15 +59,17 @@ jobs:
         with:
           components: rustfmt, clippy, llvm-tools-preview
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: jq
 
       - name: Check Rust Formatting
-        run: task rust:lint:check
+        run: mise run rust:lint:check
         shell: bash
 
       - name: Run Clippy
-        run: task rust:lint:check
+        run: mise run rust:lint:check
         shell: bash
 
       - name: Check feature flags (html-to-markdown)
@@ -107,17 +111,13 @@ jobs:
         with:
           version: "0.31.2"
 
-      - name: Setup Go for module freshness
-        uses: actions/setup-go@v7
+      - name: Setup mise for module freshness
+        uses: xberg-io/actions/setup-mise@v1
         with:
-          go-version-file: e2e/go/go.mod
-          cache-dependency-path: e2e/go/go.sum
-
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+          install-args: go python
 
       - name: Verify Go E2E module freshness
-        run: task go:manifest:verify
+        run: mise run go:manifest:verify
 
       # ~keep Enforcement is the DEFAULT: `alef verify` returns a failure status on drift, and
       # `--report-only` is the opt-out — never add it here. The `--exit-code` flag this step
@@ -139,28 +139,26 @@ jobs:
         uses: actions/checkout@v7
         id: checkout
 
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.13"
-
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
         with:
           components: rustfmt, clippy, llvm-tools-preview
           cache-key-prefix: rust-tests-${{ matrix.os }}
+          install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: python "github:taiki-e/cargo-llvm-cov"
 
       - name: Run Rust Tests
         env:
           RUST_BACKTRACE: full
-        run: task rust:test:ci
+        run: mise run rust:test:ci
         shell: bash
 
       - name: Run E2E Tests
-        run: task rust:e2e:test
+        run: mise run rust:e2e:test
         shell: bash
 
       - name: Cleanup Rust cache
@@ -180,7 +178,9 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: closing-tag-complexity-${{ matrix.os }}
-      - uses: xberg-io/actions/install-task@v1
+      - uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: jq
       # ~keep Issue #796 requires repeated measurements on all three runner operating systems.
       # Run the unchanged ratio gate ten times, stopping on the first failure.
       - name: Repeat the complexity regression ten times
@@ -188,7 +188,7 @@ jobs:
         run: |
           for attempt in $(seq 1 10); do
             echo "Complexity run ${attempt}/10"
-            task rust:test:complexity
+            mise run rust:test:complexity
           done
 
   rust-coverage:
@@ -203,12 +203,15 @@ jobs:
         uses: xberg-io/actions/setup-rust@v1
         with:
           components: rustfmt, clippy, llvm-tools-preview
+          install-llvm-cov: "false"
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: "github:taiki-e/cargo-llvm-cov"
 
       - name: Generate Rust Coverage
-        run: task rust:coverage:check
+        run: mise run rust:coverage:check
         shell: bash
 
       - name: Upload Coverage Artifacts
@@ -239,11 +242,13 @@ jobs:
         with:
           cache-key-prefix: benchmark-oracle
 
-      - name: Install Task
-        uses: xberg-io/actions/install-task@v1
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: jq
 
       - name: Verify output snapshots
-        run: task bench:oracle
+        run: mise run bench:oracle
         shell: bash
 
       - name: Cleanup Rust cache
