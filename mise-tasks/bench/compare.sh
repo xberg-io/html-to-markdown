@@ -13,4 +13,4 @@ extra=()
 if [ "${usage_allow_host_mismatch:-false}" = true ]; then
   extra=(--allow-host-mismatch)
 fi
-cargo run --release -p html-to-markdown-bench -- compare --results "$usage_results_file" "${extra[@]}"
+cargo run --release -p html-to-markdown-bench -- compare --results "$usage_results_file" ${extra[@]+"${extra[@]}"}

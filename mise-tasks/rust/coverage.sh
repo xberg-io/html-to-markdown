@@ -10,4 +10,4 @@ if [ -n "${usage_fail_under_lines:-}" ]; then
 fi
 RUST_LOG="${RUST_LOG:-info}" cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py \
   --exclude html-to-markdown-php --exclude benchmark-harness --exclude html-to-markdown-wasm-wasmtime-tests \
-  --lcov --output-path rust-coverage.lcov "${floor[@]}"
+  --lcov --output-path rust-coverage.lcov ${floor[@]+"${floor[@]}"}

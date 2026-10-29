@@ -13,4 +13,4 @@ python3 scripts/benchmark_telemetry.py validate \
   --telemetry "$usage_runs_dir/../logs/telemetry.jsonl" --runs-dir "$usage_runs_dir" --count 40
 cargo run --release -p html-to-markdown-bench -- calibrate --runs-dir "$usage_runs_dir" \
   --baseline tools/benchmark-harness/baselines/baseline.json \
-  --guardrails tools/benchmark-harness/guardrails.json "${extra[@]}"
+  --guardrails tools/benchmark-harness/guardrails.json ${extra[@]+"${extra[@]}"}

@@ -23,27 +23,27 @@ run = [
 
 ["test-apps:smoke:python"]
 description = "Smoke test Python package from PyPI"
-dir = "test_apps/python"
+dir = "{{config_root}}/test_apps/python"
 run = ["uv sync --no-install-project --no-install-workspace", "uv run --no-sync pytest tests/test_smoke.py -v"]
 
 ["test-apps:smoke:node"]
 description = "Smoke test Node package from npm"
-dir = "test_apps/node"
+dir = "{{config_root}}/test_apps/node"
 run = ["pnpm install", "pnpm exec vitest run tests/smoke.test.ts"]
 
 ["test-apps:smoke:ruby"]
 description = "Smoke test Ruby gem from RubyGems"
-dir = "test_apps/ruby"
+dir = "{{config_root}}/test_apps/ruby"
 run = ["bundle install", "bundle exec rspec spec/smoke_spec.rb"]
 
 ["test-apps:smoke:php"]
 description = "Smoke test PHP package from Packagist"
-dir = "test_apps/php"
+dir = "{{config_root}}/test_apps/php"
 run = ["bash install.sh", "composer install", "vendor/bin/phpunit tests/SmokeTest.php"]
 
 ["test-apps:smoke:go"]
 description = "Smoke test Go package from pkg.go.dev"
-dir = "test_apps/go"
+dir = "{{config_root}}/test_apps/go"
 run = [
   "go mod download github.com/xberg-io/html-to-markdown/packages/go/v3",
   "bash ./download_ffi.sh",
@@ -52,23 +52,23 @@ run = [
 
 ["test-apps:smoke:java"]
 description = "Smoke test Java package from Maven Central"
-dir = "test_apps/java"
+dir = "{{config_root}}/test_apps/java"
 run = ["./mvnw clean install -DskipTests", "./mvnw test -Dtest=SmokeTest"]
 run_windows = ["./mvnw.cmd clean install -DskipTests", "./mvnw.cmd test -Dtest=SmokeTest"]
 
 ["test-apps:smoke:csharp"]
 description = "Smoke test C# package from NuGet"
-dir = "test_apps/csharp"
+dir = "{{config_root}}/test_apps/csharp"
 run = ["dotnet restore", "dotnet test --filter FullyQualifiedName~SmokeTest"]
 
 ["test-apps:smoke:elixir"]
 description = "Smoke test Elixir package from Hex.pm"
-dir = "test_apps/elixir"
+dir = "{{config_root}}/test_apps/elixir"
 run = ["mix deps.get", "mix test test/smoke_test.exs"]
 
 ["test-apps:smoke:r"]
 description = "Smoke test R package"
-dir = "test_apps/r"
+dir = "{{config_root}}/test_apps/r"
 run = [
   "Rscript install.R",
   "Rscript -e \"library(testthat); library(htmltomarkdown); test_file('tests/test_smoke.R')\"",
@@ -76,27 +76,27 @@ run = [
 
 ["test-apps:smoke:bun"]
 description = "Smoke test Node package from npm under Bun"
-dir = "test_apps/bun"
+dir = "{{config_root}}/test_apps/bun"
 run = ["bun install", "bun test smoke.test.ts"]
 
 ["test-apps:smoke:wasm"]
 description = "Smoke test WASM package from npm"
-dir = "test_apps/wasm"
+dir = "{{config_root}}/test_apps/wasm"
 run = ["pnpm install", "pnpm exec vitest run tests/smoke.test.ts"]
 
 ["test-apps:smoke:rust"]
 description = "Smoke test Rust crate from crates.io"
-dir = "test_apps/rust"
+dir = "{{config_root}}/test_apps/rust"
 run = "cargo test --test smoke_test"
 
 ["test-apps:smoke:c"]
 description = "Smoke test C FFI from GitHub release tarballs"
-dir = "test_apps/c"
+dir = "{{config_root}}/test_apps/c"
 run = "make test"
 
 ["test-apps:smoke:php_ext"]
 description = "Smoke test PHP native extension installed via PIE"
-dir = "test_apps/php_ext"
+dir = "{{config_root}}/test_apps/php_ext"
 run = "./run_tests.sh"
 
 ["test-apps:test"]
@@ -119,63 +119,63 @@ run = [
 
 ["test-apps:test:python"]
 description = "Comprehensive tests for Python package"
-dir = "test_apps/python"
+dir = "{{config_root}}/test_apps/python"
 run = ["uv sync --no-install-project --no-install-workspace", "uv run --no-sync pytest tests/test_conversion.py -v"]
 
 ["test-apps:test:node"]
 description = "Comprehensive tests for Node package"
-dir = "test_apps/node"
+dir = "{{config_root}}/test_apps/node"
 run = ["pnpm install", "pnpm test"]
 
 ["test-apps:test:ruby"]
 description = "Comprehensive tests for Ruby gem"
-dir = "test_apps/ruby"
+dir = "{{config_root}}/test_apps/ruby"
 run = ["bundle install", "bundle exec rspec spec/conversion_spec.rb"]
 
 ["test-apps:test:php"]
 description = "Comprehensive tests for PHP package"
-dir = "test_apps/php"
+dir = "{{config_root}}/test_apps/php"
 run = ["bash install.sh", "composer install", "vendor/bin/phpunit tests"]
 
 ["test-apps:test:go"]
 description = "Comprehensive tests for Go package"
-dir = "test_apps/go"
+dir = "{{config_root}}/test_apps/go"
 run = ["go mod tidy", "go test -v -run Test_"]
 
 ["test-apps:test:java"]
 description = "Comprehensive tests for Java package"
-dir = "test_apps/java"
+dir = "{{config_root}}/test_apps/java"
 run = "./mvnw test -Dtest=ConversionTest"
 run_windows = "./mvnw.cmd test -Dtest=ConversionTest"
 
 ["test-apps:test:csharp"]
 description = "Comprehensive tests for C# package"
-dir = "test_apps/csharp"
+dir = "{{config_root}}/test_apps/csharp"
 run = "dotnet test --filter FullyQualifiedName~ConversionTests"
 
 ["test-apps:test:elixir"]
 description = "Comprehensive tests for Elixir package"
-dir = "test_apps/elixir"
+dir = "{{config_root}}/test_apps/elixir"
 run = ["mix deps.get", "mix test test/conversion_test.exs"]
 
 ["test-apps:test:r"]
 description = "Comprehensive tests for R package"
-dir = "test_apps/r"
+dir = "{{config_root}}/test_apps/r"
 run = ["Rscript install.R", "Rscript run_tests.R"]
 
 ["test-apps:test:swift"]
 description = "Comprehensive tests for Swift package"
-dir = "test_apps/swift_e2e"
+dir = "{{config_root}}/test_apps/swift_e2e"
 run = "swift test"
 
 ["test-apps:test:dart"]
 description = "Comprehensive tests for Dart package"
-dir = "test_apps/dart"
+dir = "{{config_root}}/test_apps/dart"
 run = ["dart pub get", "dart test"]
 
 ["test-apps:test:kotlin-android"]
 description = "Comprehensive tests for Kotlin/Android AAR (host JVM tests)"
-dir = "test_apps/kotlin_android"
+dir = "{{config_root}}/test_apps/kotlin_android"
 run = "./gradlew test"
 
 ["test-apps:comprehensive"]
