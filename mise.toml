@@ -72,10 +72,6 @@ run = ["mise install", { task = "rust:install" }, "alef setup", { task = "govern
 
 [tasks.build]
 description = "Build Rust core library only"
-run = [{ task = "build:core" }]
-
-[tasks."build:core"]
-description = "Build Rust core library only"
 run = [{ task = "rust:build" }]
 
 [tasks.test]
@@ -102,10 +98,6 @@ run = [{ task = "rust:test:ci" }, "alef test --coverage"]
 description = "Lint all code via poly"
 run = "poly lint ."
 
-[tasks."lint:check"]
-description = "Lint all code WITHOUT auto-fix (check-only)"
-run = "poly lint ."
-
 [tasks.format]
 description = "Format all code via poly"
 run = "poly fmt --fix ."
@@ -116,7 +108,7 @@ run = "poly fmt --check ."
 
 [tasks.check]
 description = "Run all checks (format + lint, no modifications)"
-run = [{ task = "format:check" }, { task = "lint:check" }, { task = "node:verify-loader" }]
+run = [{ task = "format:check" }, { task = "lint" }, { task = "node:verify-loader" }]
 
 [tasks."check:ffi-symbols:known"]
 description = "Diff exported htm_* FFI symbols against the symbols bindings call, treating the known-missing allowlist as non-blocking"
@@ -133,10 +125,6 @@ run = ["alef update", "gau --update .", "mise run deps update"]
 [tasks.upgrade]
 description = "Upgrade all dependencies to latest (including breaking changes)"
 run = ["alef update --latest", "gau --update .", "mise run deps upgrade"]
-
-[tasks."cov:all"]
-description = "Generate coverage for all languages"
-run = [{ task = "rust:test:ci" }, "alef test --coverage"]
 
 [tasks.clean]
 description = "Remove build artifacts across all languages"
@@ -213,10 +201,6 @@ run = ["alef sync-versions --bump minor", { task = "version:sync" }]
 [tasks."version:bump:patch"]
 description = "Bump patch version (0.0.X) and sync"
 run = ["alef sync-versions --bump patch", { task = "version:sync" }]
-
-[tasks."versions:sync"]
-description = "Synchronize version from Cargo.toml to all package manifests"
-run = [{ task = "version:sync" }]
 
 [tasks."publish:validate"]
 description = "Validate publish manifests are consistent"
@@ -403,7 +387,7 @@ run = [
   "node --test crates/html-to-markdown-node/scripts/loader-errors.test.mjs",
 ]
 
-[tasks."node:e2e"]
+[tasks."node:e2e:test"]
 description = "Build Node binding and run e2e/node fixture tests"
 run = ["alef test --e2e --lang node", { task = "node:verify-esm" }]
 

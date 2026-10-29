@@ -177,7 +177,3 @@ run = ["dart pub get", "dart test"]
 description = "Comprehensive tests for Kotlin/Android AAR (host JVM tests)"
 dir = "{{config_root}}/test_apps/kotlin_android"
 run = "./gradlew test"
-
-["test-apps:comprehensive"]
-description = "Run all test_app comprehensive tests (alias for test-apps:test)"
-run = [{ task = "test-apps:test" }]

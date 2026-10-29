@@ -363,7 +363,7 @@ version = "2.18.0"
 **Usage**:
 
 ```bash
-mise run versions:sync  # Updates all manifests including test_apps
+mise run version:sync  # Updates all manifests including test_apps
 ```
 
 ### Version Constraints
@@ -666,10 +666,10 @@ mix test
 
 **Problem**: Tests pass locally but fail in CI with version errors
 
-**Solution**: Run `mise run versions:sync` to ensure all test_apps manifests use correct version:
+**Solution**: Run `mise run version:sync` to ensure all test_apps manifests use correct version:
 
 ```bash
-mise run versions:sync
+mise run version:sync
 git diff tests/test_apps/  # Review changes
 ```
 
