@@ -24,8 +24,6 @@ env:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: short
   BUILD_PROFILE: "ci"
-  GO_VERSION: "1.26.0"
-  GO_TOOLCHAIN: "go1.26.0"
   GOLANGCI_LINT_VERSION: "latest"
 
 permissions:
@@ -224,8 +222,6 @@ jobs:
     if: inputs.task == 'e2e-freshness'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
-    env:
-      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       - {
@@ -244,7 +240,7 @@ jobs:
           "uses": "erlef/setup-beam@v1",
           "with": { "elixir-version": "1.19", "otp-version": "28.1" },
         }
-      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "jq" } }
+      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install": "false" } }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       # ~keep Alef runs Dart's formatter during generation; without it the freshness check reports formatting drift.
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }
@@ -426,7 +422,6 @@ jobs:
       - {
           "name": "Install golangci-lint",
           "if": "steps.set-modules.outputs.modules != '[]'",
-          "env": { "GOTOOLCHAIN": "${{ env.GO_TOOLCHAIN }}" },
           "run": "scripts/ci/go/install-golangci-lint.sh",
           "shell": "bash",
         }
@@ -479,8 +474,6 @@ jobs:
     if: inputs.task == 'test-r'
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    env:
-      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       - {
@@ -501,7 +494,7 @@ jobs:
           "run": "../../scripts/ci/r/run-lintr.sh",
           "shell": "bash",
         }
-      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "jq" } }
+      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install": "false" } }
       - { "name": "Verify R reference pages are fresh", "run": "mise run r:docs:verify", "shell": "bash" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - { "name": "Run E2E tests", "run": "alef test --e2e --lang r", "shell": "bash" }

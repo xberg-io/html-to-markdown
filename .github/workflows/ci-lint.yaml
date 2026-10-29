@@ -85,7 +85,6 @@ jobs:
     name: Verify release helper regressions
     runs-on: ubuntu-latest
     env:
-      MISE_TASK_RUN_AUTO_INSTALL: "false"
       UV_PYTHON_PREFERENCE: only-system
     steps:
       - uses: actions/checkout@v7
@@ -102,8 +101,6 @@ jobs:
   quality-warnings:
     name: Reject quality warning regressions
     runs-on: ubuntu-latest
-    env:
-      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - uses: actions/checkout@v7
         with:

@@ -40,7 +40,6 @@ env:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: short
   BUILD_PROFILE: "ci"
-  MISE_TASK_RUN_AUTO_INSTALL: "false"
 
 permissions:
   contents: read
@@ -62,10 +61,10 @@ jobs:
       - name: Setup mise
         uses: xberg-io/actions/setup-mise@v1
         with:
-          install-args: jq
+          install: "false"
 
       - name: Check Rust Formatting
-        run: mise run rust:lint:check
+        run: mise run rust:format:check
         shell: bash
 
       - name: Run Clippy
@@ -149,7 +148,7 @@ jobs:
       - name: Setup mise
         uses: xberg-io/actions/setup-mise@v1
         with:
-          install-args: python "github:taiki-e/cargo-llvm-cov"
+          install-args: python github:taiki-e/cargo-llvm-cov
 
       - name: Run Rust Tests
         env:
@@ -180,7 +179,7 @@ jobs:
           cache-key-prefix: closing-tag-complexity-${{ matrix.os }}
       - uses: xberg-io/actions/setup-mise@v1
         with:
-          install-args: jq
+          install: "false"
       # ~keep Issue #796 requires repeated measurements on all three runner operating systems.
       # Run the unchanged ratio gate ten times, stopping on the first failure.
       - name: Repeat the complexity regression ten times
@@ -208,7 +207,7 @@ jobs:
       - name: Setup mise
         uses: xberg-io/actions/setup-mise@v1
         with:
-          install-args: "github:taiki-e/cargo-llvm-cov"
+          install-args: github:taiki-e/cargo-llvm-cov
 
       - name: Generate Rust Coverage
         run: mise run rust:coverage:check
@@ -245,7 +244,7 @@ jobs:
       - name: Setup mise
         uses: xberg-io/actions/setup-mise@v1
         with:
-          install-args: jq
+          install: "false"
 
       - name: Verify output snapshots
         run: mise run bench:oracle

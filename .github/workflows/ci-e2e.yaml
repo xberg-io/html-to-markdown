@@ -13,8 +13,6 @@ env:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: short
   BUILD_PROFILE: "ci"
-  GO_VERSION: "1.26.0"
-  GO_TOOLCHAIN: "go1.26.0"
   GOLANGCI_LINT_VERSION: "latest"
 permissions:
   contents: read
@@ -67,6 +65,7 @@ jobs:
               - "rust-toolchain.toml"
               - "mise.toml"
               - "mise.lock"
+              - "mise-tasks/**"
               - ".cargo/config.toml"
               - "fixtures/**"
               - "alef.toml"
@@ -250,8 +249,6 @@ jobs:
     if: needs.changes.outputs.run-build-node == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
-    env:
-      MISE_TASK_RUN_AUTO_INSTALL: "false"
     strategy:
       fail-fast: false
       matrix:
@@ -281,7 +278,7 @@ jobs:
           "name": "Setup mise",
           "if": "matrix.runtime == 'bun'",
           "uses": "xberg-io/actions/setup-mise@v1",
-          "with": { "install-args": "jq" },
+          "with": { "install": "false" },
         }
       - {
           "name": "Build NAPI-RS Bindings (Node.js)",
@@ -623,8 +620,6 @@ jobs:
     if: always() && !cancelled() && needs.changes.outputs.run-test-node == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
-    env:
-      MISE_TASK_RUN_AUTO_INSTALL: "false"
     strategy:
       fail-fast: false
       matrix:
@@ -650,7 +645,7 @@ jobs:
           "name": "Setup mise",
           "if": "matrix.runtime == 'bun'",
           "uses": "xberg-io/actions/setup-mise@v1",
-          "with": { "install-args": "jq" },
+          "with": { "install": "false" },
         }
       - {
           "name": "Build NAPI-RS Bindings (Node.js)",

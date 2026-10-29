@@ -44,8 +44,6 @@ jobs:
     name: "Verify: FFI symbol exports vs callers"
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 10
-    env:
-      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
