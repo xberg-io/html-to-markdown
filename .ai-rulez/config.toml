@@ -91,8 +91,9 @@ include_outputs = false
 allow_overrides = ["claude:mcp", "python-conventions"]
 
 [lint.load_budgets]
-# ~keep AR964 also counts the plugin bundle and public skill mirrors, which Codex does not list; measured plus about 5%.
-codex-skill-listing = 20800
+# ~keep AR964's 8000-char Codex skill-listing figure is unverified; the counted listing (8774 on 5.9.2), plus
+# about 12% to stay out of AR964's 10% info band. Trim skill descriptions to lower it; re-measure on every pin bump.
+codex-skill-listing = 9800
 
 # Goldziher/ai-rulez#485: ai-rulez reports generated skill copies as duplicates. ~keep
 [[lint.ignore_rules]]

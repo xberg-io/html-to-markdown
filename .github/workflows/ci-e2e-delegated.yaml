@@ -55,12 +55,13 @@ jobs:
           "if": "!startsWith(inputs.runner, 'windows')",
           "run": "cargo build --release --locked -p html-to-markdown-ffi",
           "shell": "bash",
-          "env": {
-            "CARGO_TERM_COLOR": "always",
-            "CARGO_INCREMENTAL": "0",
-            "RUST_BACKTRACE": "short",
-            "ALEF_EXPORT_GENERATED_HEADERS": "1",
-          },
+          "env":
+            {
+              "CARGO_TERM_COLOR": "always",
+              "CARGO_INCREMENTAL": "0",
+              "RUST_BACKTRACE": "short",
+              "ALEF_EXPORT_GENERATED_HEADERS": "1",
+            },
         }
       - {
           "name": "Build html-to-markdown-ffi (debug, Windows)",
@@ -119,24 +120,26 @@ jobs:
           "name": "Setup Ruby (Unix)",
           "if": "runner.os != 'Windows'",
           "uses": "ruby/setup-ruby@v1.335.0",
-          "with": {
-            "ruby-version": "${{ inputs.ruby }}",
-            "bundler": "4.0.3",
-            "bundler-cache": false,
-            "working-directory": "packages/ruby",
-          },
+          "with":
+            {
+              "ruby-version": "${{ inputs.ruby }}",
+              "bundler": "4.0.3",
+              "bundler-cache": false,
+              "working-directory": "packages/ruby",
+            },
         }
       - {
           "name": "Setup Ruby (Windows)",
           "if": "runner.os == 'Windows'",
           "uses": "ruby/setup-ruby@v1.335.0",
-          "with": {
-            "ruby-version": "${{ inputs.ruby }}",
-            "bundler": "4.0.3",
-            "bundler-cache": false,
-            "working-directory": "packages/ruby",
-            "windows-toolchain": "UCRT64",
-          },
+          "with":
+            {
+              "ruby-version": "${{ inputs.ruby }}",
+              "bundler": "4.0.3",
+              "bundler-cache": false,
+              "working-directory": "packages/ruby",
+              "windows-toolchain": "UCRT64",
+            },
         }
       - {
           "name": "Build CLI binary",
@@ -205,11 +208,12 @@ jobs:
       - {
           "name": "Test Java Panama FFI bindings",
           "uses": "xberg-io/actions/test-java-ffi@v1",
-          "with": {
-            "ffi-crate-name": "html-to-markdown-ffi",
-            "ffi-lib-name": "html_to_markdown_ffi",
-            "java-version": "${{ inputs.java }}",
-          },
+          "with":
+            {
+              "ffi-crate-name": "html-to-markdown-ffi",
+              "ffi-lib-name": "html_to_markdown_ffi",
+              "java-version": "${{ inputs.java }}",
+            },
         }
       - {
           "name": "Cleanup Rust cache",
@@ -254,7 +258,7 @@ jobs:
       # ~keep `alef e2e generate` formats every suite it emits by shelling out to poly. With
       # poly absent this job failed all 16 languages with "poly not found on PATH" before the
       # drift check below ever ran, so the gate could not report on the drift it exists to catch.
-      - { "name": "Install poly", "uses": "Goldziher/poly@v0", "with": { "version": "0.31.0" } }
+      - { "name": "Install poly", "uses": "Goldziher/poly@v0", "with": { "version": "0.31.2" } }
       # ~keep Alef runs `dart format` on the generated suite; omitting Dart makes freshness
       # compare unformatted output with committed formatted files.
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }
@@ -300,12 +304,13 @@ jobs:
           # ~keep The action recreates npm/ after deleting it. pnpm 12 otherwise rejects the
           # temporarily missing workspace importers before napi can recreate them.
           "env": { "PNPM_CONFIG_FROZEN_LOCKFILE": "false" },
-          "with": {
-            "crate-dir": "crates/html-to-markdown-node",
-            "target": "aarch64-unknown-linux-gnu",
-            "use-napi-cross": true,
-            "install-deps": "false",
-          },
+          "with":
+            {
+              "crate-dir": "crates/html-to-markdown-node",
+              "target": "aarch64-unknown-linux-gnu",
+              "use-napi-cross": true,
+              "install-deps": "false",
+            },
         }
       - name: Verify the platform package holds a native module
         shell: bash
@@ -360,12 +365,13 @@ jobs:
       - {
           "name": "Setup PHP",
           "uses": "shivammathur/setup-php@v2",
-          "with": {
-            "php-version": "8.4",
-            "extensions": "ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter",
-            "tools": "composer:2.9.8",
-            "coverage": "none",
-          },
+          "with":
+            {
+              "php-version": "8.4",
+              "extensions": "ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter",
+              "tools": "composer:2.9.8",
+              "coverage": "none",
+            },
         }
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - { "name": "Capture php-config path", "run": "scripts/ci/php/set-php-config.sh", "shell": "bash" }
@@ -373,7 +379,7 @@ jobs:
           "name": "Install root Composer dependencies",
           "uses": "ramsey/composer-install@4.0.0",
           "with": { "dependency-versions": "locked" },
-          "env": { "COMPOSER_AUTH": "{\"github-oauth\":{\"github.com\":\"${{ secrets.GITHUB_TOKEN }}\"}}" },
+          "env": { "COMPOSER_AUTH": '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}' },
         }
       - name: Build PHP extension
         id: build-php-extension
