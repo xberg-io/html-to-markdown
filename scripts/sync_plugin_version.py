@@ -5,7 +5,7 @@
 ``plugin/`` from ``plugin/.ai-rulez/config.toml``'s ``[plugin].version``. This script
 keeps that single source pinned to the crate version in ``Cargo.toml`` (the repo's
 version source of truth), the same way ``alef sync-versions`` pins the alef-managed
-binding manifests. Run via ``task version:sync`` (which then regenerates the bundles);
+binding manifests. Run via ``mise run version:sync`` (which then regenerates the bundles);
 freshness of the generated bundles themselves is enforced by ``ai-rulez verify
 --plugin`` in CI, so this script only touches the config source.
 
@@ -33,7 +33,7 @@ if not PLUGIN_CONFIG.exists():
 # ~keep Matches the `version` key of the `[plugin]` table only. The file also has a
 # top-level ai-rulez schema `version = "4.0"` that must never be rewritten.
 PLUGIN_VERSION_RE = re.compile(r'(\[plugin\][^\[]*?\nversion = ")([^"]*)(")', re.DOTALL)
-SYNC_HINT = "run `task version:sync` to re-pin the plugin and regenerate its bundles"
+SYNC_HINT = "run `mise run version:sync` to re-pin the plugin and regenerate its bundles"
 
 
 def core_version() -> str:

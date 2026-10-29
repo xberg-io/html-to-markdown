@@ -64,7 +64,7 @@ required-features = ["testkit"]
 
 # ~keep Imports `html_to_markdown_bench::bench::NoOpVisitor`, which only exists under the
 # `visitor` feature, so the example cannot build under `--no-default-features`. Without this
-# gate it breaks `task test` (cargo test builds examples).
+# gate it breaks `mise run test` (cargo test builds examples).
 [[example]]
 name = "profile_visitor"
 path = "examples/profile_visitor.rs"

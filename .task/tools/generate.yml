@@ -1,7 +1,0 @@
-version: "3"
-
-tasks:
-  generate:
-    desc: Generate package READMEs using alef
-    cmds:
-      - alef readme

@@ -334,7 +334,7 @@ fn report_inventory_mismatches(mismatches: &[String]) {
         eprintln!("  {mismatch}");
     }
     eprintln!(
-        "Re-calibrate with `task bench:calibrate` (ACCEPT_OUTPUT_CHANGE=1 when the output change is intended and reviewed)."
+        "Re-calibrate with `mise run bench:calibrate --runs-dir <dir>` (--accept-output-change when the output change is intended and reviewed)."
     );
 }
 

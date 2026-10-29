@@ -1,0 +1,183 @@
+# Published-package test apps, included from mise.toml [task_config]. Each runs against the
+# released package in test_apps/<lang>; dir is relative to the repository root. ~keep
+
+["test-apps:smoke"]
+description = "Run smoke tests for all published packages (fast validation)"
+run = [
+  { task = "test-apps:smoke:python" },
+  { task = "test-apps:smoke:node" },
+  { task = "test-apps:smoke:bun" },
+  { task = "test-apps:smoke:wasm" },
+  { task = "test-apps:smoke:ruby" },
+  { task = "test-apps:smoke:php" },
+  { task = "test-apps:smoke:php_ext" },
+  { task = "test-apps:smoke:go" },
+  { task = "test-apps:smoke:java" },
+  { task = "test-apps:smoke:csharp" },
+  { task = "test-apps:smoke:elixir" },
+  { task = "test-apps:smoke:r" },
+  { task = "test-apps:smoke:rust" },
+  { task = "test-apps:smoke:c" },
+  { task = "test-apps:smoke:homebrew" },
+]
+
+["test-apps:smoke:python"]
+description = "Smoke test Python package from PyPI"
+dir = "test_apps/python"
+run = ["uv sync --no-install-project --no-install-workspace", "uv run --no-sync pytest tests/test_smoke.py -v"]
+
+["test-apps:smoke:node"]
+description = "Smoke test Node package from npm"
+dir = "test_apps/node"
+run = ["pnpm install", "pnpm exec vitest run tests/smoke.test.ts"]
+
+["test-apps:smoke:ruby"]
+description = "Smoke test Ruby gem from RubyGems"
+dir = "test_apps/ruby"
+run = ["bundle install", "bundle exec rspec spec/smoke_spec.rb"]
+
+["test-apps:smoke:php"]
+description = "Smoke test PHP package from Packagist"
+dir = "test_apps/php"
+run = ["bash install.sh", "composer install", "vendor/bin/phpunit tests/SmokeTest.php"]
+
+["test-apps:smoke:go"]
+description = "Smoke test Go package from pkg.go.dev"
+dir = "test_apps/go"
+run = [
+  "go mod download github.com/xberg-io/html-to-markdown/packages/go/v3",
+  "bash ./download_ffi.sh",
+  "go test -v -run Smoke",
+]
+
+["test-apps:smoke:java"]
+description = "Smoke test Java package from Maven Central"
+dir = "test_apps/java"
+run = ["./mvnw clean install -DskipTests", "./mvnw test -Dtest=SmokeTest"]
+run_windows = ["./mvnw.cmd clean install -DskipTests", "./mvnw.cmd test -Dtest=SmokeTest"]
+
+["test-apps:smoke:csharp"]
+description = "Smoke test C# package from NuGet"
+dir = "test_apps/csharp"
+run = ["dotnet restore", "dotnet test --filter FullyQualifiedName~SmokeTest"]
+
+["test-apps:smoke:elixir"]
+description = "Smoke test Elixir package from Hex.pm"
+dir = "test_apps/elixir"
+run = ["mix deps.get", "mix test test/smoke_test.exs"]
+
+["test-apps:smoke:r"]
+description = "Smoke test R package"
+dir = "test_apps/r"
+run = [
+  "Rscript install.R",
+  "Rscript -e \"library(testthat); library(htmltomarkdown); test_file('tests/test_smoke.R')\"",
+]
+
+["test-apps:smoke:bun"]
+description = "Smoke test Node package from npm under Bun"
+dir = "test_apps/bun"
+run = ["bun install", "bun test smoke.test.ts"]
+
+["test-apps:smoke:wasm"]
+description = "Smoke test WASM package from npm"
+dir = "test_apps/wasm"
+run = ["pnpm install", "pnpm exec vitest run tests/smoke.test.ts"]
+
+["test-apps:smoke:rust"]
+description = "Smoke test Rust crate from crates.io"
+dir = "test_apps/rust"
+run = "cargo test --test smoke_test"
+
+["test-apps:smoke:c"]
+description = "Smoke test C FFI from GitHub release tarballs"
+dir = "test_apps/c"
+run = "make test"
+
+["test-apps:smoke:php_ext"]
+description = "Smoke test PHP native extension installed via PIE"
+dir = "test_apps/php_ext"
+run = "./run_tests.sh"
+
+["test-apps:test"]
+description = "Run comprehensive tests for all published packages"
+run = [
+  { task = "test-apps:test:python" },
+  { task = "test-apps:test:node" },
+  { task = "test-apps:test:ruby" },
+  { task = "test-apps:test:php" },
+  { task = "test-apps:test:go" },
+  { task = "test-apps:test:java" },
+  { task = "test-apps:test:csharp" },
+  { task = "test-apps:test:elixir" },
+  { task = "test-apps:test:r" },
+  { task = "test-apps:test:swift" },
+  { task = "test-apps:test:dart" },
+  { task = "test-apps:test:zig" },
+  { task = "test-apps:test:kotlin-android" },
+]
+
+["test-apps:test:python"]
+description = "Comprehensive tests for Python package"
+dir = "test_apps/python"
+run = ["uv sync --no-install-project --no-install-workspace", "uv run --no-sync pytest tests/test_conversion.py -v"]
+
+["test-apps:test:node"]
+description = "Comprehensive tests for Node package"
+dir = "test_apps/node"
+run = ["pnpm install", "pnpm test"]
+
+["test-apps:test:ruby"]
+description = "Comprehensive tests for Ruby gem"
+dir = "test_apps/ruby"
+run = ["bundle install", "bundle exec rspec spec/conversion_spec.rb"]
+
+["test-apps:test:php"]
+description = "Comprehensive tests for PHP package"
+dir = "test_apps/php"
+run = ["bash install.sh", "composer install", "vendor/bin/phpunit tests"]
+
+["test-apps:test:go"]
+description = "Comprehensive tests for Go package"
+dir = "test_apps/go"
+run = ["go mod tidy", "go test -v -run Test_"]
+
+["test-apps:test:java"]
+description = "Comprehensive tests for Java package"
+dir = "test_apps/java"
+run = "./mvnw test -Dtest=ConversionTest"
+run_windows = "./mvnw.cmd test -Dtest=ConversionTest"
+
+["test-apps:test:csharp"]
+description = "Comprehensive tests for C# package"
+dir = "test_apps/csharp"
+run = "dotnet test --filter FullyQualifiedName~ConversionTests"
+
+["test-apps:test:elixir"]
+description = "Comprehensive tests for Elixir package"
+dir = "test_apps/elixir"
+run = ["mix deps.get", "mix test test/conversion_test.exs"]
+
+["test-apps:test:r"]
+description = "Comprehensive tests for R package"
+dir = "test_apps/r"
+run = ["Rscript install.R", "Rscript run_tests.R"]
+
+["test-apps:test:swift"]
+description = "Comprehensive tests for Swift package"
+dir = "test_apps/swift_e2e"
+run = "swift test"
+
+["test-apps:test:dart"]
+description = "Comprehensive tests for Dart package"
+dir = "test_apps/dart"
+run = ["dart pub get", "dart test"]
+
+["test-apps:test:kotlin-android"]
+description = "Comprehensive tests for Kotlin/Android AAR (host JVM tests)"
+dir = "test_apps/kotlin_android"
+run = "./gradlew test"
+
+["test-apps:comprehensive"]
+description = "Run all test_app comprehensive tests (alias for test-apps:test)"
+run = [{ task = "test-apps:test" }]
