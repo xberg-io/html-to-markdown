@@ -18,8 +18,8 @@ Thanks for considering a contribution to html-to-markdown. Every fix, feature, a
 ```bash
 git clone https://github.com/xberg-io/html-to-markdown.git
 cd html-to-markdown
-task setup          # installs deps, builds Rust extension, wires commit hooks
-task test           # should pass before you make any changes
+mise run setup      # installs deps, builds Rust extension, wires commit hooks
+mise run test       # should pass before you make any changes
 ```
 
 Full prerequisites and per-language build instructions are in [`CONTRIBUTING.md`](https://github.com/xberg-io/html-to-markdown/blob/main/CONTRIBUTING.md) at the repo root.
@@ -28,7 +28,7 @@ Full prerequisites and per-language build instructions are in [`CONTRIBUTING.md`
 
 1. Fork the repo and create a branch: `git checkout -b fix/your-change`
 2. Make your change, add tests if applicable
-3. Run `task test` (Rust + Python) and `pnpm test` (JS/TS) as needed
+3. Run `mise run test` (Rust + Python) and `pnpm test` (JS/TS) as needed
 4. Commit using [Conventional Commits](https://www.conventionalcommits.org/) — prek enforces this automatically
 5. Push and open a pull request against `main`
 

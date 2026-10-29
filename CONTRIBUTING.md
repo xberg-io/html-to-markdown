@@ -10,14 +10,15 @@ Please begin by reading our AI section below, followed by the getting started gu
 
 Make sure to have [Git](https://git-scm.com/) and [Rust](https://rustup.rs/) stable (via `rustup`) installed on your machine.
 
-1. Install [Task](https://taskfile.dev/installation/) on your machine.
+1. Install [mise](https://mise.jdx.dev/getting-started.html) on your machine.
 2. run:
 
 ```bash
-task setup
+mise trust
+mise run setup
 ```
 
-This will setup the dependencies, and pre-commit hooks via `poly`.
+This will install the pinned toolchain from `mise.toml`, the dependencies, and pre-commit hooks via `poly`.
 
 ### Optional Dependencies
 
@@ -36,17 +37,17 @@ This will setup the dependencies, and pre-commit hooks via `poly`.
 
 ## Quick reference
 
-| Command       | What it does                                    |
-| ------------- | ----------------------------------------------- |
-| `task setup`  | Install all dependencies (idempotent)           |
-| `task build`  | Build the project                               |
-| `task test`   | Run all test suites                             |
-| `task lint`   | Run all linters (with auto-fix)                 |
-| `task format` | Format all code                                 |
-| `task check`  | Combined lint + format check (no modifications) |
-| `task bench`  | Run benchmarks                                  |
+| Command               | What it does                                    |
+| --------------------- | ----------------------------------------------- |
+| `mise run setup`      | Install all dependencies (idempotent)           |
+| `mise run build`      | Build the project                               |
+| `mise run test`       | Run all test suites                             |
+| `mise run lint`       | Run all linters (with auto-fix)                 |
+| `mise run format`     | Format all code                                 |
+| `mise run check`      | Combined lint + format check (no modifications) |
+| `mise run bench:run`  | Run benchmarks                                  |
 
-For language-specific commands, use the namespace pattern: `task rust:test`, `task python:build`, `task node:format`, etc.
+For language-specific commands, use the namespace pattern: `mise run rust:test`, `mise run python:build`, `mise run node:e2e`, etc. `mise tasks` lists them all.
 
 ## What to keep in mind
 
@@ -89,12 +90,12 @@ The main `config.toml` selects the `plugins` layer through `default_layers`; mar
 plugin settings live separately in `config.plugins.toml`.
 
 ```sh
-task governance:generate
-task governance:check
+mise run governance:generate
+mise run governance:check
 ```
 
 The final command checks the materialized local governance files, including ignored harness
-outputs. Installing governance hooks requires Python 3.11 or newer. Run `task governance:hooks:install` to install the repository's reviewed Poly hooks.
+outputs. Run `mise run governance:hooks:install` to install the repository's reviewed Poly hooks.
 The hooks validate staged sources and verify shipped plugin artifacts where present; CI also
 validates the authored content. Shared convention modules come from `xberg-io/agent-conventions`;
 Git credentials are needed when an included repository requires access.
@@ -103,8 +104,8 @@ Product plugin sources live under `plugin/.ai-rulez/`. Keep public skills, gener
 adapters and their installation guide in sync:
 
 ```sh
-task plugin:generate
-task plugin:verify
+mise run plugin:generate
+mise run plugin:verify
 ```
 
 See [the plugin guide](plugin/README.md) for runtime setup and [public skills](skills/) for

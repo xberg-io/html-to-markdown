@@ -23,7 +23,7 @@ Unlike the main test suites that validate local development builds, `test_apps/`
 - **Fast**: <30 seconds per language, <5 minutes total
 - **Minimal**: Basic import/require + simple conversion test
 - **Pre-Release Gate**: Runs before publishing to registries
-- **CI Integration**: `task e2e:smoke:all` in publish workflow
+- **CI Integration**: `mise run test-apps:smoke` in publish workflow
 
 **Example** (`python/smoke_test.py`):
 
@@ -50,7 +50,7 @@ def test_basic_conversion():
 - **Thorough**: 1-3 minutes per language
 - **Fixture-Driven**: Shared JSON fixtures ensure language parity
 - **Post-Release Validation**: Runs after publishing (can run locally too)
-- **CI Integration**: `task e2e:test:all` (optional, can be manual)
+- **CI Integration**: `mise run test-apps:test` (optional, can be manual)
 
 **Example** (`python/comprehensive_test.py`):
 
@@ -209,17 +209,17 @@ Run before publishing packages to registries:
 
 ```bash
 # All languages (fast: <5 min)
-task e2e:smoke:all
+mise run test-apps:smoke
 
 # Individual languages
-task e2e:smoke:python
-task e2e:smoke:node
-task e2e:smoke:ruby
-task e2e:smoke:php
-task e2e:smoke:go
-task e2e:smoke:java
-task e2e:smoke:csharp
-task e2e:smoke:elixir
+mise run test-apps:smoke:python
+mise run test-apps:smoke:node
+mise run test-apps:smoke:ruby
+mise run test-apps:smoke:php
+mise run test-apps:smoke:go
+mise run test-apps:smoke:java
+mise run test-apps:smoke:csharp
+mise run test-apps:smoke:elixir
 ```
 
 ### Comprehensive Tests (Post-Release)
@@ -228,17 +228,17 @@ Run after publishing or during development:
 
 ```bash
 # All languages (thorough: 8-24 min)
-task e2e:test:all
+mise run test-apps:test
 
 # Individual languages
-task e2e:test:python
-task e2e:test:node
-task e2e:test:ruby
-task e2e:test:php
-task e2e:test:go
-task e2e:test:java
-task e2e:test:csharp
-task e2e:test:elixir
+mise run test-apps:test:python
+mise run test-apps:test:node
+mise run test-apps:test:ruby
+mise run test-apps:test:php
+mise run test-apps:test:go
+mise run test-apps:test:java
+mise run test-apps:test:csharp
+mise run test-apps:test:elixir
 ```
 
 ### Manual Testing
@@ -288,14 +288,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install Task
-        uses: arduino/setup-task@v2
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
 
       - name: Setup Language
         # ... language-specific setup
 
       - name: Run Smoke Tests
-        run: task e2e:smoke:${{ matrix.language }}
+        run: mise run test-apps:smoke:${{ matrix.language }}
 
   publish:
     needs: [prepare, smoke-tests] # Blocks on smoke tests
@@ -326,11 +326,11 @@ jobs:
       matrix:
         language: [python, node, ruby, php, go, java, csharp, elixir]
     steps:
-      - name: Install Task
-        uses: arduino/setup-task@v2
+      - name: Setup mise
+        uses: xberg-io/actions/setup-mise@v1
 
       - name: Run Comprehensive Tests
-        run: task e2e:test:${{ matrix.language }}
+        run: mise run test-apps:test:${{ matrix.language }}
 ```
 
 **Behavior**:
@@ -363,7 +363,7 @@ version = "2.18.0"
 **Usage**:
 
 ```bash
-task versions:sync  # Updates all manifests including test_apps
+mise run versions:sync  # Updates all manifests including test_apps
 ```
 
 ### Version Constraints
@@ -409,15 +409,15 @@ Comprehensive tests automatically pick up new fixtures (parametrized):
 
 ```bash
 # Python
-task e2e:test:python
+mise run test-apps:test:python
 # ✓ test_basic_html_conversion[Code block] PASSED
 
 # Node
-task e2e:test:node
+mise run test-apps:test:node
 # ✓ Code block PASSED
 
 # All languages
-task e2e:test:all
+mise run test-apps:test
 # ✓ All 8 languages pass new test case
 ```
 
@@ -525,36 +525,24 @@ class ComprehensiveTest {
 }
 ```
 
-### Step 5: Add to Taskfile
+### Step 5: Add the mise tasks
 
-**File**: `Taskfile.yml`
+**File**: `mise-tasks/test-apps.toml`
 
-```yaml
-tasks:
-  e2e:smoke:kotlin:
-    desc: "Smoke test: Kotlin from Maven Central"
-    dir: tests/test_apps/kotlin
-    cmds:
-      - gradle test --tests SmokeTest
+```toml
+["test-apps:smoke:kotlin"]
+description = "Smoke test: Kotlin from Maven Central"
+dir = "test_apps/kotlin"
+run = "gradle test --tests SmokeTest"
 
-  e2e:test:kotlin:
-    desc: "Comprehensive test: Kotlin"
-    dir: tests/test_apps/kotlin
-    cmds:
-      - gradle test
-
-  e2e:smoke:all:
-    cmds:
-      - task: e2e:smoke:python
-      # ... existing languages
-      - task: e2e:smoke:kotlin # ADD THIS
-
-  e2e:test:all:
-    cmds:
-      - task: e2e:test:python
-      # ... existing languages
-      - task: e2e:test:kotlin # ADD THIS
+["test-apps:test:kotlin"]
+description = "Comprehensive test: Kotlin"
+dir = "test_apps/kotlin"
+run = "gradle test"
 ```
+
+Then add `{ task = "test-apps:smoke:kotlin" }` to the `test-apps:smoke` run list and
+`{ task = "test-apps:test:kotlin" }` to `test-apps:test`.
 
 ### Step 6: Extend Version Sync
 
@@ -678,10 +666,10 @@ mix test
 
 **Problem**: Tests pass locally but fail in CI with version errors
 
-**Solution**: Run `task versions:sync` to ensure all test_apps manifests use correct version:
+**Solution**: Run `mise run versions:sync` to ensure all test_apps manifests use correct version:
 
 ```bash
-task versions:sync
+mise run versions:sync
 git diff tests/test_apps/  # Review changes
 ```
 
@@ -707,7 +695,7 @@ fixture_path = Path("../fixtures/basic-html.json")  # Depends on cwd
 
 ```yaml
 # .github/workflows/post-release-validation.yaml
-- run: task e2e:test:all
+- run: mise run test-apps:test
   timeout-minutes: 30 # Increase from default 10
 ```
 
@@ -723,7 +711,7 @@ fixture_path = Path("../fixtures/basic-html.json")  # Depends on cwd
 ## References
 
 - **Fixture Format**: fixtures/README.md
-- **Task Commands**: ../../Taskfile.yml
+- **Task Commands**: ../mise-tasks/test-apps.toml
 - **Version Sync**: ../../scripts/sync_versions.py
 - **CI Workflows**: ../../.github/workflows/publish.yaml
 

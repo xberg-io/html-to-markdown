@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Run repository tasks with `mise run <task>` instead of go-task; every task name is unchanged.
+  `mise.toml` and `mise.lock` now pin the development toolchain, and CI installs it with setup-mise.
+  `ai-rulez:version:check` is gone because mise pins ai-rulez exactly.
+
 ## [3.19.0] - 2026-10-27
 
 ### Changed

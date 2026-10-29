@@ -10,8 +10,8 @@ when available. Hostname is diagnostic only and is never part of the compatibili
 Run a normal capture and comparison with:
 
 ```sh
-task bench:run
-task bench:compare
+mise run bench:run
+mise run bench:compare
 ```
 
 The checked-in schema-v1 baseline remains a temporary percentage-only compatibility bridge. Comparisons print a
@@ -34,7 +34,7 @@ Making the CPU part of the contract therefore turned an unavoidable pool differe
 Host identity instead decides whether the timings are scored at all. When the CPU differs from the calibrated one,
 `compare` scores no timing, in either direction, and prints `TIMINGS NOT SCORED` with both CPUs: a delta measured on
 hardware the baseline was never measured on is neither a pass nor a regression. Such a run fails with
-`timings not scored` by default. `--allow-host-mismatch` (`ALLOW_HOST_MISMATCH=true task bench:compare`) lets it
+`timings not scored` by default. `--allow-host-mismatch` (`mise run bench:compare --allow-host-mismatch`) lets it
 succeed and prints a `Benchmark timings not scored` GitHub Actions warning, so the run page shows that nothing was
 measured. The flag is passed only by the nightly `benchmark-guardrail.yaml` job. It never relaxes the contract or the
 fixture inventory, and when the hardware *does* match the baseline it changes nothing: a real regression on the
@@ -44,12 +44,12 @@ runners now draw.
 ## Calibration and baseline promotion
 
 A calibration campaign requires exactly 40 schema-v2, full-corpus captures from one commit on one quiet, pinned
-runner, retaining the sibling `logs/telemetry.jsonl` beside `runs/`. `task bench:calibration:collect`
+runner, retaining the sibling `logs/telemetry.jsonl` beside `runs/`. `mise run bench:calibration:collect`
 collects this layout on GitHub-hosted Linux. Name captures in acquisition order (`0001.json` through `0040.json`) because adjacent captures form the 20
 pairs used by calibration. Then run:
 
 ```sh
-RUNS_DIR=/path/to/campaign task bench:calibrate
+mise run bench:calibrate --runs-dir /path/to/campaign
 ```
 
 Calibration accepts only `0001.json` through `0040.json` with strictly increasing RFC3339 capture timestamps. It
@@ -85,7 +85,7 @@ legitimately changes what the corpus renders to blocks calibration on `fixture m
 Re-promote with the explicit opt-in:
 
 ```sh
-RUNS_DIR=/path/to/campaign ACCEPT_OUTPUT_CHANGE=1 task bench:calibrate
+mise run bench:calibrate --runs-dir /path/to/campaign --accept-output-change
 ```
 
 That relaxes **only** the converted-output size comparison. The fixture set, its groups, and its
@@ -112,7 +112,7 @@ usage above 5% of total logical CPU capacity also aborts. Missing, malformed or 
 is invalid. A failed observation terminates the benchmark process group and leaves diagnosis and raw captures, never
 promotable timing floors. Retain the complete artifact, not just the capture JSON files.
 
-Both calibration and guardrail use this collector. Before baseline promotion, `task bench:calibrate` independently
+Both calibration and guardrail use this collector. Before baseline promotion, `mise run bench:calibrate` independently
 revalidates the raw records, quiet preflight, continuous capture coverage, guest/process identity and SHA-256 binding of
 every capture. A collector success marker alone is insufficient. The Rust calibration's exact 40 captures, inventory,
 provenance and nine-sample checks remain mandatory. Historical captures without this telemetry cannot be promoted.

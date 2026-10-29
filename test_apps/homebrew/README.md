@@ -12,7 +12,7 @@ Exercises the configured Homebrew formulae from tap `xberg-io/tap` at the releas
 Run from the repository root:
 
 ```bash
-task test-apps:smoke:homebrew
+mise run test-apps:smoke:homebrew
 ```
 
 ## What it tests

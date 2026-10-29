@@ -244,10 +244,10 @@ resources as `plugin/skills/`. Install them independently of a plugin runtime:
 npx skills add xberg-io/html-to-markdown --skill html-to-markdown
 ```
 
-Edit `plugin/.ai-rulez/skills`, then run `task plugin:generate` to regenerate runtime
-bundles and synchronize the public export. `task plugin:verify` checks both projections;
-`task plugin:skills:test` verifies resource freshness, ownership and symlink protection.
+Edit `plugin/.ai-rulez/skills`, then run `mise run plugin:generate` to regenerate runtime
+bundles and synchronize the public export. `mise run plugin:verify` checks both projections;
+`mise run plugin:skills:test` verifies resource freshness, ownership and symlink protection.
 The public ownership manifest records SHA-256 hashes of every exported file.
 
 Launcher and visual assets are authored in `plugin/.ai-rulez/scripts/` and
-`plugin/.ai-rulez/assets/`; `task plugin:generate` copies them into the runtime bundle.
+`plugin/.ai-rulez/assets/`; `mise run plugin:generate` copies them into the runtime bundle.
