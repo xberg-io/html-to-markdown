@@ -26,6 +26,10 @@ actionlint = "1.7.12"
 bats = "1.14.0"
 lychee = "0.24.2"
 
+[env]
+# Repository specifics for the shared task sets (toolchains.toml task_sets). ~keep
+BATS_LIB_REF = "v1.29.0"
+
 # ---- Shared task bodies ------------------------------------------------------------------------
 # Shared tasks from the xberg-io/toolchains task library; this file supplies their repo specifics. ~keep
 
