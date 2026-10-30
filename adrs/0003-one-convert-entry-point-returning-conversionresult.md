@@ -1,6 +1,6 @@
 ---
 status: accepted
-date: 2026-03-29
+date: 2026-03-28
 decision-makers: ["Na'aman Hirschfeld"]
 ---
 
@@ -25,8 +25,10 @@ Chosen option: "One `convert()` that returns a `ConversionResult` with content, 
 tables, images and warnings", because one entry point gives every binding the same surface, and the
 options decide which parts of the result are filled.
 
-* a7dde300d1 and 21dbc3aff8 (2026-03-29) removed the `convert_with_*` functions and the async visitor
-  from the public API. The change shipped as 3.0.0 on 2026-03-30.
+* 690665d4de (2026-03-27) added an `extract()` function returning `ConversionResult`, and c5b8bb9799
+  (2026-03-28) made that the single `convert()`. 941bc1b5f1 (2026-03-28) cut the bindings down to it.
+* a7dde300d1 and 21dbc3aff8 (2026-03-29) removed the remaining `convert_with_*` functions and the async
+  visitor from the public API. The change shipped as 3.0.0 on 2026-03-30.
 * 13b936e08a (2026-05-02) narrowed the surface to `convert(html, options)` by moving the visitor into
   `ConversionOptions` (ADR 0004) and dropping the public JSON option helpers.
 * `convert_with_accessible_names` is the same conversion with an explicit accessible-name policy, and

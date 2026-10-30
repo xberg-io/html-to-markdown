@@ -43,4 +43,4 @@ markup)".
 * `crates/html-to-markdown/src/converter/main_helpers.rs:564` defines `repair_with_html5ever_bounded`.
 * `crates/html-to-markdown/src/converter/main/prepare.rs:27` repairs custom element tags, and
   `crates/html-to-markdown/src/converter/main/parse.rs:102` repairs after the first parse.
-* `crates/html-to-markdown/src/converter/main_helpers/tests.rs:9` covers the bounded repair.
+* `crates/html-to-markdown/src/converter/main_helpers/tests.rs:6` covers the bounded repair.

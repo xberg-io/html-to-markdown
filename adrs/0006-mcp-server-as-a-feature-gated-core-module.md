@@ -25,8 +25,12 @@ Chosen option: "An rmcp server in the core crate behind the `mcp` and `mcp-http`
 `mcp` subcommand of the existing CLI", because e1b39e57c9 (2026-06-20) records that with every MCP
 dependency optional, "the default and all binding builds are unchanged (no tokio)".
 
-* One `convert_html` tool accepts the full `ConversionOptions` surface as JSON. stdio is the default
-  transport, and HTTP is behind `mcp-http`.
+* e1b39e57c9 shipped one `convert_html` tool that took the `ConversionOptions` surface as an untyped
+  JSON blob. c7d4b39a96 (2026-06-22) replaced the blob with a typed `ConvertConfig` that MCP clients
+  discover through the tool's input schema, and added a second tool, `extract_metadata`, that returns
+  the document metadata as JSON.
+* stdio is the default transport, and HTTP is behind `mcp-http`, which implies `mcp`. The flag names
+  follow [org ADR-0011 (Shared Cargo feature flag names)](https://github.com/xberg-io/agent-conventions/blob/main/adrs/0011-shared-cargo-feature-flag-names.md).
 * The MCP code is outside the alef-generated surface, so no binding exposes it.
 * The CLI enables `mcp` by default. 696bffba1b (2026-08-11) made `mcp-http` opt-in, because a CLI
   installed from brew, cargo, npm or pip must not ship an unauthenticated HTTP listener by default.
@@ -41,7 +45,9 @@ dependency optional, "the default and all binding builds are unchanged (no tokio
 
 * `crates/html-to-markdown/Cargo.toml:36` and `crates/html-to-markdown/Cargo.toml:37` define the `mcp`
   and `mcp-http` features, and `crates/html-to-markdown/src/lib.rs:134` gates the `mcp` module on
-  them.
+  `mcp` alone.
+* `crates/html-to-markdown/src/mcp/params.rs:447-459` defines the typed `config` parameter of
+  `convert_html`, and `crates/html-to-markdown/src/mcp/server.rs:144-160` declares `extract_metadata`.
 * `crates/html-to-markdown/src/mcp/server.rs:298` and
   `crates/html-to-markdown/src/mcp/server.rs:329` start the stdio and HTTP servers.
 * `crates/html-to-markdown-cli/Cargo.toml:37` sets `default = ["mcp"]`, and

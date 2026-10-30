@@ -9,9 +9,9 @@ decision-makers: ["Na'aman Hirschfeld"]
 ## Context and Problem Statement
 
 The Rust core has parsed HTML with the `tl` crate since the Rust workspace was added (`tl = "0.7"` in
-ca4bc5389c, 2025-10-10). Version 2.9.0 fixed comment parsing defects, for example zero-width
-`<!---->` comments that made the following content disappear, and its changelog names `astral-tl` as
-the actively maintained fork of `tl`.
+ca4bc5389c, 2025-10-10). The 2.9.0 changelog names `astral-tl` as the actively
+maintained fork of `tl`, so that comment parsing keeps up with upstream fixes. The same release fixed
+zero-width `<!---->` comments separately, by normalizing them before parsing.
 
 ## Considered Options
 

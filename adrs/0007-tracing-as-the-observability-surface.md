@@ -42,7 +42,7 @@ the spans as "a product observability surface" and leaves the subscriber to the 
 ### Confirmation
 
 * `crates/html-to-markdown/src/convert_api.rs:72` instruments the conversion, and
-  `crates/html-to-markdown/src/convert_api.rs:53` documents the span and its stable field names.
+  `crates/html-to-markdown/src/convert_api.rs:52-57` documents the span and its stable field names.
 * `crates/html-to-markdown/Cargo.toml` has no `tracing-subscriber` dependency, and
   `crates/html-to-markdown-cli/src/main.rs:43` installs the subscriber in the CLI.
 * `Cargo.toml:81` and `Cargo.toml:82` deny `print_stdout` and `print_stderr`.
