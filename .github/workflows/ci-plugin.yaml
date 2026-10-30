@@ -28,6 +28,10 @@ on:
       - "mise.toml"
       - "mise-tasks/**"
       - "scripts/tests/**"
+      - "scripts/**/*.sh"
+      - "packages/r/configure"
+      - "packages/r/cleanup"
+      - "packages/ruby/build-extension.sh"
       - ".github/workflows/ci-plugin.yaml"
   workflow_dispatch:
 
@@ -108,16 +112,15 @@ jobs:
 
       - name: Run the launcher contract tests
         uses: xberg-io/actions/run-bats@v1
-        env:
-          # `bats_load_library` searches BATS_LIB_PATH and nothing else. run-bats grew a lib-path
-          # input for this, but it is not in the released v1 yet, so the variable is set here;
-          # switch to `lib-path: scripts/tests/lib` once actions ships it. ~keep
-          BATS_LIB_PATH: ${{ github.workspace }}/scripts/tests/lib
         with:
+          lib-path: scripts/tests/lib
           path: scripts/tests/bats
           args: |-
             --recursive
             --print-output-on-failure
+
+      - name: Verify vendored Bats helpers
+        run: BATS_LIB_REF=v1.29.0 bash scripts/task/sync-bats-lib.sh --check
 
       - name: Verify public skills and export ownership
         run: |
