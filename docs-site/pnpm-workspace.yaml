@@ -2,7 +2,7 @@ allowBuilds:
   esbuild: true
   sharp: true
 minimumReleaseAgeExclude:
-  - "@xberg-io/docs-theme@0.4.1"
+  - "@xberg-io/docs-theme@0.4.1 || 0.4.2"
 overrides:
   # ~keep GHSA-rj75-hqrm-r3gf: avoid quadratic parsing in nested CSS selectors.
   postcss-selector-parser: ">=7.1.6 <8"
