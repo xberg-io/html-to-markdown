@@ -20,7 +20,3 @@ task_sets = [
 [overrides.zig]
 version = "0.16.0"
 reason = "packages/zig/build.zig.zon sets minimum_zig_version 0.16.0 and the Zig binding targets the 0.16 API"
-
-[overrides.rust]
-version = "1.95"
-reason = "clippy 1.99 reports 38 new lints in html-to-markdown-rs (assert_is_empty, byte_char_slices); move with the fixes"
