@@ -10,7 +10,7 @@ use rmcp::{
         PromptsCapability, ProtocolVersion, ReadResourceRequestParams, ReadResourceResponse, ResourcesCapability,
         ServerCapabilities, ServerConfig, ToolsCapability,
     },
-    service::RequestContext,
+    service::{MaybeSendFuture, RequestContext},
     tool, tool_handler, tool_router,
     transport::stdio,
 };
@@ -200,6 +200,8 @@ impl HtmlToMarkdownMcp {
 }
 
 #[tool_handler]
+// ~keep The rmcp `tool_handler` macro emits `list_tools` as an `async fn` with no `.await`.
+#[allow(clippy::unused_async_trait_impl)]
 impl ServerHandler for HtmlToMarkdownMcp {
     fn get_info(&self) -> ServerConfig {
         let mut capabilities = ServerCapabilities::default();
@@ -234,44 +236,44 @@ impl ServerHandler for HtmlToMarkdownMcp {
             )
     }
 
-    async fn list_prompts(
+    fn list_prompts(
         &self,
         _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
-    ) -> Result<ListPromptsResult, McpError> {
-        Ok(super::catalog::list_prompts())
+    ) -> impl Future<Output = Result<ListPromptsResult, McpError>> + MaybeSendFuture + '_ {
+        std::future::ready(Ok(super::catalog::list_prompts()))
     }
 
-    async fn get_prompt(
+    fn get_prompt(
         &self,
         request: GetPromptRequestParams,
         _context: RequestContext<RoleServer>,
-    ) -> Result<GetPromptResponse, McpError> {
-        super::catalog::get_prompt(&request.name, request.arguments.as_ref()).map(Into::into)
+    ) -> impl Future<Output = Result<GetPromptResponse, McpError>> + MaybeSendFuture + '_ {
+        std::future::ready(super::catalog::get_prompt(&request.name, request.arguments.as_ref()).map(Into::into))
     }
 
-    async fn list_resources(
+    fn list_resources(
         &self,
         _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
-    ) -> Result<ListResourcesResult, McpError> {
-        Ok(super::catalog::list_resources())
+    ) -> impl Future<Output = Result<ListResourcesResult, McpError>> + MaybeSendFuture + '_ {
+        std::future::ready(Ok(super::catalog::list_resources()))
     }
 
-    async fn read_resource(
+    fn read_resource(
         &self,
         request: ReadResourceRequestParams,
         _context: RequestContext<RoleServer>,
-    ) -> Result<ReadResourceResponse, McpError> {
-        super::catalog::read_resource(&request.uri).map(Into::into)
+    ) -> impl Future<Output = Result<ReadResourceResponse, McpError>> + MaybeSendFuture + '_ {
+        std::future::ready(super::catalog::read_resource(&request.uri).map(Into::into))
     }
 
-    async fn complete(
+    fn complete(
         &self,
         request: CompleteRequestParams,
         _context: RequestContext<RoleServer>,
-    ) -> Result<CompleteResult, McpError> {
-        Ok(super::catalog::complete(&request.r#ref, &request.argument))
+    ) -> impl Future<Output = Result<CompleteResult, McpError>> + MaybeSendFuture + '_ {
+        std::future::ready(Ok(super::catalog::complete(&request.r#ref, &request.argument)))
     }
 }
 
