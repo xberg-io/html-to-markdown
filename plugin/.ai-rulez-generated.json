@@ -1,13 +1,13 @@
 {
   "schema_version": "v1",
-  "source_hash": "blake3:9da3d98c0d76c117018a690308d932c78635b38daf7094bea050b56689270c33",
+  "source_hash": "blake3:6e3594e8da030d6eab99940921db66d18e1e559f6b7a24ecc60afc18fe72f73e",
   "outputs": {
     ".claude-plugin/plugin.json": {
       "content_hash": "blake3:b40cb974f0f7e7ecb9b289d85617a0b09f0335f8617c5a2747686c078bf75b22",
       "mode": "0644"
     },
     ".codex-plugin/plugin.json": {
-      "content_hash": "blake3:17190a61b94eecf265a4d80e249ca038a4e8b03e384c979ec7367c0b6510de2f",
+      "content_hash": "blake3:2c022d8ca96fc8034502d85e37903225d8bf1fc6e084580c2dd87505bd93a713",
       "mode": "0644"
     },
     ".cursor-plugin/commands/html-to-markdown-convert.md": {
@@ -215,7 +215,7 @@
       "mode": "0644"
     },
     ".factory-plugin/plugin.json": {
-      "content_hash": "blake3:465e33fb80c5fd981a4d658f8f58f235022a89c45a8a79122a6fe1285e2c94e6",
+      "content_hash": "blake3:8c797412d6486d97be45f5594178dc5bd3d02a84dc0b37e4b687d7294947e2b6",
       "mode": "0644"
     },
     ".hermes/package/pyproject.toml": {
@@ -1063,11 +1063,11 @@
       "mode": "0644"
     },
     "assets/icon.svg": {
-      "content_hash": "blake3:d0013bd7902f8dbe086e1ec21f3f4a38835de6940ba03b5d9d812862225ebdc4",
+      "content_hash": "blake3:fba9cce240f6fdcc05a7f1400d1f7c2adb471049980e5975e51869145da70a19",
       "mode": "0644"
     },
     "assets/logo.svg": {
-      "content_hash": "blake3:edbce41f41812957f6f07afa54d73e3ebd3d57b4578384e74d4f8bdcb7d5483b",
+      "content_hash": "blake3:fba9cce240f6fdcc05a7f1400d1f7c2adb471049980e5975e51869145da70a19",
       "mode": "0644"
     },
     "commands/html-to-markdown-convert.md": {
@@ -1091,7 +1091,7 @@
       "mode": "0644"
     },
     "kimi.plugin.json": {
-      "content_hash": "blake3:9aa86b6f3b8e0e542ec86356d4887319d947195f723ed3dfac8a4e2e8fda283d",
+      "content_hash": "blake3:6cde54462eec02e897019c52c5597c7413dc5b77e8fbb0bf711c53edd06c22f9",
       "mode": "0644"
     },
     "mcp.json": {
@@ -1103,7 +1103,7 @@
       "mode": "0644"
     },
     "plugin.json": {
-      "content_hash": "blake3:3f4f2ff6b882f0981618197a1b133c55d52e550a6f9127bf6ef123b7c11d3be8",
+      "content_hash": "blake3:dce5483de2a70bfde37b60e8e11fd4392a833e016d56f340af53eb6e345f4b12",
       "mode": "0644"
     },
     "scripts/mcp-launch.sh": {

@@ -20,7 +20,7 @@ homepage = "https://xberg.io"
 repository = "https://github.com/xberg-io/html-to-markdown"
 license = "MIT"
 category = "developer-tools"
-brand_color = "#58FBDA"
+brand_color = "#00E0C2"
 icon = "./assets/icon.svg"
 logo = "./assets/logo.svg"
 keywords = ["html-to-markdown", "markdown", "html", "conversion", "metadata"]
@@ -56,7 +56,7 @@ privacy_policy_url = "https://xberg.io/privacy"
 terms_of_service_url = "https://xberg.io/terms"
 composer_icon = "./assets/icon.svg"
 logo = "./assets/logo.svg"
-brand_color = "#58FBDA"
+brand_color = "#00E0C2"
 
 [plugin.gemini]
 context_file_name = "GEMINI.md"
