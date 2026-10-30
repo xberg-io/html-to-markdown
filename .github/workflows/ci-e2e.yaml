@@ -13,7 +13,10 @@ env:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: short
   BUILD_PROFILE: "ci"
-  GOLANGCI_LINT_VERSION: "latest"
+  # ~keep Built with `go install` by the job's Go, not a mise prebuilt: golangci-lint embeds the
+  # ~keep go/types it was compiled with, so a binary older than the Go stdlib fails typecheck.
+  # ~keep Pinned like liter-llm's lint job; move both together.
+  GOLANGCI_LINT_VERSION: "v2.13.1"
 permissions:
   contents: read
 jobs:
