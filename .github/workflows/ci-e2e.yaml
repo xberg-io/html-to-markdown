@@ -643,7 +643,6 @@ jobs:
         }
       - {
           "name": "Setup mise",
-          "if": "matrix.runtime == 'bun'",
           "uses": "xberg-io/actions/setup-mise@v1",
           "with": { "install": "false" },
         }
@@ -669,7 +668,7 @@ jobs:
       - {
           "name": "Run E2E tests (Node.js only)",
           "if": "matrix.runtime == 'node'",
-          "run": "alef test --e2e --lang node",
+          "run": "mise run node:e2e:test",
           "shell": "bash",
         }
   test-ruby:
