@@ -117,6 +117,7 @@ export default defineConfig({
               { label: "Error types (generated)", slug: "reference/errors" },
               { label: "CLI (generated)", slug: "reference/cli" },
               { label: "MCP (generated)", slug: "reference/mcp" },
+              { label: "Architecture decisions", slug: "reference/adrs" },
             ],
           },
           {
