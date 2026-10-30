@@ -39,7 +39,11 @@
     "support-nts": true,
     "download-url-method": "pre-packaged-binary"
   },
-  "keywords": ["converter", "html", "markdown"],
+  "keywords": [
+    "converter",
+    "html",
+    "markdown"
+  ],
   "extra": {
     "pie": {
       "binary": {

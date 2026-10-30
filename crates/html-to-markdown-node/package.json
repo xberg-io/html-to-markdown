@@ -27,7 +27,13 @@
       "default": "./index.js"
     }
   },
-  "files": ["index.js", "binding.cjs", "index.mjs", "index.d.ts", "*.node"],
+  "files": [
+    "index.js",
+    "binding.cjs",
+    "index.mjs",
+    "index.d.ts",
+    "*.node"
+  ],
   "optionalDependencies": {
     "@xberg-io/html-to-markdown-darwin-arm64": "3.19.0",
     "@xberg-io/html-to-markdown-darwin-x64": "3.19.0",

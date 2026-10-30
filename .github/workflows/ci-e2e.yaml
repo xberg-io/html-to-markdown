@@ -218,10 +218,11 @@ jobs:
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
-          "with": {
-            "components": "rustfmt, clippy, llvm-tools-preview",
-            "cache-key-prefix": "python-${{ matrix.os }}-${{ matrix.python }}",
-          },
+          "with":
+            {
+              "components": "rustfmt, clippy, llvm-tools-preview",
+              "cache-key-prefix": "python-${{ matrix.os }}-${{ matrix.python }}",
+            },
         }
       - name: Install Python Dependencies
         uses: nick-fields/retry@v4
@@ -269,10 +270,7 @@ jobs:
           "uses": "xberg-io/actions/setup-rust@v1",
           "with": { "cache-key-prefix": "node-${{ matrix.os }}-${{ matrix.runtime }}" },
         }
-      - {
-          "name": "Setup Node.js workspace",
-          "uses": "xberg-io/actions/setup-node-workspace@v1",
-        }
+      - { "name": "Setup Node.js workspace", "uses": "xberg-io/actions/setup-node-workspace@v1" }
       - {
           "name": "Setup Bun",
           "if": "matrix.runtime == 'bun'",
@@ -327,11 +325,12 @@ jobs:
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
-          "with": {
-            "target": "${{ matrix.target }}",
-            "cache-key-prefix": "node-musl-${{ matrix.target }}",
-            "configure-musl-cc": "false",
-          },
+          "with":
+            {
+              "target": "${{ matrix.target }}",
+              "cache-key-prefix": "node-musl-${{ matrix.target }}",
+              "configure-musl-cc": "false",
+            },
         }
       - {
           "name": "Setup Node.js workspace",
@@ -349,12 +348,13 @@ jobs:
           # ~keep The action recreates npm/ after deleting it. pnpm 12 otherwise rejects the
           # temporarily missing workspace importers before napi can recreate them.
           "env": { "PNPM_CONFIG_FROZEN_LOCKFILE": "false" },
-          "with": {
-            "crate-dir": "crates/html-to-markdown-node",
-            "target": "${{ matrix.target }}",
-            "cross-compile": "true",
-            "install-deps": "false",
-          },
+          "with":
+            {
+              "crate-dir": "crates/html-to-markdown-node",
+              "target": "${{ matrix.target }}",
+              "cross-compile": "true",
+              "install-deps": "false",
+            },
         }
       - name: Verify the platform package holds a native module
         shell: bash
@@ -410,25 +410,27 @@ jobs:
           "name": "Setup Ruby (Unix)",
           "if": "runner.os != 'Windows'",
           "uses": "ruby/setup-ruby@v1.335.0",
-          "with": {
-            "ruby-version": "${{ matrix.ruby }}",
-            "bundler": "4.0.3",
-            "bundler-cache": false,
-            "working-directory": "packages/ruby",
-          },
+          "with":
+            {
+              "ruby-version": "${{ matrix.ruby }}",
+              "bundler": "4.0.3",
+              "bundler-cache": false,
+              "working-directory": "packages/ruby",
+            },
         }
       # ~keep ruby is a mise lock gap on Windows; this leg keeps its setup action.
       - {
           "name": "Setup Ruby (Windows)",
           "if": "runner.os == 'Windows'",
           "uses": "ruby/setup-ruby@v1.335.0",
-          "with": {
-            "ruby-version": "${{ matrix.ruby }}",
-            "bundler": "4.0.3",
-            "bundler-cache": false,
-            "working-directory": "packages/ruby",
-            "windows-toolchain": "UCRT64",
-          },
+          "with":
+            {
+              "ruby-version": "${{ matrix.ruby }}",
+              "bundler": "4.0.3",
+              "bundler-cache": false,
+              "working-directory": "packages/ruby",
+              "windows-toolchain": "UCRT64",
+            },
         }
       - {
           "name": "Build CLI binary",
@@ -472,12 +474,13 @@ jobs:
       - {
           "name": "Setup PHP",
           "uses": "shivammathur/setup-php@v2",
-          "with": {
-            "php-version": "8.4",
-            "extensions": "ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter",
-            "tools": "composer:2.9.8",
-            "coverage": "none",
-          },
+          "with":
+            {
+              "php-version": "8.4",
+              "extensions": "ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter",
+              "tools": "composer:2.9.8",
+              "coverage": "none",
+            },
         }
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
@@ -490,7 +493,7 @@ jobs:
           "name": "Install root Composer dependencies",
           "uses": "ramsey/composer-install@4.0.0",
           "with": { "dependency-versions": "locked" },
-          "env": { "COMPOSER_AUTH": "{\"github-oauth\":{\"github.com\":\"${{ secrets.GITHUB_TOKEN }}\"}}" },
+          "env": { "COMPOSER_AUTH": '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}' },
         }
       - name: Build PHP extension
         id: build-php-extension
@@ -503,11 +506,12 @@ jobs:
       - {
           "name": "Upload PHP extension artifact",
           "uses": "actions/upload-artifact@v7",
-          "with": {
-            "name": "php-extension-${{ matrix.platform.label }}",
-            "path": "${{ steps.build-php-extension.outputs.extension-path }}",
-            "retention-days": 7,
-          },
+          "with":
+            {
+              "name": "php-extension-${{ matrix.platform.label }}",
+              "path": "${{ steps.build-php-extension.outputs.extension-path }}",
+              "retention-days": 7,
+            },
         }
       - {
           "name": "Cleanup Rust cache",
@@ -644,21 +648,14 @@ jobs:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
-      - {
-          "name": "Setup Node.js workspace",
-          "uses": "xberg-io/actions/setup-node-workspace@v1",
-        }
+      - { "name": "Setup Node.js workspace", "uses": "xberg-io/actions/setup-node-workspace@v1" }
       - {
           "name": "Setup Bun",
           "if": "matrix.runtime == 'bun'",
           "uses": "oven-sh/setup-bun@v2",
           "with": { "bun-version": "latest" },
         }
-      - {
-          "name": "Setup mise",
-          "uses": "xberg-io/actions/setup-mise@v1",
-          "with": { "install": "false" },
-        }
+      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install": "false" } }
       - {
           "name": "Build NAPI-RS Bindings (Node.js)",
           "if": "matrix.runtime == 'node'",
@@ -749,10 +746,11 @@ jobs:
           "if": "runner.os != 'Windows'",
           "run": "alef test --e2e --lang csharp",
           "shell": "bash",
-          "env": {
-            "LD_LIBRARY_PATH": "${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug",
-            "DYLD_LIBRARY_PATH": "${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug",
-          },
+          "env":
+            {
+              "LD_LIBRARY_PATH": "${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug",
+              "DYLD_LIBRARY_PATH": "${{ github.workspace }}/target/release:${{ github.workspace }}/target/debug",
+            },
         }
       - name: Run E2E tests (Windows)
         if: runner.os == 'Windows'
@@ -786,11 +784,12 @@ jobs:
       - {
           "name": "Test Java Panama FFI bindings",
           "uses": "xberg-io/actions/test-java-ffi@v1",
-          "with": {
-            "ffi-crate-name": "html-to-markdown-ffi",
-            "ffi-lib-name": "html_to_markdown_ffi",
-            "java-version": "${{ matrix.java }}",
-          },
+          "with":
+            {
+              "ffi-crate-name": "html-to-markdown-ffi",
+              "ffi-lib-name": "html_to_markdown_ffi",
+              "java-version": "${{ matrix.java }}",
+            },
         }
       - { "name": "Install alef", "if": "matrix.os != 'windows-latest'", "uses": "xberg-io/actions/install-alef@v1" }
       - {
@@ -843,10 +842,11 @@ jobs:
       - {
           "name": "Run C e2e tests",
           "shell": "bash",
-          "env": {
-            "LD_LIBRARY_PATH": "${{ github.workspace }}/target/release",
-            "DYLD_LIBRARY_PATH": "${{ github.workspace }}/target/release",
-          },
+          "env":
+            {
+              "LD_LIBRARY_PATH": "${{ github.workspace }}/target/release",
+              "DYLD_LIBRARY_PATH": "${{ github.workspace }}/target/release",
+            },
           "run": "cd e2e/c && make test",
         }
       - name: Verify header is fresh

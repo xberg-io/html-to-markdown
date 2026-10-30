@@ -987,13 +987,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {
-              os: macos-26,
-              target: aarch64-apple-darwin,
-              rust_target: "",
-              use_napi_cross: false,
-              use_zig_cross: false,
-            }
+          - { os: macos-26, target: aarch64-apple-darwin, rust_target: "", use_napi_cross: false, use_zig_cross: false }
           - {
               os: macos-26-intel,
               target: x86_64-apple-darwin,

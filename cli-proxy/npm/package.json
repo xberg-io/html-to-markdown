@@ -21,7 +21,10 @@
   "bin": {
     "html-to-markdown": "bin/html-to-markdown.js"
   },
-  "files": ["bin/", "install.js"],
+  "files": [
+    "bin/",
+    "install.js"
+  ],
   "type": "module",
   "publishConfig": {
     "access": "public"

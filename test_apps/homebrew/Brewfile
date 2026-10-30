@@ -1,4 +1,4 @@
 # Brewfile — managed by alef. DO NOT EDIT.
-tap "xberg-io/tap"
-brew "xberg-io/tap/html-to-markdown"
-brew "xberg-io/tap/libhtml-to-markdown"
+tap("xberg-io/tap")
+brew("xberg-io/tap/html-to-markdown")
+brew("xberg-io/tap/libhtml-to-markdown")
