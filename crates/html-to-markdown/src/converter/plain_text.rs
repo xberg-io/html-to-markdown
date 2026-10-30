@@ -334,8 +334,11 @@ fn collect_descendant_handles(
     state: &WalkState<'_>,
     result: &mut Vec<tl::NodeHandle>,
 ) {
-    let children = tag.children();
-    let mut stack: Vec<_> = children.top().iter().copied().collect();
+    let mut stack: Vec<_> = if tag.name().as_utf8_str().eq_ignore_ascii_case("table") {
+        crate::converter::utility::siblings::table_children(tag, parser)
+    } else {
+        tag.children().top().iter().copied().collect()
+    };
     stack.reverse();
 
     while let Some(handle) = stack.pop() {

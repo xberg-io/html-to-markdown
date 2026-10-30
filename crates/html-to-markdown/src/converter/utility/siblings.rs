@@ -56,6 +56,23 @@ pub fn get_previous_sibling_tag<'a>(
     None
 }
 
+/// Order table row groups as rendered by the HTML table model.
+pub(crate) fn table_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser) -> Vec<tl::NodeHandle> {
+    let mut children: Vec<_> = tag.children().top().iter().copied().collect();
+    children.sort_by_key(|handle| {
+        let Some(tl::Node::Tag(child)) = handle.get(parser) else {
+            return 2;
+        };
+        match child.name().as_utf8_str().to_ascii_lowercase().as_str() {
+            "caption" | "col" | "colgroup" => 0,
+            "thead" => 1,
+            "tfoot" => 3,
+            _ => 2,
+        }
+    });
+    children
+}
+
 #[cfg(test)]
 thread_local! {
     /// The eager following-content classifications and cached lookups on this thread. ~keep

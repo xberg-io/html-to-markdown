@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Render table headers, body rows, and footers in HTML table order regardless of source section order,
+  including plain text and structured table grids (#960).
+
 ### Changed
 
 - Run repository tasks with `mise run <task>` instead of go-task; every task name is unchanged.

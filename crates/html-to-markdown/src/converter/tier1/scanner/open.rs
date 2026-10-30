@@ -344,7 +344,7 @@ fn emit_open_kind(
         TagKind::TableHead => open_table_head(state)?,
         TagKind::TableBody => open_table_body(state)?,
         TagKind::TableFoot => open_table_foot(state),
-        TagKind::TableRow => open_table_row(state),
+        TagKind::TableRow => open_table_row(state)?,
         TagKind::TableCell { is_header } => open_table_cell(state, attrs, is_header, table_probes)?,
         // ~keep Block containers: emit a leading blank-line separator when there's
         // already preceding content.  Mirrors Tier-2's div/sectioning handlers
@@ -937,10 +937,20 @@ fn open_table_foot(state: &mut Tier1State) {
     }
 }
 
-fn open_table_row(state: &mut Tier1State) {
+fn open_table_row(state: &mut Tier1State) -> Result<(), BailReason> {
+    let in_footer = state
+        .stack
+        .iter()
+        .rev()
+        .take_while(|frame| !matches!(frame.spec.kind, TagKind::Table))
+        .any(|frame| matches!(frame.spec.kind, TagKind::TableFoot));
     if let Some(ts) = state.table_stack.last_mut() {
+        if ts.seen_tfoot && !in_footer {
+            return Err(BailReason::TableSectionOrder);
+        }
         ts.current_row.clear();
     }
+    Ok(())
 }
 
 fn open_table_cell(

@@ -240,9 +240,7 @@ impl TableWalk {
         handler: HandlerContext<'_>,
         children: &mut Vec<tl::NodeHandle>,
     ) {
-        let mut pending: Vec<_> = tag
-            .children()
-            .top()
+        let mut pending: Vec<_> = crate::converter::utility::siblings::table_children(tag, parser)
             .iter()
             .map(|node| (*node, handler.depth + 1, None, None))
             .collect();

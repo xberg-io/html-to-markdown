@@ -162,9 +162,8 @@ fn collect_table_grid(
 
     let mut state = GridState::default();
 
-    let children = tag.children();
-    for child_handle in children.top().iter() {
-        collect_grid_child(child_handle, parser, handler, &mut state);
+    for child_handle in crate::converter::utility::siblings::table_children(tag, parser) {
+        collect_grid_child(&child_handle, parser, handler, &mut state);
     }
 
     if state.row_index == 0 {

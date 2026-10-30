@@ -238,7 +238,8 @@ fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid
 
 /// Collect all `<tr>` `NodeHandle`s from within a table element.
 fn collect_tr_handles(tag: &tl::HTMLTag, parser: &tl::Parser, result: &mut Vec<tl::NodeHandle>) {
-    let mut stack = reversed_child_handles(tag);
+    let mut stack = crate::converter::utility::siblings::table_children(tag, parser);
+    stack.reverse();
 
     while let Some(handle) = stack.pop() {
         if let Some(tl::Node::Tag(child_tag)) = handle.get(parser) {
