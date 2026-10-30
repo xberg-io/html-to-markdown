@@ -39,6 +39,7 @@ on:
       - "alef.toml"
       - "uv.lock"
       - "Cargo.lock"
+      - "mise.lock"
       - "packages/elixir/mix.lock"
       - "packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj"
       - "packages/csharp/HtmlToMarkdown/runtime.json.template"
@@ -70,6 +71,13 @@ permissions:
   contents: read
 
 jobs:
+  toolchain:
+    name: Toolchain baseline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: xberg-io/actions/check-toolchain@v1
+
   # ~keep This lives here, not in `CI Docs`, because `CI Docs` filters on `docs-site/**`: a commit
   # that edits only CHANGELOG.md would not trigger it, which is exactly the drift being guarded
   # against. This workflow's filter covers `**/*.md` and `*.md`, so both changelogs match it.
