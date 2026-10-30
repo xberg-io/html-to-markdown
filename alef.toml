@@ -79,7 +79,7 @@ dirs = [
 ]
 # The gap pass (unreferenced snippets, missing language variants) is skipped entirely unless at
 # least one of `docs_dirs`/`required_languages` is set, and a `--strict` run refuses to pass on a
-# check that compared nothing. These two mirror the flags `task docs:snippets:gaps` already
+# check that compared nothing. These two mirror the flags `mise run docs:snippets:gaps` already
 # passes, so `alef snippets check --strict` runs the same comparison CI does instead of erroring.
 # kotlin is absent from the required set: alef.toml gives kotlin_android
 # exclude_functions = ["visitor"], because its trait-bridge emitter cannot bind via an options
@@ -339,9 +339,9 @@ exclude = [
   "/.ai-rulez/.generated-manifest.json",
   "/plugin/.ai-rulez/.generated-manifest.json",
   # The vendored Bats helper is copied byte-identical from xberg-io/actions, whose shell is
-  # tab-indented; reformatting it here would break `task test:scripts:lib:check`. Excluded from
-  # discovery rather than from fmt alone because poly has no per-engine exclude -- and the file
-  # is linted and formatted in the repo that owns it. ~keep
+  # tab-indented; reformatting it here would break `mise run test:scripts:lib:check`. Excluded
+  # from discovery rather than from fmt alone because poly has no per-engine exclude -- and the
+  # file is linted and formatted in the repo that owns it. ~keep
   "scripts/tests/lib/**",
   "docs-site/src/snippets/**",
   "**/_generated/**",
@@ -707,7 +707,7 @@ traineddata = "traineddata"
 # Node build-time scripts whose console output IS their product: the two `verify-*` guards
 # report the check they ran, and fail the build via `console.error` + `process.exit(1)`;
 # `patch-bundler-entry.js` reports the wasm entry it rewrote. These are standalone scripts run
-# by npm/task with no subscriber or logger to route through. ~keep
+# by npm or mise with no subscriber or logger to route through. ~keep
 "crates/html-to-markdown-node/scripts/**" = ["no-console"]
 "crates/html-to-markdown-wasm/scripts/**" = ["no-console"]
 # Standalone browser demo asset, loaded straight into a `<script type="module">` on the docs
