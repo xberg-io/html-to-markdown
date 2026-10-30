@@ -131,7 +131,7 @@
   "license": "MIT",
   "main": ".opencode/plugins/html-to-markdown.js",
   "name": "@xberg-io/opencode-html-to-markdown",
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.15.0",
   "pi": {
     "prompts": [
       "./.pi/prompts/html-to-markdown-convert.md",

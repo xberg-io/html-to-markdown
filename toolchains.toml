@@ -17,10 +17,6 @@ task_sets = [
   "rust",
 ]
 
-[overrides.pnpm]
-version = "12.11.2"
-reason = "package.json packageManager pins pnpm 12.11.2, which wrote pnpm-lock.yaml; move both together"
-
 [overrides.zig]
 version = "0.16.0"
 reason = "packages/zig/build.zig.zon sets minimum_zig_version 0.16.0 and the Zig binding targets the 0.16 API"

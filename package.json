@@ -38,7 +38,7 @@
     "node": ">=22.12",
     "pnpm": ">=11"
   },
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.15.0",
   "pi": {
     "prompts": [
       "./plugin/.pi/prompts/html-to-markdown-convert.md",
