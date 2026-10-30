@@ -1,18 +1,31 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
+// Zig 0.17 replaced `build_root`/`pathFromRoot` with `root`; the compile-time field check
+// keeps 0.16 working, matching alef's generated e2e build. An if/else statement rather than the
+// generated if-expression, because poly's Zig formatter and `zig fmt` indent that differently. ~keep
+fn buildRoot(b: *std.Build) []const u8 {
+    if (@hasField(std.Build, "root")) {
+        return b.root.toString(b.allocator) catch @panic("failed to resolve build root");
+    } else {
+        return b.build_root.path orelse ".";
+    }
+}
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     const test_step = b.step("test", "Run tests");
     const smoke_step = b.step("smoke", "Run smoke tests only");
 
+    const _build_root = buildRoot(b);
+
     // Fetch the published Zig package from the registry.
     const html_to_markdown_dep = b.dependency("html_to_markdown", .{
         .target = target,
         .optimize = optimize,
-        .ffi_path = b.pathFromRoot("../c/ffi/lib"),
-        .ffi_include_path = b.pathFromRoot("../c/ffi/include"),
+        .ffi_path = b.pathResolve(&.{ _build_root, "../c/ffi/lib" }),
+        .ffi_include_path = b.pathResolve(&.{ _build_root, "../c/ffi/include" }),
     });
     const html_to_markdown_rs_module = html_to_markdown_dep.module("html_to_markdown_rs");
 
