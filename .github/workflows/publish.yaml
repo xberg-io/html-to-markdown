@@ -1067,19 +1067,14 @@ jobs:
       # out to cargo-zigbuild — unlike the gnu targets' --use-napi-cross
       # (docker-based @napi-rs/cross-toolchain). The shared action drives it
       # through its `cross-compile` input but deliberately does not install the
-      # toolchain, because the zig version is a per-repo pin; hence these two
-      # setup steps.
-      - name: Setup Zig (musl cross-compile)
+      # toolchain, because the zig version is a per-repo pin; hence this setup
+      # step, which installs both from mise.toml.
+      - name: Setup Zig and cargo-zigbuild (musl cross-compile)
         if: matrix.use_zig_cross
         uses: xberg-io/actions/setup-mise@v1
         with:
-          install-args: zig
+          install-args: zig github:rust-cross/cargo-zigbuild
           config-ref: ${{ github.sha }}
-
-      - name: Install cargo-zigbuild (musl cross-compile)
-        if: matrix.use_zig_cross
-        shell: bash
-        run: command -v cargo-zigbuild || cargo install --locked cargo-zigbuild
 
       - name: Build native module
         if: ${{ !matrix.use_zig_cross }}

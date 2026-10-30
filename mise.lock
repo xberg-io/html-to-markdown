@@ -202,6 +202,41 @@ checksum_source = "mise-versions"
 url = "https://github.com/Goldziher/poly/releases/download/v0.31.2/poly-0.31.2-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/Goldziher/poly/releases/assets/686266048"
 
+[[tools."github:rust-cross/cargo-zigbuild"]]
+version = "0.24.0"
+backend = "github:rust-cross/cargo-zigbuild"
+specifiers = ["0.24.0"]
+
+[tools."github:rust-cross/cargo-zigbuild"."platforms.linux-arm64"]
+checksum = "sha256:de42626985f428033078dfc12ac8a59ee713f8e5627235ec883b1c899bee895c"
+checksum_source = "mise-versions"
+url = "https://github.com/rust-cross/cargo-zigbuild/releases/download/v0.24.0/cargo-zigbuild-aarch64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/rust-cross/cargo-zigbuild/releases/assets/662592464"
+
+[tools."github:rust-cross/cargo-zigbuild"."platforms.linux-x64"]
+checksum = "sha256:3ca25ee4348f9abd0932ed4debe826d246e20fb616d0201de5bd05e7f965e9d9"
+checksum_source = "mise-versions"
+url = "https://github.com/rust-cross/cargo-zigbuild/releases/download/v0.24.0/cargo-zigbuild-x86_64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/rust-cross/cargo-zigbuild/releases/assets/662592608"
+
+[tools."github:rust-cross/cargo-zigbuild"."platforms.macos-arm64"]
+checksum = "sha256:c88f9b9da35cb67b151dad4384614f769b1b2b5d30630e381c4e9c2b28ed349e"
+checksum_source = "mise-versions"
+url = "https://github.com/rust-cross/cargo-zigbuild/releases/download/v0.24.0/cargo-zigbuild-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/rust-cross/cargo-zigbuild/releases/assets/662592460"
+
+[tools."github:rust-cross/cargo-zigbuild"."platforms.macos-x64"]
+checksum = "sha256:09ec54ffa7e73f393ed60102b984238d4027147423e36da17fb18d66c56f8dcb"
+checksum_source = "mise-versions"
+url = "https://github.com/rust-cross/cargo-zigbuild/releases/download/v0.24.0/cargo-zigbuild-x86_64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/rust-cross/cargo-zigbuild/releases/assets/662592574"
+
+[tools."github:rust-cross/cargo-zigbuild"."platforms.windows-x64"]
+checksum = "sha256:2f1637f56e2f59ee980fe548650e874c381a664803ce94f146808e5b9a5e2adf"
+checksum_source = "mise-versions"
+url = "https://github.com/rust-cross/cargo-zigbuild/releases/download/v0.24.0/cargo-zigbuild-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/rust-cross/cargo-zigbuild/releases/assets/662592602"
+
 [[tools."github:taiki-e/cargo-llvm-cov"]]
 version = "0.9.1"
 backend = "github:taiki-e/cargo-llvm-cov"

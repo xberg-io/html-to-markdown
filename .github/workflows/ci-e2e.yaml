@@ -335,11 +335,10 @@ jobs:
           "uses": "xberg-io/actions/setup-node-workspace@v1",
           "with": { "node-version": "24" },
         }
-      - { "name": "Setup Zig", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "zig" } }
       - {
-          "name": "Install cargo-zigbuild",
-          "shell": "bash",
-          "run": "command -v cargo-zigbuild || cargo install --locked cargo-zigbuild",
+          "name": "Setup Zig and cargo-zigbuild",
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "install-args": "zig github:rust-cross/cargo-zigbuild" },
         }
       - {
           "name": "Build native module",
