@@ -404,6 +404,9 @@ exclude = [
   ".agents/plugins/marketplace.json",
   ".ai-rulez-generated.json",
   "/skills/**",
+  # adrlint owns ADR Markdown with its own rumdl config and content-hash lock; poly would
+  # double-report and its lock-unaware formatter would break locks. ~keep
+  "/adrs/**",
 ]
 
 # Opt-in comment-removal sweep. Preserve doc comments, TODO/FIXME, and
@@ -2335,3 +2338,9 @@ id = "ai-rulez"
 git = "https://github.com/Goldziher/ai-rulez.git"
 revision = "v5.9.2"
 hooks = ["ai-rulez-validate", "ai-rulez-plugin-verify"]
+
+[[workspace.poly.hooks-sources]]
+id = "adrlint"
+git = "https://github.com/Goldziher/adrlint.git"
+revision = "v0.4.0"
+hooks = ["adrlint-lint", "adrlint-format-check", "adrlint-lock-check"]
