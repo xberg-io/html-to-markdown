@@ -1,0 +1,42 @@
+version = 1
+canonical = 1
+
+[adrs."adrs/0000-record-architecture-decisions.md"]
+number = 0
+status = "accepted"
+blake3 = "a3f66d430832f402381010d5983006c7a3caa9be4f41c9c50f9d1b4b0af3e611"
+
+[adrs."adrs/0001-parse-with-the-astral-tl-fork-of-tl.md"]
+number = 1
+status = "accepted"
+blake3 = "4a73b152407333313bdf7a25f72a62d39334c77ba30d47633b30ba59b3a7107e"
+
+[adrs."adrs/0002-repair-malformed-html-with-html5ever.md"]
+number = 2
+status = "accepted"
+blake3 = "af60bff96191f662fee73b5ff7ae6267f2b217945f71c16959bfe82380e2e0b9"
+
+[adrs."adrs/0003-one-convert-entry-point-returning-conversionresult.md"]
+number = 3
+status = "accepted"
+blake3 = "d1039e7ef9bfd7820b6f0e5d01b1efb5f44aedfe69648ed8e2e4eb8f3edca3f7"
+
+[adrs."adrs/0004-visitor-as-a-send-field-of-conversionoptions.md"]
+number = 4
+status = "accepted"
+blake3 = "baf4b0120b13fe6e76e343a1274e2b89ec55b4a1f5e90b69baef1fac798abb4e"
+
+[adrs."adrs/0005-tier-1-byte-scanner-with-tier-2-fallback.md"]
+number = 5
+status = "accepted"
+blake3 = "99abd8a9e392a77ebcf3ace5d388c07f74278171f16e9bdc4d973a8f033e6152"
+
+[adrs."adrs/0006-mcp-server-as-a-feature-gated-core-module.md"]
+number = 6
+status = "accepted"
+blake3 = "0bf5eb8609880796bf1f6e164707ed36c9cad8766959fe48c0696274ee7b3d20"
+
+[adrs."adrs/0007-tracing-as-the-observability-surface.md"]
+number = 7
+status = "accepted"
+blake3 = "45fa84e604f8de943e3c7cd5cf08258f2ca81b21802eebd97ebd65394f4db621"
