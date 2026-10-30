@@ -151,3 +151,4 @@ jobs:
       r-install-deps-script: scripts/ci/r/install-deps.sh
       setup-swift: true
       check-fixture-snippets: true
+      check-adrs: true
