@@ -158,7 +158,7 @@ fn assert_unknown_observer(source: &str, mode: usize, expected: &str, starts: us
             );
             if let Some(document) = result.document {
                 assert_eq!(document.source_format.as_deref(), Some("html"));
-                assert!(!document.nodes.is_empty());
+                assert_ne!(document.nodes, [] as [html_to_markdown_rs::DocumentNode; 0]);
             }
             let observed = {
                 let observer = visitor.lock().expect("observer calls");

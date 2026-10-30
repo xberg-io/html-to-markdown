@@ -325,6 +325,9 @@ mod tests {
     fn test_complete_unknown_argument_is_empty() {
         let reference = Reference::for_prompt(PROMPT_CONVERT);
         let arg = ArgumentInfo::new("unknown", "");
-        assert!(complete(&reference, &arg).completion.values.is_empty());
+        assert_eq!(
+            complete(&reference, &arg).completion.values,
+            [] as [std::string::String; 0]
+        );
     }
 }

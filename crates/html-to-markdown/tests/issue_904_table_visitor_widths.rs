@@ -381,7 +381,7 @@ fn should_keep_colspan_rowspan_and_ragged_columns_after_cell_omissions() {
             let control_source = source.replace("<span>surplus long text</span>", "");
             let control = content(convert(&control_source, options.clone()).expect("span control"));
             rows += 1;
-            assert!(!control.is_empty());
+            assert_ne!(control, "");
             let (result, trace) = observed(
                 source,
                 options.clone(),
@@ -524,7 +524,7 @@ fn should_preserve_tables_inside_code_and_pre_contexts() {
             let source = format!("<{wrapper}>{CHEESE}</{wrapper}>");
             let expected = content(convert(&source, options.clone()).expect("literal control"));
             rows += 1;
-            assert!(!expected.is_empty());
+            assert_ne!(expected, "");
             let (result, trace) = observed(
                 &source,
                 options.clone(),
@@ -557,7 +557,7 @@ fn should_preserve_nested_preview_flattening_and_emission_walks_in_compact_outpu
     for options in configurations(true) {
         let expected = content(convert(source, options.clone()).expect("nested control"));
         rows += 1;
-        assert!(!expected.is_empty());
+        assert_ne!(expected, "");
         let (result, trace) = observed(
             source,
             options,

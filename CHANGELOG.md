@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.19.1] - 2026-10-30
+
 ### Fixed
 
 - Render table headers, body rows, and footers in HTML table order regardless of source section order,
@@ -16,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Run repository tasks with `mise run <task>` instead of go-task; every task name is unchanged.
   `mise.toml` and `mise.lock` now pin the development toolchain, and CI installs it with setup-mise.
-  `ai-rulez:version:check` is gone because mise pins ai-rulez exactly.
+- Upgrade Rust dependencies, including development benchmarks, to current compatible toolchain versions.
 
 ## [3.19.0] - 2026-10-27
 

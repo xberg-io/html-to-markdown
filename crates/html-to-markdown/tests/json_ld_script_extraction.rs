@@ -41,6 +41,6 @@ fn extracts_json_ld_from_body_script_and_keeps_content() {
     let metadata = result.metadata;
 
     assert_eq!(metadata.structured_data.len(), 1);
-    assert!(!metadata.structured_data[0].raw_json.trim().is_empty());
+    assert_ne!(metadata.structured_data[0].raw_json.trim(), "");
     assert_eq!(metadata.structured_data[0].schema_type.as_deref(), Some("Article"));
 }

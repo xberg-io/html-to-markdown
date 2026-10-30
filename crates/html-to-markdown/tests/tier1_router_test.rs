@@ -302,7 +302,7 @@ fn classify_tier2_on_exclude_selectors() {
 #[test]
 fn classify_tier1_when_exclude_selectors_empty() {
     let opts = minimal_options();
-    assert!(opts.exclude_selectors.is_empty());
+    assert_eq!(opts.exclude_selectors, [] as [std::string::String; 0]);
     let choice = route("<p>hello</p>", &opts);
     assert_eq!(choice, RouterDecision::Tier1);
 }

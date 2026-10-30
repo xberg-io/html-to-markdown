@@ -10,18 +10,30 @@
     }
   ],
   "name": "@xberg-io/html-to-markdown-linux-x64-gnu",
-  "version": "3.19.0",
+  "version": "3.19.1",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xberg-io/html-to-markdown.git"
   },
   "main": "html-to-markdown-node.linux-x64-gnu.node",
-  "files": ["html-to-markdown-node.linux-x64-gnu.node"],
-  "os": ["linux"],
-  "cpu": ["x64"],
-  "libc": ["glibc"],
-  "engines": { "node": ">= 22" },
-  "publishConfig": { "access": "public" },
+  "files": [
+    "html-to-markdown-node.linux-x64-gnu.node"
+  ],
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "pnpm@12.15.0"
 }

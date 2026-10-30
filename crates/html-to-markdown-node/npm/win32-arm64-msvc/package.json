@@ -10,17 +10,27 @@
     }
   ],
   "name": "@xberg-io/html-to-markdown-win32-arm64-msvc",
-  "version": "3.19.0",
+  "version": "3.19.1",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xberg-io/html-to-markdown.git"
   },
   "main": "html-to-markdown-node.win32-arm64-msvc.node",
-  "files": ["html-to-markdown-node.win32-arm64-msvc.node"],
-  "os": ["win32"],
-  "cpu": ["arm64"],
-  "engines": { "node": ">= 22" },
-  "publishConfig": { "access": "public" },
+  "files": [
+    "html-to-markdown-node.win32-arm64-msvc.node"
+  ],
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "pnpm@12.15.0"
 }

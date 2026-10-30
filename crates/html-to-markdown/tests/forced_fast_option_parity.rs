@@ -242,7 +242,7 @@ fn should_keep_empty_selector_options_on_scanner() {
     for format in FORMATS {
         for metadata in [false, true] {
             let config = options(format, metadata);
-            assert!(config.exclude_selectors.is_empty());
+            assert_eq!(config.exclude_selectors, [] as [std::string::String; 0]);
             rows += public_rows(
                 "<p>Bread.</p><p>Cheese.</p>",
                 "Bread.\n\nCheese.\n",

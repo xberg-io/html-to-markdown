@@ -385,7 +385,7 @@ mod tests {
         assert!(collector.headers.is_empty());
         assert!(collector.links.is_empty());
         assert!(collector.images.is_empty());
-        assert!(collector.json_ld.is_empty());
+        assert_eq!(collector.json_ld, [] as [std::string::String; 0]);
     }
 
     #[test]

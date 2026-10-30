@@ -390,7 +390,7 @@ fn should_create_block_nodes_when_start_visitor_returns_custom_text() {
             text: "heading replacement".to_string()
         }
     );
-    assert!(heading.annotations.is_empty());
+    assert_eq!(heading.annotations, [] as [html_to_markdown_rs::TextAnnotation; 0]);
 
     let item = node_for(&document, |content| matches!(content, NodeContent::ListItem { .. }));
     assert_eq!(
@@ -399,7 +399,7 @@ fn should_create_block_nodes_when_start_visitor_returns_custom_text() {
             text: "item replacement".to_string()
         }
     );
-    assert!(item.annotations.is_empty());
+    assert_eq!(item.annotations, [] as [html_to_markdown_rs::TextAnnotation; 0]);
 }
 
 #[cfg(feature = "visitor")]
@@ -459,7 +459,7 @@ fn assert_wrapper_rollback(mode: WrapperVisitorMode) {
     );
     for node in &document.nodes {
         assert_eq!(node.parent, None);
-        assert!(node.children.is_empty());
+        assert_eq!(node.children, [] as [u32; 0]);
     }
 }
 

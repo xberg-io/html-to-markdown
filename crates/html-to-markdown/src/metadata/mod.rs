@@ -240,7 +240,7 @@ mod tests {
 
         assert!(doc.title.is_none());
         assert!(doc.description.is_none());
-        assert!(doc.keywords.is_empty());
+        assert_eq!(doc.keywords, [] as [std::string::String; 0]);
         assert!(doc.open_graph.is_empty());
         assert!(doc.twitter_card.is_empty());
         assert!(doc.meta_tags.is_empty());
