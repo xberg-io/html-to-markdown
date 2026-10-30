@@ -49,6 +49,7 @@ jobs:
       UV_PYTHON_PREFERENCE: only-system
     steps:
       - uses: actions/checkout@v7
+      # ~keep ai-rulez runs at its latest release, never a mise pin (org ADR-0015).
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@v1
         with:

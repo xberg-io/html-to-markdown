@@ -38,6 +38,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
         with:

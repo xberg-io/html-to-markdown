@@ -46,6 +46,7 @@ jobs:
           "uses": "xberg-io/actions/free-disk-space-linux@v1",
           "with": { "show-initial": "false", "show-final": "true" },
         }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -116,6 +117,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - {
           "name": "Setup Ruby (Unix)",
@@ -129,6 +131,7 @@ jobs:
               "working-directory": "packages/ruby",
             },
         }
+      # ~keep ruby is a mise lock gap on Windows; this leg keeps its setup action.
       - {
           "name": "Setup Ruby (Windows)",
           "if": "runner.os == 'Windows'",
@@ -200,6 +203,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -227,6 +231,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -288,6 +293,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -337,6 +343,7 @@ jobs:
     timeout-minutes: 120
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -362,6 +369,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep PHP stays on its setup action (org toolchain policy).
       - {
           "name": "Setup PHP",
           "uses": "shivammathur/setup-php@v2",
@@ -373,6 +381,7 @@ jobs:
               "coverage": "none",
             },
         }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - { "name": "Capture php-config path", "run": "scripts/ci/php/set-php-config.sh", "shell": "bash" }
       - {
@@ -409,6 +418,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - { "name": "Setup Go", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "go" } }
       - {
@@ -445,11 +455,13 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep BEAM stays on its setup action until evaluated for mise (org toolchain policy).
       - {
           "name": "Setup Elixir",
           "uses": "erlef/setup-beam@v1",
           "with": { "elixir-version": "1.19", "otp-version": "28.1" },
         }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - { "name": "Install Hex/Rebar", "run": "scripts/ci/elixir/install-hex-rebar.sh", "shell": "bash" }
       - {
@@ -479,11 +491,13 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep R stays on its setup action (org toolchain policy).
       - {
           "name": "Setup R",
           "uses": "xberg-io/actions/setup-r@v1",
           "with": { "install-deps-script": "scripts/ci/r/install-deps.sh" },
         }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - {
           "name": "Run tests",
@@ -508,6 +522,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -542,6 +557,7 @@ jobs:
     timeout-minutes: 120
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -576,6 +592,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -618,6 +635,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -655,8 +673,11 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1", "with": { "cache-key-prefix": "swift" } }
+      # ~keep Swift stays on its setup action (org toolchain policy).
       - { "name": "Setup Swift", "uses": "xberg-io/actions/setup-swift@v1", "with": { "version": "6.0" } }
+      # ~keep PHP stays on its setup action (org toolchain policy).
       - { "name": "Setup PHP", "uses": "shivammathur/setup-php@v2", "with": { "php-version": "8.3" } }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - { "name": "Run E2E tests", "run": "alef test --e2e --lang swift", "shell": "bash" }
@@ -668,7 +689,9 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1", "with": { "cache-key-prefix": "dart" } }
+      # ~keep Dart/Flutter stays on its setup action (org toolchain policy).
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - { "name": "Run E2E tests", "run": "alef test --e2e --lang dart", "shell": "bash" }
@@ -680,6 +703,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1", "with": { "cache-key-prefix": "zig" } }
       - { "name": "Setup Zig", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "zig" } }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }

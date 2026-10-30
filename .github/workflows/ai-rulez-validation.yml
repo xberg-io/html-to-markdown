@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      # ~keep ai-rulez runs at its latest release, never a mise pin (org ADR-0015).
       - uses: xberg-io/actions/setup-ai-rulez@v1
         with:
           ai-rulez-version: "latest"

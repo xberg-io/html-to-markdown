@@ -41,6 +41,7 @@ jobs:
           python3 "$GITHUB_WORKSPACE/scripts/ci/verify_plugin_recovery_source.py" \
             "$PLUGIN_TAG" "$SOURCE_SHA" > "$RUNNER_TEMP/plugin-source-provenance.json"
           cat "$RUNNER_TEMP/plugin-source-provenance.json"
+      # ~keep ai-rulez runs at its latest release, never a mise pin (org ADR-0015).
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@v1
         with:

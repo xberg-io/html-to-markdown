@@ -214,6 +214,7 @@ jobs:
           "uses": "actions/setup-python@v7",
           "with": { "python-version": "${{ matrix.python }}" },
         }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -262,6 +263,7 @@ jobs:
             runtime: bun
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -321,6 +323,7 @@ jobs:
         target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -397,6 +400,7 @@ jobs:
         ruby: ["3.2", "3.3"]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -413,6 +417,7 @@ jobs:
             "working-directory": "packages/ruby",
           },
         }
+      # ~keep ruby is a mise lock gap on Windows; this leg keeps its setup action.
       - {
           "name": "Setup Ruby (Windows)",
           "if": "runner.os == 'Windows'",
@@ -463,6 +468,7 @@ jobs:
           - { os: windows-latest, label: windows-x86_64 }
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep PHP stays on its setup action (org toolchain policy).
       - {
           "name": "Setup PHP",
           "uses": "shivammathur/setup-php@v2",
@@ -473,6 +479,7 @@ jobs:
             "coverage": "none",
           },
         }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -519,11 +526,13 @@ jobs:
         os: [ubuntu-latest, macos-26, windows-latest]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
           "with": { "cache-key-prefix": "csharp-${{ matrix.os }}" },
         }
+      # ~keep dotnet is a mise lock gap (script install, no checksummed artifact).
       - { "name": "Setup .NET", "uses": "actions/setup-dotnet@v6", "with": { "dotnet-version": "10.0.x" } }
       - {
           "name": "Build FFI library (Unix)",
@@ -590,6 +599,7 @@ jobs:
           "uses": "actions/setup-python@v7",
           "with": { "python-version": "${{ matrix.python }}" },
         }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
@@ -632,6 +642,7 @@ jobs:
             runtime: bun
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - {
           "name": "Setup Node.js workspace",
@@ -706,11 +717,13 @@ jobs:
         os: [ubuntu-latest, macos-26, windows-latest]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
           "with": { "cache-key-prefix": "csharp-test-${{ matrix.os }}" },
         }
+      # ~keep dotnet is a mise lock gap (script install, no checksummed artifact).
       - { "name": "Setup .NET", "uses": "actions/setup-dotnet@v6", "with": { "dotnet-version": "10.0.x" } }
       - {
           "name": "Build FFI library (Unix)",
@@ -768,6 +781,7 @@ jobs:
         java: ["25"]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
       - {
           "name": "Test Java Panama FFI bindings",
@@ -814,6 +828,7 @@ jobs:
           - macos-26
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
