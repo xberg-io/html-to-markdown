@@ -45,9 +45,8 @@ This will install the pinned toolchain from `mise.toml`, the dependencies, and p
 | `mise run lint`       | Run all linters (with auto-fix)                 |
 | `mise run format`     | Format all code                                 |
 | `mise run check`      | Combined lint + format check (no modifications) |
-| `mise run bench:run`  | Run benchmarks                                  |
 
-For language-specific commands, use the namespace pattern: `mise run rust:test`, `mise run python:build`, `mise run node:e2e:test`, etc. `mise tasks` lists them all.
+For language-specific commands, use the namespace pattern: `mise run rust:test`, `mise run rust:e2e:test`, `mise run node:e2e:test`, etc. `mise tasks` lists them all.
 
 ## What to keep in mind
 
@@ -90,7 +89,8 @@ The main `config.toml` selects the `plugins` layer through `default_layers`; mar
 plugin settings live separately in `config.plugins.toml`.
 
 ```sh
-mise run governance:generate
+ai-rulez validate --no-local
+ai-rulez generate --no-local --strict-config
 mise run governance:check
 ```
 

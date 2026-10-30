@@ -55,10 +55,6 @@ run = [{ task = "rust:build" }]
 description = "Run Rust core test suite only"
 run = [{ task = "rust:test" }]
 
-[tasks."test:ci"]
-description = "Run all tests with coverage (CI mode)"
-run = [{ task = "rust:test:ci" }, "alef test --coverage"]
-
 [tasks.check]
 description = "Run all checks (format + lint, no modifications)"
 run = [{ task = "format:check" }, { task = "lint" }, { task = "node:verify-loader" }]
@@ -83,12 +79,6 @@ run = ["alef update --latest", "gau --update .", "mise run deps upgrade"]
 description = "Remove build artifacts across all languages"
 run = [{ task = "rust:clean" }, "alef clean"]
 
-# ---- Governance and plugin ---------------------------------------------------------------------
-
-[tasks."governance:generate"]
-description = "Validate and regenerate local governance with the reviewed generator"
-run = ["ai-rulez validate --no-local", "ai-rulez generate --no-local --strict-config"]
-
 # ---- Versions and publishing -------------------------------------------------------------------
 
 [tasks."version:sync"]
@@ -107,44 +97,7 @@ run = [
   { task = "alef:verify:strict" },
 ]
 
-# ---- alef --------------------------------------------------------------------------------------
-
-[tasks."alef:generate"]
-description = "Regenerate all Alef-managed outputs without building"
-# @napi-rs/cli 3.x emits an explicit `module.exports.<name> = nativeBinding.<name>` line for
-# every runtime export, so cjs-module-lexer resolves named ESM imports straight off napi's
-# output (#450). The post-build re-export fixup that used to run here is gone; do not
-# reintroduce one. `node:verify-esm` is the guard that this stays true. ~keep
-# ~keep `alef all` never builds the per-language artifacts that a `compile`/`typecheck`
-# `docs.snippets.validation_level` needs (only `alef build` does), so leaving validation on
-# spawns a doomed toolchain per snippet and cannot pass by construction. Discovery, the
-# reference-page audit and gap detection still run. Use `mise run alef:snippets` after
-# `alef build` when you actually want validation.
-run = "alef all --clean --skip-snippet-validation --skip-compile"
-
-[tasks."alef:sync"]
-description = "Sync the version to all manifests and the plugin version pin"
-# Delegate instead of calling `alef sync-versions` directly: release runs that used the bare
-# command left the plugin version pin behind. ~keep
-run = [{ task = "version:sync" }]
-
-[tasks."alef:docs"]
-description = "Generate API reference documentation"
-run = "alef docs"
-
-[tasks."readme:generate"]
-description = "Generate package READMEs using alef"
-run = "alef readme"
-
 # ---- Docs --------------------------------------------------------------------------------------
-
-[tasks."docs:lint:prose"]
-description = "Lint prose with textlint"
-run = "pnpm exec textlint 'docs-site/src/content/docs/**/*.{md,mdx}'"
-
-[tasks."docs:snippets:list"]
-description = "List all discovered snippets"
-run = "alef snippets list --snippets docs-site/src/snippets"
 
 [tasks."docs:snippets:gaps"]
 description = "Report snippet coverage gaps (missing variants, unreferenced files, etc.)"
@@ -156,10 +109,6 @@ description = "Report snippet coverage gaps (missing variants, unreferenced file
 run = """\
   alef snippets gaps --snippets docs-site/src/snippets --docs docs-site/src/content/docs \
   --required-languages rust,python,typescript,go,ruby,php,java,csharp,elixir,r,c,swift,dart,zig"""
-
-[tasks."docs:snippets:audit"]
-description = "Run structural audit (frontmatter, fences, includes)"
-run = "alef snippets audit --snippets docs-site/src/snippets --docs docs-site/src/content/docs"
 
 # ---- Rust --------------------------------------------------------------------------------------
 
@@ -208,13 +157,6 @@ run = "cargo fmt --all --check"
 description = "Run Rust E2E tests in e2e/rust directory"
 run = "cargo test --manifest-path e2e/rust/Cargo.toml"
 
-# ---- Python ------------------------------------------------------------------------------------
-
-[tasks."python:build"]
-description = "Build Python bindings with maturin (release unless BUILD_PROFILE says otherwise)"
-dir = "packages/python"
-run = 'if [ "${BUILD_PROFILE:-release}" = release ]; then maturin develop --release; else maturin develop; fi'
-
 # ---- Node --------------------------------------------------------------------------------------
 
 [tasks."node:audit"]
@@ -232,8 +174,11 @@ run = "bun run build"
 
 [tasks."node:verify-esm"]
 description = "Assert named ESM imports resolve from the built Node binding (#450 guard)"
+# @napi-rs/cli 3.x emits an explicit `module.exports.<name> = nativeBinding.<name>` line for
+# every runtime export, so cjs-module-lexer resolves named ESM imports straight off napi's
+# output (#450). Do not reintroduce a post-build re-export fixup; this is the guard. ~keep
 # Requires an already-built host binding: the guard loads the real `.node`, so it cannot run
-# after a bare `alef:generate` (nothing built) or in the cross-compiling publish pipeline
+# after a bare `alef generate` (nothing built) or in the cross-compiling publish pipeline
 # (artifact targets a foreign platform). ~keep
 run = "node crates/html-to-markdown-node/scripts/verify-esm-exports.mjs"
 
@@ -257,12 +202,6 @@ run = ["alef test --e2e --lang node", { task = "node:verify-esm" }]
 [tasks."r:docs:verify"]
 description = "Check committed R reference pages against a fresh roxygen2 render"
 run = "scripts/ci/r/verify-reference.sh"
-
-# ---- E2E ---------------------------------------------------------------------------------------
-
-[tasks."e2e:test"]
-description = "Run E2E tests for all languages"
-run = "alef test --e2e"
 
 # ---- Benchmarks --------------------------------------------------------------------------------
 

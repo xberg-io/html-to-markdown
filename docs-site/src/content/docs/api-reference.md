@@ -5,7 +5,7 @@ description: "Generated, binding-accurate API pages from the Rust source (alef d
 
 ## API reference
 
-These pages are **generated** from the public Rust API surface. You can run `mise run alef:generate` (or `alef docs`) after changing types, options, or `alef.toml` so the Markdown under `docs/reference/` stays in sync.
+These pages are **generated** from the public Rust API surface. You can run `alef docs` after changing types, options, or `alef.toml` so the Markdown under `docs/reference/` stays in sync.
 
 | Topic                               | Link                                                    |
 | ----------------------------------- | ------------------------------------------------------- |

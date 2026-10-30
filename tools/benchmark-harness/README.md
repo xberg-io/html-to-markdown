@@ -10,7 +10,8 @@ when available. Hostname is diagnostic only and is never part of the compatibili
 Run a normal capture and comparison with:
 
 ```sh
-mise run bench:run
+HTMBENCH_LOG=htmbench=info,html_to_markdown=error \
+  cargo run --release -p html-to-markdown-bench -- run --output tools/benchmark-harness/results/latest.json
 mise run bench:compare
 ```
 
