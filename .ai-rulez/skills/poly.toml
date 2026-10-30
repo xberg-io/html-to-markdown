@@ -1,0 +1,3 @@
+# ~keep Governance titles identify records; count body H1s separately.
+[lint.markdown.rumdl.rules.MD025]
+front-matter-title = ""
