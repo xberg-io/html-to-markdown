@@ -57,7 +57,7 @@ pub fn get_previous_sibling_tag<'a>(
 }
 
 /// Order table row groups as rendered by the HTML table model.
-pub(crate) fn table_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser) -> Vec<tl::NodeHandle> {
+pub fn table_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser) -> Vec<tl::NodeHandle> {
     let mut children: Vec<_> = tag.children().top().iter().copied().collect();
     children.sort_by_key(|handle| {
         let Some(tl::Node::Tag(child)) = handle.get(parser) else {
