@@ -297,12 +297,12 @@ bin/
 
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .ai-rulez/.config.local.*
-.mcp.json
 .opencode/agents/
 .opencode/commands/
-AGENTS.md
-CLAUDE.md
-opencode.json
+/.mcp.json
+/AGENTS.md
+/CLAUDE.md
+/opencode.json
 # END ai-rulez
 
 # Agent harness output outside the ai-rulez managed block: the machine-local overlay,
