@@ -5,7 +5,7 @@ lockfile = true
 lockfile_platforms = ["linux-x64", "linux-arm64", "macos-arm64", "macos-x64", "windows-x64"]
 
 [task_config]
-includes = ["mise-tasks/shared.toml", "mise-tasks", "mise-tasks/test-apps.toml"]
+includes = ["mise-tasks/shared.toml", "mise-tasks"]
 
 [tools]
 python = "3.13.18"

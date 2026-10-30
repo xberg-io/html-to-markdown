@@ -9,11 +9,15 @@ Exercises the configured Homebrew formulae from tap `xberg-io/tap` at the releas
 
 ## Running
 
-Run from the repository root:
+From `test_apps/homebrew`, with `<version>` from `mise run version:show`:
 
 ```bash
-mise run test-apps:smoke:homebrew
+brew bundle install --file=Brewfile
+"$(brew --prefix html-to-markdown)/bin/html-to-markdown" --version   # expect: html-to-markdown <version>
 ```
+
+Then compile a C probe against `$(brew --prefix libhtml-to-markdown)` that prints `htm_version()` and check it
+reports the same version.
 
 ## What it tests
 
