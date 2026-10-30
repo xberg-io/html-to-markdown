@@ -237,6 +237,41 @@ checksum_source = "mise-versions"
 url = "https://github.com/rust-cross/cargo-zigbuild/releases/download/v0.24.0/cargo-zigbuild-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/rust-cross/cargo-zigbuild/releases/assets/662592602"
 
+[[tools."github:rustwasm/wasm-pack"]]
+version = "0.15.0"
+backend = "github:rustwasm/wasm-pack"
+specifiers = ["0.15.0"]
+
+[tools."github:rustwasm/wasm-pack"."platforms.linux-arm64"]
+checksum = "sha256:e17ef0806381c3a0acb9c9ddad643a49facaa5a2ecf657a421d4d8f3357a24b7"
+checksum_source = "mise-versions"
+url = "https://github.com/rustwasm/wasm-pack/releases/download/v0.15.0/wasm-pack-v0.15.0-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rustwasm/wasm-pack/releases/assets/420850444"
+
+[tools."github:rustwasm/wasm-pack"."platforms.linux-x64"]
+checksum = "sha256:c09f971ecaed9a2efc80fdcea7a00ef6b53c7fadc8c57d1f61b53a6aa66b668a"
+checksum_source = "mise-versions"
+url = "https://github.com/rustwasm/wasm-pack/releases/download/v0.15.0/wasm-pack-v0.15.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rustwasm/wasm-pack/releases/assets/420850440"
+
+[tools."github:rustwasm/wasm-pack"."platforms.macos-arm64"]
+checksum = "sha256:0abff4a03d670b6c00ea31d0e1608a72407e355f3d3765e9c30eb45cd5b7e318"
+checksum_source = "mise-versions"
+url = "https://github.com/rustwasm/wasm-pack/releases/download/v0.15.0/wasm-pack-v0.15.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rustwasm/wasm-pack/releases/assets/420850469"
+
+[tools."github:rustwasm/wasm-pack"."platforms.macos-x64"]
+checksum = "sha256:d3f1a4a33e95f8f0d7801b024e08624c479999ac96aa150908b2394015cd0363"
+checksum_source = "mise-versions"
+url = "https://github.com/rustwasm/wasm-pack/releases/download/v0.15.0/wasm-pack-v0.15.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rustwasm/wasm-pack/releases/assets/420850460"
+
+[tools."github:rustwasm/wasm-pack"."platforms.windows-x64"]
+checksum = "sha256:518dc51180c7bc864699c9279b3bc99025bc109123e0249a34ba34d130a509bf"
+checksum_source = "mise-versions"
+url = "https://github.com/rustwasm/wasm-pack/releases/download/v0.15.0/wasm-pack-v0.15.0-x86_64-pc-windows-msvc.tar.gz"
+url_api = "https://api.github.com/repos/rustwasm/wasm-pack/releases/assets/420850448"
+
 [[tools."github:taiki-e/cargo-llvm-cov"]]
 version = "0.9.1"
 backend = "github:taiki-e/cargo-llvm-cov"
@@ -391,6 +426,31 @@ checksum = "sha256:32975d1493ee1a975d6bb41e4fb56fe419cb442ded628bb772ba2e614acfa
 checksum_source = "mise-versions"
 url = "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/lycheeverse/lychee/releases/assets/409959491"
+
+[[tools.maven]]
+version = "3.10.0"
+backend = "aqua:apache/maven"
+specifiers = ["3.10.0"]
+
+[tools.maven."platforms.linux-arm64"]
+checksum = "sha512:908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799102bffb84518cde74c679bd76870247c6528683abdd620581bffa90f95d92d175aa"
+url = "https://archive.apache.org/dist/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz"
+
+[tools.maven."platforms.linux-x64"]
+checksum = "sha512:908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799102bffb84518cde74c679bd76870247c6528683abdd620581bffa90f95d92d175aa"
+url = "https://archive.apache.org/dist/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz"
+
+[tools.maven."platforms.macos-arm64"]
+checksum = "sha512:908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799102bffb84518cde74c679bd76870247c6528683abdd620581bffa90f95d92d175aa"
+url = "https://archive.apache.org/dist/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz"
+
+[tools.maven."platforms.macos-x64"]
+checksum = "sha512:908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799102bffb84518cde74c679bd76870247c6528683abdd620581bffa90f95d92d175aa"
+url = "https://archive.apache.org/dist/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz"
+
+[tools.maven."platforms.windows-x64"]
+checksum = "sha512:908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799102bffb84518cde74c679bd76870247c6528683abdd620581bffa90f95d92d175aa"
+url = "https://archive.apache.org/dist/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz"
 
 [[tools.node]]
 version = "26.12.1"

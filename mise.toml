@@ -26,6 +26,8 @@ jq = "1.8.2"
 actionlint = "1.7.12"
 bats = "1.14.0"
 lychee = "0.24.2"
+maven = "3.10.0"
+"github:rustwasm/wasm-pack" = "0.15.0"
 
 [env]
 # Repository specifics for the shared task sets (toolchains.toml task_sets). ~keep
