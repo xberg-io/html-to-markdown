@@ -138,7 +138,7 @@ fn should_remove_the_two_tags_of_an_element_together_or_not_at_all() {
 #[test]
 fn should_give_the_tag_end_that_a_scan_from_each_byte_gives() {
     // ~keep Every page of up to eight bytes over the bytes that the scan tells apart.
-    let alphabet = [b'"', b'\'', b'>', b'a'];
+    let alphabet = *b"\"'>a";
     let mut compared = 0;
     for len in 0..=8u32 {
         for mut code in 0..4usize.pow(len) {

@@ -518,7 +518,7 @@ fn tag_declares_shadow_root(tag: &str) -> bool {
 /// unchanged if there is no `=`.
 ///
 /// Extracted from `tag_has_hidden_attribute` — identical quote-aware value scan, unchanged.
-fn skip_attribute_value(bytes: &[u8], mut i: usize, len: usize) -> usize {
+const fn skip_attribute_value(bytes: &[u8], mut i: usize, len: usize) -> usize {
     if i >= len || bytes[i] != b'=' {
         return i;
     }

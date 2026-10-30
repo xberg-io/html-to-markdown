@@ -11,7 +11,7 @@ use std::ops::Range;
 /// (whitespace, `/`, `>`).
 #[inline]
 #[must_use]
-pub fn scan_tag_name(bytes: &[u8], start: usize) -> usize {
+pub const fn scan_tag_name(bytes: &[u8], start: usize) -> usize {
     let mut end = start;
     while end < bytes.len() && is_tag_name_continue(bytes[end]) {
         end += 1;
@@ -36,7 +36,7 @@ pub const fn is_tag_name_continue(b: u8) -> bool {
 /// Skip ASCII whitespace, returning the new position.
 #[inline]
 #[must_use]
-pub fn skip_ws(bytes: &[u8], mut pos: usize) -> usize {
+pub const fn skip_ws(bytes: &[u8], mut pos: usize) -> usize {
     while pos < bytes.len() && bytes[pos].is_ascii_whitespace() {
         pos += 1;
     }

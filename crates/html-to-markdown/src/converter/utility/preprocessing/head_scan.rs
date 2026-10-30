@@ -128,7 +128,7 @@ impl HeadScan {
         }
     }
 
-    fn after_end_tag(self, name: &[u8]) -> Self {
+    const fn after_end_tag(self, name: &[u8]) -> Self {
         match name {
             b"head" => self.at(Place::AfterEndTag),
             name if end_tag_starts_body(name) => self.body(),
@@ -155,7 +155,7 @@ impl HeadScan {
 
 impl Inside {
     /// The element that the start tag named `name` opens in the head.
-    fn opened_by(name: &[u8], closes_itself: bool) -> Self {
+    const fn opened_by(name: &[u8], closes_itself: bool) -> Self {
         match name {
             _ if closes_itself => Self::Nothing,
             b"title" => Self::Title,
@@ -166,7 +166,7 @@ impl Inside {
     }
 
     /// The element that the scan is in after a tag named `name` in the content of `self`.
-    fn after_tag(self, name: &[u8], is_end_tag: bool, closes_itself: bool) -> Self {
+    const fn after_tag(self, name: &[u8], is_end_tag: bool, closes_itself: bool) -> Self {
         match (self, name) {
             (Self::Title, b"title") | (Self::Noscript, b"noscript") | (Self::Template(1), b"template")
                 if is_end_tag =>

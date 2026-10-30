@@ -82,14 +82,13 @@ pub(super) fn parse_descriptor(descriptor: &str) -> Option<Descriptor> {
                 return None;
             }
             density = Some(non_negative_float(number)?);
-        } else if let Some(number) = token.strip_suffix('h') {
+        } else {
+            let number = token.strip_suffix('h')?;
             if has_height || density.is_some() {
                 return None;
             }
             positive_integer(number)?;
             has_height = true;
-        } else {
-            return None;
         }
     }
     if has_height && width.is_none() {

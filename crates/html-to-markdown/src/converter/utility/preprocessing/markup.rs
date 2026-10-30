@@ -355,7 +355,7 @@ fn strip_doctype(
 /// be entity-escaped so a later HTML parse does not swallow following content as a bogus tag.
 ///
 /// Extracted from `preprocess_html`'s main scan loop — identical byte-class checks, unchanged.
-fn looks_like_tag_start(bytes: &[u8], idx: usize, len: usize) -> bool {
+const fn looks_like_tag_start(bytes: &[u8], idx: usize, len: usize) -> bool {
     if idx + 1 >= len {
         return false;
     }
@@ -463,7 +463,7 @@ pub(super) fn second_pass<C: FnMut(PassRead)>(input: &str, count: C) -> Cow<'_, 
 ///
 /// Extracted from `is_json_ld_script_open_tag`'s unquoted-value branch — identical scan,
 /// unchanged.
-fn scan_unquoted_attr_value_end(bytes: &[u8], start: usize) -> usize {
+const fn scan_unquoted_attr_value_end(bytes: &[u8], start: usize) -> usize {
     let mut end = start;
     while end < bytes.len() && !bytes[end].is_ascii_whitespace() && bytes[end] != b'>' {
         end += 1;

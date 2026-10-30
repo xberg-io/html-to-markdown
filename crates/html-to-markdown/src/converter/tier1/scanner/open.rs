@@ -172,7 +172,7 @@ const fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReas
 // though they can also hit a preprocessing-strip shortcut elsewhere
 // (`is_preprocessing_skip_candidate`): when that shortcut does NOT fire, they
 // get semantic-handler separator behaviour like `<div>`.
-fn block_container_is_passthrough(name_lower: &[u8]) -> bool {
+const fn block_container_is_passthrough(name_lower: &[u8]) -> bool {
     matches!(name_lower, b"colgroup" | b"col" | b"base" | b"html" | b"body")
 }
 
@@ -772,7 +772,7 @@ fn open_list(state: &mut Tier1State, kind: ListKind, options: &ConversionOptions
 /// Cycle through the canonical default `options.bullets` value (`"-*+"`) by
 /// `<ul>` nesting depth.  The router (`router.rs::classify`) gates Tier-1 to
 /// the literal default, so this hardcoded cycle reproduces Tier-2 byte-for-byte.
-const TIER1_BULLETS: [u8; 3] = [b'-', b'*', b'+'];
+const TIER1_BULLETS: [u8; 3] = *b"-*+";
 
 fn open_list_item(state: &mut Tier1State, options: &ConversionOptions) {
     // ~keep When inside a table cell, Tier-2 does NOT emit bullet/number prefixes

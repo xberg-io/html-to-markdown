@@ -413,7 +413,7 @@ fn find_attr<'a>(attrs: &[(&'a [u8], Option<&'a [u8]>)], key: &[u8]) -> Option<&
 /// Returns true when `name_lower` is a tag that *may* need preprocessing-skip
 /// evaluation.  All other tags skip the more expensive `should_skip_preprocessing`
 /// check entirely.
-fn is_preprocessing_skip_candidate(name_lower: &[u8]) -> bool {
+const fn is_preprocessing_skip_candidate(name_lower: &[u8]) -> bool {
     matches!(name_lower, b"nav" | b"header" | b"footer" | b"aside" | b"form")
 }
 

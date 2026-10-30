@@ -32,5 +32,5 @@ fn test_spa_first_half() {
 
     let result = convert(&html, Some(opts)).unwrap();
     eprintln!("Result length: {}", result.len());
-    assert!(!result.is_empty());
+    assert_ne!(result, "");
 }

@@ -239,7 +239,7 @@ fn should_not_collect_text_or_annotations_from_excluded_descendants() {
             text: "kept  tail".to_string()
         }
     );
-    assert!(paragraph.annotations.is_empty());
+    assert_eq!(paragraph.annotations, Vec::new());
 }
 
 #[test]
@@ -260,7 +260,7 @@ fn should_not_collect_text_or_annotations_beyond_max_depth() {
             text: "kept".to_string()
         }
     );
-    assert!(paragraph.annotations.is_empty());
+    assert_eq!(paragraph.annotations, Vec::new());
 }
 
 #[cfg(feature = "visitor")]
@@ -295,7 +295,7 @@ fn should_replace_collected_descendants_when_visitor_replaces_element() {
             text: "kept replacement tail".to_string()
         }
     );
-    assert!(paragraph.annotations.is_empty());
+    assert_eq!(paragraph.annotations, Vec::new());
 }
 
 #[cfg(feature = "visitor")]
@@ -309,7 +309,7 @@ fn should_rollback_strong_annotation_when_specialized_visitor_skips_element() {
             text: "before after".to_string()
         }
     );
-    assert!(paragraph.annotations.is_empty());
+    assert_eq!(paragraph.annotations, Vec::new());
 }
 
 #[cfg(feature = "visitor")]
@@ -323,7 +323,7 @@ fn should_replace_strong_annotation_when_specialized_visitor_returns_custom_text
             text: "before replacement after".to_string()
         }
     );
-    assert!(paragraph.annotations.is_empty());
+    assert_eq!(paragraph.annotations, Vec::new());
 }
 
 #[cfg(feature = "visitor")]
@@ -337,7 +337,7 @@ fn should_replace_strong_annotation_when_specialized_visitor_preserves_html() {
             text: "before <strong>hidden</strong> after".to_string()
         }
     );
-    assert!(paragraph.annotations.is_empty());
+    assert_eq!(paragraph.annotations, Vec::new());
 }
 
 #[cfg(feature = "visitor")]
@@ -380,7 +380,7 @@ fn should_create_block_nodes_when_start_visitor_returns_custom_text() {
             text: "paragraph replacement".to_string()
         }
     );
-    assert!(paragraph.annotations.is_empty());
+    assert_eq!(paragraph.annotations, Vec::new());
 
     let heading = node_for(&document, |content| matches!(content, NodeContent::Heading { .. }));
     assert_eq!(

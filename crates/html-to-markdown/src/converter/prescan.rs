@@ -319,7 +319,7 @@ fn matches_end_tag_start(bytes: &[u8], start: usize, tag: &[u8]) -> bool {
     matches_tag_start(bytes, start + 1, tag)
 }
 
-fn find_tag_end(bytes: &[u8], mut idx: usize) -> Option<usize> {
+const fn find_tag_end(bytes: &[u8], mut idx: usize) -> Option<usize> {
     let len = bytes.len();
     let mut in_quote: Option<u8> = None;
     while idx < len {

@@ -25,7 +25,7 @@ enum ListTagScan {
 ///
 /// Extracted from `normalize_unclosed_list_items`'s main scan loop — identical comment
 /// state-machine, unchanged.
-fn advance_past_comment(bytes: &[u8], idx: &mut usize, len: usize, in_comment: &mut bool) -> bool {
+const fn advance_past_comment(bytes: &[u8], idx: &mut usize, len: usize, in_comment: &mut bool) -> bool {
     let b = bytes[*idx];
 
     if *in_comment {
@@ -51,7 +51,7 @@ fn advance_past_comment(bytes: &[u8], idx: &mut usize, len: usize, in_comment: &
 ///
 /// Extracted from `normalize_unclosed_list_items`'s main scan loop — identical open/close-slash,
 /// whitespace-skip, name-scan, and quote-aware attribute scan, unchanged.
-fn scan_list_tag(bytes: &[u8], tag_start: usize, len: usize) -> ListTagScan {
+const fn scan_list_tag(bytes: &[u8], tag_start: usize, len: usize) -> ListTagScan {
     let mut idx = tag_start + 1;
     if idx >= len {
         return ListTagScan::Truncated;

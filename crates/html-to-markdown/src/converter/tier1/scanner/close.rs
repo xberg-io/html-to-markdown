@@ -324,7 +324,7 @@ fn separate_blockquote_prefix(output: &mut String, previous_context: EscapeCtx) 
 ///
 /// A cell break checks and trims only that buffer in Tier-2, so Tier-1 must not look past the
 /// start of such an element in the flat cell buffer (see [`cell_scratch_start`]).
-fn renders_into_own_buffer(kind: TagKind, name_lower: &[u8], ctx: EscapeCtx) -> bool {
+const fn renders_into_own_buffer(kind: TagKind, name_lower: &[u8], ctx: EscapeCtx) -> bool {
     match kind {
         // ~keep In a cell Tier-2 writes a figure, fieldset, dl, details, dialog, menu and form
         // ~keep straight into the cell. It gives a legend and a figure caption a buffer of their

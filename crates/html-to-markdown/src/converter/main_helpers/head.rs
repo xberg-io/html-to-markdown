@@ -372,7 +372,7 @@ pub fn is_ignorable_before_head(text: &str, next_tag_is_html: bool) -> bool {
 
 /// Whether a start tag named `name` (lower case) starts the body when no body has started:
 /// every tag except the ones the HTML parser's "in head" insertion mode keeps in the head.
-pub fn starts_body(name: &[u8]) -> bool {
+pub const fn starts_body(name: &[u8]) -> bool {
     !matches!(
         name,
         b"html"
@@ -394,6 +394,6 @@ pub fn starts_body(name: &[u8]) -> bool {
 /// Whether an end tag named `name` (lower case) starts the body when no body has started. The
 /// HTML parser's "in head" insertion mode reads these three as the first thing after the head
 /// and ignores every other end tag.
-pub fn end_tag_starts_body(name: &[u8]) -> bool {
+pub const fn end_tag_starts_body(name: &[u8]) -> bool {
     matches!(name, b"body" | b"html" | b"br")
 }

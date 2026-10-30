@@ -42,8 +42,7 @@ fn decode_utf16_without_bom(bytes: &[u8]) -> String {
 
     let is_little_endian = odd_nul >= even_nul;
     let mut units = Vec::with_capacity(bytes.len() / 2);
-    let mut chunks = bytes.chunks_exact(2);
-    for chunk in &mut chunks {
+    for chunk in bytes.as_chunks::<2>().0 {
         let unit = if is_little_endian {
             u16::from_le_bytes([chunk[0], chunk[1]])
         } else {

@@ -263,10 +263,7 @@ pub fn previous_content_block_through<'a>(
     PREVIOUS_CONTENT_BLOCK_CALLS.with(|calls| calls.set(calls.get() + 1));
     let id = node_handle.get_inner();
     let siblings = match dom_ctx.parent_of(id) {
-        Some(parent_id) => match dom_ctx.children_of(parent_id) {
-            Some(children) => children.as_slice(),
-            None => return None,
-        },
+        Some(parent_id) => dom_ctx.children_of(parent_id)?.as_slice(),
         None => dom_ctx.root_children.as_slice(),
     };
     let position = dom_ctx
@@ -285,13 +282,8 @@ pub fn previous_content_block_through<'a>(
                 if !looks_into(&info.name) {
                     return None;
                 }
-                match dom_ctx.children_of(sibling.get_inner()) {
-                    Some(children) => {
-                        nodes = children.as_slice();
-                        continue 'outer;
-                    }
-                    None => return None,
-                }
+                nodes = dom_ctx.children_of(sibling.get_inner())?.as_slice();
+                continue 'outer;
             }
             if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
                 if !raw.as_utf8_str().trim().is_empty() {

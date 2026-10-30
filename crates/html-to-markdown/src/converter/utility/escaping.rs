@@ -319,7 +319,7 @@ pub fn escape_bare_pipes_outside_code_spans(text: &str) -> String {
 /// Find the start index of the next backtick run of exactly `run_len` backticks at or
 /// after `start`, treating a longer or shorter run as not matching (mirroring `CommonMark`
 /// code span matching, which requires an exact backtick-count match).
-pub fn find_matching_backtick_run(chars: &[char], start: usize, run_len: usize) -> Option<usize> {
+pub const fn find_matching_backtick_run(chars: &[char], start: usize, run_len: usize) -> Option<usize> {
     let mut i = start;
     while i < chars.len() {
         if chars[i] == '`' {

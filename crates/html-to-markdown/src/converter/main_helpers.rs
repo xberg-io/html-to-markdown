@@ -382,7 +382,7 @@ const HTML5_VOID_ELEMENTS: &[&str] = &[
 /// Advance past a `</tag>` closing tag, starting at the `/` immediately after `<` (`i` points
 /// at that `/`). Returns the index just past the `>`, or `len` if never terminated. Extracted
 /// from `expand_xml_self_closing_tags` — identical scan, unchanged.
-fn skip_closing_tag(bytes: &[u8], mut i: usize, len: usize) -> usize {
+const fn skip_closing_tag(bytes: &[u8], mut i: usize, len: usize) -> usize {
     while i < len && bytes[i] != b'>' {
         i += 1;
     }
@@ -395,7 +395,7 @@ fn skip_closing_tag(bytes: &[u8], mut i: usize, len: usize) -> usize {
 /// Scan a tag name starting at `start`, stopping at `>`, `/`, or ASCII whitespace. Returns the
 /// end index (exclusive) of the name. Extracted from `expand_xml_self_closing_tags` — identical
 /// scan, unchanged.
-pub fn scan_tag_name_end(bytes: &[u8], start: usize) -> usize {
+pub const fn scan_tag_name_end(bytes: &[u8], start: usize) -> usize {
     let len = bytes.len();
     let mut i = start;
     while i < len {
@@ -423,7 +423,7 @@ pub fn is_html5_void_element(tag_name_bytes: &[u8]) -> bool {
 /// index of the terminating `/` (when `self_closing` is true) or `>` (when false), or `len` if
 /// the tag is never closed. Extracted from `expand_xml_self_closing_tags` — identical
 /// quote-tracking scan, unchanged.
-fn scan_tag_terminator(bytes: &[u8], start: usize) -> (bool, usize) {
+const fn scan_tag_terminator(bytes: &[u8], start: usize) -> (bool, usize) {
     let len = bytes.len();
     let mut i = start;
     let mut in_single_quote = false;

@@ -694,7 +694,7 @@ fn decode_utf16_bytes(bytes: &[u8], encoding: Utf16Encoding) -> String {
     };
 
     let mut units = Vec::with_capacity(bytes.len() / 2);
-    for chunk in bytes.chunks_exact(2) {
+    for chunk in bytes.as_chunks::<2>().0 {
         let unit = if is_little_endian {
             u16::from_le_bytes([chunk[0], chunk[1]])
         } else {

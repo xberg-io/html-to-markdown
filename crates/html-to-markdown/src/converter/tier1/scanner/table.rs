@@ -280,7 +280,7 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool, options: &Convers
 /// Used by the inter-block whitespace strip to recognise that the scanner just
 /// emitted a list-item marker and the next text would be the item content;
 /// leading whitespace from the source HTML indentation should be dropped.
-fn ends_with_ordered_marker(s: &str) -> bool {
+const fn ends_with_ordered_marker(s: &str) -> bool {
     let bytes = s.as_bytes();
     let len = bytes.len();
     if len < 3 || bytes[len - 1] != b' ' {

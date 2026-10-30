@@ -242,7 +242,7 @@ fn link_destination_len(text: &str) -> Option<usize> {
 
 /// Whether `text` is exactly one link title: `"..."`, `'...'` or `(...)`, with no unescaped
 /// closing character before its end (and no unescaped `(` in a parenthesized title).
-fn is_link_title(text: &str) -> bool {
+const fn is_link_title(text: &str) -> bool {
     let bytes = text.as_bytes();
     let close = match bytes.first() {
         Some(b'"') => b'"',
