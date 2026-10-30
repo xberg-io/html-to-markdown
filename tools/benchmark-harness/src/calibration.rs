@@ -405,7 +405,7 @@ fn calibrated_record(template: &BenchRecord, medians: &[f64]) -> Result<Calibrat
 fn fixture_floor(medians: &[f64]) -> Result<FixtureFloor> {
     let median_ms = stats::median(medians);
     let mad_ms = stats::mad(medians);
-    let pair_deltas: Vec<f64> = medians.chunks_exact(2).map(|pair| (pair[0] - pair[1]).abs()).collect();
+    let pair_deltas: Vec<f64> = medians.as_chunks::<2>().0.iter().map(|[a, b]| (a - b).abs()).collect();
     let floor_ms = stats::nearest_rank(&pair_deltas, 0.95);
     ensure!(
         floor_ms.is_finite() && floor_ms > 0.0,
