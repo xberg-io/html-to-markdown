@@ -3237,9 +3237,13 @@ jobs:
         with:
           r-version: "release"
 
-      - uses: dtolnay/rust-toolchain@v1
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
+      - uses: xberg-io/actions/setup-rust@v1
         with:
-          toolchain: stable
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+          cache-key-prefix: publish-r
 
       - name: Install system deps
         run: |
