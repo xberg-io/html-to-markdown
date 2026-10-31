@@ -413,7 +413,7 @@ jobs:
       - {
           "name": "Setup Ruby (Windows)",
           "if": "runner.os == 'Windows'",
-          "uses": "ruby/setup-ruby@v1.335.0",
+          "uses": "ruby/setup-ruby@v1",
           "with":
             {
               "ruby-version": "${{ matrix.ruby }}",
