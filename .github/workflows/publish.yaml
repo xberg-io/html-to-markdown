@@ -1208,9 +1208,19 @@ jobs:
 
       # ~keep The CI profile locks Ruby 3.3 besides mise.toml's Ruby (mise.ci.toml).
       - uses: xberg-io/actions/setup-mise@v1
+        if: matrix.os != 'macos-26-intel'
         with:
           mise-env: ci
           tools: ruby=3.3
+
+      # ~keep No precompiled macOS x86_64 Ruby for mise: its lock entry is the source tarball, so
+      # this leg would compile Ruby. The version matches mise.ci.toml's 3.3 pin exactly.
+      - uses: ruby/setup-ruby@v1.335.0
+        if: matrix.os == 'macos-26-intel'
+        with:
+          ruby-version: "3.3.13"
+          bundler: "4.0.3"
+          bundler-cache: false
 
       - name: Install Ruby dependencies
         shell: bash
