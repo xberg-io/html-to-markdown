@@ -2145,8 +2145,6 @@ jobs:
         run: gem update --system
         shell: bash
 
-      - uses: rubygems/configure-rubygems-credentials@v2.1.0
-
       - uses: xberg-io/actions/publish-rubygems@v1
         with:
           gems-dir: dist
