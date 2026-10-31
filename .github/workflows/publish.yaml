@@ -1206,11 +1206,11 @@ jobs:
         with:
           cache-key-prefix: publish-ruby-${{ matrix.label }}
 
-      - uses: ruby/setup-ruby@v1.335.0
+      # ~keep The CI profile locks Ruby 3.3 besides mise.toml's Ruby (mise.ci.toml).
+      - uses: xberg-io/actions/setup-mise@v1
         with:
-          ruby-version: "3.3"
-          bundler: "4.0.3"
-          bundler-cache: false
+          mise-env: ci
+          tools: ruby=3.3
 
       - name: Install Ruby dependencies
         shell: bash
@@ -2127,10 +2127,9 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - uses: ruby/setup-ruby@v1.335.0
+      - uses: xberg-io/actions/setup-mise@v1
         with:
-          ruby-version: "3.3"
-          bundler-cache: false
+          tools: ruby
 
       - name: Update RubyGems
         run: gem update --system
@@ -2361,16 +2360,11 @@ jobs:
             cp -r "${dir}native/." "packages/java/src/main/resources/natives/${classifier}/"
           done
 
-      - uses: actions/setup-java@v6
+      # ~keep publish-maven writes the ossrh server entry and imports MAVEN_GPG_PRIVATE_KEY, as
+      # setup-java did; Java goes first because setup-maven runs `mvn --version`.
+      - uses: xberg-io/actions/setup-mise@v1
         with:
-          distribution: temurin
-          java-version: "25"
-          cache: maven
-          server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          tools: java
 
       - uses: xberg-io/actions/setup-maven@v1
 
@@ -2389,6 +2383,7 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
       - name: Verify Maven Central indexing
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
