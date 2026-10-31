@@ -119,17 +119,18 @@ jobs:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1" }
+      # ~keep The matrix Ruby versions are locked in mise.ci.toml.
       - {
           "name": "Setup Ruby (Unix)",
           "if": "runner.os != 'Windows'",
-          "uses": "ruby/setup-ruby@v1.335.0",
-          "with":
-            {
-              "ruby-version": "${{ inputs.ruby }}",
-              "bundler": "4.0.3",
-              "bundler-cache": false,
-              "working-directory": "packages/ruby",
-            },
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "tools": "ruby=${{ inputs.ruby }}", "mise-env": "ci" },
+        }
+      - {
+          "name": "Install Bundler (Unix)",
+          "if": "runner.os != 'Windows'",
+          "run": "gem install bundler -v 4.0.3 --no-document",
+          "shell": "bash",
         }
       # ~keep ruby is a mise lock gap on Windows; this leg keeps its setup action.
       - {
@@ -646,10 +647,11 @@ jobs:
           "uses": "android-actions/setup-android@v4",
           "with": { "packages": "platform-tools" },
         }
+      # ~keep JDK 17 is the Android Gradle plugin's target, locked in mise.ci.toml.
       - {
           "name": "Setup JDK",
-          "uses": "actions/setup-java@v6",
-          "with": { "distribution": "temurin", "java-version": "17" },
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "tools": "java=temurin-17", "mise-env": "ci" },
         }
       - { "name": "Install alef", "uses": "xberg-io/actions/install-alef@v1" }
       - {

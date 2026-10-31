@@ -208,11 +208,11 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7", "id": "checkout" }
-      - { "name": "Install uv", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "uv" } }
+      # ~keep The matrix Python versions are locked in mise.ci.toml.
       - {
-          "name": "Set up Python",
-          "uses": "actions/setup-python@v7",
-          "with": { "python-version": "${{ matrix.python }}" },
+          "name": "Install uv and Python",
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "tools": "uv python=${{ matrix.python }}", "mise-env": "ci" },
         }
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
@@ -274,14 +274,8 @@ jobs:
       - {
           "name": "Setup Bun",
           "if": "matrix.runtime == 'bun'",
-          "uses": "oven-sh/setup-bun@v2",
-          "with": { "bun-version": "latest" },
-        }
-      - {
-          "name": "Setup mise",
-          "if": "matrix.runtime == 'bun'",
           "uses": "xberg-io/actions/setup-mise@v1",
-          "with": { "install": "false" },
+          "with": { "tools": "bun" },
         }
       - {
           "name": "Build NAPI-RS Bindings (Node.js)",
@@ -402,17 +396,18 @@ jobs:
           "uses": "xberg-io/actions/setup-rust@v1",
           "with": { "cache-key-prefix": "ruby-${{ matrix.os }}-${{ matrix.ruby }}" },
         }
+      # ~keep The matrix Ruby versions are locked in mise.ci.toml.
       - {
           "name": "Setup Ruby (Unix)",
           "if": "runner.os != 'Windows'",
-          "uses": "ruby/setup-ruby@v1.335.0",
-          "with":
-            {
-              "ruby-version": "${{ matrix.ruby }}",
-              "bundler": "4.0.3",
-              "bundler-cache": false,
-              "working-directory": "packages/ruby",
-            },
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "tools": "ruby=${{ matrix.ruby }}", "mise-env": "ci" },
+        }
+      - {
+          "name": "Install Bundler (Unix)",
+          "if": "runner.os != 'Windows'",
+          "run": "gem install bundler -v 4.0.3 --no-document",
+          "shell": "bash",
         }
       # ~keep ruby is a mise lock gap on Windows; this leg keeps its setup action.
       - {
@@ -593,11 +588,11 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
-      - { "name": "Install uv", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install-args": "uv" } }
+      # ~keep The matrix Python versions are locked in mise.ci.toml.
       - {
-          "name": "Set up Python",
-          "uses": "actions/setup-python@v7",
-          "with": { "python-version": "${{ matrix.python }}" },
+          "name": "Install uv and Python",
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "tools": "uv python=${{ matrix.python }}", "mise-env": "ci" },
         }
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - {
@@ -648,10 +643,15 @@ jobs:
       - {
           "name": "Setup Bun",
           "if": "matrix.runtime == 'bun'",
-          "uses": "oven-sh/setup-bun@v2",
-          "with": { "bun-version": "latest" },
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "tools": "bun" },
         }
-      - { "name": "Setup mise", "uses": "xberg-io/actions/setup-mise@v1", "with": { "install": "false" } }
+      - {
+          "name": "Setup mise",
+          "if": "matrix.runtime != 'bun'",
+          "uses": "xberg-io/actions/setup-mise@v1",
+          "with": { "install": "false" },
+        }
       - {
           "name": "Build NAPI-RS Bindings (Node.js)",
           "if": "matrix.runtime == 'node'",
