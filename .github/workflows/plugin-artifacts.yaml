@@ -44,8 +44,6 @@ jobs:
       # ~keep ai-rulez runs at its latest release, never a mise pin (org ADR-0015).
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@v1
-        with:
-          ai-rulez-version: "latest"
       - name: Verify public skill exports
         working-directory: release-source
         run: python3 scripts/sync_public_skills.py --check
