@@ -332,11 +332,7 @@ jobs:
               "configure-musl-cc": "false",
             },
         }
-      - {
-          "name": "Setup Node.js workspace",
-          "uses": "xberg-io/actions/setup-node-workspace@v1",
-          "with": { "node-version": "24" },
-        }
+      - { "name": "Setup Node.js workspace", "uses": "xberg-io/actions/setup-node-workspace@v1" }
       - {
           "name": "Setup Zig and cargo-zigbuild",
           "uses": "xberg-io/actions/setup-mise@v1",

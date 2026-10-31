@@ -947,8 +947,6 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
       - uses: xberg-io/actions/setup-node-workspace@v1
-        with:
-          node-version: "24"
 
       - name: Generate TypeScript definitions
         shell: bash
@@ -1060,8 +1058,6 @@ jobs:
           configure-musl-cc: ${{ matrix.use_zig_cross && 'false' || 'true' }}
 
       - uses: xberg-io/actions/setup-node-workspace@v1
-        with:
-          node-version: "24"
 
       # napi-rs cross-compiles musl targets via `napi build -x`, which shells
       # out to cargo-zigbuild — unlike the gnu targets' --use-napi-cross
@@ -1122,8 +1118,6 @@ jobs:
           cache-key-prefix: publish-wasm
 
       - uses: xberg-io/actions/setup-node-workspace@v1
-        with:
-          node-version: "24"
 
       - uses: xberg-io/actions/build-wasm-package@v1
         with:
@@ -2187,7 +2181,6 @@ jobs:
 
       - uses: xberg-io/actions/setup-node-workspace@v1
         with:
-          node-version: "24"
           registry-url: "https://registry.npmjs.org/"
 
       - name: Stage platform packages and main package
@@ -2292,7 +2285,6 @@ jobs:
 
       - uses: xberg-io/actions/setup-node-workspace@v1
         with:
-          node-version: "24"
           registry-url: "https://registry.npmjs.org/"
 
       - uses: xberg-io/actions/publish-npm@v1
@@ -3446,7 +3438,6 @@ jobs:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
       - uses: xberg-io/actions/setup-node-workspace@v1
         with:
-          node-version: "24"
           registry-url: "https://registry.npmjs.org/"
       # ~keep ai-rulez runs at its latest release, never a mise pin (org ADR-0015).
       - name: Install ai-rulez

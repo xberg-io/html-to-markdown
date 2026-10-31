@@ -299,11 +299,7 @@ jobs:
           "uses": "xberg-io/actions/setup-rust@v1",
           "with": { "target": "aarch64-unknown-linux-gnu", "cache-key-prefix": "node-linux-arm64-gnu" },
         }
-      - {
-          "name": "Setup Node.js workspace",
-          "uses": "xberg-io/actions/setup-node-workspace@v1",
-          "with": { "node-version": "24" },
-        }
+      - { "name": "Setup Node.js workspace", "uses": "xberg-io/actions/setup-node-workspace@v1" }
       - {
           "name": "Build native module (napi-cross, docker toolchain)",
           "uses": "xberg-io/actions/build-node-napi@v1",
