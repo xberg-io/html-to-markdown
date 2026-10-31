@@ -1,0 +1,4 @@
+# Loaded only with MISE_ENV=ci, so the versions CI selects with setup-mise `tools: <tool>=<version>` stay
+# locked. ruby: 3.3 is the Ruby the release builds the host-platform gems against. ~keep
+[tools]
+ruby = ["3.4.12", "3.3.13"]
