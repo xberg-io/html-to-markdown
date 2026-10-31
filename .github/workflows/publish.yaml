@@ -3243,7 +3243,7 @@ jobs:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
-          cache-key-prefix: publish-r
+          disable-cache: "true"
 
       - name: Install system deps
         run: |
