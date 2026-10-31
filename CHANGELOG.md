@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.19.2] - 2026-10-31
+
+### Fixed
+
+- Refresh stale coding-agent plugin provenance that blocked plugin package publication.
+
 ## [3.19.1] - 2026-10-30
 
 ### Fixed

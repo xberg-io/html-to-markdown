@@ -8,7 +8,7 @@ resolution-markers = [
 
 [[package]]
 name = "html-to-markdown"
-version = "3.19.1"
+version = "3.19.2"
 source = { editable = "." }
 
 [package.dev-dependencies]
