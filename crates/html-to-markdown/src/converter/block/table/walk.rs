@@ -689,6 +689,7 @@ impl TableWalk {
                     }
                 }
                 self.skip_until = Some(end);
+                #[cfg(feature = "metadata")]
                 return;
             }
         }
