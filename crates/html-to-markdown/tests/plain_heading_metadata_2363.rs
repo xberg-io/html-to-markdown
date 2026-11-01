@@ -21,20 +21,31 @@ fn metadata_without_rendering_changes(html: &str, options: ConversionOptions) ->
     )
     .expect("the converter without metadata must succeed");
     let result = convert(html, Some(options.clone())).expect("the metadata converter must succeed");
-    assert_eq!(result.content, control.content, "metadata must not change rendered output");
+    assert_eq!(
+        result.content, control.content,
+        "metadata must not change rendered output"
+    );
     assert_eq!(result.document.is_some(), options.include_document_structure);
     assert!(control.metadata.headers.is_empty());
-    assert!(!result.metadata.headers.is_empty(), "the real heading producer must run");
+    assert!(
+        !result.metadata.headers.is_empty(),
+        "the real heading producer must run"
+    );
     result
 }
 
 fn header_texts(result: &ConversionResult) -> Vec<&str> {
-    result.metadata.headers.iter().map(|header| header.text.as_str()).collect()
+    result
+        .metadata
+        .headers
+        .iter()
+        .map(|header| header.text.as_str())
+        .collect()
 }
 
 #[test]
 fn semantic_superscript_has_plain_heading_metadata_and_unchanged_markdown() {
-    let result = metadata_without_rendering_changes("<h1 id="person">Jane <sup>Doe</sup></h1>", options());
+    let result = metadata_without_rendering_changes(r#"<h1 id="person">Jane <sup>Doe</sup></h1>"#, options());
     assert_eq!(result.content.as_deref().map(str::trim), Some("# Jane ^Doe^"));
     assert_eq!(result.metadata.headers.len(), 1);
     assert_eq!(result.metadata.headers[0].level, 1);
@@ -73,7 +84,7 @@ fn heading_metadata_is_plain_across_output_formats_and_heading_styles() {
 fn heading_metadata_obeys_actual_exclusions_hidden_nodes_and_entity_decoding() {
     let html = concat!(
         "<h2>Jane &amp; ",
-        "<span class="omit"><strong>Excluded </strong></span>",
+        r#"<span class="omit"><strong>Excluded </strong></span>"#,
         "<span hidden>Hidden </span><sup>Doe</sup></h2>",
     );
     let result = metadata_without_rendering_changes(
@@ -94,20 +105,26 @@ fn heading_metadata_obeys_actual_exclusions_hidden_nodes_and_entity_decoding() {
 #[test]
 fn heading_metadata_keeps_inline_image_alt_text_without_image_markup() {
     let result = metadata_without_rendering_changes(
-        "<h2>Jane <img src="name.png" alt="Doe"></h2>",
+        r#"<h2>Jane <img src="name.png" alt="Doe"></h2>"#,
         ConversionOptions {
             keep_inline_images_in: vec!["h2".to_string()],
             ..options()
         },
     );
-    assert!(result.content.as_deref().expect("rendered output").contains("![Doe](name.png)"));
+    assert!(
+        result
+            .content
+            .as_deref()
+            .expect("rendered output")
+            .contains("![Doe](name.png)")
+    );
     assert_eq!(header_texts(&result), ["Jane Doe"]);
 }
 
 #[test]
 fn heading_metadata_omits_skipped_images_and_preserves_visible_text() {
     let result = metadata_without_rendering_changes(
-        "<h2>Jane<img src="name.png" alt="Excluded"> Doe</h2>",
+        r#"<h2>Jane<img src="name.png" alt="Excluded"> Doe</h2>"#,
         ConversionOptions {
             skip_images: true,
             ..options()
@@ -123,14 +140,20 @@ fn heading_metadata_omits_skipped_images_and_preserves_visible_text() {
 fn repeated_heading_attributes_do_not_merge_distinct_source_headings() {
     for include_document_structure in [false, true] {
         let result = metadata_without_rendering_changes(
-            "<h2 id="same">Jane <sup>Doe</sup></h2><h2 id="same">Jane ^Doe^</h2>",
+            r#"<h2 id="same">Jane <sup>Doe</sup></h2><h2 id="same">Jane ^Doe^</h2>"#,
             ConversionOptions {
                 include_document_structure,
                 ..options()
             },
         );
         assert_eq!(result.metadata.headers.len(), 2);
-        assert!(result.metadata.headers.iter().all(|header| header.id.as_deref() == Some("same")));
+        assert!(
+            result
+                .metadata
+                .headers
+                .iter()
+                .all(|header| header.id.as_deref() == Some("same"))
+        );
         assert_eq!(header_texts(&result), ["Jane Doe", "Jane ^Doe^"]);
     }
 }
