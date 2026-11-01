@@ -237,8 +237,8 @@ pub(super) fn preserved(node: &tl::NodeHandle, parser: &tl::Parser, handler: Han
     if !active(handler.ctx) {
         return;
     }
-    let mut stack = vec![(*node, handler.ctx.in_code)];
-    while let Some((handle, in_code)) = stack.pop() {
+    let mut stack = vec![(*node, handler.ctx.in_code, 0)];
+    while let Some((handle, in_code, depth)) = stack.pop() {
         match handle.get(parser) {
             Some(tl::Node::Raw(bytes)) => {
                 let raw = bytes.as_utf8_str();
@@ -246,18 +246,21 @@ pub(super) fn preserved(node: &tl::NodeHandle, parser: &tl::Parser, handler: Han
                 record(handler.ctx, TextEvent::Text(decoded.into_owned(), in_code));
             }
             Some(tl::Node::Tag(tag)) => {
-                if let Some(event) = preserved_leaf(tag, parser, handler, in_code) {
+                if let Some(event) = preserved_leaf(tag, parser, handler, in_code, depth) {
                     record(handler.ctx, event);
+                    continue;
+                }
+                if depth >= crate::options::conversion::NATIVE_STACK_SAFE_DEPTH {
                     continue;
                 }
                 let name = tag.name().as_utf8_str();
                 let in_code = in_code || name == "pre" || super::utility::content::is_inline_code(name.as_ref());
                 if let Some(children) = handler.dom_ctx.children_of(handle.get_inner()) {
-                    stack.extend(children.iter().rev().map(|child| (*child, in_code)));
+                    stack.extend(children.iter().rev().map(|child| (*child, in_code, depth + 1)));
                 } else {
                     let mut children: Vec<_> = tag.children().top().iter().copied().collect();
                     children.reverse();
-                    stack.extend(children.into_iter().map(|child| (child, in_code)));
+                    stack.extend(children.into_iter().map(|child| (child, in_code, depth + 1)));
                 }
             }
             _ => {}
@@ -270,6 +273,7 @@ fn preserved_leaf(
     parser: &tl::Parser,
     handler: HandlerContext<'_>,
     in_code: bool,
+    depth: usize,
 ) -> Option<TextEvent> {
     match tag.name().as_utf8_str().as_ref() {
         "br" => Some(TextEvent::Break(in_code)),
@@ -280,7 +284,13 @@ fn preserved_leaf(
             in_code,
         )),
         "svg" => Some(TextEvent::Text(
-            super::media::svg::graphic_text(tag, parser, handler.options, handler.ctx.accessible_names),
+            super::media::svg::preserved_graphic_text(
+                tag,
+                parser,
+                handler.options,
+                handler.ctx.accessible_names,
+                crate::options::conversion::NATIVE_STACK_SAFE_DEPTH - depth,
+            ),
             in_code,
         )),
         _ => None,
@@ -338,3 +348,6 @@ fn write_headers(collector: &mut MetadataCollector, headers: impl Iterator<Item 
         collector.add_header(header.level, header.text, header.id, header.depth, 0);
     }
 }
+
+#[cfg(test)]
+mod preserved_depth_tests;
