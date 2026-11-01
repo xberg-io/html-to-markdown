@@ -131,6 +131,8 @@ pub fn convert_html_impl(
     trace_walk_complete(&ctx);
 
     check_visitor_error(&ctx)?;
+    #[cfg(feature = "metadata")]
+    super::heading_metadata::flush(&ctx);
 
     let depth_warning = depth_warning(&ctx, options).or_else(|| repair_warning.map(repair_limit_warning));
 
@@ -610,7 +612,7 @@ fn begin_tag<'a>(
         TagRoute::Children => return Begun::Children,
     }
     collect_document_attributes(tag_name, tag, ctx);
-    let structure_capture = super::structure_capture::begin_element(tag_name, tag, ctx);
+    let structure_capture = super::structure_capture::begin_element(tag_name, tag, ctx, node_handle.get_inner(), depth);
     #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
     let element_output_start = output.len();
     strip_breaks_before_block(tag_name, output, options, ctx);
@@ -687,7 +689,7 @@ fn capture_custom_start(
         handler.dom_ctx.record_absent_breaks(node_id, true);
     }
     collect_document_attributes(tag_name, tag, handler.ctx);
-    super::structure_capture::replace_element_at_start(tag_name, tag, handler.ctx, replacement);
+    super::structure_capture::replace_element_at_start(tag_name, tag, handler.ctx, replacement, node_id, handler.depth);
 }
 
 fn finish_tag(

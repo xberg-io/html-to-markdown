@@ -629,6 +629,7 @@ fn detach_collectors(ctx: &mut Context) {
     #[cfg(feature = "metadata")]
     {
         ctx.metadata_collector = None;
+        ctx.header_capture = None;
     }
     ctx.structure_collector = None;
     #[cfg(feature = "inline-images")]

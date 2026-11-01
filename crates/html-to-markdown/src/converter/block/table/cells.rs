@@ -598,6 +598,7 @@ fn visitor_cell_contents(visit: RowVisit<'_>) -> Vec<String> {
     #[cfg(feature = "metadata")]
     {
         collect_ctx.metadata_collector = None;
+        collect_ctx.header_capture = None;
     }
     collect_ctx.structure_collector = None;
     #[cfg(feature = "inline-images")]

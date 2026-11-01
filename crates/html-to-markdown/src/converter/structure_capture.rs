@@ -9,9 +9,13 @@ pub(super) struct BlockTextCapture {
 pub(super) struct ElementTextCapture {
     suspended: Vec<TextCaptureId>,
     block: Option<BlockTextCapture>,
+    #[cfg(feature = "metadata")]
+    metadata_node: Option<u32>,
 }
 
 pub(super) fn append_text(ctx: &Context, text: &str) {
+    #[cfg(feature = "metadata")]
+    super::heading_metadata::append(ctx, text);
     if let Some(collector) = ctx.structure_collector.as_ref() {
         let mut collector = collector.borrow_mut();
         if ctx.in_heading && !ctx.in_code {
@@ -23,16 +27,32 @@ pub(super) fn append_text(ctx: &Context, text: &str) {
 }
 
 pub(super) fn is_text_capture_active(ctx: &Context) -> bool {
+    #[cfg(feature = "metadata")]
+    if super::heading_metadata::active(ctx) {
+        return true;
+    }
     ctx.structure_collector
         .as_ref()
         .is_some_and(|collector| collector.borrow().has_active_text_capture())
 }
 
-pub(super) fn begin_element(tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context) -> ElementTextCapture {
+pub(super) fn begin_element(
+    tag_name: &str,
+    tag: &tl::HTMLTag<'_>,
+    ctx: &Context,
+    node: u32,
+    depth: usize,
+) -> ElementTextCapture {
+    #[cfg(feature = "metadata")]
+    let metadata_node = super::heading_metadata::begin(ctx, node, depth, tag_name, tag);
+    #[cfg(not(feature = "metadata"))]
+    let _ = (node, depth);
     if ctx.structure_collector.is_none() {
         return ElementTextCapture {
             suspended: Vec::new(),
             block: None,
+            #[cfg(feature = "metadata")]
+            metadata_node,
         };
     }
     let kind = crate::types::structure_builder::annotation_kind_for_tag(tag_name, tag);
@@ -47,10 +67,17 @@ pub(super) fn begin_element(tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context
     if let Some(collector) = ctx.structure_collector.as_ref() {
         collector.borrow_mut().begin_element(kind);
     }
-    ElementTextCapture { suspended, block }
+    ElementTextCapture {
+        suspended,
+        block,
+        #[cfg(feature = "metadata")]
+        metadata_node,
+    }
 }
 
 pub(super) fn finish_element(capture: ElementTextCapture, tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context) {
+    #[cfg(feature = "metadata")]
+    super::heading_metadata::finish(ctx, capture.metadata_node);
     if let Some(collector) = ctx.structure_collector.as_ref() {
         let allow_loose_text = !ctx.in_table_cell && !ctx.in_code_block && !ctx.convert_as_inline;
         collector.borrow_mut().finish_element(allow_loose_text);
@@ -84,6 +111,8 @@ fn finish_loose_paragraph(ctx: &Context) {
 }
 
 pub(super) fn replace_element(ctx: &Context, replacement: Option<&str>) {
+    #[cfg(feature = "metadata")]
+    super::heading_metadata::replace(ctx, replacement);
     if let Some(boundary) = ctx.media_boundary.as_ref() {
         boundary.set(Default::default());
     }
@@ -93,8 +122,15 @@ pub(super) fn replace_element(ctx: &Context, replacement: Option<&str>) {
     }
 }
 
-pub(super) fn replace_element_at_start(tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context, replacement: &str) {
-    let capture = begin_element(tag_name, tag, ctx);
+pub(super) fn replace_element_at_start(
+    tag_name: &str,
+    tag: &tl::HTMLTag<'_>,
+    ctx: &Context,
+    replacement: &str,
+    node: u32,
+    depth: usize,
+) {
+    let capture = begin_element(tag_name, tag, ctx, node, depth);
     replace_element(ctx, Some(replacement));
     finish_element(capture, tag_name, tag, ctx);
 }

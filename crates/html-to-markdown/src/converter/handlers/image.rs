@@ -231,6 +231,10 @@ fn render_image(
     if let std::ops::ControlFlow::Break(result) = visit_image(tag, data, handler) {
         return result;
     }
+    #[cfg(feature = "metadata")]
+    if !handler.options.skip_images && inline_data != InlineDataMedia::DropElement {
+        crate::converter::heading_metadata::append(context, &data.alt);
+    }
     // ~keep Code has no image marks. An image in code is its alt text as literal code text, as
     // ~keep where a heading or a table cell cannot hold an image. A visitor is asked first.
     if !handler.options.skip_images
@@ -304,7 +308,13 @@ fn visit_image(
     );
     match result {
         VisitResult::Continue => std::ops::ControlFlow::Continue(()),
-        VisitResult::Custom(custom) => std::ops::ControlFlow::Break(Some(custom)),
+        VisitResult::Custom(custom) => {
+            #[cfg(feature = "metadata")]
+            if !handler.options.skip_images {
+                crate::converter::heading_metadata::append(handler.context, &custom);
+            }
+            std::ops::ControlFlow::Break(Some(custom))
+        }
         VisitResult::Skip => std::ops::ControlFlow::Break(None),
         VisitResult::Error(error) => {
             if handler.context.visitor_error.borrow().is_none() {
@@ -313,7 +323,12 @@ fn visit_image(
             std::ops::ControlFlow::Break(None)
         }
         VisitResult::PreserveHtml => {
-            std::ops::ControlFlow::Break(Some(serialize_node(handler.node_handle, handler.parser)))
+            let html = serialize_node(handler.node_handle, handler.parser);
+            #[cfg(feature = "metadata")]
+            if !handler.options.skip_images {
+                crate::converter::heading_metadata::append(handler.context, &html);
+            }
+            std::ops::ControlFlow::Break(Some(html))
         }
     }
 }

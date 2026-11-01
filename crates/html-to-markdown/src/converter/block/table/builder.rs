@@ -351,6 +351,7 @@ pub(super) fn column_widths(
         #[cfg(feature = "metadata")]
         {
             prepass_ctx.metadata_collector = None;
+            prepass_ctx.header_capture = None;
         }
         prepass_ctx.structure_collector = None;
         #[cfg(feature = "inline-images")]

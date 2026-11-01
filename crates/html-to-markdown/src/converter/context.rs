@@ -398,6 +398,8 @@ pub struct Context {
     ///
     /// Populated when `options.include_document_structure == true`.
     pub(crate) structure_collector: Option<StructureCollectorHandle>,
+    #[cfg(feature = "metadata")]
+    pub(crate) header_capture: Option<Rc<RefCell<super::heading_metadata::HeaderCapture>>>,
     /// Optional reference collector for reference-style links.
     pub(crate) reference_collector: Option<ReferenceCollectorHandle>,
     /// When `true`, all visitor-hook Mutex acquisitions are skipped.
@@ -487,6 +489,10 @@ impl Context {
             metadata_collector: parameters.metadata_collector,
             #[cfg(feature = "metadata")]
             metadata_wants: metadata,
+            #[cfg(feature = "metadata")]
+            header_capture: metadata
+                .headers
+                .then(|| Rc::new(RefCell::new(super::heading_metadata::HeaderCapture::new()))),
             #[cfg(feature = "visitor")]
             visitor: parameters.visitor,
             structure_collector: parameters.structure_collector,
@@ -664,6 +670,8 @@ impl Context {
             inline_collector: None,
             #[cfg(feature = "metadata")]
             metadata_collector: None,
+            #[cfg(feature = "metadata")]
+            header_capture: None,
             visitor: self.visitor.as_ref().map(|_| -> crate::visitor::VisitorHandle {
                 std::sync::Arc::new(std::sync::Mutex::new(ContinuesEverywhere))
             }),

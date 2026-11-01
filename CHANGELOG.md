@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Keep heading metadata as plain text from the same conversion pass, preserving literal markup,
+  admitted image labels and visitor decisions without changing rendered output.
+
 ## [3.19.2] - 2026-10-31
 
 ### Fixed
