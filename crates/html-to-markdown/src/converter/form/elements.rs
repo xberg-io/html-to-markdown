@@ -75,13 +75,17 @@ pub fn dispatch_form_visitor(
         VisitResult::Continue => false,
         VisitResult::Skip => true,
         VisitResult::Custom(custom) => {
-            #[cfg(feature = "metadata")]
-            crate::converter::heading_metadata::append(ctx, &custom);
             if !output.is_empty() && !output.ends_with("\n\n") {
                 output.push_str("\n\n");
+                #[cfg(feature = "metadata")]
+                crate::converter::heading_metadata::append(ctx, "\n\n");
             }
             output.push_str(&custom);
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::append(ctx, &custom);
             output.push_str("\n\n");
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::append(ctx, "\n\n");
             true
         }
         VisitResult::PreserveHtml => {
