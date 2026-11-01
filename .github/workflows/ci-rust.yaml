@@ -110,7 +110,7 @@ jobs:
       - name: Install poly
         uses: Goldziher/poly@v0
         with:
-          version: "0.31.2"
+          version: "0.32.1"
 
       - name: Setup mise for module freshness
         uses: xberg-io/actions/setup-mise@v1

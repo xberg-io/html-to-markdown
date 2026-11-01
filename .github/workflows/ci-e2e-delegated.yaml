@@ -264,7 +264,7 @@ jobs:
       # ~keep `alef e2e generate` formats every suite it emits by shelling out to poly. With
       # poly absent this job failed all 16 languages with "poly not found on PATH" before the
       # drift check below ever ran, so the gate could not report on the drift it exists to catch.
-      - { "name": "Install poly", "uses": "Goldziher/poly@v0", "with": { "version": "0.31.2" } }
+      - { "name": "Install poly", "uses": "Goldziher/poly@v0", "with": { "version": "0.32.1" } }
       # ~keep Alef runs `dart format` on the generated suite; omitting Dart makes freshness
       # compare unformatted output with committed formatted files.
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }

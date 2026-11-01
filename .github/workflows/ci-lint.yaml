@@ -118,7 +118,7 @@ jobs:
           install-args: python
       - uses: Goldziher/poly@v0
         with:
-          version: "0.31.2"
+          version: "0.32.1"
       - run: mise run check:quality-warnings
         env:
           QUALITY_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
