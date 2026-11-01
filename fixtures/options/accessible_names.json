@@ -6,7 +6,7 @@
     "input": {
       "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
       "options": {
-        "tier_strategy": "Auto",
+        "tier_strategy": "auto",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": true
@@ -31,7 +31,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Auto",
+        "tier_strategy": "auto",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": true
@@ -56,7 +56,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Auto",
+        "tier_strategy": "auto",
         "inline_data_media": "AltTextOnly",
         "output_format": "Plain"
       },
@@ -82,7 +82,7 @@
     "input": {
       "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
       "options": {
-        "tier_strategy": "Auto",
+        "tier_strategy": "auto",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": false
@@ -107,7 +107,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Auto",
+        "tier_strategy": "auto",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": false
@@ -132,7 +132,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Auto",
+        "tier_strategy": "auto",
         "inline_data_media": "AltTextOnly",
         "output_format": "Plain"
       },
@@ -158,7 +158,7 @@
     "input": {
       "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
       "options": {
-        "tier_strategy": "Tier2",
+        "tier_strategy": "tier2",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": true
@@ -183,7 +183,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Tier2",
+        "tier_strategy": "tier2",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": true
@@ -208,7 +208,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Tier2",
+        "tier_strategy": "tier2",
         "inline_data_media": "AltTextOnly",
         "output_format": "Plain"
       },
@@ -234,7 +234,7 @@
     "input": {
       "html": "<p>see <a href=\"https://example.com/x\">GitHub<svg aria-label=\"(opens in new tab)\"><use href=\"#ext\"></use></svg></a> now</p>",
       "options": {
-        "tier_strategy": "Tier2",
+        "tier_strategy": "tier2",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": false
@@ -259,7 +259,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Tier2",
+        "tier_strategy": "tier2",
         "inline_data_media": "AltTextOnly"
       },
       "use_accessible_names": false
@@ -284,7 +284,7 @@
     "input": {
       "html": "<p><svg aria-label=\"Name\"><text>Drawn</text></svg></p>",
       "options": {
-        "tier_strategy": "Tier2",
+        "tier_strategy": "tier2",
         "inline_data_media": "AltTextOnly",
         "output_format": "Plain"
       },
