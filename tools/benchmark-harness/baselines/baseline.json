@@ -47,7 +47,7 @@
       "median_ms": 5.4856486,
       "mad_ms": 0.009397044444444447,
       "mb_per_s": 19.51141673181659,
-      "output_bytes": 12982
+      "output_bytes": 12984
     },
     {
       "fixture": "mdream/wikipedia-small.html",
