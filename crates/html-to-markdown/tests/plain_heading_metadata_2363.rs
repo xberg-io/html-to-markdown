@@ -191,7 +191,7 @@ mod visitor_capture {
     }
 
     #[test]
-    fn heading_metadata_captures_accepted_visitor_text_without_reinvoking_the_visitor() {
+    fn heading_metadata_ignores_unaccepted_custom_text_without_reinvoking_the_visitor() {
         let visitor = Arc::new(Mutex::new(ReplacementVisitor::default()));
         let handle: VisitorHandle = visitor.clone();
         let result = convert(
@@ -203,8 +203,8 @@ mod visitor_capture {
         )
         .expect("the visitor conversion must succeed");
         assert_eq!(visitor.lock().expect("visitor state").text_calls, ["Jane ", "Doe"]);
-        assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane ^Smith^"));
+        assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane ^Doe^"));
         assert!(result.document.is_none());
-        assert_eq!(header_texts(&result), ["Jane Smith"]);
+        assert_eq!(header_texts(&result), ["Jane Doe"]);
     }
 }
