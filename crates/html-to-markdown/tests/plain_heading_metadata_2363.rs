@@ -1,3 +1,5 @@
+//! Plain heading metadata follows admitted semantic text without changing rendering.
+
 #![cfg(feature = "metadata")]
 
 use html_to_markdown_rs::{ConversionOptions, ConversionResult, HeadingStyle, OutputFormat, TierStrategy, convert};
@@ -11,7 +13,7 @@ fn options() -> ConversionOptions {
     }
 }
 
-fn metadata_without_rendering_changes(html: &str, options: ConversionOptions) -> ConversionResult {
+fn metadata_without_rendering_changes(html: &str, options: &ConversionOptions) -> ConversionResult {
     let control = convert(
         html,
         Some(ConversionOptions {
@@ -45,7 +47,7 @@ fn header_texts(result: &ConversionResult) -> Vec<&str> {
 
 #[test]
 fn semantic_superscript_has_plain_heading_metadata_and_unchanged_markdown() {
-    let result = metadata_without_rendering_changes(r#"<h1 id="person">Jane <sup>Doe</sup></h1>"#, options());
+    let result = metadata_without_rendering_changes(r#"<h1 id="person">Jane <sup>Doe</sup></h1>"#, &options());
     assert_eq!(result.content.as_deref().map(str::trim), Some("# Jane ^Doe^"));
     assert_eq!(result.metadata.headers.len(), 1);
     assert_eq!(result.metadata.headers[0].level, 1);
@@ -55,7 +57,7 @@ fn semantic_superscript_has_plain_heading_metadata_and_unchanged_markdown() {
 
 #[test]
 fn literal_carets_in_heading_metadata_are_source_text() {
-    let result = metadata_without_rendering_changes("<h2>Jane ^Doe^</h2>", options());
+    let result = metadata_without_rendering_changes("<h2>Jane ^Doe^</h2>", &options());
     assert!(result.content.as_deref().expect("rendered output").contains("Doe"));
     assert_eq!(header_texts(&result), ["Jane ^Doe^"]);
 }
@@ -67,7 +69,7 @@ fn heading_metadata_is_plain_across_output_formats_and_heading_styles() {
         for heading_style in [HeadingStyle::Atx, HeadingStyle::AtxClosed, HeadingStyle::Underlined] {
             let result = metadata_without_rendering_changes(
                 "<h2>Jane <strong><sup>Doe</sup></strong></h2>",
-                ConversionOptions {
+                &ConversionOptions {
                     output_format,
                     heading_style,
                     ..options()
@@ -89,7 +91,7 @@ fn heading_metadata_obeys_actual_exclusions_hidden_nodes_and_entity_decoding() {
     );
     let result = metadata_without_rendering_changes(
         html,
-        ConversionOptions {
+        &ConversionOptions {
             exclude_selectors: vec![".omit".to_string()],
             ..options()
         },
@@ -106,7 +108,7 @@ fn heading_metadata_obeys_actual_exclusions_hidden_nodes_and_entity_decoding() {
 fn heading_metadata_keeps_inline_image_alt_text_without_image_markup() {
     let result = metadata_without_rendering_changes(
         r#"<h2>Jane <img src="name.png" alt="Doe"></h2>"#,
-        ConversionOptions {
+        &ConversionOptions {
             keep_inline_images_in: vec!["h2".to_string()],
             ..options()
         },
@@ -125,7 +127,7 @@ fn heading_metadata_keeps_inline_image_alt_text_without_image_markup() {
 fn heading_metadata_omits_skipped_images_and_preserves_visible_text() {
     let result = metadata_without_rendering_changes(
         r#"<h2>Jane<img src="name.png" alt="Excluded"> Doe</h2>"#,
-        ConversionOptions {
+        &ConversionOptions {
             skip_images: true,
             ..options()
         },
@@ -141,7 +143,7 @@ fn repeated_heading_attributes_do_not_merge_distinct_source_headings() {
     for include_document_structure in [false, true] {
         let result = metadata_without_rendering_changes(
             r#"<h2 id="same">Jane <sup>Doe</sup></h2><h2 id="same">Jane ^Doe^</h2>"#,
-            ConversionOptions {
+            &ConversionOptions {
                 include_document_structure,
                 ..options()
             },
@@ -162,7 +164,7 @@ fn repeated_heading_attributes_do_not_merge_distinct_source_headings() {
 fn heading_metadata_in_a_table_cell_uses_its_own_source_text() {
     let result = metadata_without_rendering_changes(
         "<table><tr><td><h2>Jane <sup>Doe</sup></h2></td></tr></table>",
-        options(),
+        &options(),
     );
     assert!(result.content.as_deref().expect("rendered output").contains("^Doe^"));
     assert_eq!(header_texts(&result), ["Jane Doe"]);
@@ -216,7 +218,7 @@ fn heading_metadata_folds_actual_breaks_inside_and_outside_table_cells() {
         "<h2>Jane<br><sup>Doe</sup></h2>",
         "<table><tr><td><h2>Jane<br><sup>Doe</sup></h2></td></tr></table>",
     ] {
-        let result = metadata_without_rendering_changes(html, options());
+        let result = metadata_without_rendering_changes(html, &options());
         assert!(
             result
                 .content
