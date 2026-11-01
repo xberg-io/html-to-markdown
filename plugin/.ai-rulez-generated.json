@@ -1,6 +1,6 @@
 {
   "schema_version": "v1",
-  "source_hash": "blake3:6380bf1dcb469c29c1a0389a3575f74ac8983f69c16a698cf2f4e78fe3d9c17a",
+  "source_hash": "blake3:25aff2d6495f85f31e43d878c418221ab6d2edce946baaa4716510a2c8633f5b",
   "outputs": {
     ".claude-plugin/plugin.json": {
       "content_hash": "blake3:d39d5c63b159d220141a8beade765d9a61bf4ac9757f5e06a5caf428bea4a7be",
@@ -1099,7 +1099,7 @@
       "mode": "0644"
     },
     "package.json": {
-      "content_hash": "blake3:1609b536b82c6a3a598ab6300cc5f1e0af60a383cb12b0805af91d447858bb16",
+      "content_hash": "blake3:516fe3032695df9c9f60b51160b24dbf00964fa627ce431d2b19d41c2106533d",
       "mode": "0644"
     },
     "plugin.json": {
