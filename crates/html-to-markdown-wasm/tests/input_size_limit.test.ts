@@ -16,7 +16,10 @@ describe("WASM input size limit", () => {
   it("rejects input above the default limit when options are omitted", () => {
     const html = "x".repeat(DEFAULT_LIMIT + 1);
 
-    expect(captureError(() => convert(html))).toEqual({
+    const error = captureError(() => convert(html));
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error).toMatchObject({
       code: "input_too_large",
       message: `Input size ${DEFAULT_LIMIT + 1} bytes exceeds the configured maximum of ${DEFAULT_LIMIT} bytes`,
       observed_size: DEFAULT_LIMIT + 1,
