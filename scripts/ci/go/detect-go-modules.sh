@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mapfile -t all_modules < <(git ls-files -- '*/go.mod' | sort)
+# A read loop rather than mapfile: macOS runners ship bash 3.2, which has no mapfile.
+all_modules=()
+while IFS= read -r mod; do
+  all_modules+=("$mod")
+done < <(git ls-files -- '*/go.mod' | sort)
 if [[ "${#all_modules[@]}" -eq 0 ]]; then
   echo "modules=[]" >>"$GITHUB_OUTPUT"
   exit 0
