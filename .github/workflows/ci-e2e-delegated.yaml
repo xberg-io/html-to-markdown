@@ -672,7 +672,13 @@ jobs:
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
-      - { "name": "Setup Rust", "uses": "xberg-io/actions/setup-rust@v1", "with": { "cache-key-prefix": "swift" } }
+      # ~keep No global -undefined dynamic_lookup: the Swift cdylib's build.rs passes -U per Swift
+      # ~keep export, and ld warns the -U is redundant beside it, which build-warnings deny fails.
+      - {
+          "name": "Setup Rust",
+          "uses": "xberg-io/actions/setup-rust@v1",
+          "with": { "cache-key-prefix": "swift", "macos-dynamic-lookup": "false" },
+        }
       # ~keep Swift stays on its setup action (org toolchain policy).
       - { "name": "Setup Swift", "uses": "xberg-io/actions/setup-swift@v1", "with": { "version": "6.0" } }
       # ~keep PHP stays on its setup action (org toolchain policy).
