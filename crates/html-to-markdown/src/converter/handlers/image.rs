@@ -326,7 +326,7 @@ fn visit_image(
             let html = serialize_node(handler.node_handle, handler.parser);
             #[cfg(feature = "metadata")]
             if !handler.options.skip_images {
-                crate::converter::heading_metadata::append(handler.context, &html);
+                crate::converter::heading_metadata::append(handler.context, &data.alt);
             }
             std::ops::ControlFlow::Break(Some(html))
         }

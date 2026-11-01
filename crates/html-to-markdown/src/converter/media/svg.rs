@@ -481,6 +481,8 @@ pub fn handle_svg(
     }
 
     let title = graphic_text(tag, parser, options, ctx.accessible_names);
+    #[cfg(feature = "metadata")]
+    crate::converter::heading_metadata::append(ctx, &title);
     if ctx.in_code || ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
         super::record_text_label(&title, ctx);
     }

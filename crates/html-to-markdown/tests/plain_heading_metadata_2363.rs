@@ -232,6 +232,218 @@ fn heading_metadata_folds_actual_breaks_inside_and_outside_table_cells() {
     assert_eq!(actual, ["Jane Doe", "Jane Doe"]);
 }
 
+#[test]
+fn heading_metadata_includes_admitted_svg_labels() {
+    for (html, expected) in [
+        ("<h2>Head <svg><title>T</title></svg></h2>", "Head T"),
+        ("<h2><svg><title>T</title></svg></h2>", "T"),
+    ] {
+        let result = metadata_without_rendering_changes(html, &options());
+        assert_eq!(header_texts(&result), [expected]);
+    }
+}
+
+#[test]
+fn heading_metadata_keeps_the_rendered_boundaries_around_image_labels() {
+    let result = metadata_without_rendering_changes(r#"<h2>hot<img src="i.png" alt="pic">end</h2>"#, &options());
+    assert_eq!(result.content.as_deref().map(str::trim), Some("## hot pic end"));
+    assert_eq!(header_texts(&result), ["hot pic end"]);
+}
+
+#[test]
+fn heading_metadata_normalizes_strict_source_newlines() {
+    let result = metadata_without_rendering_changes(
+        "<h2>Jane\nDoe</h2>",
+        &ConversionOptions {
+            whitespace_mode: html_to_markdown_rs::WhitespaceMode::Strict,
+            ..options()
+        },
+    );
+    assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane Doe"));
+    assert_eq!(header_texts(&result), ["Jane Doe"]);
+}
+
+#[test]
+fn heading_metadata_mirrors_excluded_node_space_removal() {
+    let result = metadata_without_rendering_changes(
+        r#"<h2>Jane <span class="omit">Excluded</span> Doe</h2>"#,
+        &ConversionOptions {
+            exclude_selectors: vec![".omit".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane Doe"));
+    assert_eq!(header_texts(&result), ["Jane Doe"]);
+}
+
+#[test]
+fn heading_metadata_reads_plain_text_from_preserved_source_tags() {
+    let result = metadata_without_rendering_changes(
+        "<h2>Jane <span>Doe</span></h2>",
+        &ConversionOptions {
+            preserve_tags: vec!["span".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(
+        result.content.as_deref().map(str::trim),
+        Some("## Jane <span>Doe</span>")
+    );
+    assert_eq!(header_texts(&result), ["Jane Doe"]);
+}
+
+#[test]
+fn heading_metadata_keeps_code_spaces_and_literal_carets_at_excluded_boundaries() {
+    for whitespace_mode in [
+        html_to_markdown_rs::WhitespaceMode::Normalized,
+        html_to_markdown_rs::WhitespaceMode::Strict,
+    ] {
+        let result = metadata_without_rendering_changes(
+            r#"<h2>Jane <code>^a  b^</code> <span class="omit">Excluded</span> Doe</h2>"#,
+            &ConversionOptions {
+                whitespace_mode,
+                exclude_selectors: vec![".omit".to_string()],
+                ..options()
+            },
+        );
+        assert_eq!(header_texts(&result), ["Jane ^a  b^ Doe"]);
+    }
+}
+
+#[test]
+fn heading_metadata_omits_svg_labels_when_the_renderer_drops_the_graphic() {
+    for conversion in [
+        ConversionOptions {
+            skip_images: true,
+            ..options()
+        },
+        ConversionOptions {
+            inline_data_media: html_to_markdown_rs::InlineDataMedia::DropElement,
+            ..options()
+        },
+    ] {
+        let result =
+            metadata_without_rendering_changes("<h2>Head <svg><title>Excluded</title></svg></h2>", &conversion);
+        assert_eq!(result.content.as_deref().map(str::trim), Some("## Head"));
+        assert_eq!(header_texts(&result), ["Head"]);
+    }
+}
+
+#[test]
+fn preserved_heading_descendants_keep_entities_literal_carets_and_code_spaces() {
+    let result = metadata_without_rendering_changes(
+        "<h2>Jane <span>^Doe^ &amp; <code>A  B</code></span></h2>",
+        &ConversionOptions {
+            preserve_tags: vec!["span".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(header_texts(&result), ["Jane ^Doe^ & A  B"]);
+}
+
+#[cfg(feature = "visitor")]
+mod specialized_admission {
+    use super::*;
+    use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
+    use std::sync::{Arc, Mutex};
+
+    #[derive(Debug)]
+    struct Replacement {
+        target: &'static str,
+        calls: Vec<&'static str>,
+    }
+
+    impl Replacement {
+        fn admit(&mut self, tag: &'static str) -> VisitResult {
+            if self.target != tag {
+                return VisitResult::Continue;
+            }
+            self.calls.push(tag);
+            if tag == "img" {
+                VisitResult::PreserveHtml
+            } else {
+                VisitResult::Custom("Doe".to_string())
+            }
+        }
+    }
+
+    impl HtmlVisitor for Replacement {
+        fn visit_line_break(&mut self, _context: &NodeContext<'_>) -> VisitResult {
+            self.admit("br")
+        }
+
+        fn visit_form(
+            &mut self,
+            _context: &NodeContext<'_>,
+            _action: Option<&str>,
+            _method: Option<&str>,
+        ) -> VisitResult {
+            self.admit("form")
+        }
+
+        fn visit_button(&mut self, _context: &NodeContext<'_>, _text: &str) -> VisitResult {
+            self.admit("button")
+        }
+
+        fn visit_image(
+            &mut self,
+            _context: &NodeContext<'_>,
+            _src: &str,
+            _alt: &str,
+            _title: Option<&str>,
+        ) -> VisitResult {
+            self.admit("img")
+        }
+    }
+
+    fn admitted_heading(tag: &'static str, html: &str) -> ConversionResult {
+        let visitor = Arc::new(Mutex::new(Replacement {
+            target: tag,
+            calls: Vec::new(),
+        }));
+        let handle: VisitorHandle = visitor.clone();
+        let result = convert(
+            html,
+            Some(ConversionOptions {
+                visitor: Some(handle),
+                ..options()
+            }),
+        )
+        .expect("the actual specialized visitor must succeed");
+        assert_eq!(visitor.lock().expect("visitor state").calls, [tag]);
+        assert_eq!(result.metadata.headers.len(), 1);
+        result
+    }
+
+    #[test]
+    fn line_break_replacement_is_admitted_to_heading_metadata_once() {
+        let result = admitted_heading("br", "<h2>Jane <br></h2>");
+        assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane Doe"));
+        assert_eq!(header_texts(&result), ["Jane Doe"]);
+    }
+
+    #[test]
+    fn form_replacement_is_admitted_to_heading_metadata_once() {
+        let result = admitted_heading("form", "<h2>Jane <form></form></h2>");
+        assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane Doe"));
+        assert_eq!(header_texts(&result), ["Jane Doe"]);
+    }
+
+    #[test]
+    fn button_replacement_is_admitted_to_heading_metadata_once() {
+        let result = admitted_heading("button", "<h2>Jane <button>Original</button></h2>");
+        assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane Doe"));
+        assert_eq!(header_texts(&result), ["Jane Doe"]);
+    }
+
+    #[test]
+    fn preserved_image_uses_its_admitted_label_instead_of_serialized_html() {
+        let result = admitted_heading("img", r#"<h2>Jane <img src="i.png" alt="Doe"></h2>"#);
+        assert!(result.content.as_deref().expect("rendered output").contains("<img"));
+        assert_eq!(header_texts(&result), ["Jane Doe"]);
+    }
+}
+
 #[cfg(feature = "visitor")]
 mod capture_transactions {
     use super::*;
@@ -560,4 +772,180 @@ mod specialized_table_transactions {
         assert!(result.document.is_none());
         assert_eq!(header_texts(&result), ["Jane"]);
     }
+}
+
+#[test]
+fn preserved_image_source_contributes_its_alt_label_to_heading_metadata() {
+    let result = metadata_without_rendering_changes(
+        r#"<h2>Jane <img src="i.png" alt="Doe"></h2>"#,
+        &ConversionOptions {
+            preserve_tags: vec!["img".to_string()],
+            ..options()
+        },
+    );
+    assert!(result.content.as_deref().expect("preserved output").contains("<img"));
+    assert_eq!(header_texts(&result), ["Jane Doe"]);
+}
+
+#[test]
+fn preserved_descendant_break_separates_admitted_heading_words() {
+    let result = metadata_without_rendering_changes(
+        "<h2>Jane <span>Doe<br>Smith</span></h2>",
+        &ConversionOptions {
+            preserve_tags: vec!["span".to_string()],
+            ..options()
+        },
+    );
+    assert!(result.content.as_deref().expect("preserved output").contains("<br"));
+    assert_eq!(header_texts(&result), ["Jane Doe Smith"]);
+}
+
+#[test]
+fn admitted_image_spacing_consumes_whitespace_owed_by_an_exclusion() {
+    let result = metadata_without_rendering_changes(
+        r#"<h2>Jane <span class="omit">Excluded</span><img src="i.png" alt="pic"></h2>"#,
+        &ConversionOptions {
+            exclude_selectors: vec![".omit".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane pic"));
+    assert_eq!(header_texts(&result), ["Jane pic"]);
+}
+
+#[test]
+fn semantic_breaks_and_inserted_media_spaces_share_the_admitted_boundary() {
+    for html in [
+        r#"<h2>Jane<br><img src="i.png" alt="pic"></h2>"#,
+        r#"<h2>Jane <span class="omit">Excluded</span><br><img src="i.png" alt="pic"></h2>"#,
+        r#"<h2>Jane <span class="omit">Excluded</span><img src="i.png" alt="pic"><br>Doe</h2>"#,
+    ] {
+        let result = metadata_without_rendering_changes(
+            html,
+            &ConversionOptions {
+                exclude_selectors: vec![".omit".to_string()],
+                ..options()
+            },
+        );
+        let expected = if html.ends_with("Doe</h2>") {
+            "Jane pic Doe"
+        } else {
+            "Jane pic"
+        };
+        assert_eq!(header_texts(&result), [expected], "{html}");
+    }
+}
+
+#[test]
+fn preserved_descendant_labels_and_breaks_keep_entities_and_code_spaces() {
+    let result = metadata_without_rendering_changes(
+        r#"<h2>Jane <span>^Doe^ &amp; <code>A  B</code><br><img alt="M &amp; N"> <svg><style>Hidden</style><title>Icon</title></svg></span></h2>"#,
+        &ConversionOptions {
+            preserve_tags: vec!["span".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(header_texts(&result), ["Jane ^Doe^ & A  B M & N Icon"]);
+}
+
+#[test]
+fn excluded_preserved_media_does_not_admit_labels_to_heading_metadata() {
+    let result = metadata_without_rendering_changes(
+        r#"<h2>Jane <img class="omit" alt="Hidden"><svg class="omit"><title>Hidden</title></svg> Doe</h2>"#,
+        &ConversionOptions {
+            preserve_tags: vec!["img".to_string(), "svg".to_string()],
+            exclude_selectors: vec![".omit".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(result.content.as_deref().map(str::trim), Some("## Jane Doe"));
+    assert_eq!(header_texts(&result), ["Jane Doe"]);
+}
+
+#[cfg(feature = "visitor")]
+#[test]
+fn preserved_descendant_capture_does_not_invoke_image_callbacks() {
+    use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
+    use std::sync::{Arc, Mutex};
+    #[derive(Debug, Default)]
+    struct Images {
+        calls: usize,
+    }
+    impl HtmlVisitor for Images {
+        fn visit_image(&mut self, _: &NodeContext<'_>, _: &str, _: &str, _: Option<&str>) -> VisitResult {
+            self.calls += 1;
+            VisitResult::Continue
+        }
+    }
+    let visitor = Arc::new(Mutex::new(Images::default()));
+    let handle: VisitorHandle = visitor.clone();
+    let result = convert(
+        r#"<h2>Jane <span><img src="i.png" alt="Doe"></span></h2>"#,
+        Some(ConversionOptions {
+            preserve_tags: vec!["span".to_string()],
+            visitor: Some(handle),
+            ..options()
+        }),
+    )
+    .expect("the preserved subtree must be admitted");
+    assert_eq!(header_texts(&result), ["Jane Doe"]);
+    assert_eq!(visitor.lock().expect("image callback state").calls, 0);
+}
+
+#[test]
+fn preserved_source_tags_obey_html_case_insensitivity() {
+    for (html, preserve, expected) in [
+        (r#"<h2>Jane <IMG src="i.png" alt="Doe"></h2>"#, "img", "Jane Doe"),
+        ("<h2>Jane <span>Doe<BR>Smith</span></h2>", "span", "Jane Doe Smith"),
+    ] {
+        let result = metadata_without_rendering_changes(
+            html,
+            &ConversionOptions {
+                preserve_tags: vec![preserve.to_string()],
+                ..options()
+            },
+        );
+        assert_eq!(header_texts(&result), [expected]);
+    }
+}
+
+fn assert_preserved_code_boundary(tag: &str) {
+    let html = format!("<h2>Jane <span><br><{tag}>  A</{tag}></span></h2>");
+    let ordinary = metadata_without_rendering_changes(&html, &options());
+    assert_eq!(header_texts(&ordinary), ["Jane   A"], "ordinary {tag}");
+    let preserved = metadata_without_rendering_changes(
+        &html,
+        &ConversionOptions {
+            preserve_tags: vec!["span".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(header_texts(&preserved), header_texts(&ordinary), "preserved {tag}");
+}
+
+#[test]
+fn preserved_keyboard_text_keeps_the_ordinary_code_boundary() {
+    assert_preserved_code_boundary("kbd");
+}
+
+#[test]
+fn preserved_sample_text_keeps_the_ordinary_code_boundary() {
+    assert_preserved_code_boundary("samp");
+}
+
+#[test]
+fn preserved_code_text_keeps_the_ordinary_code_boundary() {
+    assert_preserved_code_boundary("code");
+}
+
+#[test]
+fn preserved_preformatted_text_retains_its_code_boundary() {
+    let result = metadata_without_rendering_changes(
+        "<h2>Jane <span><br><pre>  A</pre></span></h2>",
+        &ConversionOptions {
+            preserve_tags: vec!["span".to_string()],
+            ..options()
+        },
+    );
+    assert_eq!(header_texts(&result), ["Jane   A"]);
 }

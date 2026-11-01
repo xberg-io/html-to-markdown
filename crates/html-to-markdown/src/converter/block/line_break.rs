@@ -243,6 +243,8 @@ fn visit_line_break(
         VisitResult::Continue => false,
         VisitResult::Skip => true,
         VisitResult::Custom(custom) => {
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::append(handler.ctx, &custom);
             output.push_str(&custom);
             true
         }

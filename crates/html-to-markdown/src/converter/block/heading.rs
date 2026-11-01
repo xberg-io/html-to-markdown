@@ -178,7 +178,7 @@ pub fn heading_allows_inline_images(
 }
 
 /// Normalize heading text by replacing newlines with spaces.
-fn normalize_heading_text(text: &str) -> Cow<'_, str> {
+pub(in crate::converter) fn normalize_heading_text(text: &str) -> Cow<'_, str> {
     if !text.contains('\n') && !text.contains('\r') {
         return Cow::Borrowed(text);
     }

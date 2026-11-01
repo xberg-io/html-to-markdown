@@ -77,9 +77,15 @@ struct CaptureBuffer(Box<CaptureText>);
 #[derive(Default)]
 struct CaptureText(String);
 
-fn end_media_boundary(scope: &Context, media_state: Option<MediaBoundaryState>, output: &mut String, start: usize) {
+fn end_media_boundary(
+    scope: &Context,
+    media_state: Option<MediaBoundaryState>,
+    output: &mut String,
+    start: usize,
+    metadata_start: Option<usize>,
+) {
     if let (Some(boundary), Some(incoming)) = (scope.media_boundary.as_ref(), media_state) {
-        super::finish_media_boundary(output, start, boundary, incoming, scope);
+        super::finish_media_boundary(output, start, boundary, incoming, scope, metadata_start);
     }
 }
 
@@ -175,6 +181,7 @@ struct Frame<'a> {
     child_has_buffer: bool,
     child_depth: Option<usize>,
     media_start: usize,
+    metadata_start: Option<usize>,
     media_state: Option<super::super::context::MediaBoundaryState>,
 }
 
@@ -230,13 +237,17 @@ impl<'a> Walker for MarkdownWalk<'a, '_> {
         let handler = HandlerContext::new(options, scope, depth, self.root.dom_ctx);
         let output = current_output(&mut self.captures, self.output);
         let media_start = output.len();
+        #[cfg(feature = "metadata")]
+        let metadata_start = crate::converter::heading_metadata::checkpoint(scope);
+        #[cfg(not(feature = "metadata"))]
+        let metadata_start = None;
         let media_state = scope
             .media_boundary
             .as_ref()
             .map(|state| state.replace(Default::default()));
         if is_table_part(&node_handle, self.parser, handler.dom_ctx) {
             walk_table_parts(&node_handle, self.parser, output, handler);
-            end_media_boundary(scope, media_state, output, media_start);
+            end_media_boundary(scope, media_state, output, media_start, metadata_start);
             return None;
         }
         scope.last_list.enter(output);
@@ -246,7 +257,7 @@ impl<'a> Walker for MarkdownWalk<'a, '_> {
         let mut frame = match enter_node(&node_handle, self.parser, output, handler, self.root.dom_ctx, children) {
             Entered::Complete => {
                 leave_node(node_handle, self.parser, output, scope, first_writer_start);
-                end_media_boundary(scope, media_state, output, media_start);
+                end_media_boundary(scope, media_state, output, media_start, metadata_start);
                 return None;
             }
             Entered::Children {
@@ -266,6 +277,7 @@ impl<'a> Walker for MarkdownWalk<'a, '_> {
                 child_has_buffer: false,
                 child_depth: None,
                 media_start,
+                metadata_start,
                 media_state,
             },
         };
@@ -319,7 +331,14 @@ impl<'a> Walker for MarkdownWalk<'a, '_> {
         end_fresh_block_start(&frame.scope, output, frame.output_start);
         leave_node(frame.node, self.parser, output, &frame.scope, frame.first_writer_start);
         if let (Some(boundary), Some(incoming)) = (frame.scope.media_boundary.as_ref(), frame.media_state) {
-            super::finish_media_boundary(output, frame.media_start, boundary, incoming, &frame.scope);
+            super::finish_media_boundary(
+                output,
+                frame.media_start,
+                boundary,
+                incoming,
+                &frame.scope,
+                frame.metadata_start,
+            );
         }
         if let Some(mut buffer) = captured {
             buffer.0.0.clear();
