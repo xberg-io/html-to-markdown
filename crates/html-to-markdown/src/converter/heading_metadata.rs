@@ -26,7 +26,7 @@ struct PendingHeader {
     depth: usize,
 }
 
-pub(crate) struct HeaderCapture {
+pub struct HeaderCapture {
     // ~keep Only text/checkpoint operations are used, so metadata never builds a public tree.
     text: StructureCollector,
     elements: Vec<Element>,
@@ -34,7 +34,7 @@ pub(crate) struct HeaderCapture {
 }
 
 impl HeaderCapture {
-    pub(super) fn new() -> Self {
+    pub(super) const fn new() -> Self {
         Self {
             text: StructureCollector::new(),
             elements: Vec::new(),
