@@ -106,6 +106,8 @@ struct InertData {
 struct InertState {
     output_start: usize,
     data: Option<InertData>,
+    #[cfg(feature = "metadata")]
+    metadata_node: Option<u32>,
 }
 
 struct TableWalk {
@@ -663,6 +665,8 @@ impl TableWalk {
         self.inert_starts.push(InertState {
             output_start: self.text.len(),
             data,
+            #[cfg(feature = "metadata")]
+            metadata_node: None,
         });
         if !site.context.skip_visitor_hooks && site.context.visitor.is_some() {
             let Some(tl::Node::Tag(tag)) = node.get(site.parser) else {
@@ -685,7 +689,26 @@ impl TableWalk {
                     }
                 }
                 self.skip_until = Some(end);
+                return;
             }
+        }
+        #[cfg(feature = "metadata")]
+        self.begin_inert_metadata(node, depth, site);
+    }
+
+    #[cfg(all(feature = "visitor", feature = "metadata"))]
+    fn begin_inert_metadata(&mut self, node: tl::NodeHandle, depth: usize, site: &HookSite<'_>) {
+        let Some(tl::Node::Tag(tag)) = node.get(site.parser) else {
+            return;
+        };
+        if let Some(checkpoint) = self.inert_starts.last_mut() {
+            checkpoint.metadata_node = crate::converter::heading_metadata::begin(
+                site.context,
+                node.get_inner(),
+                depth,
+                tag.name().as_utf8_str().as_ref(),
+                tag,
+            );
         }
     }
 
@@ -694,6 +717,15 @@ impl TableWalk {
         let Some(checkpoint) = self.inert_starts.pop() else {
             return;
         };
+        #[cfg(feature = "metadata")]
+        let metadata_node = checkpoint.metadata_node;
+        self.finish_inert_visit(node, depth, site, checkpoint);
+        #[cfg(feature = "metadata")]
+        crate::converter::heading_metadata::finish(site.context, metadata_node);
+    }
+
+    #[cfg(feature = "visitor")]
+    fn finish_inert_visit(&mut self, node: tl::NodeHandle, depth: usize, site: &HookSite<'_>, checkpoint: InertState) {
         if !site.context.skip_visitor_hooks
             && let Some(visitor) = &site.context.visitor
         {
@@ -724,6 +756,13 @@ impl TableWalk {
                 crate::converter::visitor_hooks::VisitAction::Skip
                     | crate::converter::visitor_hooks::VisitAction::Custom
             ) {
+                #[cfg(feature = "metadata")]
+                if checkpoint.metadata_node.is_some() {
+                    let replacement = matches!(action, crate::converter::visitor_hooks::VisitAction::Custom)
+                        .then(|| self.text.get(checkpoint.output_start..))
+                        .flatten();
+                    crate::converter::heading_metadata::replace_owned(site.context, node.get_inner(), replacement);
+                }
                 self.restore_inert_data(checkpoint);
             }
         }

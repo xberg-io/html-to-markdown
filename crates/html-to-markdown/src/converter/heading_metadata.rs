@@ -140,13 +140,22 @@ pub(super) fn replace(ctx: &Context, replacement: Option<&str>) {
     }
 }
 
+#[cfg(feature = "visitor")]
+pub(super) fn replace_owned(ctx: &Context, node: u32, replacement: Option<&str>) {
+    if let Some(capture) = ctx.header_capture.as_ref() {
+        let mut capture = capture.borrow_mut();
+        assert_eq!(capture.elements.last().map(|element| element.node), Some(node));
+        capture.replace(replacement);
+    }
+}
+
 pub(super) fn eligible(ctx: &Context, node: u32) {
     if let Some(capture) = ctx.header_capture.as_ref() {
         let mut capture = capture.borrow_mut();
-        if let Some(element) = capture.elements.last_mut().filter(|element| element.node == node) {
-            if let Some(heading) = element.heading.as_mut() {
-                heading.eligible = true;
-            }
+        if let Some(element) = capture.elements.last_mut().filter(|element| element.node == node)
+            && let Some(heading) = element.heading.as_mut()
+        {
+            heading.eligible = true;
         }
     }
 }
