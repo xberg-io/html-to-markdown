@@ -868,7 +868,7 @@ jobs:
         with:
           python-version: "3.13"
           package-dir: packages/python
-          cibw-build: "cp310-*"
+          cibw-build: "cp311-*"
           cibw-before-build-linux: >
             yum install -y openssl-devel &&
             (test -x /usr/bin/aarch64-linux-gnu-gcc ||

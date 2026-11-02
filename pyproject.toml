@@ -6,10 +6,9 @@ requires = ["setuptools>=69"]
 name = "html-to-markdown-workspace"
 version = "3.19.2"
 description = "Workspace-only metadata for tooling."
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",

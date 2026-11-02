@@ -1,7 +1,7 @@
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:a4b50fdb10a58c59ec38a25a1ca9114cc7e765be961aa39adb702d0c343f6431
-Source-Hash: blake3:25aff2d6495f85f31e43d878c418221ab6d2edce946baaa4716510a2c8633f5b
+Content-Hash: blake3:06390c0ca099d44cd5ef94441756dacb561188f9a95a772faa11d885f172bf79
+Source-Hash: blake3:c3c4ea7c5d8ddfea556dfc80ebeaff91d24f0232960b21b75c1552e961ebab9a
 Schema-Version: v1
 -->
 
@@ -9,7 +9,7 @@ Schema-Version: v1
 
 Package name: `html-to-markdown`
 Import: `from html_to_markdown import ...`
-Python requirement: 3.10+
+Python requirement: 3.11+
 
 ## Primary Function
 

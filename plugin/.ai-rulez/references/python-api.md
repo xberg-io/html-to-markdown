@@ -2,7 +2,7 @@
 
 Package name: `html-to-markdown`
 Import: `from html_to_markdown import ...`
-Python requirement: 3.10+
+Python requirement: 3.11+
 
 ## Primary Function
 
