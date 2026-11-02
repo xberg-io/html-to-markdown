@@ -57,6 +57,8 @@ pub fn handle(node_handle: &NodeHandle, parser: &Parser, output: &mut String, ha
 
 // ~keep Inline code belongs to its enclosing capture; blocks and cells collect their own text.
 fn record_structure_break(ctx: &Context) {
+    #[cfg(feature = "metadata")]
+    crate::converter::heading_metadata::line_break(ctx);
     if ctx.in_code_block || ctx.in_table_cell || ctx.in_layout_cell {
         return;
     }
@@ -241,6 +243,8 @@ fn visit_line_break(
         VisitResult::Continue => false,
         VisitResult::Skip => true,
         VisitResult::Custom(custom) => {
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::append(handler.ctx, &custom);
             output.push_str(&custom);
             true
         }

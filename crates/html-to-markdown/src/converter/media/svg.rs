@@ -234,7 +234,7 @@ enum GraphicScope {
 }
 
 enum GraphicStep {
-    Visit(tl::NodeHandle, GraphicScope),
+    Visit(tl::NodeHandle, GraphicScope, usize),
     Space,
     EndPart,
 }
@@ -321,6 +321,28 @@ pub fn graphic_text(
     options: &ConversionOptions,
     policy: crate::convert_api::AccessibleNamePolicy,
 ) -> String {
+    graphic_text_with_depth(svg, parser, options, policy, usize::MAX)
+}
+
+// ~keep Preserved HTML emits cutoff-node attributes but never its children; semantic SVG labels share that budget.
+#[cfg(feature = "metadata")]
+pub(in crate::converter) fn preserved_graphic_text(
+    svg: &tl::HTMLTag<'_>,
+    parser: &Parser<'_>,
+    options: &ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
+    remaining_depth: usize,
+) -> String {
+    graphic_text_with_depth(svg, parser, options, policy, remaining_depth)
+}
+
+fn graphic_text_with_depth(
+    svg: &tl::HTMLTag<'_>,
+    parser: &Parser<'_>,
+    options: &ConversionOptions,
+    policy: crate::convert_api::AccessibleNamePolicy,
+    remaining_depth: usize,
+) -> String {
     let hidden_content = options.hidden_content;
     if is_hidden_in_graphic(svg, hidden_content) {
         return String::new();
@@ -339,10 +361,15 @@ pub fn graphic_text(
     }
     // ~keep An explicit stack: the nesting is the page's, and native recursion over it can overflow.
     let mut stack = Vec::new();
-    push_graphic_children(&mut stack, svg, GraphicScope::Drawing { of_svg: true, named });
+    push_graphic_children(
+        &mut stack,
+        svg,
+        GraphicScope::Drawing { of_svg: true, named },
+        remaining_depth,
+    );
     while let Some(step) = stack.pop() {
-        let (handle, scope) = match step {
-            GraphicStep::Visit(handle, scope) => (handle, scope),
+        let (handle, scope, remaining_depth) = match step {
+            GraphicStep::Visit(handle, scope, remaining_depth) => (handle, scope, remaining_depth),
             GraphicStep::Space => {
                 out.current.push(' ');
                 continue;
@@ -358,7 +385,7 @@ pub fn graphic_text(
                     .push_str(&crate::text::decode_html_entities_cow(bytes.as_utf8_str().as_ref()));
             }
             Some(tl::Node::Tag(tag)) if is_hidden_in_graphic(tag, hidden_content) => {}
-            Some(tl::Node::Tag(tag)) => visit_graphic_tag(tag, parser, scope, &mut stack, &mut out),
+            Some(tl::Node::Tag(tag)) => visit_graphic_tag(tag, parser, scope, &mut stack, &mut out, remaining_depth),
             _ => {}
         }
     }
@@ -366,22 +393,36 @@ pub fn graphic_text(
     out.parts.join(" ")
 }
 
-fn push_graphic_children(stack: &mut Vec<GraphicStep>, tag: &tl::HTMLTag<'_>, scope: GraphicScope) {
+fn push_graphic_children(
+    stack: &mut Vec<GraphicStep>,
+    tag: &tl::HTMLTag<'_>,
+    scope: GraphicScope,
+    remaining_depth: usize,
+) {
+    if remaining_depth == 0 {
+        return;
+    }
     stack.extend(
         tag.children()
             .top()
             .as_slice()
             .iter()
             .rev()
-            .map(|child| GraphicStep::Visit(*child, scope)),
+            .map(|child| GraphicStep::Visit(*child, scope, remaining_depth - 1)),
     );
 }
 
 /// Schedules the children of `tag` as one part of the text.
-fn push_graphic_part(stack: &mut Vec<GraphicStep>, out: &mut GraphicParts, tag: &tl::HTMLTag<'_>, scope: GraphicScope) {
+fn push_graphic_part(
+    stack: &mut Vec<GraphicStep>,
+    out: &mut GraphicParts,
+    tag: &tl::HTMLTag<'_>,
+    scope: GraphicScope,
+    remaining_depth: usize,
+) {
     out.end_part();
     stack.push(GraphicStep::EndPart);
-    push_graphic_children(stack, tag, scope);
+    push_graphic_children(stack, tag, scope, remaining_depth);
 }
 
 fn visit_graphic_tag(
@@ -390,6 +431,7 @@ fn visit_graphic_tag(
     scope: GraphicScope,
     stack: &mut Vec<GraphicStep>,
     out: &mut GraphicParts,
+    remaining_depth: usize,
 ) {
     let name = normalized_tag_name(tag.name().as_utf8_str());
     let nested_svg = |named: bool| GraphicScope::Drawing {
@@ -399,32 +441,34 @@ fn visit_graphic_tag(
     match (scope, &*name) {
         (GraphicScope::Drawing { of_svg, named }, "title" | "desc") => {
             if of_svg && named {
-                push_graphic_part(stack, out, tag, GraphicScope::Label);
+                push_graphic_part(stack, out, tag, GraphicScope::Label, remaining_depth);
             }
         }
-        (GraphicScope::Drawing { .. }, "text") => push_graphic_part(stack, out, tag, GraphicScope::Text),
-        (GraphicScope::Drawing { .. }, "foreignobject") => push_graphic_part(stack, out, tag, GraphicScope::Html),
-        (GraphicScope::Drawing { named, .. }, "svg") => push_graphic_children(stack, tag, nested_svg(named)),
-        (GraphicScope::Drawing { named, .. }, "g" | "a") => {
-            push_graphic_children(stack, tag, GraphicScope::Drawing { of_svg: false, named });
+        (GraphicScope::Drawing { .. }, "text") => {
+            push_graphic_part(stack, out, tag, GraphicScope::Text, remaining_depth);
         }
-        (GraphicScope::Drawing { named, .. }, "switch") => {
-            // ~keep A `switch` draws one child: the first element whose test attributes hold. The
-            // ~keep converter knows no language of the reader, so a `systemLanguage` holds only
-            // ~keep when it names English, and a child without the attribute is the fallback.
-            let first = tag
-                .children()
-                .top()
-                .iter()
-                .find(|child| matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if system_language_holds(child_tag)))
-                .copied();
-            stack.extend(first.map(|child| GraphicStep::Visit(child, GraphicScope::Drawing { of_svg: false, named })));
+        (GraphicScope::Drawing { .. }, "foreignobject") => {
+            push_graphic_part(stack, out, tag, GraphicScope::Html, remaining_depth);
+        }
+        (GraphicScope::Drawing { named, .. }, "svg") => {
+            push_graphic_children(stack, tag, nested_svg(named), remaining_depth);
+        }
+        (GraphicScope::Drawing { named, .. }, "g" | "a") => {
+            push_graphic_children(
+                stack,
+                tag,
+                GraphicScope::Drawing { of_svg: false, named },
+                remaining_depth,
+            );
+        }
+        (GraphicScope::Drawing { named, .. }, "switch") if remaining_depth > 0 => {
+            push_graphic_switch(stack, tag, parser, named, remaining_depth);
         }
         (GraphicScope::Drawing { .. }, _) => {}
-        (GraphicScope::Label, _) => push_graphic_children(stack, tag, GraphicScope::Label),
+        (GraphicScope::Label, _) => push_graphic_children(stack, tag, GraphicScope::Label, remaining_depth),
         (GraphicScope::Text, "title" | "desc") | (GraphicScope::Html, "script" | "style" | "template") => {}
         (GraphicScope::Text, _) => {
-            push_graphic_children(stack, tag, GraphicScope::Text);
+            push_graphic_children(stack, tag, GraphicScope::Text, remaining_depth);
             // ~keep A span with its own `x` or `y` starts at a new place, as a new line of a label does.
             if ["x", "y"].iter().any(|key| tag.attributes().get(*key).is_some()) {
                 stack.push(GraphicStep::Space);
@@ -433,7 +477,7 @@ fn visit_graphic_tag(
         (GraphicScope::Html, "svg") => {
             out.end_part();
             stack.push(GraphicStep::EndPart);
-            push_graphic_children(stack, tag, nested_svg(out.use_accessible_names));
+            push_graphic_children(stack, tag, nested_svg(out.use_accessible_names), remaining_depth);
         }
         (GraphicScope::Html, "br") => out.current.push(' '),
         (GraphicScope::Html, html_name) => {
@@ -441,12 +485,37 @@ fn visit_graphic_tag(
             if is_block {
                 stack.push(GraphicStep::Space);
             }
-            push_graphic_children(stack, tag, GraphicScope::Html);
+            push_graphic_children(stack, tag, GraphicScope::Html, remaining_depth);
             if is_block {
                 stack.push(GraphicStep::Space);
             }
         }
     }
+}
+
+fn push_graphic_switch(
+    stack: &mut Vec<GraphicStep>,
+    tag: &tl::HTMLTag<'_>,
+    parser: &Parser<'_>,
+    named: bool,
+    remaining_depth: usize,
+) {
+    // ~keep A `switch` draws one child: the first element whose test attributes hold. The
+    // ~keep converter knows no language of the reader, so a `systemLanguage` holds only
+    // ~keep when it names English, and a child without the attribute is the fallback.
+    let first = tag
+        .children()
+        .top()
+        .iter()
+        .find(|child| matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if system_language_holds(child_tag)))
+        .copied();
+    stack.extend(first.map(|child| {
+        GraphicStep::Visit(
+            child,
+            GraphicScope::Drawing { of_svg: false, named },
+            remaining_depth - 1,
+        )
+    }));
 }
 
 /// Handle SVG element conversion to Markdown.
@@ -481,6 +550,8 @@ pub fn handle_svg(
     }
 
     let title = graphic_text(tag, parser, options, ctx.accessible_names);
+    #[cfg(feature = "metadata")]
+    crate::converter::heading_metadata::append(ctx, &title);
     if ctx.in_code || ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
         super::record_text_label(&title, ctx);
     }

@@ -131,6 +131,8 @@ pub fn convert_html_impl(
     trace_walk_complete(&ctx);
 
     check_visitor_error(&ctx)?;
+    #[cfg(feature = "metadata")]
+    super::heading_metadata::flush(&ctx);
 
     let depth_warning = depth_warning(&ctx, options).or_else(|| repair_warning.map(repair_limit_warning));
 
@@ -521,7 +523,10 @@ fn finish_media_boundary(
     boundary: &std::cell::Cell<super::context::MediaBoundaryState>,
     incoming: super::context::MediaBoundaryState,
     ctx: &Context,
+    metadata_start: Option<usize>,
 ) {
+    #[cfg(not(feature = "metadata"))]
+    let _ = metadata_start;
     let Some(chunk) = output.get(start..).filter(|chunk| !chunk.is_empty()) else {
         boundary.set(incoming);
         return;
@@ -540,6 +545,8 @@ fn finish_media_boundary(
         && edge.is_some_and(|character| !character.is_whitespace() && !".,;:!?)]}".contains(character))
     {
         ctx.insert_media_space(output, start);
+        #[cfg(feature = "metadata")]
+        super::heading_metadata::insert_space(ctx, metadata_start);
     }
     if incoming.first_edge.is_some() {
         current.first_is_media = incoming.first_is_media;
@@ -556,6 +563,8 @@ struct TagCapture<'a> {
     node_id: u32,
     #[cfg(feature = "visitor")]
     output_start: usize,
+    #[cfg(feature = "visitor")]
+    output_checkpoint: Option<std::rc::Rc<std::cell::Cell<usize>>>,
     #[cfg(feature = "visitor")]
     code_break_start: Option<usize>,
     #[cfg(not(feature = "visitor"))]
@@ -610,9 +619,13 @@ fn begin_tag<'a>(
         TagRoute::Children => return Begun::Children,
     }
     collect_document_attributes(tag_name, tag, ctx);
-    let structure_capture = super::structure_capture::begin_element(tag_name, tag, ctx);
+    let structure_capture = super::structure_capture::begin_element(tag_name, tag, ctx, node_handle.get_inner(), depth);
     #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
     let element_output_start = output.len();
+    #[cfg(feature = "visitor")]
+    let output_checkpoint = visitor_element_state
+        .as_ref()
+        .map(|_| ctx.capture_visitor_output_start(output));
     strip_breaks_before_block(tag_name, output, options, ctx);
 
     Begun::Open(TagCapture {
@@ -623,6 +636,8 @@ fn begin_tag<'a>(
         node_id: node_handle.get_inner(),
         #[cfg(feature = "visitor")]
         output_start: element_output_start,
+        #[cfg(feature = "visitor")]
+        output_checkpoint,
         #[cfg(feature = "visitor")]
         code_break_start: ctx.inline_code_breaks.as_ref().map(|(_, breaks)| breaks.borrow().len()),
         #[cfg(not(feature = "visitor"))]
@@ -687,7 +702,7 @@ fn capture_custom_start(
         handler.dom_ctx.record_absent_breaks(node_id, true);
     }
     collect_document_attributes(tag_name, tag, handler.ctx);
-    super::structure_capture::replace_element_at_start(tag_name, tag, handler.ctx, replacement);
+    super::structure_capture::replace_element_at_start(tag_name, tag, handler.ctx, replacement, node_id, handler.depth);
 }
 
 fn finish_tag(
@@ -700,20 +715,28 @@ fn finish_tag(
 ) {
     #[cfg(feature = "visitor")]
     if !stop {
+        let output_start = capture
+            .output_checkpoint
+            .as_ref()
+            .map_or(capture.output_start, |start| start.get());
         let safe_start =
-            crate::converter::utility::content::floor_char_boundary(output, capture.output_start.min(output.len()));
+            crate::converter::utility::content::floor_char_boundary(output, output_start.min(output.len()));
         if let Some(action) =
             super::structure_capture::handle_visitor_end(super::structure_capture::VisitorEndCapture {
                 state: capture.visitor.as_ref(),
                 tag_name,
                 tag,
                 output,
-                element_output_start: capture.output_start,
+                element_output_start: output_start,
                 ctx: handler.ctx,
                 depth: handler.depth,
             })
         {
             use crate::converter::visitor_hooks::VisitAction;
+            #[cfg(feature = "metadata")]
+            if output_start < capture.output_start && matches!(action, VisitAction::Skip | VisitAction::Custom) {
+                super::heading_metadata::trim_replaced_prefix(handler.ctx);
+            }
             // ~keep A direct BR can be erased after its line-break callback emitted it (#921).
             // ~keep Restore its checkpoint rather than counting replacement source whitespace.
             if tag_name == "br"
@@ -743,6 +766,11 @@ fn finish_tag(
     }
     #[cfg(not(feature = "visitor"))]
     let _ = (output, stop);
+    #[cfg(feature = "visitor")]
+    if capture.output_checkpoint.is_some() {
+        drop(capture.output_checkpoint);
+        handler.ctx.prune_visitor_output_starts();
+    }
     super::structure_capture::finish_element(capture.structure, tag_name, tag, handler.ctx);
 }
 
@@ -802,7 +830,17 @@ fn skip_or_render_tag(
             handler.dom_ctx.record_absent_breaks(node_handle.get_inner(), true);
         }
         if handler.ctx.inline_code_links.is_none() {
+            let before = output.len();
             trim_trailing_whitespace(output);
+            if output.len() < before {
+                #[cfg(feature = "visitor")]
+                handler.ctx.clamp_visitor_output_starts(output);
+                #[cfg(feature = "metadata")]
+                super::heading_metadata::trim(
+                    handler.ctx,
+                    handler.options.whitespace_mode == crate::options::WhitespaceMode::Normalized,
+                );
+            }
         }
         return TagRoute::Written;
     }
@@ -822,6 +860,8 @@ fn skip_or_render_tag(
             preserved_menu_placeholder,
         )
     {
+        #[cfg(feature = "metadata")]
+        super::heading_metadata::preserved(node_handle, parser, handler);
         TagRoute::Written
     } else {
         TagRoute::Handler

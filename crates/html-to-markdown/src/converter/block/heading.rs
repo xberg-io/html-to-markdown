@@ -100,9 +100,11 @@ pub fn close(
         append_heading(output, &heading_output, options, ctx, level);
     }
     #[cfg(feature = "metadata")]
-    record_heading(node_handle, parser, &normalized, level, handler);
-    #[cfg(not(feature = "metadata"))]
-    let _ = (node_handle, parser);
+    crate::converter::heading_metadata::eligible(ctx, node_handle.get_inner());
+    #[cfg(not(feature = "visitor"))]
+    let _ = parser;
+    #[cfg(not(any(feature = "metadata", feature = "visitor")))]
+    let _ = node_handle;
 }
 
 fn separate_heading(output: &mut String, options: &ConversionOptions, ctx: &Context, level: usize) {
@@ -150,31 +152,6 @@ fn append_heading(output: &mut String, heading_text: &str, options: &ConversionO
     output.push_str(heading_text);
 }
 
-#[cfg(feature = "metadata")]
-fn record_heading(
-    node_handle: &NodeHandle,
-    parser: &Parser,
-    normalized: &str,
-    level: usize,
-    handler: HandlerContext<'_>,
-) {
-    let id = node_handle
-        .get(parser)
-        .and_then(|node| match node {
-            tl::Node::Tag(tag) => tag.attributes().get("id").flatten(),
-            _ => None,
-        })
-        .map(|value| value.as_utf8_str().to_string());
-
-    if handler.ctx.metadata_wants.headers {
-        if let Some(ref collector) = handler.ctx.metadata_collector {
-            collector
-                .borrow_mut()
-                .add_header(level as u8, normalized.to_string(), id, handler.depth, 0);
-        }
-    }
-}
-
 /// Whether a heading in a quote's buffer would join the line before it: text on the same line,
 /// or, for an underlined heading, a line of text above it (issue #640).
 ///
@@ -201,7 +178,7 @@ pub fn heading_allows_inline_images(
 }
 
 /// Normalize heading text by replacing newlines with spaces.
-fn normalize_heading_text(text: &str) -> Cow<'_, str> {
+pub(in crate::converter) fn normalize_heading_text(text: &str) -> Cow<'_, str> {
     if !text.contains('\n') && !text.contains('\r') {
         return Cow::Borrowed(text);
     }
@@ -422,18 +399,24 @@ fn visitor_heading_output(
             if let Some(collector) = ctx.structure_collector.as_ref() {
                 collector.borrow_mut().replace_current_element(Some(&custom));
             }
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace(ctx, Some(&custom));
             Some(custom)
         }
         VisitResult::Skip => {
             if let Some(collector) = ctx.structure_collector.as_ref() {
                 collector.borrow_mut().replace_current_element(None);
             }
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace(ctx, None);
             None
         }
         VisitResult::Error(err) => {
             if let Some(collector) = ctx.structure_collector.as_ref() {
                 collector.borrow_mut().replace_current_element(None);
             }
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace(ctx, None);
             if ctx.visitor_error.borrow().is_none() {
                 *ctx.visitor_error.borrow_mut() = Some(err);
             }

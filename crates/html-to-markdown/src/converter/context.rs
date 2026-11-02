@@ -36,6 +36,9 @@ pub type InlineCollectorHandle = ();
 #[cfg(feature = "metadata")]
 pub type ImageMetadataPayload = (BTreeMap<String, String>, Option<u32>, Option<u32>);
 
+#[cfg(feature = "visitor")]
+type VisitorOutputStarts = Vec<(usize, std::rc::Weak<Cell<usize>>)>;
+
 pub struct ContextParameters {
     pub accessible_names: crate::convert_api::AccessibleNamePolicy,
     pub inline_collector: Option<InlineCollectorHandle>,
@@ -388,6 +391,9 @@ pub struct Context {
     /// Optional visitor for custom HTML traversal callbacks.
     pub(crate) visitor: Option<crate::visitor::VisitorHandle>,
     #[cfg(feature = "visitor")]
+    // ~keep Weak starts follow only edits to their own buffer and never retain closed captures.
+    pub(crate) visitor_output_starts: Rc<RefCell<VisitorOutputStarts>>,
+    #[cfg(feature = "visitor")]
     /// Stores the first visitor error encountered during traversal.
     pub(crate) visitor_error: Rc<RefCell<Option<String>>>,
     #[cfg(feature = "visitor")]
@@ -398,6 +404,8 @@ pub struct Context {
     ///
     /// Populated when `options.include_document_structure == true`.
     pub(crate) structure_collector: Option<StructureCollectorHandle>,
+    #[cfg(feature = "metadata")]
+    pub(crate) header_capture: Option<Rc<RefCell<super::heading_metadata::HeaderCapture>>>,
     /// Optional reference collector for reference-style links.
     pub(crate) reference_collector: Option<ReferenceCollectorHandle>,
     /// When `true`, all visitor-hook Mutex acquisitions are skipped.
@@ -440,6 +448,34 @@ pub struct Context {
 }
 
 impl Context {
+    #[cfg(feature = "visitor")]
+    pub(crate) fn capture_visitor_output_start(&self, output: &String) -> Rc<Cell<usize>> {
+        self.prune_visitor_output_starts();
+        let start = Rc::new(Cell::new(output.len()));
+        let mut starts = self.visitor_output_starts.borrow_mut();
+        starts.push((std::ptr::from_ref(output) as usize, Rc::downgrade(&start)));
+        start
+    }
+
+    #[cfg(feature = "visitor")]
+    pub(crate) fn prune_visitor_output_starts(&self) {
+        self.visitor_output_starts
+            .borrow_mut()
+            .retain(|(_, start)| start.strong_count() > 0);
+    }
+
+    #[cfg(feature = "visitor")]
+    pub(crate) fn clamp_visitor_output_starts(&self, output: &String) {
+        let buffer = std::ptr::from_ref(output) as usize;
+        self.visitor_output_starts.borrow_mut().retain(|(owner, start)| {
+            let Some(start) = start.upgrade() else { return false };
+            if *owner == buffer {
+                start.set(start.get().min(output.len()));
+            }
+            true
+        });
+    }
+
     // ~keep CaptureText boxes keep the String object stable even when its byte storage reallocates.
     // ~keep Raw code ranges must follow edits to their buffer, never edits to the emitted Markdown.
     pub(crate) fn insert_media_space(&self, output: &mut String, at: usize) {
@@ -487,6 +523,10 @@ impl Context {
             metadata_collector: parameters.metadata_collector,
             #[cfg(feature = "metadata")]
             metadata_wants: metadata,
+            #[cfg(feature = "metadata")]
+            header_capture: metadata
+                .headers
+                .then(|| Rc::new(RefCell::new(super::heading_metadata::HeaderCapture::new()))),
             #[cfg(feature = "visitor")]
             visitor: parameters.visitor,
             structure_collector: parameters.structure_collector,
@@ -664,6 +704,8 @@ impl Context {
             inline_collector: None,
             #[cfg(feature = "metadata")]
             metadata_collector: None,
+            #[cfg(feature = "metadata")]
+            header_capture: None,
             visitor: self.visitor.as_ref().map(|_| -> crate::visitor::VisitorHandle {
                 std::sync::Arc::new(std::sync::Mutex::new(ContinuesEverywhere))
             }),
@@ -823,6 +865,37 @@ mod inline_buffer_tests {
                     }
                 }
             }
+        }
+    }
+}
+
+#[cfg(all(test, feature = "visitor"))]
+mod visitor_output_checkpoint_tests {
+    use super::Context;
+
+    #[test]
+    fn visitor_output_checkpoints_clamp_only_the_edited_buffer() {
+        let context = Context::default();
+        let mut first = String::from("first ");
+        let second = String::from("second buffer");
+        let first_start = context.capture_visitor_output_start(&first);
+        let second_start = context.capture_visitor_output_start(&second);
+        first.pop();
+        context.clamp_visitor_output_starts(&first);
+        assert_eq!(first_start.get(), 5);
+        assert_eq!(second_start.get(), second.len());
+    }
+
+    #[test]
+    fn visitor_output_checkpoints_do_not_retain_closed_captures_without_trims() {
+        let context = Context::default();
+        let output = String::from("unchanged");
+        for _ in 0..32 {
+            let start = context.capture_visitor_output_start(&output);
+            assert_eq!(context.visitor_output_starts.borrow().len(), 1);
+            drop(start);
+            context.prune_visitor_output_starts();
+            assert_eq!(context.visitor_output_starts.borrow().len(), 0);
         }
     }
 }

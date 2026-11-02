@@ -289,6 +289,7 @@ fn collect_grid_cell_content(cell_handle: &tl::NodeHandle, parser: &tl::Parser, 
     #[cfg(feature = "metadata")]
     {
         cell_ctx.metadata_collector = None;
+        cell_ctx.header_capture = None;
     }
     cell_ctx.structure_collector = None;
     #[cfg(feature = "inline-images")]

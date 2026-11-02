@@ -97,6 +97,8 @@ pub mod form;
 pub mod format;
 pub mod handlers;
 pub mod head_metadata;
+#[cfg(feature = "metadata")]
+mod heading_metadata;
 pub mod inline;
 pub mod list;
 pub mod main;

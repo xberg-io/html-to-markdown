@@ -351,6 +351,7 @@ pub(super) fn column_widths(
         #[cfg(feature = "metadata")]
         {
             prepass_ctx.metadata_collector = None;
+            prepass_ctx.header_capture = None;
         }
         prepass_ctx.structure_collector = None;
         #[cfg(feature = "inline-images")]
@@ -665,7 +666,11 @@ fn apply_table_visit_result(
             output.push_str(&rows_output);
             output.push_str(&custom);
         }
-        VisitResult::Skip => output.truncate(state.output_start),
+        VisitResult::Skip => {
+            output.truncate(state.output_start);
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace_owned(handler.ctx, node_handle.get_inner(), None);
+        }
         VisitResult::Error(err) => {
             if handler.ctx.visitor_error.borrow().is_none() {
                 *handler.ctx.visitor_error.borrow_mut() = Some(err);

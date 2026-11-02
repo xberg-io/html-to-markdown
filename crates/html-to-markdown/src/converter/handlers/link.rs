@@ -886,18 +886,24 @@ fn visit_link(
             if let Some(collector) = handler.context.structure_collector.as_ref() {
                 collector.borrow_mut().replace_current_element(Some(&custom));
             }
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace(handler.context, Some(&custom));
             handler.output.push_str(&custom);
         }
         VisitResult::Skip => {
             if let Some(collector) = handler.context.structure_collector.as_ref() {
                 collector.borrow_mut().replace_current_element(None);
             }
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace(handler.context, None);
             return false;
         }
         VisitResult::Error(error) => {
             if let Some(collector) = handler.context.structure_collector.as_ref() {
                 collector.borrow_mut().replace_current_element(None);
             }
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace(handler.context, None);
             if handler.context.visitor_error.borrow().is_none() {
                 *handler.context.visitor_error.borrow_mut() = Some(error);
             }
@@ -907,6 +913,8 @@ fn visit_link(
             if let Some(collector) = handler.context.structure_collector.as_ref() {
                 collector.borrow_mut().replace_current_element(Some(&html));
             }
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::replace(handler.context, Some(&html));
             handler.output.push_str(&html);
             return false;
         }

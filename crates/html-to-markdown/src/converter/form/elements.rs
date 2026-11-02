@@ -77,9 +77,15 @@ pub fn dispatch_form_visitor(
         VisitResult::Custom(custom) => {
             if !output.is_empty() && !output.ends_with("\n\n") {
                 output.push_str("\n\n");
+                #[cfg(feature = "metadata")]
+                crate::converter::heading_metadata::append(ctx, "\n\n");
             }
             output.push_str(&custom);
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::append(ctx, &custom);
             output.push_str("\n\n");
+            #[cfg(feature = "metadata")]
+            crate::converter::heading_metadata::append(ctx, "\n\n");
             true
         }
         VisitResult::PreserveHtml => {
@@ -674,6 +680,8 @@ pub fn visit_button(
                 VisitResult::Continue => {}
                 VisitResult::Skip => return true,
                 VisitResult::Custom(custom) => {
+                    #[cfg(feature = "metadata")]
+                    crate::converter::heading_metadata::append(ctx, &custom);
                     output.push_str(&custom);
                     return true;
                 }

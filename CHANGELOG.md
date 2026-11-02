@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Keep heading metadata as plain text from the same conversion pass, preserving literal markup,
+  admitted image labels and visitor decisions.
+- Fully remove visitor-skipped children after exclusions trim whitespace, including UTF-8 text and
+  nested table buffers.
+
 ## [3.19.2] - 2026-10-31
 
 ### Fixed
