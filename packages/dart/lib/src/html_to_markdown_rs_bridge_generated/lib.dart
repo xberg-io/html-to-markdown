@@ -389,8 +389,8 @@ sealed class ConversionError with _$ConversionError {
 
   /// Input exceeds the configured byte limit.
   const factory ConversionError.inputTooLarge({
-    required PlatformInt64 observedSize,
-    required PlatformInt64 maxSize,
+    required BigInt observedSize,
+    required BigInt maxSize,
   }) = ConversionError_InputTooLarge;
 
   /// Generic conversion error
@@ -581,14 +581,14 @@ class ConversionOptions {
   final bool extractImages;
 
   /// Maximum decoded image size in bytes (default 5MB).
-  final PlatformInt64 maxImageSize;
+  final BigInt maxImageSize;
 
   /// Maximum accepted HTML input size in bytes.
   ///
   /// WebAssembly builds default to [`DEFAULT_WASM_MAX_INPUT_SIZE`] (2 MiB) to avoid
   /// an uncatchable stack-exhaustion trap on unusually large DOMs. Native builds default
   /// to `None`. Set `Some(bytes)` to choose another limit or `None` to disable it.
-  final PlatformInt64? maxInputSize;
+  final BigInt? maxInputSize;
 
   /// Capture SVG elements as images.
   final bool captureSvg;
@@ -955,10 +955,10 @@ class ConversionOptionsUpdate {
   final bool? extractImages;
 
   /// Optional override for [`ConversionOptions::max_image_size`].
-  final PlatformInt64? maxImageSize;
+  final BigInt? maxImageSize;
 
   /// Optional override for [`ConversionOptions::max_input_size`].
-  final PlatformInt64? maxInputSize;
+  final BigInt? maxInputSize;
 
   /// Optional override for [`ConversionOptions::capture_svg`].
   final bool? captureSvg;

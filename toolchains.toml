@@ -16,7 +16,3 @@ task_sets = [
   "plugin-runtime",
   "rust",
 ]
-
-[overrides.zig]
-version = "0.16.0"
-reason = "packages/zig/build.zig.zon sets minimum_zig_version 0.16.0 and the Zig binding targets the 0.16 API"

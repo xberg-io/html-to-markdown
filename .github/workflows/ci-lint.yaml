@@ -154,7 +154,7 @@ jobs:
       # which still reported all 341). Those were a build-system layout change -- see
       # scripts/ci/swift/snippet-module-shim.sh. Kept only so a runner without Swift still works.
       setup-zig: true
-      zig-version: "0.16.0"
+      zig-version: "0.17.0"
       setup-r: true
       r-install-deps-script: scripts/ci/r/install-deps.sh
       setup-swift: true

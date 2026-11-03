@@ -1055,7 +1055,7 @@ return other(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String field0)?  parseError,TResult Function( String field0)?  sanitizationError,TResult Function( String field0)?  configError,TResult Function( String field0)?  ioError,TResult Function( String field0)?  panic,TResult Function( String field0)?  invalidInput,TResult Function( PlatformInt64 observedSize,  PlatformInt64 maxSize)?  inputTooLarge,TResult Function( String field0)?  other,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String field0)?  parseError,TResult Function( String field0)?  sanitizationError,TResult Function( String field0)?  configError,TResult Function( String field0)?  ioError,TResult Function( String field0)?  panic,TResult Function( String field0)?  invalidInput,TResult Function( BigInt observedSize,  BigInt maxSize)?  inputTooLarge,TResult Function( String field0)?  other,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ConversionError_ParseError() when parseError != null:
 return parseError(_that.field0);case ConversionError_SanitizationError() when sanitizationError != null:
@@ -1083,7 +1083,7 @@ return other(_that.field0);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String field0)  parseError,required TResult Function( String field0)  sanitizationError,required TResult Function( String field0)  configError,required TResult Function( String field0)  ioError,required TResult Function( String field0)  panic,required TResult Function( String field0)  invalidInput,required TResult Function( PlatformInt64 observedSize,  PlatformInt64 maxSize)  inputTooLarge,required TResult Function( String field0)  other,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String field0)  parseError,required TResult Function( String field0)  sanitizationError,required TResult Function( String field0)  configError,required TResult Function( String field0)  ioError,required TResult Function( String field0)  panic,required TResult Function( String field0)  invalidInput,required TResult Function( BigInt observedSize,  BigInt maxSize)  inputTooLarge,required TResult Function( String field0)  other,}) {final _that = this;
 switch (_that) {
 case ConversionError_ParseError():
 return parseError(_that.field0);case ConversionError_SanitizationError():
@@ -1107,7 +1107,7 @@ return other(_that.field0);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String field0)?  parseError,TResult? Function( String field0)?  sanitizationError,TResult? Function( String field0)?  configError,TResult? Function( String field0)?  ioError,TResult? Function( String field0)?  panic,TResult? Function( String field0)?  invalidInput,TResult? Function( PlatformInt64 observedSize,  PlatformInt64 maxSize)?  inputTooLarge,TResult? Function( String field0)?  other,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String field0)?  parseError,TResult? Function( String field0)?  sanitizationError,TResult? Function( String field0)?  configError,TResult? Function( String field0)?  ioError,TResult? Function( String field0)?  panic,TResult? Function( String field0)?  invalidInput,TResult? Function( BigInt observedSize,  BigInt maxSize)?  inputTooLarge,TResult? Function( String field0)?  other,}) {final _that = this;
 switch (_that) {
 case ConversionError_ParseError() when parseError != null:
 return parseError(_that.field0);case ConversionError_SanitizationError() when sanitizationError != null:
@@ -1540,8 +1540,8 @@ class ConversionError_InputTooLarge extends ConversionError {
   const ConversionError_InputTooLarge({required this.observedSize, required this.maxSize}): super._();
 
 
- final  PlatformInt64 observedSize;
- final  PlatformInt64 maxSize;
+ final  BigInt observedSize;
+ final  BigInt maxSize;
 
 /// Create a copy of ConversionError
 /// with the given fields replaced by the non-null parameter values.
@@ -1575,7 +1575,7 @@ abstract mixin class $ConversionError_InputTooLargeCopyWith<$Res> implements $Co
   factory $ConversionError_InputTooLargeCopyWith(ConversionError_InputTooLarge value, $Res Function(ConversionError_InputTooLarge) _then) = _$ConversionError_InputTooLargeCopyWithImpl;
 @useResult
 $Res call({
- PlatformInt64 observedSize, PlatformInt64 maxSize
+ BigInt observedSize, BigInt maxSize
 });
 
 
@@ -1595,8 +1595,8 @@ class _$ConversionError_InputTooLargeCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? observedSize = null,Object? maxSize = null,}) {
   return _then(ConversionError_InputTooLarge(
 observedSize: null == observedSize ? _self.observedSize : observedSize // ignore: cast_nullable_to_non_nullable
-as PlatformInt64,maxSize: null == maxSize ? _self.maxSize : maxSize // ignore: cast_nullable_to_non_nullable
-as PlatformInt64,
+as BigInt,maxSize: null == maxSize ? _self.maxSize : maxSize // ignore: cast_nullable_to_non_nullable
+as BigInt,
   ));
 }
 
