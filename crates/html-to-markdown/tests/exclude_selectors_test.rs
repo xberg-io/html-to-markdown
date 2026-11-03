@@ -227,3 +227,13 @@ fn should_exclude_by_a_type_selector_whatever_the_case_of_the_tag() {
         "Kept.\n"
     );
 }
+
+#[test]
+fn should_match_attribute_id_and_class_selectors_on_the_decoded_value() {
+    let html = r#"<div title="&#65;bc">A.</div><div id="b&#99;">B.</div><div class="x&#32;y">C.</div><p>Kept.</p>"#;
+    let options = ConversionOptions {
+        exclude_selectors: vec!["[title=Abc]".to_owned(), "#bc".to_owned(), ".y".to_owned()],
+        ..Default::default()
+    };
+    assert_eq!(convert(html, Some(options)).expect("conversion succeeds"), "Kept.\n");
+}

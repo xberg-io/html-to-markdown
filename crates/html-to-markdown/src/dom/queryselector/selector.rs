@@ -1,4 +1,6 @@
-use crate::dom::Node;
+use std::borrow::Cow;
+
+use crate::dom::{Bytes, Node};
 
 /// A single query selector node
 #[derive(Debug, Clone)]
@@ -39,10 +41,18 @@ impl Selector<'_> {
     pub fn matches(&self, node: &Node<'_>) -> bool {
         match self {
             Self::Tag(tag) => node.as_tag().is_some_and(|t| t.name().as_bytes().eq(*tag)),
-            Self::Id(id) => node
-                .as_tag()
-                .is_some_and(|t| t.attributes().id().is_some_and(|value| value == *id)),
-            Self::Class(class) => node.as_tag().is_some_and(|t| t.attributes().is_class_member(*class)),
+            Self::Id(id) => node.as_tag().is_some_and(|t| {
+                t.attributes()
+                    .id()
+                    .is_some_and(|value| decoded(value).as_bytes() == *id)
+            }),
+            Self::Class(class) => node.as_tag().is_some_and(|t| {
+                t.attributes().class().is_some_and(|value| {
+                    decoded(value)
+                        .split_ascii_whitespace()
+                        .any(|name| name.as_bytes() == *class)
+                })
+            }),
             Self::And(a, b) => a.matches(node) && b.matches(node),
             Self::Or(a, b) => a.matches(node) || b.matches(node),
             Self::All => true,
@@ -77,6 +87,14 @@ where
         t.attributes()
             .get(attribute)
             .flatten()
-            .is_some_and(|attr| callback(&attr.as_utf8_str(), &String::from_utf8_lossy(value)))
+            .is_some_and(|attr| callback(&decoded(attr), &String::from_utf8_lossy(value)))
     })
+}
+
+/// The value of an attribute as HTML reads it, with its character references decoded.
+fn decoded<'v>(value: &'v Bytes<'_>) -> Cow<'v, str> {
+    match value.as_utf8_str() {
+        Cow::Borrowed(text) => crate::text::decode_attribute_value_cow(text),
+        Cow::Owned(text) => Cow::Owned(crate::text::decode_attribute_value_cow(&text).into_owned()),
+    }
 }
