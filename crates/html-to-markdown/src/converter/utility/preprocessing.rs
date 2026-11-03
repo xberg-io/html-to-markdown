@@ -21,9 +21,7 @@ pub use kept_scripts::{KeptScripts, owner_mark_numbers};
 pub use lists::normalize_unclosed_list_items;
 #[cfg(feature = "metadata")]
 pub use markup::{ScriptType, script_type};
-pub use markup::{
-    find_html_comment_end, find_tag_end, normalize_split_closing_tags, preprocess_html, strip_html_cdata,
-};
+pub use markup::{find_html_comment_end, find_tag_end, preprocess_html, strip_html_cdata};
 pub use menu::{PRESERVED_MENU_ATTRIBUTE, normalize_menu_elements, restore_preserved_menu_elements};
 #[cfg(feature = "metadata")]
 pub use raw_text::strip_script_and_style_tags_for_second_pass;

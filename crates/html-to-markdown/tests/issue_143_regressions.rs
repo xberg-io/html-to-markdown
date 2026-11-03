@@ -35,11 +35,8 @@ fn normalize_newlines(input: &str) -> String {
 
 #[test]
 fn split_closing_tag_does_not_merge_nested_list() {
-    // ~keep Regression: tl parser mishandles </tag\n> (closing bracket on next line).
-    // ~keep The <a> element absorbs the nested <ul> because the closing </a\n> isn't
-    // ~keep recognised, so all nested items end up inside the link text.
-    // ~keep Note: the `>` closing the opening <a> and the `>` closing </a are on
-    // ~keep separate lines (JSX-style formatting). tl must still parse this correctly.
+    // ~keep An end tag may hold white space and a line break before its `>` (JSX-style
+    // ~keep formatting). The link must close there, or it absorbs the nested list.
     let html = r##"<ul>
   <li>
     <a href="#beyond"
@@ -95,4 +92,11 @@ fn wrap_preserves_link_only_list_items() {
         normalize_newlines(&expected).trim(),
         "word wrapping should not merge nested link-only list items"
     );
+}
+
+#[test]
+fn should_close_each_link_at_an_end_tag_split_over_lines() {
+    let html = "<p><a href=\"#a\">A</a\n  >\n<a href=\"#b\">B</a\n> after</p>";
+    let result = convert(html, None).expect("conversion should succeed");
+    assert_eq!(result, "[A](#a) [B](#b) after\n");
 }
