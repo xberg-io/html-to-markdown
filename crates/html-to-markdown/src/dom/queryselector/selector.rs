@@ -40,7 +40,11 @@ impl Selector<'_> {
     #[must_use]
     pub fn matches(&self, node: &Node<'_>) -> bool {
         match self {
-            Self::Tag(tag) => node.as_tag().is_some_and(|t| t.name().as_bytes().eq(*tag)),
+            // ~keep HTML type selectors match without regard to case. The tree names a tag in lower case, except
+            // ~keep the mixed-case svg names such as `clipPath`, so the selector is compared, not lower-cased.
+            Self::Tag(tag) => node
+                .as_tag()
+                .is_some_and(|t| t.name().as_bytes().eq_ignore_ascii_case(tag)),
             Self::Id(id) => node.as_tag().is_some_and(|t| {
                 t.attributes()
                     .id()

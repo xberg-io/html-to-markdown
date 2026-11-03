@@ -229,6 +229,34 @@ fn should_exclude_by_a_type_selector_whatever_the_case_of_the_tag() {
 }
 
 #[test]
+fn should_exclude_by_a_type_selector_written_in_any_case() {
+    for selector in ["div", "DIV", "Div"] {
+        let options = ConversionOptions {
+            exclude_selectors: vec![selector.to_owned()],
+            ..Default::default()
+        };
+        assert_eq!(
+            convert("<div>Lower.</div><DIV>Upper.</DIV><p>Kept.</p>", Some(options)).expect("conversion succeeds"),
+            "Kept.\n",
+            "selector {selector}"
+        );
+    }
+}
+
+#[test]
+fn should_keep_class_selectors_case_sensitive() {
+    let options = ConversionOptions {
+        exclude_selectors: vec![".Foo".to_owned()],
+        ..Default::default()
+    };
+    let html = r#"<div class="foo">Lower class.</div><div class="Foo">Upper class.</div>"#;
+    assert_eq!(
+        convert(html, Some(options)).expect("conversion succeeds"),
+        "Lower class.\n"
+    );
+}
+
+#[test]
 fn should_match_attribute_id_and_class_selectors_on_the_decoded_value() {
     let html = r#"<div title="&#65;bc">A.</div><div id="b&#99;">B.</div><div class="x&#32;y">C.</div><p>Kept.</p>"#;
     let options = ConversionOptions {
