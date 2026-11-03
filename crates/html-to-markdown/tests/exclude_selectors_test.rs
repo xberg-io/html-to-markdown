@@ -215,3 +215,15 @@ fn should_exclude_declarative_shadow_templates_when_retaining_reachable_content(
         );
     }
 }
+
+#[test]
+fn should_exclude_by_a_type_selector_whatever_the_case_of_the_tag() {
+    let options = ConversionOptions {
+        exclude_selectors: vec!["div".to_owned()],
+        ..Default::default()
+    };
+    assert_eq!(
+        convert("<DIV>Excluded.</DIV><p>Kept.</p>", Some(options)).expect("conversion succeeds"),
+        "Kept.\n"
+    );
+}
