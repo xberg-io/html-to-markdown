@@ -6,6 +6,11 @@ number = 0
 status = "accepted"
 blake3 = "a3f66d430832f402381010d5983006c7a3caa9be4f41c9c50f9d1b4b0af3e611"
 
+[adrs."adrs/0001-parse-with-the-astral-tl-fork-of-tl.md"]
+number = 1
+status = "superseded by [ADR-0008](0008-parse-with-a-dom-built-on-astral-html.md)"
+blake3 = "1e966b508db80e1ed3cd2b8f8b8156557c3a7159d73e096715fd5a68dba37bdf"
+
 [adrs."adrs/0002-repair-malformed-html-with-html5ever.md"]
 number = 2
 status = "accepted"
@@ -35,3 +40,8 @@ blake3 = "0bf5eb8609880796bf1f6e164707ed36c9cad8766959fe48c0696274ee7b3d20"
 number = 7
 status = "accepted"
 blake3 = "45fa84e604f8de943e3c7cd5cf08258f2ca81b21802eebd97ebd65394f4db621"
+
+[adrs."adrs/0008-parse-with-a-dom-built-on-astral-html.md"]
+number = 8
+status = "accepted"
+blake3 = "058885342bb65ae792f58043883ba20c850e0bdffad628cd33879feb92d7eb30"
