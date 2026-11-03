@@ -623,7 +623,7 @@ fn normalize_input(html: &str) -> Result<Cow<'_, str>> {
                 Cow::Borrowed(b) => normalize_line_endings(b),
                 Cow::Owned(o) => Cow::Owned(normalize_line_endings(&o).into_owned()),
             };
-            Ok(fix_xhtml_self_closing(line_normalized))
+            Ok(line_normalized)
         }
         Cow::Owned(mut owned) => {
             validate_input(&owned)?;
@@ -633,32 +633,8 @@ fn normalize_input(html: &str) -> Result<Cow<'_, str>> {
             if owned.contains('\r') {
                 owned = owned.replace("\r\n", "\n").replace('\r', "\n");
             }
-            Ok(fix_xhtml_self_closing(Cow::Owned(owned)))
+            Ok(Cow::Owned(owned))
         }
-    }
-}
-
-/// Insert a space before `/>` in XHTML-style self-closing tags so the underlying
-/// HTML parser does not greedily consume the trailing slash as part of the tag name.
-///
-/// The parser treats `/` as an identifier character, so `<td/>`
-/// is parsed as a tag literally named `"td/"` and subsequent siblings become its
-/// children — silently truncating the table and dropping the rest of the document.
-/// Rewriting to `<td />` (with a space) lets the parser recognise the self-closing
-/// syntax correctly. EPUB/XHTML-derived HTML uses this form heavily for empty
-/// table cells; see issue #391.
-fn fix_xhtml_self_closing(html: Cow<'_, str>) -> Cow<'_, str> {
-    use std::sync::OnceLock;
-    static RE: OnceLock<regex::Regex> = OnceLock::new();
-    let re = RE.get_or_init(|| {
-        regex::Regex::new(r"<([a-zA-Z][a-zA-Z0-9_:.\-]*)/>").expect("XHTML self-closing regex is well-formed")
-    });
-    if !html.contains("/>") {
-        return html;
-    }
-    match re.replace_all(html.as_ref(), "<$1 />") {
-        Cow::Borrowed(_) => html,
-        Cow::Owned(s) => Cow::Owned(s),
     }
 }
 

@@ -3,15 +3,10 @@
 
 //! Regression test for issue #391: XHTML-style self-closing tags like `<td/>`
 //! (no space before `/`) silently truncated tables and dropped the rest of the
-//! document. The bundled astral-tl parser treats `/` as an identifier character,
-//! so `<td/>` was parsed as a literal tag named `"td/"` and subsequent siblings
-//! became its children.
-//!
-//! The fix preprocesses input HTML to rewrite `<tag/>` → `<tag />` so the parser
-//! reads the trailing slash as a self-closing marker. This test pins the
-//! before/after behavior for `<td/>` (the originally reported case from an
-//! EPUB-derived HTML page), `<br/>` (must still render as a line break), and a
-//! plain non-table element.
+//! document. The tokenizer reads the slash as part of the tag, never of its name.
+//! These tests pin `<td/>` (the reported case from an EPUB-derived page), `<br/>`
+//! (still a line break), a plain non-table element, and author text that holds
+//! `<x/>`, which keeps its bytes.
 
 use html_to_markdown_rs::convert;
 
@@ -69,4 +64,15 @@ fn explicit_space_before_self_closing_unchanged() {
         content.contains("| x") && content.contains("| y"),
         "explicit-space self-close should already work, got:\n{content}"
     );
+}
+
+#[test]
+fn should_keep_self_closing_markup_in_raw_text_as_written() {
+    for html in ["<xmp><br/><td/></xmp>", "<textarea><br/><td/></textarea>"] {
+        let content = convert(html, None)
+            .expect("conversion should succeed")
+            .content
+            .unwrap_or_default();
+        assert!(content.contains("<br/><td/>"), "input: {html:?}; actual: {content:?}");
+    }
 }
