@@ -44,16 +44,11 @@ pub fn main() !void {
     const visitor = c.htm_visitor_create(&callbacks);
     defer c.htm_visitor_free(visitor);
 
-    const options_z = try std.heap.c_allocator.dupeZ(u8, "{}");
-    defer std.heap.c_allocator.free(options_z);
-    const options = c.htm_conversion_options_from_json(options_z.ptr);
+    const options = c.htm_conversion_options_from_json("{}");
     defer c.htm_conversion_options_free(options);
     c.htm_options_set_visitor(options, visitor);
 
-    const html_z = try std.heap.c_allocator.dupeZ(u8, "<h1>Title</h1><p>Body.</p>");
-    defer std.heap.c_allocator.free(html_z);
-
-    const result = c.htm_convert(html_z.ptr, options);
+    const result = c.htm_convert("<h1>Title</h1><p>Body.</p>", options);
     if (result == 0) return error.ConvertFailed;
     defer c.htm_conversion_result_free(result);
 
