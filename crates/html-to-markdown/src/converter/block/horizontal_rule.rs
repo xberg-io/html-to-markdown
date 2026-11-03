@@ -6,9 +6,9 @@
 use crate::converter::block::container::HandlerContext;
 use crate::converter::main_helpers::trim_trailing_whitespace;
 use crate::converter::utility::siblings::get_previous_sibling_tag;
+use crate::dom::{NodeHandle, Parser};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -104,7 +104,7 @@ fn visit_horizontal_rule(
     let Some(ref visitor_handle) = handler.ctx.visitor else {
         return false;
     };
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return true;
     };
     let node_id = node_handle.get_inner();

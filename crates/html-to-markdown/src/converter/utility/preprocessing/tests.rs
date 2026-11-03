@@ -256,7 +256,7 @@ fn normalize_split_closing_tags_handles_multiple_split_closing_tags() {
 fn normalize_split_closing_tags_does_not_collapse_inline_whitespace() {
     let input = "<a href=\"#x\">text</a >";
     let result = normalize_split_closing_tags(input);
-    // ~keep A space before > is actually valid HTML and tl handles it fine.
+    // ~keep A space before > is actually valid HTML and the parser handles it fine.
     // ~keep We must not touch it to avoid over-normalising.
     assert_eq!(result.as_ref(), input);
 }

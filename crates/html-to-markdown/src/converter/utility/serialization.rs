@@ -23,9 +23,9 @@ pub fn escape_html_attribute_value(value: &str) -> Cow<'_, str> {
     }
 }
 
-fn serialize_attributes(tag: &tl::HTMLTag<'_>, tag_name: &str, output: &mut String) {
+fn serialize_attributes(tag: &crate::dom::HTMLTag<'_>, tag_name: &str, output: &mut String) {
     if tag_name == "script" {
-        // ~keep A repaired-script owner temporarily promotes tl's inline attributes to a randomized map.
+        // ~keep A repaired-script owner temporarily promotes the parser's inline attributes to a randomized map.
         let mut attributes: Vec<_> = tag.attributes().iter().collect();
         attributes.sort_unstable_by(|left, right| left.0.cmp(&right.0));
         write_attributes(attributes.into_iter(), output);
@@ -56,7 +56,7 @@ fn write_attributes<'a>(attributes: impl Iterator<Item = (Cow<'a, str>, Option<C
 // ~keep reason: used only when the visitor feature is active (PreserveHtml path) or
 // ~keep inline-images feature is active (SVG serialization).
 #[allow(dead_code)]
-pub fn serialize_element(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> String {
+pub fn serialize_element(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser) -> String {
     serialize_element_at_depth(node_handle, parser, 0)
 }
 
@@ -66,7 +66,7 @@ pub fn serialize_element(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> S
 #[allow(clippy::trivially_copy_pass_by_ref)]
 // ~keep reason: used only when the visitor feature is active (PreserveHtml path).
 #[allow(dead_code)]
-pub fn serialize_node(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> String {
+pub fn serialize_node(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser) -> String {
     serialize_node_at_depth(node_handle, parser, 0)
 }
 
@@ -79,8 +79,12 @@ pub fn serialize_node(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> Stri
 /// stack (audit #23). The element's own opening tag and attributes are always emitted; only
 /// its descendants are dropped once the budget is exhausted.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn serialize_element_at_depth(node_handle: &tl::NodeHandle, parser: &tl::Parser, depth: usize) -> String {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+fn serialize_element_at_depth(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    depth: usize,
+) -> String {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let tag_name = normalized_tag_name(tag.name().as_utf8_str());
         let mut html = String::with_capacity(256);
         html.push('<');
@@ -118,11 +122,11 @@ fn serialize_element_at_depth(node_handle: &tl::NodeHandle, parser: &tl::Parser,
 /// Serialize a node to HTML string, stopping descent once `depth` reaches
 /// [`NATIVE_STACK_SAFE_DEPTH`]. See [`serialize_element_at_depth`] for the depth-guard
 /// contract.
-fn serialize_node_at_depth(node_handle: &tl::NodeHandle, parser: &tl::Parser, depth: usize) -> String {
+fn serialize_node_at_depth(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, depth: usize) -> String {
     if let Some(node) = node_handle.get(parser) {
         match node {
-            tl::Node::Raw(bytes) => bytes.as_utf8_str().to_string(),
-            tl::Node::Tag(_) => serialize_element_at_depth(node_handle, parser, depth),
+            crate::dom::Node::Raw(bytes) => bytes.as_utf8_str().to_string(),
+            crate::dom::Node::Tag(_) => serialize_element_at_depth(node_handle, parser, depth),
             _ => String::new(),
         }
     } else {
@@ -131,7 +135,7 @@ fn serialize_node_at_depth(node_handle: &tl::NodeHandle, parser: &tl::Parser, de
 }
 
 /// Serialize a tag to HTML, wrapping `serialize_node_to_html`.
-pub fn serialize_tag_to_html(handle: &tl::NodeHandle, parser: &tl::Parser) -> String {
+pub fn serialize_tag_to_html(handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser) -> String {
     let mut html = String::new();
     serialize_node_to_html(handle, parser, &mut html);
     html
@@ -144,13 +148,18 @@ pub fn serialize_tag_to_html(handle: &tl::NodeHandle, parser: &tl::Parser) -> St
 #[allow(clippy::trivially_copy_pass_by_ref)]
 // ~keep reason: used only when the visitor feature is active (PreserveHtml path).
 #[allow(dead_code)]
-pub fn serialize_node_to_html(handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String) {
+pub fn serialize_node_to_html(handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, output: &mut String) {
     serialize_node_to_html_at_depth(handle, parser, output, 0);
 }
 
-fn serialize_node_to_html_at_depth(handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, depth: usize) {
+fn serialize_node_to_html_at_depth(
+    handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    depth: usize,
+) {
     match handle.get(parser) {
-        Some(tl::Node::Tag(tag)) => {
+        Some(crate::dom::Node::Tag(tag)) => {
             let tag_name = normalized_tag_name(tag.name().as_utf8_str());
 
             output.push('<');
@@ -195,7 +204,7 @@ fn serialize_node_to_html_at_depth(handle: &tl::NodeHandle, parser: &tl::Parser,
                 output.push('>');
             }
         }
-        Some(tl::Node::Raw(bytes)) => {
+        Some(crate::dom::Node::Raw(bytes)) => {
             if let Ok(text) = std::str::from_utf8(bytes.as_bytes()) {
                 output.push_str(text);
             }
@@ -217,9 +226,9 @@ mod tests {
     #[test]
     fn should_serialize_closed_script_attributes_in_key_order_on_both_paths() {
         for _ in 0..60 {
-            let dom = tl::parse(
+            let dom = crate::dom::parse(
                 "<script type='application/ld+json' nonce='n' data-x='v'>{}</script>",
-                tl::ParserOptions::default(),
+                crate::dom::ParserOptions::default(),
             )
             .expect("closed script");
             let handle = dom.children()[0];
@@ -231,12 +240,12 @@ mod tests {
 
     #[test]
     fn should_escape_a_quote_inside_serialize_element_attribute_reconstruction() {
-        let dom = tl::parse(QUOTE_BREAKING_HTML, tl::ParserOptions::default()).unwrap();
+        let dom = crate::dom::parse(QUOTE_BREAKING_HTML, crate::dom::ParserOptions::default()).unwrap();
         let parser = dom.parser();
         let node_handle = dom
             .children()
             .iter()
-            .find(|handle| matches!(handle.get(parser), Some(tl::Node::Tag(_))))
+            .find(|handle| matches!(handle.get(parser), Some(crate::dom::Node::Tag(_))))
             .expect("tag node");
         let result = serialize_element(node_handle, parser);
         assert_eq!(
@@ -247,12 +256,12 @@ mod tests {
 
     #[test]
     fn should_escape_a_quote_inside_serialize_tag_to_html_attribute_reconstruction() {
-        let dom = tl::parse(QUOTE_BREAKING_HTML, tl::ParserOptions::default()).unwrap();
+        let dom = crate::dom::parse(QUOTE_BREAKING_HTML, crate::dom::ParserOptions::default()).unwrap();
         let parser = dom.parser();
         let node_handle = dom
             .children()
             .iter()
-            .find(|handle| matches!(handle.get(parser), Some(tl::Node::Tag(_))))
+            .find(|handle| matches!(handle.get(parser), Some(crate::dom::Node::Tag(_))))
             .expect("tag node");
         let result = serialize_tag_to_html(node_handle, parser);
         assert_eq!(

@@ -28,7 +28,7 @@ The preprocessing pass is conservative — it only removes elements that would n
 
 The HTML is parsed by [html5ever](https://crates.io/crates/html5ever), the same WHATWG-spec-compliant parser used by Servo. The parser builds an in-memory tree rooted at a document node and applies browser-compatible error recovery so malformed input degrades gracefully.
 
-Metadata extraction (`<title>`, `<meta>`, `<link>`, Open Graph, JSON-LD, …) runs in a separate fast pass using [astral-tl](https://crates.io/crates/astral-tl), a high-performance tokenizer.
+Metadata extraction (`<title>`, `<meta>`, `<link>`, Open Graph, JSON-LD, …) runs in a separate fast pass using [astral-html](https://crates.io/crates/astral-html), a high-performance tokenizer.
 
 The library does not stream: the entire HTML is parsed before the DOM walk starts. For very large documents (multi-MB) this is the dominant memory cost.
 

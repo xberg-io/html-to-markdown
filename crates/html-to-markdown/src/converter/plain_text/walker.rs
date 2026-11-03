@@ -26,12 +26,12 @@ enum CaptureKind {
 
 enum Frame<'a> {
     Children {
-        handles: std::vec::IntoIter<tl::NodeHandle>,
+        handles: std::vec::IntoIter<crate::dom::NodeHandle>,
         scope: Scope<'a>,
         after: bool,
     },
     Node {
-        handle: tl::NodeHandle,
+        handle: crate::dom::NodeHandle,
         scope: Scope<'a>,
         after: bool,
     },
@@ -47,7 +47,7 @@ enum Frame<'a> {
     },
     ReleaseList,
     Capture {
-        handle: tl::NodeHandle,
+        handle: crate::dom::NodeHandle,
         scope: Scope<'a>,
         kind: CaptureKind,
         visit_self: bool,
@@ -60,7 +60,7 @@ enum Frame<'a> {
     },
     #[cfg(feature = "visitor")]
     ElementEnd {
-        handle: tl::NodeHandle,
+        handle: crate::dom::NodeHandle,
         scope: Scope<'a>,
         checkpoint: Checkpoint,
     },
@@ -72,7 +72,7 @@ struct Walker<'a> {
     lists: Vec<ListContext>,
 }
 
-pub(super) fn extract(handles: &[tl::NodeHandle], parser: &tl::Parser, state: WalkState<'_>) -> String {
+pub(super) fn extract(handles: &[crate::dom::NodeHandle], parser: &crate::dom::Parser, state: WalkState<'_>) -> String {
     let mut walker = Walker {
         frames: Vec::new(),
         outputs: vec![PlainOutput::with_capacity(1024)],
@@ -93,7 +93,7 @@ pub(super) fn extract(handles: &[tl::NodeHandle], parser: &tl::Parser, state: Wa
 }
 
 impl<'a> Walker<'a> {
-    fn children(&mut self, handles: impl Iterator<Item = tl::NodeHandle>, scope: Scope<'a>) {
+    fn children(&mut self, handles: impl Iterator<Item = crate::dom::NodeHandle>, scope: Scope<'a>) {
         self.frames.push(Frame::Children {
             handles: handles.collect::<Vec<_>>().into_iter(),
             scope,
@@ -101,11 +101,11 @@ impl<'a> Walker<'a> {
         });
     }
 
-    fn tag_children(&mut self, tag: &tl::HTMLTag<'_>, scope: Scope<'a>) {
+    fn tag_children(&mut self, tag: &crate::dom::HTMLTag<'_>, scope: Scope<'a>) {
         self.children(tag.children().top().iter().copied(), scope);
     }
 
-    fn resume(&mut self, frame: Frame<'a>, parser: &tl::Parser) {
+    fn resume(&mut self, frame: Frame<'a>, parser: &crate::dom::Parser) {
         match frame {
             Frame::Children { handles, scope, after } => self.next_child(handles, scope, after, parser),
             Frame::Node { handle, scope, after } => self.node(handle, scope, after, parser),
@@ -137,18 +137,18 @@ impl<'a> Walker<'a> {
 
     fn next_child(
         &mut self,
-        mut handles: std::vec::IntoIter<tl::NodeHandle>,
+        mut handles: std::vec::IntoIter<crate::dom::NodeHandle>,
         scope: Scope<'a>,
         after: bool,
-        parser: &tl::Parser,
+        parser: &crate::dom::Parser,
     ) {
         let Some(handle) = handles.next() else {
             return;
         };
         let passed_over = scope.state.depth < effective_max_depth(scope.state.options)
             && match handle.get(parser) {
-                Some(tl::Node::Comment(_)) => true,
-                Some(tl::Node::Tag(tag)) if !scope.state.excludes(&handle) => SKIP_TAGS
+                Some(crate::dom::Node::Comment(_)) => true,
+                Some(crate::dom::Node::Tag(tag)) if !scope.state.excludes(&handle) => SKIP_TAGS
                     .iter()
                     .any(|skip| tag.name().as_utf8_str().eq_ignore_ascii_case(skip)),
                 _ => false,
@@ -161,20 +161,26 @@ impl<'a> Walker<'a> {
         self.frames.push(Frame::Node { handle, scope, after });
     }
 
-    fn node(&mut self, handle: tl::NodeHandle, scope: Scope<'a>, after: bool, parser: &tl::Parser) {
+    fn node(&mut self, handle: crate::dom::NodeHandle, scope: Scope<'a>, after: bool, parser: &crate::dom::Parser) {
         if scope.state.depth >= effective_max_depth(scope.state.options) {
             return;
         }
         match handle.get(parser) {
-            Some(tl::Node::Raw(bytes)) => {
+            Some(crate::dom::Node::Raw(bytes)) => {
                 super::emit_raw_text(bytes, &mut self.outputs[scope.output], &scope.state, after);
             }
-            Some(tl::Node::Tag(tag)) if !scope.state.excludes(&handle) => self.tag(handle, tag, scope, parser),
+            Some(crate::dom::Node::Tag(tag)) if !scope.state.excludes(&handle) => self.tag(handle, tag, scope, parser),
             _ => {}
         }
     }
 
-    fn tag(&mut self, handle: tl::NodeHandle, tag: &tl::HTMLTag<'_>, scope: Scope<'a>, parser: &tl::Parser) {
+    fn tag(
+        &mut self,
+        handle: crate::dom::NodeHandle,
+        tag: &crate::dom::HTMLTag<'_>,
+        scope: Scope<'a>,
+        parser: &crate::dom::Parser,
+    ) {
         let name = tag.name().as_utf8_str().to_ascii_lowercase();
         if SKIP_TAGS.contains(&name.as_str())
             || should_drop_for_preprocessing(
@@ -206,9 +212,15 @@ impl<'a> Walker<'a> {
     }
 
     #[cfg(feature = "visitor")]
-    fn element_end(&mut self, handle: tl::NodeHandle, scope: Scope<'a>, checkpoint: Checkpoint, parser: &tl::Parser) {
+    fn element_end(
+        &mut self,
+        handle: crate::dom::NodeHandle,
+        scope: Scope<'a>,
+        checkpoint: Checkpoint,
+        parser: &crate::dom::Parser,
+    ) {
         if let Some(visitor) = scope.state.visitor
-            && let Some(tl::Node::Tag(tag)) = handle.get(parser)
+            && let Some(crate::dom::Node::Tag(tag)) = handle.get(parser)
         {
             let name = tag.name().as_utf8_str().to_ascii_lowercase();
             super::visit_plain_element_end(
@@ -224,12 +236,12 @@ impl<'a> Walker<'a> {
 
     fn capture(
         &mut self,
-        handle: tl::NodeHandle,
+        handle: crate::dom::NodeHandle,
         mut scope: Scope<'a>,
         kind: CaptureKind,
         visit_self: bool,
         own_list: bool,
-        parser: &tl::Parser,
+        parser: &crate::dom::Parser,
     ) {
         self.frames.push(Frame::FinishCapture {
             output: scope.output,
@@ -248,7 +260,7 @@ impl<'a> Walker<'a> {
                 scope,
                 after: false,
             });
-        } else if let Some(tl::Node::Tag(tag)) = handle.get(parser) {
+        } else if let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) {
             self.tag_children(tag, scope);
         }
     }

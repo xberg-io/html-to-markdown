@@ -10,7 +10,7 @@
 //! - A body that is non-empty but entirely whitespace stands for a word separator, and a
 //!   handler that only tests `!trimmed.is_empty()` drops it, joining the words either side.
 
-use tl::{NodeHandle, Parser};
+use crate::dom::{NodeHandle, Parser};
 
 type DomContext = crate::converter::DomContext;
 type Context = crate::converter::Context;
@@ -325,14 +325,18 @@ thread_local! {
 }
 
 fn has_leading_blank_source(site: InlineSite<'_>) -> bool {
-    site.dom_ctx.children_of(site.node_handle.get_inner())
+    site.dom_ctx
+        .children_of(site.node_handle.get_inner())
         .and_then(|children| children.first())
         .inspect(|_| {
             #[cfg(test)]
             BLANK_PREFIX_NODE_READS.with(|reads| reads.set(reads.get() + 1));
         })
         .and_then(|child| child.get(site.parser))
-        .is_some_and(|node| matches!(node, tl::Node::Raw(raw) if raw.as_utf8_str().starts_with(crate::converter::utility::white_space::is_collapsible)))
+        .is_some_and(|node| {
+            matches!(node, crate::dom::Node::Raw(raw)
+            if raw.as_utf8_str().starts_with(crate::converter::utility::white_space::is_collapsible))
+        })
 }
 
 // ~keep A lone break is the #502 separator only in a block that starts its buffer. In a later
@@ -352,7 +356,7 @@ fn keeps_hard_break(content: &str, site: InlineSite<'_>) -> bool {
             .and_then(|children| children.last())
             .and_then(|child| child.get(site.parser))
             .is_some_and(|node| {
-                matches!(node, tl::Node::Raw(raw)
+                matches!(node, crate::dom::Node::Raw(raw)
                     if raw.as_utf8_str().ends_with(crate::converter::utility::white_space::is_collapsible))
             })
 }
@@ -574,7 +578,7 @@ mod tests {
         for depth in [4, 16, 64, 256] {
             for newline_style in [crate::NewlineStyle::Spaces, crate::NewlineStyle::Backslash] {
                 let source = format!("<p><b>a</b>{}<br>{}b</p>", "<em>".repeat(depth), "</em>".repeat(depth));
-                let dom = tl::parse(&source, tl::ParserOptions::default()).expect("nested break nodes");
+                let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("nested break nodes");
                 let nodes = dom.nodes().len();
                 assert_eq!(nodes, depth + 5);
                 super::BLANK_PREFIX_NODE_READS.with(|reads| reads.set(0));

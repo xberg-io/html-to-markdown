@@ -44,8 +44,8 @@ pub use caption::handle_caption;
 /// ```
 pub fn dispatch_table_handler(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) -> bool {
@@ -81,8 +81,8 @@ pub fn dispatch_table_handler(
 /// * `dom_ctx` - DOM context for tree structure info
 /// * `depth` - Current nesting depth
 pub fn handle_table_with_context(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
@@ -93,8 +93,8 @@ pub fn handle_table_with_context(
 }
 
 fn append_table_output(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
     table_output: &str,
@@ -152,11 +152,11 @@ fn append_table_output(
 /// Walks the table's rows and cells, extracting text content and span attributes
 /// to build a structured grid representation.
 fn collect_table_grid(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
 ) -> Option<crate::types::TableGrid> {
-    let tl::Node::Tag(tag) = node_handle.get(parser)? else {
+    let crate::dom::Node::Tag(tag) = node_handle.get(parser)? else {
         return None;
     };
 
@@ -179,15 +179,15 @@ fn collect_table_grid(
 
 #[derive(Default)]
 struct GridState {
-    cell_handles: Vec<tl::NodeHandle>,
+    cell_handles: Vec<crate::dom::NodeHandle>,
     grid_cells: Vec<crate::types::GridCell>,
     row_index: u32,
     max_cols: u32,
 }
 
 fn collect_grid_child(
-    child_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    child_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
     state: &mut GridState,
 ) {
@@ -197,7 +197,7 @@ fn collect_grid_child(
         return;
     }
 
-    let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(parser) else {
         return;
     };
     let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
@@ -221,8 +221,8 @@ fn collect_grid_child(
 ///
 /// `depth` is the row's own recursion depth; cell content is walked at `depth + 1`.
 fn collect_grid_row(
-    row_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    row_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
     state: &mut GridState,
     is_header_section: bool,
@@ -268,7 +268,11 @@ fn collect_grid_row(
     state.row_index += 1;
 }
 
-fn collect_grid_cell_content(cell_handle: &tl::NodeHandle, parser: &tl::Parser, handler: HandlerContext<'_>) -> String {
+fn collect_grid_cell_content(
+    cell_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    handler: HandlerContext<'_>,
+) -> String {
     let mut text = String::new();
     // ~keep This walk runs after `builder::handle_table` has already rendered — and recorded —
     // ~keep the same cells; it exists only to fill the `TableGrid` returned below, which is
@@ -296,7 +300,7 @@ fn collect_grid_cell_content(cell_handle: &tl::NodeHandle, parser: &tl::Parser, 
     {
         cell_ctx.inline_collector = None;
     }
-    if let Some(tl::Node::Tag(cell_tag)) = cell_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(cell_tag)) = cell_handle.get(parser) {
         for child_handle in cell_tag.children().top().iter() {
             super::super::walk_node(
                 child_handle,
@@ -316,11 +320,11 @@ fn collect_grid_cell_content(cell_handle: &tl::NodeHandle, parser: &tl::Parser, 
 
 /// Open a table whose content is captured by the heap-backed Markdown walk.
 pub fn open_table_with_context(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
     match walk::open(node_handle, parser, handler, children) {
         walk::Opened::Children(open) => Some(open),

@@ -189,17 +189,17 @@ pub enum EmphasisKind {
 /// the walk captures their text for [`close`].
 pub fn open(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
     context: &Context,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
     let kind = match tag_name {
         "strong" | "b" => EmphasisKind::Strong,
         _ => EmphasisKind::Emphasis,
     };
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -222,7 +222,7 @@ pub fn open(
 
 /// Write an emphasis element around `content`, the text of its children.
 pub fn close(kind: EmphasisKind, content: &str, handler: HandlerContext<'_>) {
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return;
     };
 
@@ -243,7 +243,7 @@ pub fn close(kind: EmphasisKind, content: &str, handler: HandlerContext<'_>) {
 }
 
 #[cfg(feature = "visitor")]
-fn visit_emphasis(tag: &tl::HTMLTag<'_>, kind: EmphasisKind, handler: &HandlerContext<'_>) -> Option<String> {
+fn visit_emphasis(tag: &crate::dom::HTMLTag<'_>, kind: EmphasisKind, handler: &HandlerContext<'_>) -> Option<String> {
     use crate::converter::{get_text_content, serialize_node};
     use crate::visitor::{NodeContext, NodeType, VisitResult};
 
@@ -308,7 +308,7 @@ fn visit_emphasis(tag: &tl::HTMLTag<'_>, kind: EmphasisKind, handler: &HandlerCo
 ///
 /// Only reachable when `content` is empty: [`emit_wrapped_inline`] already handles the
 /// non-empty and whitespace-only-but-non-empty cases and leaves `output` untouched otherwise.
-fn maybe_emit_caret(output: &mut String, content: &str, tag: &tl::HTMLTag) {
+fn maybe_emit_caret(output: &mut String, content: &str, tag: &crate::dom::HTMLTag) {
     if !content.is_empty() {
         return;
     }

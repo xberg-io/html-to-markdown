@@ -19,8 +19,8 @@ pub(super) use crate::converter::utility::content::normalized_tag_name;
 /// True if node has the specified tag name
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub(super) fn is_tag_name(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     name: &str,
 ) -> bool {
@@ -29,7 +29,7 @@ pub(super) fn is_tag_name(
     }
     matches!(
         node_handle.get(parser),
-        Some(tl::Node::Tag(tag)) if tag_name_eq(tag.name().as_utf8_str(), name)
+        Some(crate::dom::Node::Tag(tag)) if tag_name_eq(tag.name().as_utf8_str(), name)
     )
 }
 
@@ -56,8 +56,8 @@ pub(super) fn is_tag_name(
 // ~keep cost stays linear.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub(super) fn is_or_contains_table(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
 ) -> bool {
     let mut work = vec![*node_handle];
@@ -65,7 +65,7 @@ pub(super) fn is_or_contains_table(
         if is_tag_name(&handle, parser, dom_ctx, "table") {
             return true;
         }
-        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) else {
             continue;
         };
         if let Some(children) = dom_ctx.children_of(handle.get_inner()) {

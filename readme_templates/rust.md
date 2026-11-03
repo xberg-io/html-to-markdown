@@ -30,6 +30,8 @@ Fast, reliable HTML to Markdown conversion with full CommonMark compliance. Buil
 html-to-markdown-rs = "3.0"
 ```
 
+The Rust crate needs Rust 1.99 or newer.
+
 ## Basic Usage
 
 `convert()` returns a structured `ConversionResult` with the converted text, metadata, tables, and more:

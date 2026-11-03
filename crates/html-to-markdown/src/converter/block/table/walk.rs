@@ -29,7 +29,7 @@ impl CellKind {
 
 #[derive(Clone, Copy)]
 struct CellSpec {
-    node: tl::NodeHandle,
+    node: crate::dom::NodeHandle,
     depth: usize,
     kind: CellKind,
     defer: bool,
@@ -37,22 +37,22 @@ struct CellSpec {
 
 enum Step {
     InertStart {
-        node: tl::NodeHandle,
+        node: crate::dom::NodeHandle,
         depth: usize,
         end: usize,
     },
     InertEnd {
-        node: tl::NodeHandle,
+        node: crate::dom::NodeHandle,
         depth: usize,
     },
     Row {
-        node: tl::NodeHandle,
+        node: crate::dom::NodeHandle,
         header: Option<bool>,
         depth: usize,
     },
     Cell(CellSpec),
     Content {
-        node: tl::NodeHandle,
+        node: crate::dom::NodeHandle,
         depth: usize,
     },
     EndCell,
@@ -71,7 +71,7 @@ enum Mode {
     Flat,
 }
 
-type PendingNode = (tl::NodeHandle, usize, Option<bool>, Option<usize>);
+type PendingNode = (crate::dom::NodeHandle, usize, Option<bool>, Option<usize>);
 
 struct DataState {
     scan: scanner::TableScan,
@@ -115,8 +115,8 @@ struct TableWalk {
     steps: Vec<Step>,
     text: String,
     active: Option<ActiveCell>,
-    row: Option<(tl::NodeHandle, Option<bool>, usize)>,
-    row_cells: Vec<tl::NodeHandle>,
+    row: Option<(crate::dom::NodeHandle, Option<bool>, usize)>,
+    row_cells: Vec<crate::dom::NodeHandle>,
     row_texts: Vec<String>,
     skip_row: bool,
     #[cfg(feature = "visitor")]
@@ -136,12 +136,12 @@ pub(super) enum Opened {
 }
 
 pub(super) fn open(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Opened {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return Opened::Complete(String::new());
     };
     #[cfg(feature = "visitor")]
@@ -184,7 +184,7 @@ pub(super) fn open(
         visitor: Some(visitor),
     };
     if let Some((cell, depth)) = wrapper.filter(|_| matches!(walk.mode, Mode::Wrapper)) {
-        if let Some(tl::Node::Tag(cell)) = cell.get(parser) {
+        if let Some(crate::dom::Node::Tag(cell)) = cell.get(parser) {
             for child in cell.children().top().iter() {
                 walk.push(
                     *child,
@@ -205,9 +205,9 @@ pub(super) fn open(
 }
 
 fn data_mode(
-    node: &tl::NodeHandle,
-    tag: &tl::HTMLTag<'_>,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
     scan: scanner::TableScan,
 ) -> Mode {
@@ -230,17 +230,17 @@ fn data_mode(
 }
 
 impl TableWalk {
-    fn push(&mut self, node: tl::NodeHandle, step: Step, children: &mut Vec<tl::NodeHandle>) {
+    fn push(&mut self, node: crate::dom::NodeHandle, step: Step, children: &mut Vec<crate::dom::NodeHandle>) {
         children.push(node);
         self.steps.push(step);
     }
 
     fn plan(
         &mut self,
-        tag: &tl::HTMLTag<'_>,
-        parser: &tl::Parser,
+        tag: &crate::dom::HTMLTag<'_>,
+        parser: &crate::dom::Parser,
         handler: HandlerContext<'_>,
-        children: &mut Vec<tl::NodeHandle>,
+        children: &mut Vec<crate::dom::NodeHandle>,
     ) {
         let mut pending: Vec<_> = crate::converter::utility::siblings::table_children(tag, parser)
             .iter()
@@ -257,7 +257,7 @@ impl TableWalk {
             if handler.ctx.excluded_node_ids.contains(&node.get_inner()) {
                 continue;
             }
-            let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+            let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
                 continue;
             };
             if matches!(self.mode, Mode::Flat)
@@ -314,9 +314,9 @@ impl TableWalk {
     fn plan_inert(
         &mut self,
         (node, depth, header, _): PendingNode,
-        tag: &tl::HTMLTag<'_>,
+        tag: &crate::dom::HTMLTag<'_>,
         pending: &mut Vec<PendingNode>,
-        children: &mut Vec<tl::NodeHandle>,
+        children: &mut Vec<crate::dom::NodeHandle>,
     ) {
         let open_index = self.steps.len();
         self.push(
@@ -341,10 +341,10 @@ impl TableWalk {
 
     fn finish_inert_plan(
         &mut self,
-        node: tl::NodeHandle,
+        node: crate::dom::NodeHandle,
         depth: usize,
         open_index: usize,
-        children: &mut Vec<tl::NodeHandle>,
+        children: &mut Vec<crate::dom::NodeHandle>,
     ) {
         let end = self.steps.len();
         if let Step::InertStart { end: open_end, .. } = &mut self.steps[open_index] {
@@ -354,9 +354,9 @@ impl TableWalk {
     }
 
     fn plan_section(
-        tag: &tl::HTMLTag<'_>,
+        tag: &crate::dom::HTMLTag<'_>,
         depth: usize,
-        parser: &tl::Parser,
+        parser: &crate::dom::Parser,
         handler: HandlerContext<'_>,
         pending: &mut Vec<PendingNode>,
     ) {
@@ -380,12 +380,12 @@ impl TableWalk {
 
     fn plan_row(
         &mut self,
-        node: tl::NodeHandle,
+        node: crate::dom::NodeHandle,
         depth: usize,
         header: Option<bool>,
-        parser: &tl::Parser,
+        parser: &crate::dom::Parser,
         handler: HandlerContext<'_>,
-        children: &mut Vec<tl::NodeHandle>,
+        children: &mut Vec<crate::dom::NodeHandle>,
     ) {
         let mut row_cells = Vec::new();
         cell::collect_table_cells(&node, parser, handler.dom_ctx, handler.ctx, &mut row_cells);
@@ -430,9 +430,9 @@ impl TableWalk {
         self.push(node, Step::RowEnd, children);
     }
 
-    fn plan_cell(&mut self, spec: CellSpec, parser: &tl::Parser, children: &mut Vec<tl::NodeHandle>) {
+    fn plan_cell(&mut self, spec: CellSpec, parser: &crate::dom::Parser, children: &mut Vec<crate::dom::NodeHandle>) {
         self.push(spec.node, Step::Cell(spec), children);
-        if let Some(tl::Node::Tag(tag)) = spec.node.get(parser) {
+        if let Some(crate::dom::Node::Tag(tag)) = spec.node.get(parser) {
             for &node in tag.children().top().iter() {
                 self.push(
                     node,
@@ -473,13 +473,13 @@ impl TableWalk {
             _ => None,
         };
         if cached.is_none() && matches!(spec.kind, CellKind::Render) && !self.skip_row {
-            if let Some(tl::Node::Tag(tag)) = spec.node.get(site.parser) {
-                if !tag
-                    .children()
-                    .top()
-                    .iter()
-                    .any(|node| matches!(node.get(site.parser), Some(tl::Node::Tag(_) | tl::Node::Comment(_))))
-                {
+            if let Some(crate::dom::Node::Tag(tag)) = spec.node.get(site.parser) {
+                if !tag.children().top().iter().any(|node| {
+                    matches!(
+                        node.get(site.parser),
+                        Some(crate::dom::Node::Tag(_) | crate::dom::Node::Comment(_))
+                    )
+                }) {
                     cached = Some(cell::render_cell_text(
                         &spec.node,
                         site.parser,
@@ -651,7 +651,7 @@ const fn row_env<'a>(site: &'a HookSite<'a>) -> cells::RowEnv<'a> {
 
 impl TableWalk {
     #[cfg(feature = "visitor")]
-    fn start_inert(&mut self, node: tl::NodeHandle, depth: usize, end: usize, site: &HookSite<'_>) {
+    fn start_inert(&mut self, node: crate::dom::NodeHandle, depth: usize, end: usize, site: &HookSite<'_>) {
         let data = match &self.mode {
             Mode::Data(state) => Some(InertData {
                 row_index: state.row_index,
@@ -669,7 +669,7 @@ impl TableWalk {
             metadata_node: None,
         });
         if !site.context.skip_visitor_hooks && site.context.visitor.is_some() {
-            let Some(tl::Node::Tag(tag)) = node.get(site.parser) else {
+            let Some(crate::dom::Node::Tag(tag)) = node.get(site.parser) else {
                 return;
             };
             let name = tag.name().as_utf8_str();
@@ -698,8 +698,8 @@ impl TableWalk {
     }
 
     #[cfg(all(feature = "visitor", feature = "metadata"))]
-    fn begin_inert_metadata(&mut self, node: tl::NodeHandle, depth: usize, site: &HookSite<'_>) {
-        let Some(tl::Node::Tag(tag)) = node.get(site.parser) else {
+    fn begin_inert_metadata(&mut self, node: crate::dom::NodeHandle, depth: usize, site: &HookSite<'_>) {
+        let Some(crate::dom::Node::Tag(tag)) = node.get(site.parser) else {
             return;
         };
         if let Some(checkpoint) = self.inert_starts.last_mut() {
@@ -714,7 +714,7 @@ impl TableWalk {
     }
 
     #[cfg(feature = "visitor")]
-    fn finish_inert(&mut self, node: tl::NodeHandle, depth: usize, site: &HookSite<'_>) {
+    fn finish_inert(&mut self, node: crate::dom::NodeHandle, depth: usize, site: &HookSite<'_>) {
         let Some(checkpoint) = self.inert_starts.pop() else {
             return;
         };
@@ -726,11 +726,17 @@ impl TableWalk {
     }
 
     #[cfg(feature = "visitor")]
-    fn finish_inert_visit(&mut self, node: tl::NodeHandle, depth: usize, site: &HookSite<'_>, checkpoint: InertState) {
+    fn finish_inert_visit(
+        &mut self,
+        node: crate::dom::NodeHandle,
+        depth: usize,
+        site: &HookSite<'_>,
+        checkpoint: InertState,
+    ) {
         if !site.context.skip_visitor_hooks
             && let Some(visitor) = &site.context.visitor
         {
-            let Some(tl::Node::Tag(tag)) = node.get(site.parser) else {
+            let Some(crate::dom::Node::Tag(tag)) = node.get(site.parser) else {
                 return;
             };
             let name = tag.name().as_utf8_str();
@@ -770,10 +776,10 @@ impl TableWalk {
     }
 
     #[cfg(not(feature = "visitor"))]
-    const fn start_inert(&self, _node: tl::NodeHandle, _depth: usize, _end: usize, _site: &HookSite<'_>) {}
+    const fn start_inert(&self, _node: crate::dom::NodeHandle, _depth: usize, _end: usize, _site: &HookSite<'_>) {}
 
     #[cfg(not(feature = "visitor"))]
-    const fn finish_inert(&self, _node: tl::NodeHandle, _depth: usize, _site: &HookSite<'_>) {}
+    const fn finish_inert(&self, _node: crate::dom::NodeHandle, _depth: usize, _site: &HookSite<'_>) {}
 
     #[cfg(feature = "visitor")]
     fn restore_inert_data(&mut self, checkpoint: InertState) {
@@ -921,7 +927,8 @@ impl ChildHook for TableWalk {
         }
         #[cfg(feature = "visitor")]
         if !matches!(self.mode, Mode::Layout) {
-            if let (Some(visitor), Some(tl::Node::Tag(tag))) = (self.visitor.take(), site.node_handle.get(site.parser))
+            if let (Some(visitor), Some(crate::dom::Node::Tag(tag))) =
+                (self.visitor.take(), site.node_handle.get(site.parser))
             {
                 builder::finish_table_visit(
                     site.node_handle,

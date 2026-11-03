@@ -43,7 +43,7 @@ pub enum TierStrategy {
     /// to Tier-2.
     #[default]
     Auto,
-    /// Always use the Tier-2 (`tl::parse` + walk) path, skipping Tier-1.
+    /// Always use the Tier-2 (DOM parse + walk) path, skipping Tier-1.
     Tier2,
     /// Force the Tier-1 byte scanner; if it bails, fall back to Tier-2.
     /// Testkit-only; not stable API.

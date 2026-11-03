@@ -40,7 +40,12 @@ pub use figure::handle as handle_figure;
 pub use sectioning::handle as handle_sectioning;
 pub use summary::handle as handle_summary;
 
-pub fn walk_tag_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser, output: &mut String, handler: HandlerContext<'_>) {
+pub fn walk_tag_children(
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    handler: HandlerContext<'_>,
+) {
     for child_handle in tag.children().top().iter() {
         walk_node(
             child_handle,
@@ -87,8 +92,8 @@ pub fn walk_tag_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser, output: &mu
 /// ```
 pub fn dispatch_semantic_handler(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) -> bool {

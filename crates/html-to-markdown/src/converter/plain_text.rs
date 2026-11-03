@@ -126,7 +126,7 @@ impl WalkState<'_> {
     }
 
     /// Whether a selector of `exclude_selectors` names the node.
-    fn excludes(&self, node_handle: &tl::NodeHandle) -> bool {
+    fn excludes(&self, node_handle: &crate::dom::NodeHandle) -> bool {
         self.excluded_node_ids.contains(&node_handle.get_inner())
     }
 }
@@ -146,8 +146,8 @@ impl WalkState<'_> {
 /// - When a visitor is configured, `visit_element_start`, `visit_element_end`, and
 ///   `visit_text` callbacks are fired and their results are honoured.
 pub fn extract_plain_text(
-    dom: &tl::VDom,
-    parser: &tl::Parser,
+    dom: &crate::dom::VDom,
+    parser: &crate::dom::Parser,
     options: &ConversionOptions,
     accessible_names: crate::convert_api::AccessibleNamePolicy,
 ) -> String {
@@ -186,7 +186,7 @@ pub fn extract_plain_text(
 
 /// Writes a text node. `after_passed_over` says whether the walker passed over the node right
 /// before the text.
-fn emit_raw_text(bytes: &tl::Bytes<'_>, buf: &mut PlainOutput, state: &WalkState<'_>, after_passed_over: bool) {
+fn emit_raw_text(bytes: &crate::dom::Bytes<'_>, buf: &mut PlainOutput, state: &WalkState<'_>, after_passed_over: bool) {
     let raw = bytes.as_utf8_str();
     let decoded = text::decode_html_entities_cow(raw.as_ref());
     #[cfg(feature = "visitor")]
@@ -243,7 +243,7 @@ fn visit_plain_text(decoded: &str, buf: &mut PlainOutput, state: &WalkState<'_>)
 #[cfg(feature = "visitor")]
 fn visit_plain_element_start(
     tag_name: &str,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     buf: &mut PlainOutput,
     state: &WalkState<'_>,
 ) -> bool {
@@ -274,7 +274,7 @@ fn visit_plain_element_start(
 fn visit_plain_element_end(
     visitor_handle: &VisitorHandle,
     tag_name: &str,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     buf: &mut PlainOutput,
     depth: usize,
     element_start: Checkpoint,
@@ -302,7 +302,7 @@ fn close_plain_checkpoint(buf: &mut PlainOutput, checkpoint: Checkpoint, end_res
 }
 
 #[cfg(feature = "visitor")]
-fn plain_element_context<'a>(tag_name: &'a str, tag: &'a tl::HTMLTag<'a>, depth: usize) -> NodeContext<'a> {
+fn plain_element_context<'a>(tag_name: &'a str, tag: &'a crate::dom::HTMLTag<'a>, depth: usize) -> NodeContext<'a> {
     NodeContext::with_lazy_attributes(
         NodeType::Element,
         Cow::Borrowed(tag_name),
@@ -314,7 +314,7 @@ fn plain_element_context<'a>(tag_name: &'a str, tag: &'a tl::HTMLTag<'a>, depth:
     )
 }
 
-fn emit_plain_image(tag: &tl::HTMLTag<'_>, buf: &mut PlainOutput, options: &ConversionOptions) {
+fn emit_plain_image(tag: &crate::dom::HTMLTag<'_>, buf: &mut PlainOutput, options: &ConversionOptions) {
     if options.skip_images {
         return;
     }
@@ -328,11 +328,11 @@ fn emit_plain_image(tag: &tl::HTMLTag<'_>, buf: &mut PlainOutput, options: &Conv
 /// Collect all descendant `NodeHandle`s matching `target_tag` (by cloning handles). An element
 /// that `exclude_selectors` names is not collected, and neither is an element in it.
 fn collect_descendant_handles(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     target_tag: &str,
     state: &WalkState<'_>,
-    result: &mut Vec<tl::NodeHandle>,
+    result: &mut Vec<crate::dom::NodeHandle>,
 ) {
     let mut stack: Vec<_> = if tag.name().as_utf8_str().eq_ignore_ascii_case("table") {
         crate::converter::utility::siblings::table_children(tag, parser)
@@ -345,7 +345,7 @@ fn collect_descendant_handles(
         if state.excludes(&handle) {
             continue;
         }
-        if let Some(tl::Node::Tag(child_tag)) = handle.get(parser) {
+        if let Some(crate::dom::Node::Tag(child_tag)) = handle.get(parser) {
             let name = child_tag.name().as_utf8_str();
             if SKIP_TAGS.iter().any(|skip| name.eq_ignore_ascii_case(skip)) {
                 continue;

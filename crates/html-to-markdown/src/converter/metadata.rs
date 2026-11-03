@@ -9,9 +9,9 @@
 use crate::converter::block::container::HandlerContext;
 #[cfg(feature = "metadata")]
 use crate::converter::utility::preprocessing::{KeptScripts, ScriptType, script_type};
+use crate::dom::{NodeHandle, Parser};
 use crate::options::ConversionOptions;
 use crate::text::escape;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -66,7 +66,7 @@ pub fn open_head(
     handler: HandlerContext<'_>,
     children: &mut Vec<NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
 
@@ -92,12 +92,12 @@ pub fn open_head(
 }
 
 #[cfg(feature = "metadata")]
-fn collect_json_ld_from_children(children: &tl::Children, parser: &Parser, handler: HandlerContext<'_>) {
+fn collect_json_ld_from_children(children: &crate::dom::Children, parser: &Parser, handler: HandlerContext<'_>) {
     let Some(collector) = handler.ctx.metadata_collector.as_ref() else {
         return;
     };
     for child_handle in children.top().iter() {
-        let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(parser) else {
             continue;
         };
         let child_name = handler
@@ -121,7 +121,12 @@ fn collect_json_ld_from_children(children: &tl::Children, parser: &Parser, handl
 /// ~keep A script with no end tag whose bytes the repair kept has those bytes in the tree by now
 /// ~keep (`restore_inert_bodies`), and no owner mark of the first pass: it reads as the tree has it.
 #[cfg(feature = "metadata")]
-fn json_ld_from_tag(node: u32, tag: &tl::HTMLTag<'_>, parser: &Parser, kept_scripts: &KeptScripts) -> Option<String> {
+fn json_ld_from_tag(
+    node: u32,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &Parser,
+    kept_scripts: &KeptScripts,
+) -> Option<String> {
     let type_value = crate::converter::utility::attributes::decoded_attribute(tag, "type")?;
     if script_type(&type_value) != ScriptType::StructuredData {
         return None;
@@ -140,7 +145,7 @@ fn handle_script(node_handle: &NodeHandle, parser: &Parser, _output: &mut String
     let Some(node) = node_handle.get(parser) else { return };
 
     let tag = match node {
-        tl::Node::Tag(tag) => tag,
+        crate::dom::Node::Tag(tag) => tag,
         _ => return,
     };
 
@@ -183,7 +188,7 @@ fn handle_math(
     let Some(node) = node_handle.get(parser) else { return };
 
     let tag = match node {
-        tl::Node::Tag(tag) => tag,
+        crate::dom::Node::Tag(tag) => tag,
         _ => return,
     };
 
@@ -215,7 +220,7 @@ mod tests {
     fn a_script_with_no_owner_mark_gives_its_text_with_nothing_decoded() {
         let (_, kept_scripts) = strip_script_and_style_tags_with_kept_scripts("");
         let page = r#"<script type="application/ld+json">{"a":"&lt;"}</script>"#;
-        let dom = tl::parse(page, tl::ParserOptions::default()).expect("the page");
+        let dom = crate::dom::parse(page, crate::dom::ParserOptions::default()).expect("the page");
         let tag = dom.nodes()[0].as_tag().expect("the script");
         let json = json_ld_from_tag(0, tag, dom.parser(), &kept_scripts);
         assert_eq!(json.as_deref(), Some(r#"{"a":"&lt;"}"#));

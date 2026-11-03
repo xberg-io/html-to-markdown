@@ -256,7 +256,7 @@ fn apply_list_item_tag(tag: ListItemTag<'_>, state: ListItemState<'_>) {
     }
 }
 
-/// Close implicitly-terminated list-item elements that `tl` would otherwise
+/// Close implicitly-terminated list-item elements that the parser would otherwise
 /// absorb as deep children, causing stack overflows on large documents.
 ///
 /// The HTML5 parsing spec (§13.2.6.4.7 "in body" insertion mode) states that
@@ -265,7 +265,7 @@ fn apply_list_item_tag(tag: ListItemTag<'_>, state: ListItemState<'_>) {
 /// - Another `<li>` / `<dt>` / `<dd>` open tag is encountered, or
 /// - The closing `</ul>`, `</ol>`, or `</dl>` tag is reached.
 ///
-/// The `tl` parser is not a full HTML5 parser; it does not apply implicit
+/// The parser is not a full HTML5 parser; it does not apply implicit
 /// closure rules.  When it encounters `<li>content<li>more` it treats the
 /// second `<li>` as a child of the first, producing a linear chain of depth
 /// equal to the number of items.  A list with 400 unclosed `<li>` items
@@ -273,7 +273,7 @@ fn apply_list_item_tag(tag: ListItemTag<'_>, state: ListItemState<'_>) {
 /// single document (curl.se/changes.html) the cumulative stack depth triggers
 /// an OS-level stack overflow.
 ///
-/// This function rewrites the source HTML in one linear pass before `tl` sees
+/// This function rewrites the source HTML in one linear pass before the parser sees
 /// it, inserting the missing `</li>`, `</dt>`, and `</dd>` close tags exactly
 /// where the HTML5 spec says they belong.
 ///

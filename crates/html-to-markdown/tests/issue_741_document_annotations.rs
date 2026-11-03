@@ -35,7 +35,8 @@ fn should_collect_all_supported_inline_annotations_during_conversion() {
         .expect("conversion should succeed")
         .document
         .expect("document structure should be populated");
-    let dom = tl::parse(&html, tl::ParserOptions::default()).expect("HTML should parse");
+    let dom = html_to_markdown_rs::dom::parse(&html, html_to_markdown_rs::dom::ParserOptions::default())
+        .expect("HTML should parse");
     let rebuilt = build_document_structure(&dom);
 
     let expected = vec![
@@ -115,7 +116,8 @@ fn should_adjust_annotation_byte_offsets_after_trimming_block_whitespace() {
         .expect("conversion should succeed")
         .document
         .expect("document structure should be populated");
-    let dom = tl::parse(html, tl::ParserOptions::default()).expect("HTML should parse");
+    let dom = html_to_markdown_rs::dom::parse(html, html_to_markdown_rs::dom::ParserOptions::default())
+        .expect("HTML should parse");
     let rebuilt = build_document_structure(&dom);
     let predicate = |content: &NodeContent| matches!(content, NodeContent::Paragraph { .. });
     let converted_node = node_for(&converted, predicate);
@@ -161,7 +163,8 @@ fn should_capture_semantic_text_before_markdown_escaping() {
         .expect("conversion should succeed")
         .document
         .expect("document structure should be populated");
-    let dom = tl::parse(html, tl::ParserOptions::default()).expect("HTML should parse");
+    let dom = html_to_markdown_rs::dom::parse(html, html_to_markdown_rs::dom::ParserOptions::default())
+        .expect("HTML should parse");
     let rebuilt = build_document_structure(&dom);
     let predicate = |content: &NodeContent| matches!(content, NodeContent::Paragraph { .. });
     let converted_node = node_for(&converted, predicate);

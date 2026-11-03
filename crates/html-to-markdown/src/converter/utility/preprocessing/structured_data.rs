@@ -199,7 +199,7 @@ fn write_repaired_script(
 ) {
     let output = output.get_or_insert_with(|| String::with_capacity(input.len()));
     output.push_str(&input[copied..open_tag.start]);
-    // ~keep tl needs matching tag-name case; this changes only a synthesized missing close.
+    // ~keep The parser needs matching tag-name case; this changes only a synthesized missing close.
     output.push_str("<script");
     let body = &input[open_tag.end..body_end];
     if let Some(preserved) = preserved {
@@ -231,7 +231,7 @@ fn write_repaired_script(
 /// Write `attributes`, a start tag after its name with its `>`, with no `/` that stands alone
 /// between two attributes.
 ///
-/// ~keep Non-void script slash tokens must not strand an owned body in tl; attribute bytes stay authored.
+/// ~keep Non-void script slash tokens must not strand an owned body in the parser; attribute bytes stay authored.
 /// ~keep The first pass writes the start tag of a kept element with this function too, so a
 /// ~keep start tag that the repair closed and one that the author closed read the same.
 pub(super) fn push_without_standalone_slashes(output: &mut String, attributes: &str) {

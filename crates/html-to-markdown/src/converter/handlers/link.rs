@@ -63,9 +63,9 @@ fn indent_hard_break_continuations(label: &mut String, ctx: &Context, options: &
 ///
 /// Returns `None` for a link that is complete.
 pub fn open_link(
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     handler: &mut HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
     let Some(data) = LinkData::new(tag, handler) else {
         children.extend(tag.children().top().iter().copied());
@@ -135,7 +135,7 @@ impl ChildHook for LinkHook {
     }
 
     fn close(self: Box<Self>, element: &mut HookSite<'_>) {
-        let Some(tl::Node::Tag(tag)) = element.node_handle.get(element.parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = element.node_handle.get(element.parser) else {
             return;
         };
         let Self { data, flow } = *self;
@@ -165,7 +165,7 @@ enum LabelStage {
 struct LabelFlow {
     stage: LabelStage,
     /// The level and the node of the one heading of the link.
-    heading: Option<(usize, tl::NodeHandle)>,
+    heading: Option<(usize, crate::dom::NodeHandle)>,
     heading_text: String,
     label: Option<LabelWalk>,
     /// Whether the blocks after the link are written.
@@ -173,7 +173,7 @@ struct LabelFlow {
 }
 
 impl LabelFlow {
-    fn open(data: &LinkData, handler: &HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Self {
+    fn open(data: &LinkData, handler: &HandlerContext<'_>, children: &mut Vec<crate::dom::NodeHandle>) -> Self {
         let heading =
             find_single_heading_child(*handler.node_handle, handler.parser).filter(|_| !data.href_addr_dropped);
         children.extend(heading.map(|(_, heading_handle)| heading_handle));
@@ -205,7 +205,7 @@ impl LabelFlow {
 
     fn before_child(&mut self, index: usize, data: &LinkData, element: &mut HookSite<'_>) -> Child {
         let (part, _) = self.part(index, data);
-        if let Some(tl::Node::Tag(tag)) = element.node_handle.get(element.parser) {
+        if let Some(crate::dom::Node::Tag(tag)) = element.node_handle.get(element.parser) {
             self.advance(part, tag, data, element);
         }
         if self.stage != part {
@@ -238,7 +238,7 @@ impl LabelFlow {
     }
 
     /// Do the work of each stage before `to`.
-    fn advance(&mut self, to: LabelStage, tag: &tl::HTMLTag<'_>, data: &LinkData, element: &mut HookSite<'_>) {
+    fn advance(&mut self, to: LabelStage, tag: &crate::dom::HTMLTag<'_>, data: &LinkData, element: &mut HookSite<'_>) {
         while self.stage < to {
             self.stage = match self.stage {
                 LabelStage::Heading => {
@@ -272,7 +272,12 @@ impl LabelFlow {
 
 /// Write the link of the converter around `content`, the content of its label as the walk wrote
 /// it. Returns whether the blocks after the link are written.
-fn emit_label_link(tag: &tl::HTMLTag<'_>, data: &LinkData, content: &str, handler: &mut HandlerContext<'_>) -> bool {
+fn emit_label_link(
+    tag: &crate::dom::HTMLTag<'_>,
+    data: &LinkData,
+    content: &str,
+    handler: &mut HandlerContext<'_>,
+) -> bool {
     let (prefix, suffix, trimmed) = if keeps_source_white_space(handler.options, handler.context) {
         ("", "", content)
     } else {
@@ -318,13 +323,13 @@ impl LabelEdges<'_> {
 /// [`apply_label_fallbacks`] read from the tag.
 struct LinkData {
     href: String,
-    children: Vec<tl::NodeHandle>,
+    children: Vec<crate::dom::NodeHandle>,
     inline_label: String,
     raw_text: String,
     /// The white space at the two ends of the text that `raw_text` is trimmed from.
     text_edges: (&'static str, &'static str),
-    inline_children: Vec<tl::NodeHandle>,
-    deferred: Vec<tl::NodeHandle>,
+    inline_children: Vec<crate::dom::NodeHandle>,
+    deferred: Vec<crate::dom::NodeHandle>,
     emit_blocks_separately: bool,
     href_addr_dropped: bool,
     link_allow_inline_images: bool,
@@ -338,7 +343,7 @@ struct LinkData {
 impl LinkData {
     /// The children that write the label, in a walk that writes the blocks among them inline
     /// when the link holds a block and writes no block after itself.
-    fn label_children(&self) -> &[tl::NodeHandle] {
+    fn label_children(&self) -> &[crate::dom::NodeHandle] {
         if self.emit_blocks_separately {
             &self.inline_children
         } else {
@@ -380,7 +385,7 @@ impl LinkData {
             && (self.raw_text == self.href || (self.href.starts_with("mailto:") && self.raw_text == self.href[7..]))
     }
 
-    fn new(tag: &tl::HTMLTag<'_>, handler: &HandlerContext<'_>) -> Option<Self> {
+    fn new(tag: &crate::dom::HTMLTag<'_>, handler: &HandlerContext<'_>) -> Option<Self> {
         let raw_href = tag
             .attributes()
             .get("href")
@@ -418,7 +423,7 @@ impl LinkData {
         let (inline_children, deferred) = partition_link_children(&children, handler.parser, handler.dom_context);
         let holds_element = children
             .iter()
-            .any(|child| matches!(child.get(handler.parser), Some(tl::Node::Tag(_))));
+            .any(|child| matches!(child.get(handler.parser), Some(crate::dom::Node::Tag(_))));
         Some(Self {
             href_addr_dropped: matches!(
                 inline_data_treatment(handler.options.inline_data_media, &href),
@@ -455,13 +460,14 @@ impl LinkData {
 // ~keep without inserting URL words into document content (#771). An icon font or an image is
 // ~keep no empty wrapper: such a link gets its name or its address as the label (#775), except
 // ~keep a link into its own page, which `leads_nowhere_else` leaves out.
-fn empty_text_wrapper_child(handle: &tl::NodeHandle, parser: &tl::Parser<'_>) -> bool {
+fn empty_text_wrapper_child(handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser<'_>) -> bool {
     let mut pending = vec![*handle];
     while let Some(child) = pending.pop() {
         match child.get(parser) {
-            Some(tl::Node::Raw(raw)) if text::decode_html_entities_cow(&raw.as_utf8_str()).trim().is_empty() => {}
-            Some(tl::Node::Comment(_)) => {}
-            Some(tl::Node::Tag(tag))
+            Some(crate::dom::Node::Raw(raw))
+                if text::decode_html_entities_cow(&raw.as_utf8_str()).trim().is_empty() => {}
+            Some(crate::dom::Node::Comment(_)) => {}
+            Some(crate::dom::Node::Tag(tag))
                 if matches!(
                     normalized_tag_name(tag.name().as_utf8_str()).as_ref(),
                     "span"
@@ -493,15 +499,19 @@ fn empty_text_wrapper_child(handle: &tl::NodeHandle, parser: &tl::Parser<'_>) ->
 // ~keep An `i` or a `div` with a class is an icon that a style sheet draws: #774 and the vote
 // ~keep link of the #121 fixture name it by the link address. With no class it shows nothing,
 // ~keep as an empty `span` does.
-fn plain_wrapper(tag: &tl::HTMLTag<'_>) -> bool {
+fn plain_wrapper(tag: &crate::dom::HTMLTag<'_>) -> bool {
     tag.attributes().get("class").is_none()
         && matches!(normalized_tag_name(tag.name().as_utf8_str()).as_ref(), "i" | "div")
 }
 
 /// The context that the one heading of a link is written with, where `context` is the state of
 /// the link.
-fn heading_context(heading_handle: tl::NodeHandle, parser: &tl::Parser<'_>, context: &Context) -> Option<Context> {
-    let tl::Node::Tag(heading_tag) = heading_handle.get(parser)? else {
+fn heading_context(
+    heading_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser<'_>,
+    context: &Context,
+) -> Option<Context> {
+    let crate::dom::Node::Tag(heading_tag) = heading_handle.get(parser)? else {
         return None;
     };
     let heading_name = normalized_tag_name(heading_tag.name().as_utf8_str());
@@ -516,7 +526,7 @@ fn heading_context(heading_handle: tl::NodeHandle, parser: &tl::Parser<'_>, cont
 /// The `title` of a link.
 ///
 /// ~keep Empty titles are absent because Markdown serializers drop `""` on reparse.
-fn link_title<'a>(tag: &'a tl::HTMLTag<'a>) -> Option<Cow<'a, str>> {
+fn link_title<'a>(tag: &'a crate::dom::HTMLTag<'a>) -> Option<Cow<'a, str>> {
     crate::converter::utility::attributes::decoded_attribute(tag, "title").filter(|value| !value.is_empty())
 }
 
@@ -560,7 +570,7 @@ fn emit_autolink(data: &LinkData, handler: &mut HandlerContext<'_>) -> bool {
 /// Write a link around its one heading as a heading of that `level`, where `heading_text` is
 /// the text that the heading wrote.
 fn emit_heading_link(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &LinkData,
     level: usize,
     heading_text: &str,
@@ -638,7 +648,7 @@ impl LabelWalk {
     }
 
     /// `child` wrote to `own`, the content of the label.
-    fn after_child(&mut self, child: tl::NodeHandle, own: Option<String>, element: &HookSite<'_>) {
+    fn after_child(&mut self, child: crate::dom::NodeHandle, own: Option<String>, element: &HookSite<'_>) {
         self.content = own.unwrap_or_default();
         let child_start = self.child_start;
         if !self.convert_as_inline || self.content.len() == child_start {
@@ -692,7 +702,12 @@ fn words_touch_at(content: &str, at: usize) -> bool {
         && !content[at..].starts_with(['.', ',', ';', ':', '!', '?', ')', ']', '}'])
 }
 
-fn apply_label_fallbacks(tag: &tl::HTMLTag<'_>, data: &LinkData, label: &mut String, handler: &HandlerContext<'_>) {
+fn apply_label_fallbacks(
+    tag: &crate::dom::HTMLTag<'_>,
+    data: &LinkData,
+    label: &mut String,
+    handler: &HandlerContext<'_>,
+) {
     // ~keep Deferred table text must not be duplicated into the label (#490).
     if !data.emit_blocks_separately && label.is_empty() && !data.raw_text.is_empty() {
         *label = normalize_link_label(&data.raw_text);
@@ -733,7 +748,7 @@ fn apply_label_fallbacks(tag: &tl::HTMLTag<'_>, data: &LinkData, label: &mut Str
 }
 
 fn emit_link(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &LinkData,
     label: &str,
     edges: &LabelEdges<'_>,
@@ -754,7 +769,7 @@ fn emit_link(
 /// Writes the link of the converter: the white space of the label start, the link, the white
 /// space of the label end.
 fn write_link_with_edges(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &LinkData,
     label: &str,
     edges: &LabelEdges<'_>,
@@ -806,7 +821,7 @@ fn write_with_edges(
 
 fn write_link(
     output: &mut String,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &LinkData,
     label: &str,
     options: &ConversionOptions,
@@ -845,7 +860,7 @@ fn append_link(output: &mut String, link: &MarkdownLink<'_>, options: &Conversio
 
 #[cfg(feature = "visitor")]
 fn visit_link(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &LinkData,
     label: &str,
     edges: &LabelEdges<'_>,
@@ -923,7 +938,7 @@ fn visit_link(
 }
 
 #[cfg(feature = "metadata")]
-fn record_link_metadata(tag: &tl::HTMLTag<'_>, data: &LinkData, label: &str, context: &Context) {
+fn record_link_metadata(tag: &crate::dom::HTMLTag<'_>, data: &LinkData, label: &str, context: &Context) {
     if !context.metadata_wants.links {
         return;
     }

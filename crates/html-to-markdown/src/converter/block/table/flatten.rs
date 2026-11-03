@@ -3,8 +3,8 @@ use crate::converter::block::container::HandlerContext;
 // ~keep A nested GFM table cannot fit inside a cell; retain row content without generating
 // ~keep structural pipes or delimiter dashes (#760). Single-cell deferred tables bypass this.
 pub(super) fn render(
-    table: &tl::HTMLTag<'_>,
-    parser: &tl::Parser<'_>,
+    table: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser<'_>,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
@@ -19,7 +19,7 @@ pub(super) fn render(
         if handler.ctx.excluded_node_ids.contains(&child.get_inner()) {
             continue;
         }
-        let Some(tl::Node::Tag(tag)) = child.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = child.get(parser) else {
             continue;
         };
         if depth >= crate::converter::main_helpers::effective_max_depth(handler.options) {
@@ -43,7 +43,12 @@ pub(super) fn render(
     }
 }
 
-fn render_row(row: &tl::NodeHandle, parser: &tl::Parser<'_>, output: &mut String, handler: HandlerContext<'_>) {
+fn render_row(
+    row: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser<'_>,
+    output: &mut String,
+    handler: HandlerContext<'_>,
+) {
     let mut cells = Vec::new();
     super::cell::collect_table_cells(row, parser, handler.dom_ctx, handler.ctx, &mut cells);
     let row = cells

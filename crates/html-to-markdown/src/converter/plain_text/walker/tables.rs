@@ -2,7 +2,7 @@ use super::super::{WalkState, collect_descendant_handles};
 use super::{CaptureKind, Frame, Scope, Walker};
 
 impl<'a> Walker<'a> {
-    pub(super) fn table(&mut self, tag: &tl::HTMLTag<'_>, scope: Scope<'a>, parser: &tl::Parser) {
+    pub(super) fn table(&mut self, tag: &crate::dom::HTMLTag<'_>, scope: Scope<'a>, parser: &crate::dom::Parser) {
         self.outputs[scope.output].end_block();
         self.frames.push(Frame::EndBlock(scope.output));
         let mut scheduled = Vec::new();
@@ -15,7 +15,7 @@ impl<'a> Walker<'a> {
             ..scope
         };
         for handle in tag.children().top().iter() {
-            if let Some(tl::Node::Tag(child)) = handle.get(parser)
+            if let Some(crate::dom::Node::Tag(child)) = handle.get(parser)
                 && child.name().as_utf8_str().eq_ignore_ascii_case("caption")
             {
                 scheduled.push(Frame::Capture {
@@ -44,7 +44,7 @@ impl<'a> Walker<'a> {
                     mark: "\n",
                 });
             }
-            if let Some(tl::Node::Tag(row)) = handle.get(parser) {
+            if let Some(crate::dom::Node::Tag(row)) = handle.get(parser) {
                 self.schedule_cells(row, cell_scope, parser, &mut scheduled);
             }
         }
@@ -53,9 +53,9 @@ impl<'a> Walker<'a> {
 
     fn schedule_cells(
         &self,
-        row: &tl::HTMLTag<'_>,
+        row: &crate::dom::HTMLTag<'_>,
         scope: Scope<'a>,
-        parser: &tl::Parser,
+        parser: &crate::dom::Parser,
         scheduled: &mut Vec<Frame<'a>>,
     ) {
         let mut first = true;
@@ -63,7 +63,7 @@ impl<'a> Walker<'a> {
             if scope.state.excludes(handle) {
                 continue;
             }
-            let Some(tl::Node::Tag(cell)) = handle.get(parser) else {
+            let Some(crate::dom::Node::Tag(cell)) = handle.get(parser) else {
                 continue;
             };
             let name = cell.name().as_utf8_str();

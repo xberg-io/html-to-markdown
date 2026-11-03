@@ -28,9 +28,9 @@ use crate::options::NewlineStyle;
 /// ~keep A list is left out as the block: it already starts its own line at its own column.
 /// ~keep A lone line break is not a block's last line: the block before it wrote nothing.
 pub(super) fn separate_in_list_item(
-    node: &tl::Node,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::Node,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
@@ -39,7 +39,7 @@ pub(super) fn separate_in_list_item(
     } = handler;
     // ~keep A block that preprocessing drops (a `<nav>`) writes nothing, so it gets no line.
     let starts_block = match node {
-        tl::Node::Tag(tag) => dom_ctx.tag_info(node_handle.get_inner(), parser).is_some_and(|info| {
+        crate::dom::Node::Tag(tag) => dom_ctx.tag_info(node_handle.get_inner(), parser).is_some_and(|info| {
             is_block_level_element(&info.name)
                 && !matches!(info.name.as_str(), "ul" | "ol" | "li")
                 && !should_drop_for_preprocessing(
@@ -107,9 +107,9 @@ pub(super) fn separate_in_list_item(
 /// ~keep nesting. Inline content beside inline content gets nothing here: its own white space
 /// ~keep decides, so `<b>H</b>ello` stays one word.
 pub(super) fn separate_words_at_block_boundary(
-    node: &tl::Node,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::Node,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
@@ -154,8 +154,8 @@ fn wraps_running_text(tag_name: &str) -> bool {
 /// The walk looks only into the inline elements that `looks_into` accepts.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn starts_with_block(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     looks_into: fn(&str) -> bool,
 ) -> bool {
@@ -173,8 +173,8 @@ fn starts_with_block(
         }
         let first_content = dom_ctx.children_of(handle.get_inner()).and_then(|children| {
             children.iter().find(|child| match child.get(parser) {
-                Some(tl::Node::Raw(raw)) => !raw.as_utf8_str().trim().is_empty(),
-                Some(tl::Node::Tag(_)) => true,
+                Some(crate::dom::Node::Raw(raw)) => !raw.as_utf8_str().trim().is_empty(),
+                Some(crate::dom::Node::Tag(_)) => true,
                 _ => false,
             })
         });

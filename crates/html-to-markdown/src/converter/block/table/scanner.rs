@@ -57,8 +57,8 @@ pub struct TableScan {
 ///   [`apply_tag_content`])
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn scan_table(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
     br_in_tables: bool,
@@ -79,9 +79,9 @@ pub fn scan_table(
 /// Resolve a node's normalized tag name via the `DomContext` cache, falling back to
 /// parsing it directly when the node was not pre-registered (e.g. not yet visited).
 fn tag_name_of<'a>(
-    handle: &tl::NodeHandle,
-    tag: &'a tl::HTMLTag,
-    parser: &tl::Parser,
+    handle: &crate::dom::NodeHandle,
+    tag: &'a crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     dom_ctx: &'a super::super::super::DomContext,
 ) -> Cow<'a, str> {
     dom_ctx.tag_info(handle.get_inner(), parser).map_or_else(
@@ -97,8 +97,8 @@ fn tag_name_of<'a>(
 /// nested below it.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn scan_own_structure(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
 ) -> (Vec<usize>, usize, bool) {
@@ -106,16 +106,16 @@ fn scan_own_structure(
     let mut nested_table_count = 0usize;
     let mut has_span = false;
 
-    let Some(tl::Node::Tag(root_tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(root_tag)) = node_handle.get(parser) else {
         return (row_counts, nested_table_count, has_span);
     };
 
-    let mut work: Vec<tl::NodeHandle> = root_tag.children().top().iter().copied().collect();
+    let mut work: Vec<crate::dom::NodeHandle> = root_tag.children().top().iter().copied().collect();
     while let Some(handle) = work.pop() {
         if ctx.excluded_node_ids.contains(&handle.get_inner()) {
             continue;
         }
-        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) else {
             continue;
         };
         let tag_name = tag_name_of(&handle, tag, parser, dom_ctx);
@@ -141,8 +141,8 @@ fn scan_own_structure(
 /// Count cells (respecting `colspan`) in a single `<tr>`/`row` element and report whether
 /// any cell carries a `colspan`/`rowspan` attribute.
 fn scan_row_cells(
-    row_tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    row_tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
 ) -> (usize, bool) {
@@ -152,7 +152,7 @@ fn scan_row_cells(
         if ctx.excluded_node_ids.contains(&child.get_inner()) {
             continue;
         }
-        let Some(tl::Node::Tag(cell_tag)) = child.get(parser) else {
+        let Some(crate::dom::Node::Tag(cell_tag)) = child.get(parser) else {
             continue;
         };
         let cell_name = tag_name_of(child, cell_tag, parser, dom_ctx);
@@ -172,7 +172,7 @@ fn scan_row_cells(
 enum ContentFrame {
     /// Visit a node: accumulate its own content into the innermost open table accumulator,
     /// opening a new one first if the node is itself a `<table>`.
-    Enter(tl::NodeHandle),
+    Enter(crate::dom::NodeHandle),
     /// All descendants of the `<table>` node with this id have been visited; finalize and
     /// cache its accumulator, merging it into the now-current parent accumulator (if any).
     ExitTable(u32),
@@ -192,8 +192,8 @@ enum ContentFrame {
 /// the stack-depth risk `deeply_nested_tables_do_not_overflow_stack` guards against.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn content_summary(
-    table_handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    table_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
     br_in_tables: bool,
@@ -224,8 +224,8 @@ fn content_summary(
 /// into the innermost open accumulator, opening a new one when `handle` is itself a
 /// `<table>`, and queue its children for a later `Enter`.
 fn visit_content_node(
-    handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     acc_stack: &mut Vec<(TableContentSummary, bool)>,
     work: &mut Vec<ContentFrame>,
@@ -266,9 +266,9 @@ struct ContentTest {
 /// An element that [`fold_node_content`] read.
 enum Element<'p> {
     /// A `<table>`. Its content belongs to a summary of its own.
-    Table(&'p tl::HTMLTag<'p>),
+    Table(&'p crate::dom::HTMLTag<'p>),
     /// Any other element.
-    Other(&'p tl::HTMLTag<'p>),
+    Other(&'p crate::dom::HTMLTag<'p>),
 }
 
 /// The content test of a table for one node: folds the text of a text node, or what an element
@@ -278,14 +278,14 @@ enum Element<'p> {
 /// ~keep The scan of a table and `cell_holds_only_inputs` both read each node here, so "the
 /// ~keep table has content" and "the cell holds only inputs" are one decision with one list.
 fn fold_node_content<'p>(
-    handle: tl::NodeHandle,
-    parser: &'p tl::Parser<'p>,
+    handle: crate::dom::NodeHandle,
+    parser: &'p crate::dom::Parser<'p>,
     dom_ctx: &super::super::super::DomContext,
     acc: Option<&mut TableContentSummary>,
     content: ContentTest,
 ) -> Option<Element<'p>> {
     match handle.get(parser)? {
-        tl::Node::Raw(bytes) => {
+        crate::dom::Node::Raw(bytes) => {
             // ~keep A character reference for white space is white space.
             if !crate::text::decode_html_entities_cow(bytes.as_utf8_str().as_ref())
                 .trim()
@@ -297,7 +297,7 @@ fn fold_node_content<'p>(
             }
             None
         }
-        tl::Node::Tag(tag) => {
+        crate::dom::Node::Tag(tag) => {
             let tag_name = tag_name_of(&handle, tag, parser, dom_ctx);
             if tag_name.as_ref() == "table" {
                 return Some(Element::Table(tag));
@@ -305,7 +305,7 @@ fn fold_node_content<'p>(
             apply_tag_content(&tag_name, tag, parser, acc, content);
             Some(Element::Other(tag))
         }
-        tl::Node::Comment(_) => None,
+        crate::dom::Node::Comment(_) => None,
     }
 }
 
@@ -318,8 +318,8 @@ fn fold_node_content<'p>(
 /// ~keep reads the answer from its context. The walk stops at the first content and at a table
 /// ~keep inside the cell, so nested tables are not read one time for each level.
 pub fn cell_holds_only_inputs(
-    cell_handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    cell_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     br_in_tables: bool,
 ) -> bool {
@@ -327,11 +327,11 @@ pub fn cell_holds_only_inputs(
         br_in_tables,
         checkboxes: false,
     };
-    let Some(tl::Node::Tag(cell_tag)) = cell_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(cell_tag)) = cell_handle.get(parser) else {
         return false;
     };
     let mut found = TableContentSummary::default();
-    let mut work: Vec<tl::NodeHandle> = cell_tag.children().top().iter().copied().collect();
+    let mut work: Vec<crate::dom::NodeHandle> = cell_tag.children().top().iter().copied().collect();
     while let Some(handle) = work.pop() {
         match fold_node_content(handle, parser, dom_ctx, Some(&mut found), content) {
             Some(Element::Table(_)) => return false,
@@ -349,8 +349,8 @@ pub fn cell_holds_only_inputs(
 /// into the current accumulator, if one is open.
 fn apply_tag_content(
     tag_name: &str,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     acc: Option<&mut TableContentSummary>,
     content: ContentTest,
 ) {

@@ -29,12 +29,12 @@ use std::rc::Rc;
 /// - Inline suffix handling is applied (e.g., footnote references)
 pub fn handle_dfn(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(32);
         let children = tag.children();
         {
@@ -92,12 +92,12 @@ pub fn handle_dfn(
 /// Produces: `HTML (HyperText Markup Language)`
 pub fn handle_abbr(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(32);
         let children = tag.children();
         {
@@ -147,12 +147,12 @@ pub fn handle_abbr(
 /// - Attributes (datetime, value) are not rendered in Markdown output
 pub fn handle_time_data(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
         {
             for child_handle in children.top().iter() {
@@ -183,12 +183,12 @@ pub fn handle_time_data(
 /// - **Inline mode**: Content is output as-is without formatting
 pub fn handle_cite(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(32);
         let children = tag.children();
         {
@@ -241,13 +241,13 @@ pub fn handle_cite(
 /// links of inline code are collected, the children write to the buffer of the element and
 /// [`close_collected_q`] ends it.
 pub fn open_q(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -337,8 +337,8 @@ pub fn close_collected_q(end: &CollectedQuoteEnd, output: &mut String, handler: 
 /// to their respective handlers.
 pub fn handle(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
@@ -359,8 +359,8 @@ fn append_inline_suffix(
     output: &mut String,
     suffix: &str,
     _is_nonempty: bool,
-    _node_handle: &tl::NodeHandle,
-    _parser: &tl::Parser,
+    _node_handle: &crate::dom::NodeHandle,
+    _parser: &crate::dom::Parser,
     _dom_ctx: &super::DomContext,
 ) {
     output.push_str(suffix);

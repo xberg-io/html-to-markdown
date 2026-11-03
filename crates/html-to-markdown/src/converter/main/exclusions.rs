@@ -28,7 +28,7 @@ pub(super) fn remove_kept_tags<'a>(
 /// ~keep Every other element that a selector matches is an element of the tree under each choice
 /// ~keep of `hidden_content`, and only the exclusion that reads the tree removes it.
 ///
-/// ~keep Only the start of a match is read. `tl` gives the end of an element only when its end
+/// ~keep Only the start of a match is read. The parser gives the end of an element only when its end
 /// ~keep tag arrives while it is the innermost open element: an element with no end tag, or
 /// ~keep with an omitted end tag in its content, ends at its start tag there.
 fn excluded_starts(html: &str, hidden_content: HiddenContent, selectors: &[String]) -> Result<Vec<usize>> {

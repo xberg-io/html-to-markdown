@@ -39,7 +39,7 @@ struct GraphicData<'a> {
 /// - Collecting metadata when the metadata feature is enabled
 /// - Invoking visitor callbacks when the visitor feature is enabled
 /// - Generating appropriate markdown output
-pub fn handle_graphic(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
+pub fn handle_graphic(tag: &crate::dom::HTMLTag, handler: HandlerContext<'_>) {
     let data = graphic_data(tag, &handler);
     #[cfg(feature = "metadata")]
     let metadata = handler.context.metadata_wants.images.then(|| graphic_metadata(tag));
@@ -53,7 +53,7 @@ pub fn handle_graphic(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
     record_graphic_metadata(&data, metadata, handler.context);
 }
 
-fn graphic_data<'a>(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> GraphicData<'a> {
+fn graphic_data<'a>(tag: &'a crate::dom::HTMLTag<'a>, handler: &HandlerContext<'_>) -> GraphicData<'a> {
     let addresses = ["url", "href", "xlink:href", "src"]
         .into_iter()
         .filter_map(|name| crate::converter::utility::attributes::decoded_attribute(tag, name));
@@ -79,7 +79,7 @@ fn graphic_data<'a>(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> G
 }
 
 #[cfg(feature = "metadata")]
-fn graphic_metadata(tag: &tl::HTMLTag<'_>) -> GraphicMetadataPayload {
+fn graphic_metadata(tag: &crate::dom::HTMLTag<'_>) -> GraphicMetadataPayload {
     let mut attributes = BTreeMap::new();
     let mut width = None;
     let mut height = None;
@@ -100,7 +100,11 @@ fn graphic_metadata(tag: &tl::HTMLTag<'_>) -> GraphicMetadataPayload {
 }
 
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
-fn render_graphic(tag: &tl::HTMLTag<'_>, data: &GraphicData<'_>, handler: &HandlerContext<'_>) -> Option<String> {
+fn render_graphic(
+    tag: &crate::dom::HTMLTag<'_>,
+    data: &GraphicData<'_>,
+    handler: &HandlerContext<'_>,
+) -> Option<String> {
     // ~keep #492: byte-identical twin of `handlers/image.rs`'s `keep_as_markdown` -- see
     // ~keep that file's comment for why `|| ctx.link_allow_inline_images` is purely additive
     // ~keep and why the heading pattern's negative clause is deliberately not mirrored here.

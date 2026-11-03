@@ -24,12 +24,12 @@ use std::borrow::Cow;
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_details(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = handler.ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -82,13 +82,13 @@ pub fn handle_details(
 
 pub fn open_details(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         #[cfg(not(feature = "visitor"))]
         let _ = tag;
         #[cfg(feature = "visitor")]
@@ -162,12 +162,12 @@ pub fn open_details(
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_summary(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(64);
 
         // ~keep Set strong context for nested content. Skip the clone entirely
@@ -234,8 +234,8 @@ pub fn handle_summary(
 fn render_summary_block(
     output: &mut String,
     content: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: super::HandlerContext<'_>,
 ) {
     let mut bold = String::with_capacity(content.len() + 4);
@@ -255,9 +255,9 @@ fn render_summary_block(
 
 #[cfg(feature = "visitor")]
 fn visit_summary(
-    tag: &tl::HTMLTag<'_>,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag<'_>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     content: &str,
     handler: super::HandlerContext<'_>,
@@ -313,8 +313,8 @@ fn visit_summary(
 /// Routes `<details>` and `<summary>` elements to their respective handlers.
 pub fn handle(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
@@ -326,12 +326,12 @@ pub fn handle(
 }
 
 pub fn open_summary(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: super::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -350,12 +350,12 @@ pub fn open_summary(
 
 pub fn close_summary(
     captured: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     #[cfg(not(feature = "visitor"))]

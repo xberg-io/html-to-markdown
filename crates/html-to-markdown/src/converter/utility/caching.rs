@@ -13,27 +13,27 @@ thread_local! {
     pub(crate) static DOM_CONTEXT_BUILDS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
 }
 
-fn inline_like_value(node_handle: tl::NodeHandle, parser: &tl::Parser) -> Option<bool> {
+fn inline_like_value(node_handle: crate::dom::NodeHandle, parser: &crate::dom::Parser) -> Option<bool> {
     match node_handle.get(parser) {
-        Some(tl::Node::Tag(tag)) => {
+        Some(crate::dom::Node::Tag(tag)) => {
             let name = normalized_tag_name(tag.name().as_utf8_str());
             Some(is_inline_element(&name) || matches!(name.as_ref(), "script" | "style"))
         }
-        Some(tl::Node::Raw(raw)) if raw.as_utf8_str().trim().is_empty() => None,
-        Some(tl::Node::Raw(_)) => Some(false),
-        Some(tl::Node::Comment(_)) | None => None,
+        Some(crate::dom::Node::Raw(raw)) if raw.as_utf8_str().trim().is_empty() => None,
+        Some(crate::dom::Node::Raw(_)) => Some(false),
+        Some(crate::dom::Node::Comment(_)) | None => None,
     }
 }
 
-fn cache_sibling_context(siblings: &[tl::NodeHandle], parser: &tl::Parser, ctx: &mut DomContext) {
+fn cache_sibling_context(siblings: &[crate::dom::NodeHandle], parser: &crate::dom::Parser, ctx: &mut DomContext) {
     let mut previous_tag = None;
     for sibling in siblings {
         let id = sibling.get_inner();
         ctx.ensure_capacity(id);
         let _ = ctx.prev_tag_map[id as usize].set(previous_tag);
         match sibling.get(parser) {
-            Some(tl::Node::Tag(_)) => previous_tag = Some(id),
-            Some(tl::Node::Raw(raw)) if !raw.as_utf8_str().trim().is_empty() => previous_tag = None,
+            Some(crate::dom::Node::Tag(_)) => previous_tag = Some(id),
+            Some(crate::dom::Node::Raw(raw)) if !raw.as_utf8_str().trim().is_empty() => previous_tag = None,
             _ => {}
         }
     }
@@ -54,7 +54,7 @@ fn cache_sibling_context(siblings: &[tl::NodeHandle], parser: &tl::Parser, ctx: 
         ctx.following_content_map[id as usize] = following_content;
 
         match sibling.get(parser) {
-            Some(tl::Node::Tag(_)) => {
+            Some(crate::dom::Node::Tag(_)) => {
                 next_inline_like = inline_like_value(*sibling, parser).unwrap_or(false);
                 next_tag = Some(id);
                 next_whitespace = false;
@@ -64,7 +64,7 @@ fn cache_sibling_context(siblings: &[tl::NodeHandle], parser: &tl::Parser, ctx: 
                     crate::converter::utility::siblings::FollowingContent::NotInline
                 };
             }
-            Some(tl::Node::Raw(raw)) => {
+            Some(crate::dom::Node::Raw(raw)) => {
                 let is_whitespace = raw.as_utf8_str().trim().is_empty();
                 if !is_whitespace {
                     next_inline_like = false;
@@ -77,7 +77,7 @@ fn cache_sibling_context(siblings: &[tl::NodeHandle], parser: &tl::Parser, ctx: 
                 }
                 next_whitespace = is_whitespace;
             }
-            Some(tl::Node::Comment(_)) | None => {}
+            Some(crate::dom::Node::Comment(_)) | None => {}
         }
     }
 }
@@ -87,7 +87,7 @@ fn cache_sibling_context(siblings: &[tl::NodeHandle], parser: &tl::Parser, ctx: 
 /// Pre-computes parent-child relationships, sibling indices, and caches
 /// tag information for efficient DOM navigation during conversion.
 #[must_use]
-pub fn build_dom_context(dom: &tl::VDom, parser: &tl::Parser, _input_len: usize) -> DomContext {
+pub fn build_dom_context(dom: &crate::dom::VDom, parser: &crate::dom::Parser, _input_len: usize) -> DomContext {
     #[cfg(test)]
     DOM_CONTEXT_BUILDS.with(|builds| builds.set(builds.get() + 1));
     let mut ctx = DomContext {
@@ -134,9 +134,9 @@ pub fn build_dom_context(dom: &tl::VDom, parser: &tl::Parser, _input_len: usize)
 ///
 /// Builds the complete parent-child relationship map for efficient tree traversal.
 pub fn record_node_hierarchy(
-    node_handle: tl::NodeHandle,
+    node_handle: crate::dom::NodeHandle,
     parent: Option<u32>,
-    parser: &tl::Parser,
+    parser: &crate::dom::Parser,
     ctx: &mut DomContext,
 ) {
     let mut work = vec![(node_handle, parent)];
@@ -155,7 +155,7 @@ pub fn record_node_hierarchy(
             .flatten();
         ctx.node_map[id as usize] = Some(node_handle);
 
-        if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+        if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
             ctx.literal_pre_map[id as usize] |= tag.name().as_utf8_str().eq_ignore_ascii_case("pre");
             let name = tag.name().as_utf8_str();
             // ~keep Code renders its entire subtree literally, including a nested del (#868).

@@ -102,8 +102,8 @@ pub fn first_address<T: AsRef<str>>(choice: InlineDataMedia, addresses: impl Int
 /// Returns `true` if the tag was recognized and handled, `false` otherwise.
 pub fn dispatch_media_handler(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: MediaContext<'_>,
 ) -> bool {
@@ -111,7 +111,7 @@ pub fn dispatch_media_handler(
         return false;
     };
     let tag = match node {
-        tl::Node::Tag(tag) => tag,
+        crate::dom::Node::Tag(tag) => tag,
         _ => return false,
     };
 

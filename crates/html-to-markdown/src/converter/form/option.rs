@@ -12,8 +12,8 @@ use crate::converter::walk::{Close, Open};
 /// `<datalist>` are inline text.
 pub fn handle_option_list(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -23,7 +23,7 @@ pub fn handle_option_list(
         depth,
         dom_ctx,
     } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut rendered = String::new();
         // ~keep A select list and a data list are one control of inline text. An option that
         // ~keep no such element holds is no list control in a browser, so a block in it stays
@@ -64,8 +64,8 @@ pub fn handle_option_list(
 /// Selection state does not change the visible label.
 pub fn handle_option(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -75,7 +75,7 @@ pub fn handle_option(
         depth,
         dom_ctx,
     } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut text = String::new();
         let children = tag.children();
         {
@@ -95,13 +95,13 @@ pub fn handle_option(
 
 pub fn open_option(
     kind: &str,
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
     handler: crate::converter::block::container::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     let list = kind != "option" || !handler.ctx.in_option_list;
@@ -132,8 +132,8 @@ pub struct OptionEnd {
 pub fn close_option(
     end: &OptionEnd,
     content: &str,
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
 ) {

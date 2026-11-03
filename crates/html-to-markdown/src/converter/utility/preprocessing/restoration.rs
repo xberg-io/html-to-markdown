@@ -4,20 +4,21 @@ use super::preserved_bodies::script_marker_attribute;
 
 type ScriptOwners = (HashSet<usize>, Vec<(usize, String)>);
 
-fn script_owners(dom: &tl::VDom<'_>, originals: &HashMap<String, String>) -> ScriptOwners {
+fn script_owners(dom: &crate::dom::VDom<'_>, originals: &HashMap<String, String>) -> ScriptOwners {
     let parser = dom.parser();
     let mut stack: Vec<_> = dom.children().to_vec();
     let mut bodies = HashSet::new();
     let mut attributes = Vec::new();
     while let Some(handle) = stack.pop() {
-        let Some(tag) = handle.get(parser).and_then(tl::Node::as_tag) else {
+        let Some(tag) = handle.get(parser).and_then(crate::dom::Node::as_tag) else {
             continue;
         };
         let name = tag.name().as_utf8_str();
-        // ~keep tl can mis-nest an HTML-source script under SVG after mixed-case closes; the allocated owner proves origin.
+        // ~keep The parser can mis-nest an HTML-source script under SVG after mixed-case closes;
+        // ~keep the allocated owner proves origin.
         if name.eq_ignore_ascii_case("script") {
             for child in tag.children().top().iter() {
-                let Some(raw) = child.get(parser).and_then(tl::Node::as_raw) else {
+                let Some(raw) = child.get(parser).and_then(crate::dom::Node::as_raw) else {
                     continue;
                 };
                 let marker = raw.as_utf8_str();
@@ -48,7 +49,7 @@ fn script_owners(dom: &tl::VDom<'_>, originals: &HashMap<String, String>) -> Scr
 
 /// Restore opaque source bytes while retaining exact repaired-script ownership. ~keep
 pub fn restore_inert_bodies(
-    dom: &mut tl::VDom<'_>,
+    dom: &mut crate::dom::VDom<'_>,
     originals: &HashMap<String, String>,
 ) -> crate::error::Result<HashSet<usize>> {
     let (script_bodies, attributes) = script_owners(dom, originals);
@@ -68,8 +69,8 @@ pub fn restore_inert_bodies(
         restored.insert(id);
     }
     for (id, attribute) in attributes {
-        if let Some(tag) = dom.nodes_mut().get_mut(id).and_then(tl::Node::as_tag_mut) {
-            let key = tl::Bytes::try_from(attribute).map_err(|error| {
+        if let Some(tag) = dom.nodes_mut().get_mut(id).and_then(crate::dom::Node::as_tag_mut) {
+            let key = crate::dom::Bytes::try_from(attribute).map_err(|error| {
                 crate::error::ConversionError::Other(format!("removing repaired script ownership attribute: {error:?}"))
             })?;
             tag.attributes_mut().remove(key);
@@ -88,14 +89,14 @@ mod tests {
         let source = format!(
             "<script data-h2m-script-0='h2m_script_body_1_end'>{marker}</script><script data-h2m-script-0='{marker}'>{marker}</script>"
         );
-        let mut dom = tl::parse(&source, tl::ParserOptions::default()).expect("two scripts");
+        let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("two scripts");
         let originals = HashMap::from([(marker.into(), "JSON".into())]);
         let ids = restore_inert_bodies(&mut dom, &originals).expect("restoration");
         assert_eq!(ids.len(), 1);
         let scripts: Vec<_> = dom.query_selector("script").expect("selector").collect();
         let unowned = scripts[0]
             .get(dom.parser())
-            .and_then(tl::Node::as_tag)
+            .and_then(crate::dom::Node::as_tag)
             .expect("unowned script");
         assert_eq!(unowned.inner_text(dom.parser()), marker);
         assert_eq!(
@@ -109,7 +110,7 @@ mod tests {
         );
         let owned = scripts[1]
             .get(dom.parser())
-            .and_then(tl::Node::as_tag)
+            .and_then(crate::dom::Node::as_tag)
             .expect("owned script");
         assert_eq!(owned.inner_text(dom.parser()), "JSON");
         assert_eq!(owned.attributes().len(), 0);
@@ -122,27 +123,27 @@ mod tests {
         let source = format!(
             "<p data-h2m-script-0='{marker}'>{marker}</p><script data-h2m-script-0='{marker}'>{marker}</script><script>{marker}</script>"
         );
-        let mut dom = tl::parse(&source, tl::ParserOptions::default()).expect("DOM");
+        let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("DOM");
         let originals = HashMap::from([(marker.into(), json.into())]);
         let restored = restore_inert_bodies(&mut dom, &originals).expect("owned restoration");
         assert_eq!(restored.len(), 1);
         let scripts: Vec<_> = dom.query_selector("script").expect("selector").collect();
         let owned = scripts[0]
             .get(dom.parser())
-            .and_then(tl::Node::as_tag)
+            .and_then(crate::dom::Node::as_tag)
             .expect("owned tag");
         assert_eq!(owned.inner_text(dom.parser()), json);
         assert_eq!(owned.attributes().len(), 0);
         let other = scripts[1]
             .get(dom.parser())
-            .and_then(tl::Node::as_tag)
+            .and_then(crate::dom::Node::as_tag)
             .expect("unowned tag");
         assert_eq!(other.inner_text(dom.parser()), marker);
         let paragraph = dom.query_selector("p").expect("selector").next().expect("paragraph");
         assert_eq!(
             paragraph
                 .get(dom.parser())
-                .and_then(tl::Node::as_tag)
+                .and_then(crate::dom::Node::as_tag)
                 .expect("paragraph tag")
                 .inner_text(dom.parser()),
             marker
@@ -163,14 +164,15 @@ mod tests {
             let (marker, attribute) = preserved.protect_script(json);
             assert_eq!(marker, "h2m_script_body_1_end");
             let source = format!("{authored}<script {attribute}='{marker}'>{marker}</script>");
-            let mut dom = tl::parse(&source, tl::ParserOptions::default()).expect("foreign DOM and owned sibling");
+            let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions::default())
+                .expect("foreign DOM and owned sibling");
             let ids = restore_inert_bodies(&mut dom, &preserved.originals).expect("source-proven restoration");
             assert_eq!(ids.len(), 1);
             let handles: Vec<_> = dom.query_selector("script").expect("selector").collect();
             assert_eq!(handles.len(), 2);
             let foreign = handles[0]
                 .get(dom.parser())
-                .and_then(tl::Node::as_tag)
+                .and_then(crate::dom::Node::as_tag)
                 .expect("authored foreign script");
             assert_eq!(foreign.inner_text(dom.parser()), authored_marker);
             assert_eq!(
@@ -184,7 +186,7 @@ mod tests {
             );
             let owned = handles[1]
                 .get(dom.parser())
-                .and_then(tl::Node::as_tag)
+                .and_then(crate::dom::Node::as_tag)
                 .expect("owned sibling");
             assert_eq!(owned.inner_text(dom.parser()), json);
             assert_eq!(owned.attributes().len(), 0);

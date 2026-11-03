@@ -8,8 +8,8 @@ use crate::converter::DomContext;
 /// Get the tag name of the next sibling element.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn get_next_sibling_tag<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &'a tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &'a crate::dom::Parser,
     dom_ctx: &'a DomContext,
 ) -> Option<&'a str> {
     dom_ctx.next_tag_name(*node_handle, parser)
@@ -18,8 +18,8 @@ pub fn get_next_sibling_tag<'a>(
 /// Get the tag name of the previous sibling element.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn get_previous_sibling_tag<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &'a DomContext,
 ) -> Option<&'a str> {
     let id = node_handle.get_inner();
@@ -39,14 +39,14 @@ pub fn get_previous_sibling_tag<'a>(
     let position = dom_ctx.sibling_index(id).or_else(|| {
         siblings
             .iter()
-            .position(|handle: &tl::NodeHandle| handle.get_inner() == id)
+            .position(|handle: &crate::dom::NodeHandle| handle.get_inner() == id)
     })?;
 
     for sibling in siblings.iter().take(position).rev() {
         if let Some(info) = dom_ctx.tag_info(sibling.get_inner(), parser) {
             return Some(info.name.as_str());
         }
-        if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
+        if let Some(crate::dom::Node::Raw(raw)) = sibling.get(parser) {
             if !raw.as_utf8_str().trim().is_empty() {
                 return None;
             }
@@ -57,10 +57,10 @@ pub fn get_previous_sibling_tag<'a>(
 }
 
 /// Order table row groups as rendered by the HTML table model.
-pub fn table_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser) -> Vec<tl::NodeHandle> {
+pub fn table_children(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser) -> Vec<crate::dom::NodeHandle> {
     let mut children: Vec<_> = tag.children().top().iter().copied().collect();
     children.sort_by_key(|handle| {
-        let Some(tl::Node::Tag(child)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(child)) = handle.get(parser) else {
             return 2;
         };
         match child.name().as_utf8_str().to_ascii_lowercase().as_str() {
@@ -105,7 +105,7 @@ pub const fn count_following_content_read() {}
 
 /// The index of `id` in `siblings` by a scan from the first sibling, for a node that the index
 /// of the tree does not hold.
-fn scan_for_sibling_index(siblings: &[tl::NodeHandle], id: u32) -> Option<usize> {
+fn scan_for_sibling_index(siblings: &[crate::dom::NodeHandle], id: u32) -> Option<usize> {
     let position = siblings.iter().position(|sibling| sibling.get_inner() == id);
     count_sibling_visits(position.map_or(siblings.len(), |position| position + 1));
     position
@@ -121,8 +121,8 @@ fn scan_for_sibling_index(siblings: &[tl::NodeHandle], id: u32) -> Option<usize>
 /// ~keep The index of the tree gives the position of the text: a scan from the first sibling
 /// ~keep for each text is quadratic in the count of siblings.
 pub fn text_place(
-    node_handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     in_cell: bool,
 ) -> crate::converter::utility::white_space::TextPlace {
@@ -151,10 +151,10 @@ pub fn text_place(
         .enumerate()
         .rev()
         .inspect(|_| count_sibling_visits(1))
-        .find(|(_, sibling)| !matches!(sibling.get(parser), Some(tl::Node::Comment(_))));
+        .find(|(_, sibling)| !matches!(sibling.get(parser), Some(crate::dom::Node::Comment(_))));
     match previous {
         None => TextPlace::ElementStart,
-        Some((index, previous)) if matches!(previous.get(parser), Some(tl::Node::Tag(_))) => {
+        Some((index, previous)) if matches!(previous.get(parser), Some(crate::dom::Node::Tag(_))) => {
             place_after_element(previous.get_inner(), &before[..index], parser, dom_ctx, in_cell)
         }
         Some(_) => TextPlace::AfterText,
@@ -173,8 +173,8 @@ pub fn text_place(
 /// ~keep table cell has no line end: the rule of the empty element holds there.
 fn place_after_element(
     element: u32,
-    before: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    before: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     in_cell: bool,
 ) -> crate::converter::utility::white_space::TextPlace {
@@ -205,8 +205,8 @@ fn place_after_element(
 ///
 /// ~keep Empty inline boundaries share the full converter's main policy even where main's
 /// ~keep forced-fast route kept a second space. A preceding Unicode space remains a character (#868).
-fn ends_with_line_end(node: Option<&tl::NodeHandle>, parser: &tl::Parser) -> bool {
-    let Some(tl::Node::Raw(raw)) = node.and_then(|node| node.get(parser)) else {
+fn ends_with_line_end(node: Option<&crate::dom::NodeHandle>, parser: &crate::dom::Parser) -> bool {
+    let Some(crate::dom::Node::Raw(raw)) = node.and_then(|node| node.get(parser)) else {
         return false;
     };
     let raw = raw.as_utf8_str();
@@ -224,21 +224,21 @@ fn ends_with_line_end(node: Option<&tl::NodeHandle>, parser: &tl::Parser) -> boo
 /// ~keep of the `span` around it, and `a <span><a href="/u">x </a></span>&nbsp;b` has one space.
 /// ~keep A loop rather than recursion: nested elements are attacker-controlled depth. Each
 /// ~keep element is the last node of one parent, so no node is read for two texts.
-fn ends_with_text_space(mut element: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn ends_with_text_space(mut element: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     use crate::converter::utility::white_space::{is_collapsible, writes_in_text_flow};
     loop {
         let last = dom_ctx.children_of(element).and_then(|children| {
             children
                 .iter()
                 .rev()
-                .find(|child| !matches!(child.get(parser), Some(tl::Node::Comment(_))))
+                .find(|child| !matches!(child.get(parser), Some(crate::dom::Node::Comment(_))))
         });
         match last.and_then(|last| last.get(parser).map(|node| (last.get_inner(), node))) {
-            Some((_, tl::Node::Raw(raw))) => {
+            Some((_, crate::dom::Node::Raw(raw))) => {
                 let raw = raw.as_utf8_str();
                 return crate::text::decode_html_entities_cow(raw.as_ref()).ends_with(is_collapsible);
             }
-            Some((inner, tl::Node::Tag(_)))
+            Some((inner, crate::dom::Node::Tag(_)))
                 if dom_ctx
                     .tag_info(inner, parser)
                     .is_some_and(|info| writes_in_text_flow(&info.name)) =>
@@ -255,8 +255,8 @@ fn ends_with_text_space(mut element: u32, parser: &tl::Parser, dom_ctx: &DomCont
 /// (`<span><ul>...</ul></span>`). Whitespace text and comments are skipped (issue #585).
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn previous_content_block<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &'a DomContext,
 ) -> Option<&'a str> {
     previous_content_block_through(
@@ -271,8 +271,8 @@ pub fn previous_content_block<'a>(
 /// accepts. Any other element that is no block ends the walk: no block is found.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn previous_content_block_through<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &'a DomContext,
     looks_into: fn(&str) -> bool,
 ) -> Option<&'a str> {
@@ -302,7 +302,7 @@ pub fn previous_content_block_through<'a>(
                 nodes = dom_ctx.children_of(sibling.get_inner())?.as_slice();
                 continue 'outer;
             }
-            if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
+            if let Some(crate::dom::Node::Raw(raw)) = sibling.get(parser) {
                 if !raw.as_utf8_str().trim().is_empty() {
                     return None;
                 }
@@ -315,8 +315,8 @@ pub fn previous_content_block_through<'a>(
 /// Check if the next sibling is whitespace-only text.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn next_sibling_is_whitespace_text(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
 ) -> bool {
     dom_ctx.next_whitespace_text(*node_handle, parser)
@@ -324,7 +324,11 @@ pub fn next_sibling_is_whitespace_text(
 
 /// Check if the next sibling is an inline tag.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn next_sibling_is_inline_tag(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn next_sibling_is_inline_tag(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+) -> bool {
     dom_ctx.next_inline_like(*node_handle, parser)
 }
 
@@ -352,7 +356,7 @@ pub enum FollowingContent {
 /// `Absent` is distinct from `NotInline` so a caller can climb to the parent and ask again:
 /// the newline at the end of `<span><span>\n</span></span>Beta` still separates words, but only
 /// the outer wrapper can see `Beta` (issue #505). ~keep
-pub fn following_sibling_content(id: u32, _parser: &tl::Parser, dom_ctx: &DomContext) -> FollowingContent {
+pub fn following_sibling_content(id: u32, _parser: &crate::dom::Parser, dom_ctx: &DomContext) -> FollowingContent {
     count_following_content_read();
     dom_ctx
         .following_content_map
@@ -366,7 +370,7 @@ pub fn following_sibling_content(id: u32, _parser: &tl::Parser, dom_ctx: &DomCon
 /// `First\n<br>` does. Whitespace text and comments between them are skipped. A block
 /// ancestor ends its own line before the `<br>` is written, so the answer changes the output
 /// only for elements that write no line end: `<span>`, `<font>`, a custom element.
-pub fn br_follows_enclosing_elements(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn br_follows_enclosing_elements(id: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     let mut id = id;
     // ~keep A loop rather than recursion: nested wrappers are attacker-controlled depth.
     while following_sibling_content(id, parser, dom_ctx) == FollowingContent::Absent {
@@ -391,7 +395,11 @@ pub fn br_follows_enclosing_elements(id: u32, parser: &tl::Parser, dom_ctx: &Dom
 ///
 /// ~keep Tier-1 answers the same question on the bytes (`zero_width_space_is_upcoming`).
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn zero_width_space_follows(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+) -> bool {
     use crate::converter::utility::content::ZERO_WIDTH_SPACE;
 
     let mut current = node_handle.get_inner();
@@ -409,7 +417,7 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
         };
         loop {
             match node.get(parser) {
-                Some(tl::Node::Raw(raw)) => {
+                Some(crate::dom::Node::Raw(raw)) => {
                     let raw = raw.as_utf8_str();
                     let text = crate::text::decode_html_entities_cow(raw.as_ref());
                     if text.is_empty() {
@@ -418,7 +426,7 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
                     return text.starts_with(ZERO_WIDTH_SPACE)
                         && !is_inside_display_or_white_space_style(node_handle.get_inner(), parser, dom_ctx);
                 }
-                Some(tl::Node::Tag(_)) => {
+                Some(crate::dom::Node::Tag(_)) => {
                     if !is_plain_text_wrapper(node.get_inner(), parser, dom_ctx) {
                         return false;
                     }
@@ -430,7 +438,7 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
                         None => break,
                     }
                 }
-                Some(tl::Node::Comment(_)) => break,
+                Some(crate::dom::Node::Comment(_)) => break,
                 None => return false,
             }
         }
@@ -440,10 +448,10 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
 
 /// Whether the element `id` only wraps text (or is a `<wbr>`) and its `style` attribute, if
 /// it has one, sets neither `display` nor `white-space`.
-fn is_plain_text_wrapper(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn is_plain_text_wrapper(id: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     use crate::converter::utility::content::is_text_wrapper;
 
-    let Some(tl::Node::Tag(tag)) = tl::NodeHandle::new(id).get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = crate::dom::NodeHandle::new(id).get(parser) else {
         return false;
     };
     dom_ctx
@@ -453,7 +461,7 @@ fn is_plain_text_wrapper(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> 
 }
 
 /// Whether the `style` attribute of `tag` sets `display` or `white-space`.
-fn tag_sets_display_or_white_space(tag: &tl::HTMLTag) -> bool {
+fn tag_sets_display_or_white_space(tag: &crate::dom::HTMLTag) -> bool {
     use crate::converter::utility::attributes::style_attribute_sets_display_or_white_space;
 
     tag.attributes()
@@ -469,10 +477,10 @@ fn tag_sets_display_or_white_space(tag: &tl::HTMLTag) -> bool {
 /// ~keep that: a browser then shows the line end before a zero-width space.
 /// ~keep Tier-1 answers the same question on its open elements
 /// ~keep (`open_element_sets_display_or_white_space`).
-fn is_inside_display_or_white_space_style(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn is_inside_display_or_white_space_style(id: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     let mut current = id;
     while let Some(parent) = dom_ctx.parent_of(current) {
-        if let Some(tl::Node::Tag(tag)) = tl::NodeHandle::new(parent).get(parser)
+        if let Some(crate::dom::Node::Tag(tag)) = crate::dom::NodeHandle::new(parent).get(parser)
             && tag_sets_display_or_white_space(tag)
         {
             return true;
@@ -488,7 +496,7 @@ fn is_inside_display_or_white_space_style(id: u32, parser: &tl::Parser, dom_ctx:
 /// ~keep A `<span>` writes no marks, so a block that only `<span>` elements wrap breaks the
 /// ~keep line itself and the answer is no.
 /// ~keep Tier-1 answers the same question on the bytes (`upcoming_inline_starts_with_block`).
-pub fn content_starts_with_block(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn content_starts_with_block(id: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     use crate::converter::utility::content::is_text_wrapper;
 
     let mut current = id;
@@ -504,8 +512,8 @@ pub fn content_starts_with_block(id: u32, parser: &tl::Parser, dom_ctx: &DomCont
         inside_marks |= wrapper.name != "span";
         let first_content = dom_ctx.children_of(current).and_then(|children| {
             children.iter().find(|child| match child.get(parser) {
-                Some(tl::Node::Raw(raw)) => !raw.as_bytes().iter().all(u8::is_ascii_whitespace),
-                Some(tl::Node::Comment(_)) => false,
+                Some(crate::dom::Node::Raw(raw)) => !raw.as_bytes().iter().all(u8::is_ascii_whitespace),
+                Some(crate::dom::Node::Comment(_)) => false,
                 _ => true,
             })
         });
@@ -521,7 +529,7 @@ pub fn content_starts_with_block(id: u32, parser: &tl::Parser, dom_ctx: &DomCont
 }
 
 /// The node after `id` among the children of its parent.
-fn next_sibling(id: u32, dom_ctx: &DomContext) -> Option<tl::NodeHandle> {
+fn next_sibling(id: u32, dom_ctx: &DomContext) -> Option<crate::dom::NodeHandle> {
     let siblings = match dom_ctx.parent_of(id) {
         Some(parent_id) => dom_ctx.children_of(parent_id)?,
         None => &dom_ctx.root_children,
@@ -537,8 +545,8 @@ pub fn append_inline_suffix(
     output: &mut String,
     suffix: &str,
     has_core_content: bool,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
 ) {
     if suffix.is_empty() {
@@ -633,7 +641,7 @@ mod tests {
             ("<!--c-->&nbsp;word", FollowingContent::Inline),
         ] {
             let html = format!("<span>x</span>{suffix}");
-            let dom = tl::parse(&html, tl::ParserOptions::default()).expect("parse HTML");
+            let dom = crate::dom::parse(&html, crate::dom::ParserOptions::default()).expect("parse HTML");
             let parser = dom.parser();
             let ctx = crate::converter::utility::caching::build_dom_context(&dom, parser, html.len());
             let first = dom.children()[0].get_inner();

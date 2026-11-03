@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The Rust core now parses HTML with `astral-html` in place of `astral-tl`.
+- `build_document_structure` takes a DOM from `html_to_markdown_rs::dom::parse`.
+- A tag name that runs into the next `<` and a stray quote in a tag now follow the HTML tokenizer: `<b<i>t</i>` gives `t`, not bold text. Attributes of a preserved tag keep their source order, and a slash splits an attribute name.
 - Minimum supported versions raised: Node.js 22, Ruby 3.3, PHP 8.3, Elixir 1.17, Android API 24, macOS 26, Rust 1.99.
 - Python 3.11 is now the minimum supported version; Python 3.10 reached end of life.
 - Regenerate the bindings with Alef 0.119.0, so the generated manifests declare the raised minimums. The Zig package now requires Zig 0.17.
@@ -18,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A tag name that holds a dot or other punctuation now closes at its end tag, so later links no longer nest inside the link before it (#965).
 - Keep heading metadata as plain text from the same conversion pass, preserving literal markup,
   admitted image labels and visitor decisions.
 - Fully remove visitor-skipped children after exclusions trim whitespace, including UTF-8 text and

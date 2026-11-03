@@ -2,7 +2,7 @@
 /// `handle_svg` output byte-for-byte.
 ///
 /// `svg_slice` is the raw HTML source bytes for the entire `<svg…>…</svg>`
-/// element.  We re-parse it with `tl::parse` to get the canonical attribute
+/// element.  We re-parse it with `dom::parse` to get the canonical attribute
 /// order that `serialize_element` produces (it sorts attributes alphabetically,
 /// so raw-source slicing would diverge from Tier-2).
 ///
@@ -48,9 +48,9 @@ fn emit_svg_from_slice(
     use base64::{Engine as _, engine::general_purpose::STANDARD};
 
     // ~keep Re-parse just the SVG fragment.  Wrap it in a minimal document so
-    // tl has proper context — the same pattern used by head_metadata.rs.
+    // The parser has proper context — the same pattern used by head_metadata.rs.
     let wrapped = format!("<html><body>{svg_slice}</body></html>");
-    let dom = match tl::parse(&wrapped, tl::ParserOptions::default()) {
+    let dom = match crate::dom::parse(&wrapped, crate::dom::ParserOptions::default()) {
         Ok(d) => d,
         Err(_) => {
             // ~keep Parse failure: emit nothing rather than bail — matches
@@ -63,7 +63,7 @@ fn emit_svg_from_slice(
     let Some(handle) = find_svg_handle(&dom) else {
         return Ok(());
     };
-    let Some(tl::Node::Tag(svg)) = handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(svg)) = handle.get(parser) else {
         return Ok(());
     };
     let title = crate::converter::media::svg::graphic_text(svg, parser, options, policy);
@@ -115,14 +115,14 @@ fn holds_hidden_element(svg_slice: &str) -> bool {
     false
 }
 
-fn find_svg_handle(dom: &tl::VDom<'_>) -> Option<tl::NodeHandle> {
+fn find_svg_handle(dom: &crate::dom::VDom<'_>) -> Option<crate::dom::NodeHandle> {
     dom.nodes().iter().enumerate().find_map(|(index, node)| {
-        let tl::Node::Tag(tag) = node else { return None };
+        let crate::dom::Node::Tag(tag) = node else { return None };
         tag.name()
             .as_utf8_str()
             .as_ref()
             .eq_ignore_ascii_case("svg")
-            .then(|| tl::NodeHandle::new(index as u32))
+            .then(|| crate::dom::NodeHandle::new(index as u32))
     })
 }
 

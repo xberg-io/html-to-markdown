@@ -156,7 +156,7 @@ impl KeptScripts {
     /// ~keep visitor and a writer of HTML read the tree after it, so none of them sees a mark.
     /// ~keep The read goes to each node once, and only on a page with a mark.
     #[cfg(feature = "metadata")]
-    pub fn with_owner_marks_taken(mut self, dom: &mut tl::VDom<'_>) -> crate::error::Result<Self> {
+    pub fn with_owner_marks_taken(mut self, dom: &mut crate::dom::VDom<'_>) -> crate::error::Result<Self> {
         if self.bodies.is_empty() {
             return Ok(self);
         }
@@ -193,7 +193,7 @@ impl KeptScripts {
     /// ~keep is text in the tree, and its mark with it. The read runs only when a mark of the
     /// ~keep pass is on no script of the tree.
     #[cfg(feature = "metadata")]
-    fn take_owner_marks_out_of_text(&self, dom: &mut tl::VDom<'_>) -> crate::error::Result<()> {
+    fn take_owner_marks_out_of_text(&self, dom: &mut crate::dom::VDom<'_>) -> crate::error::Result<()> {
         for slot in dom.nodes_mut() {
             let Some(text) = slot.as_raw_mut() else {
                 continue;
@@ -263,8 +263,8 @@ impl KeptScripts {
 
 /// `text` as bytes that a node of the tree owns.
 #[cfg(feature = "metadata")]
-fn owned_bytes(text: String) -> crate::error::Result<tl::Bytes<'static>> {
-    tl::Bytes::try_from(text).map_err(|error| {
+fn owned_bytes(text: String) -> crate::error::Result<crate::dom::Bytes<'static>> {
+    crate::dom::Bytes::try_from(text).map_err(|error| {
         crate::error::ConversionError::Other(format!("taking an owner mark out of the tree: {error:?}"))
     })
 }

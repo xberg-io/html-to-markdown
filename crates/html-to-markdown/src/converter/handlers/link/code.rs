@@ -39,7 +39,7 @@ pub(super) struct CodeText {
     /// The count of the listed children that write the text.
     texts: usize,
     /// The one heading of the link, when the walk asks what it writes outside code.
-    heading: Option<tl::NodeHandle>,
+    heading: Option<crate::dom::NodeHandle>,
     heading_text: String,
     label: Option<LabelWalk>,
     /// Whether a visitor gets a `visit_link` call. `None` while the answer is open.
@@ -47,7 +47,11 @@ pub(super) struct CodeText {
 }
 
 impl CodeText {
-    pub(super) fn open(data: &LinkData, handler: &HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Self {
+    pub(super) fn open(
+        data: &LinkData,
+        handler: &HandlerContext<'_>,
+        children: &mut Vec<crate::dom::NodeHandle>,
+    ) -> Self {
         children.extend(data.children.iter().copied());
         let asks = is_observed(handler.context) && !data.is_autolink(handler.options);
         let heading = find_single_heading_child(*handler.node_handle, handler.parser)
@@ -83,7 +87,7 @@ impl CodeText {
 
     pub(super) fn before_child(&mut self, index: usize, data: &LinkData, element: &mut HookSite<'_>) -> Child {
         let (part, _) = self.part(index);
-        if let Some(tl::Node::Tag(tag)) = element.node_handle.get(element.parser) {
+        if let Some(crate::dom::Node::Tag(tag)) = element.node_handle.get(element.parser) {
             self.advance(part, tag, data, element);
         }
         match (part, self.heading, self.label.as_mut()) {
@@ -122,7 +126,7 @@ impl CodeText {
     pub(super) fn advance(
         &mut self,
         to: CodeStage,
-        tag: &tl::HTMLTag<'_>,
+        tag: &crate::dom::HTMLTag<'_>,
         data: &LinkData,
         element: &mut HookSite<'_>,
     ) {
@@ -164,7 +168,7 @@ impl CodeText {
 
     /// Answer from the text of the link and the text of its heading outside code, or start the
     /// walk of the label that the link has outside code.
-    fn ask_label(&mut self, tag: &tl::HTMLTag<'_>, data: &LinkData, element: &HookSite<'_>) {
+    fn ask_label(&mut self, tag: &crate::dom::HTMLTag<'_>, data: &LinkData, element: &HookSite<'_>) {
         if !self.heading_text.trim().is_empty() {
             self.shown = Some(false);
             return;
@@ -209,7 +213,7 @@ const fn unobserved_outside_code(_context: &Context) -> Option<Context> {
 /// `context`, goes to the span, and the links of the span record the range of that text with
 /// the link that replaces it when the span is written.
 pub(super) fn emit_code_link(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &LinkData,
     mut raw: String,
     context: &Context,
@@ -277,5 +281,6 @@ fn followed_by_break(handler: &HandlerContext<'_>) -> bool {
                 .get_sibling_index(id)
                 .and_then(|index| siblings.get(index + 1))
         });
-    matches!(next.and_then(|handle| handle.get(handler.parser)), Some(tl::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("br"))
+    matches!(next.and_then(|handle| handle.get(handler.parser)), Some(crate::dom::Node::Tag(tag))
+        if tag.name().as_utf8_str().eq_ignore_ascii_case("br"))
 }

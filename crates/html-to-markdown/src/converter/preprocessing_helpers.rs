@@ -68,14 +68,14 @@ impl MisnestState {
 fn node_is_misnested(name: &str, is_block: bool, state: MisnestState, self_inside_preformatted: bool) -> bool {
     // An anchor nested inside another anchor, outside preformatted content.
     (name == "a" && state.inside_anchor && !state.inside_preformatted)
-        // ~keep A nested form in tl can hide text outside the HTML5 form. Ancestry is only
+        // ~keep A nested form in the parser can hide text outside the HTML5 form. Ancestry is only
         // ~keep a repair signal: html5ever owns the form pointer and its end-tag semantics.
         || (name == "form" && state.inside_form && !state.form_repair_opaque)
-        // ~keep Table elements under <p>: tl misparsed an unclosed <p> in <td>.
+        // ~keep Table elements under <p>: The parser misparsed an unclosed <p> in <td>.
         || (matches!(name, "td" | "tr" | "th") && state.p_ancestor_state)
         || (is_block && !self_inside_preformatted && state.blocked_by_inline_ancestor)
         // ~keep <li>/<dt>/<dd> nested under another one without an intervening list
-        // ~keep container: tl absorbed the next item because a <p>/<div> inside the
+        // ~keep container: The parser absorbed the next item because a <p>/<div> inside the
         // ~keep previous one was left unclosed.
         || (matches!(name, "li" | "dt" | "dd") && state.list_item_ancestor_state)
         // ~keep <tr> nested directly inside a <td>/<th>: not reachable per HTML5 tree
@@ -105,7 +105,7 @@ fn child_misnest_state(name: &str, state: MisnestState, self_inside_preformatted
 /// Whether the first parse contains a structural misnest requiring tree repair.
 #[cfg(any(test, feature = "testkit"))]
 #[must_use]
-pub fn has_inline_block_misnest(dom: &tl::VDom, parser: &tl::Parser) -> bool {
+pub fn has_inline_block_misnest(dom: &crate::dom::VDom, parser: &crate::dom::Parser) -> bool {
     tree_repair_reasons(dom, parser).misnest
 }
 
@@ -128,7 +128,7 @@ pub(super) struct TreeRepairReasons {
 /// whitespace preservation rules and should not be repaired.
 ///
 /// Also detects table structural elements (`td`, `tr`, `th`) nested under `<p>` —
-/// a structural impossibility in valid HTML that signals the `tl` parser absorbed
+/// a structural impossibility in valid HTML that signals the parser absorbed
 /// a table into a paragraph because of an unclosed `<p>` (common in Word/Outlook
 /// HTML such as `<p class='MsoNormal'>` cells). Issue #336.
 ///
@@ -136,7 +136,7 @@ pub(super) struct TreeRepairReasons {
 /// with no intervening `<ul>`/`<ol>`/`<dl>`. `<li>content<div><li>more` is a
 /// structural impossibility in valid HTML: the HTML5 spec implies a closing
 /// `</li>` when a new `<li>` starts, regardless of what block elements (`<p>`,
-/// `<div>`, …) are still open inside it. `tl` does not apply that rule, so an
+/// `<div>`, …) are still open inside it. The parser does not apply that rule, so an
 /// unclosed `<p>`/`<div>` inside a list item causes it to nest the next `<li>`
 /// as a child instead of treating it as a sibling.
 ///
@@ -144,14 +144,14 @@ pub(super) struct TreeRepairReasons {
 /// impossibility in valid HTML (a `<tr>` is only ever a child of `<table>`,
 /// `<thead>`, `<tbody>`, or `<tfoot>`). HTML5's "in cell" insertion mode closes the
 /// open cell (and its row) before starting the new row as a sibling of the one that
-/// held the cell; `tl` instead nests it literally, and the table renderer only walks
+/// held the cell; the parser instead nests it literally, and the table renderer only walks
 /// a cell's own row/table ancestry, so the nested row's content is never reached and
 /// is silently dropped. Issue #486.
 ///
 /// Also detects a `<table>` with a direct child that HTML5's "in table" insertion
 /// mode would foster-parent (non-whitespace text) or restructure (any element
 /// outside the small set valid directly under `<table>`, e.g. a stray `<td>` or
-/// `<a>` with no `<tr>`). `tl` has no foster-parenting or table auto-fixup: it
+/// `<a>` with no `<tr>`). The parser has no foster-parenting or table auto-fixup: it
 /// leaves such content exactly where it was written, as a direct child of the
 /// `<table>` node, and the table handler (`converter::block::table::builder`)
 /// only recognises `caption`/`thead`/`tbody`/`tfoot`/`tr`/`colgroup`/`col` there —
@@ -168,16 +168,16 @@ pub(super) struct TreeRepairReasons {
 /// ~keep accounted for essentially all of it, confirmed via phase timing in
 /// ~keep `tools/benchmark-harness/examples/profile_deep_nesting_phases.rs`).
 #[must_use]
-pub(super) fn tree_repair_reasons(dom: &tl::VDom, parser: &tl::Parser) -> TreeRepairReasons {
+pub(super) fn tree_repair_reasons(dom: &crate::dom::VDom, parser: &crate::dom::Parser) -> TreeRepairReasons {
     let mut reasons = TreeRepairReasons::default();
-    let mut stack: Vec<(tl::NodeHandle, MisnestState)> = dom
+    let mut stack: Vec<(crate::dom::NodeHandle, MisnestState)> = dom
         .children()
         .iter()
         .map(|handle| (*handle, MisnestState::ROOT))
         .collect();
 
     while let Some((handle, state)) = stack.pop() {
-        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) else {
             continue;
         };
         let name = normalized_tag_name(tag.name().as_utf8_str());
@@ -208,8 +208,8 @@ pub(super) fn tree_repair_reasons(dom: &tl::VDom, parser: &tl::Parser) -> TreeRe
         }
 
         // ~keep A <tr>/<row> or table section (<thead>/<tbody>/<tfoot>) holding a
-        // ~keep misplaced element child: `tl`'s `read_end` (astral-tl
-        // ~keep parser/base.rs:240-256) silently discards an unmatched close tag
+        // ~keep misplaced element child: the end-tag rule of the parser
+        // ~keep silently discards an unmatched close tag
         // ~keep instead of erroring, so `</table>` inside a still-open `<tr>` is
         // ~keep dropped and a following sibling element (e.g. a footer `<p>`)
         // ~keep attaches as a child of that `<tr>` instead of becoming `<table>`'s
@@ -239,16 +239,16 @@ pub(super) fn tree_repair_reasons(dom: &tl::VDom, parser: &tl::Parser) -> TreeRe
 /// True when an element with content is still open at the end of the input, so the HTML tree
 /// builder must decide where it ends.
 ///
-/// ~keep `tl` closes an element only for an end tag that names the element on top of its stack
-/// ~keep and discards every other end tag (astral-tl `parser/base.rs`, `read_end`). In
+/// ~keep The parser closes an element only for an end tag that names the element on top of its stack
+/// ~keep and discards every other end tag (`end_tag` in the `dom` module). In
 /// ~keep `<div><p>text</div>` the `div` and the `p` stay open and take the rest of the page as
-/// ~keep descendants (issue #772). The open elements are the stack of `tl` at the end of the
+/// ~keep descendants (issue #772). The open elements are the stack of the parser at the end of the
 /// ~keep input: the last root node, its last child, and so on, so the walk is O(depth).
 /// ~keep `html` and `body` are exempt: their end tags close no element in the standard.
-pub fn has_omitted_end_tag(dom: &tl::VDom, parser: &tl::Parser) -> bool {
+pub fn has_omitted_end_tag(dom: &crate::dom::VDom, parser: &crate::dom::Parser) -> bool {
     let mut last = dom.children().last().copied();
     while let Some(handle) = last {
-        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) else {
             return false;
         };
         if has_end_tag(tag) {
@@ -266,9 +266,9 @@ pub fn has_omitted_end_tag(dom: &tl::VDom, parser: &tl::Parser) -> bool {
     false
 }
 
-/// True when the source range of `tag` ends with its end tag. For an element that `tl` never
+/// True when the source range of `tag` ends with its end tag. For an element that the parser never
 /// closed, the range is the start tag alone.
-fn has_end_tag(tag: &tl::HTMLTag<'_>) -> bool {
+fn has_end_tag(tag: &crate::dom::HTMLTag<'_>) -> bool {
     let name = tag.name().as_bytes();
     tag.raw()
         .as_bytes()
@@ -279,7 +279,7 @@ fn has_end_tag(tag: &tl::HTMLTag<'_>) -> bool {
 
 /// The position in one element (or the page) in the walk of [`has_discarded_end_tag`].
 struct SiblingList<'a> {
-    parent: Option<tl::NodeHandle>,
+    parent: Option<crate::dom::NodeHandle>,
     next: usize,
     /// The source offset where the last node ended, when the offset is known.
     previous_end: Option<usize>,
@@ -292,7 +292,7 @@ struct SiblingList<'a> {
 /// True when the first parse discarded an end tag that names an element that was open, so the
 /// HTML tree builder must decide where that element ends (issue #810).
 ///
-/// ~keep `tl` discards an end tag that does not name the element on top of its stack (astral-tl
+/// ~keep The parser discards an end tag that does not name the element on top of its stack (astral-the parser
 /// ~keep `parser/base.rs`, `read_end`) and makes no node for it. Each node is a slice of the
 /// ~keep source, so a discarded end tag is the source between two sibling nodes, or between
 /// ~keep the last child and the end tag of the parent, that is in no node. In
@@ -300,8 +300,8 @@ struct SiblingList<'a> {
 /// ~keep source between them is `</div>`. The walk reads each node once and no token.
 /// ~keep A comment and an attribute value are inside a node, so an end tag in one is not seen.
 /// ~keep Not read: the source between a start tag and the first child of an element that has
-/// ~keep its end tag, because `tl` does not keep the length of a start tag.
-pub fn has_discarded_end_tag(dom: &tl::VDom, parser: &tl::Parser, input: &str) -> bool {
+/// ~keep its end tag, because the parser does not keep the length of a start tag.
+pub fn has_discarded_end_tag(dom: &crate::dom::VDom, parser: &crate::dom::Parser, input: &str) -> bool {
     let source = input.as_bytes();
     let mut open: std::collections::HashMap<std::borrow::Cow<'_, [u8]>, usize> = std::collections::HashMap::new();
     let mut lists = vec![SiblingList {
@@ -339,7 +339,7 @@ pub fn has_discarded_end_tag(dom: &tl::VDom, parser: &tl::Parser, input: &str) -
             return true;
         }
         list.previous_end = span.map(|(_, end)| end);
-        let tl::Node::Tag(tag) = node else { continue };
+        let crate::dom::Node::Tag(tag) = node else { continue };
         let tag_children = tag.children();
         let children = tag_children.top().as_slice();
         if children.is_empty() {
@@ -369,12 +369,12 @@ fn lower_case(name: &[u8]) -> std::borrow::Cow<'_, [u8]> {
     }
 }
 
-/// The source range of `node`, or `None` when its bytes are no part of `source`: `tl` gives a
+/// The source range of `node`, or `None` when its bytes are no part of `source`: The parser gives a
 /// comment with no end an empty slice of its own.
-fn node_span(node: &tl::Node<'_>, source: &[u8]) -> Option<(usize, usize)> {
+fn node_span(node: &crate::dom::Node<'_>, source: &[u8]) -> Option<(usize, usize)> {
     let raw = match node {
-        tl::Node::Tag(tag) => tag.raw().as_bytes(),
-        tl::Node::Raw(bytes) | tl::Node::Comment(bytes) => bytes.as_bytes(),
+        crate::dom::Node::Tag(tag) => tag.raw().as_bytes(),
+        crate::dom::Node::Raw(bytes) | crate::dom::Node::Comment(bytes) => bytes.as_bytes(),
     };
     let start = (raw.as_ptr() as usize).checked_sub(source.as_ptr() as usize)?;
     (!raw.is_empty() && start + raw.len() <= source.len()).then_some((start, start + raw.len()))
@@ -408,26 +408,26 @@ fn names_open_element(
 /// ~keep difference between the two pages changes it. A parse can drop text, keep it or move
 /// ~keep it, and cannot put other text in its place, so a page that lost text has a smaller
 /// ~keep count. A no-break space counts on both pages, written as a character or as `&nbsp;`.
-pub fn readable_text_len(dom: &tl::VDom<'_>) -> usize {
+pub fn readable_text_len(dom: &crate::dom::VDom<'_>) -> usize {
     text_len(dom, &NO_READABLE_TEXT)
 }
 
 /// The count, taken as in [`readable_text_len`], of the text of the `title` elements of `dom`
 /// that the converter writes as text: a title of the body, and a title of a `head` that holds
 /// the body of the page.
-pub fn written_title_len(dom: &tl::VDom<'_>) -> usize {
+pub fn written_title_len(dom: &crate::dom::VDom<'_>) -> usize {
     text_len(dom, &NO_READABLE_TEXT[..NO_READABLE_TEXT.len() - 1]) - readable_text_len(dom)
 }
 
 /// The count of [`readable_text_len`], with the text of the elements named in `skipped` left out.
-fn text_len(dom: &tl::VDom<'_>, skipped: &[&[u8]]) -> usize {
+fn text_len(dom: &crate::dom::VDom<'_>, skipped: &[&[u8]]) -> usize {
     let parser = dom.parser();
     let mut total = 0;
     let mut stack = dom.children().to_vec();
     while let Some(handle) = stack.pop() {
         match handle.get(parser) {
-            Some(tl::Node::Raw(text)) => total += decoded_len(text.as_bytes()),
-            Some(tl::Node::Tag(tag)) if holds_readable_text(tag, parser, skipped) => {
+            Some(crate::dom::Node::Raw(text)) => total += decoded_len(text.as_bytes()),
+            Some(crate::dom::Node::Tag(tag)) if holds_readable_text(tag, parser, skipped) => {
                 stack.extend(tag.children().top().iter().copied());
             }
             _ => {}
@@ -460,17 +460,18 @@ const NO_READABLE_TEXT: [&[u8]; 5] = [b"script", b"style", b"template", b"noscri
 /// False for an element whose text the count leaves out, so text that the tree builder
 /// moves into one counts as lost.
 ///
-/// ~keep The tree builder moves a `<noframes>` that starts a page into the head, and `tl`
+/// ~keep The tree builder moves a `<noframes>` that starts a page into the head, and the parser
 /// ~keep reads the markup in it as elements: `<noframes><div></noframes><p>one</p>` comes back
 /// ~keep with all its text in the head. A `head` is read by the rule of the converter
 /// ~keep ([`is_body_content_in_head`]).
-fn holds_readable_text(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>, skipped: &[&[u8]]) -> bool {
+fn holds_readable_text(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser<'_>, skipped: &[&[u8]]) -> bool {
     let name = tag.name().as_bytes();
     if name.eq_ignore_ascii_case(b"head") {
         return tag.children().top().iter().any(|child| {
             matches!(
                 child.get(parser),
-                Some(tl::Node::Tag(child)) if is_body_content_in_head(&normalized_tag_name(child.name().as_utf8_str()))
+                Some(crate::dom::Node::Tag(child))
+                    if is_body_content_in_head(&normalized_tag_name(child.name().as_utf8_str()))
             )
         });
     }
@@ -485,14 +486,14 @@ fn holds_readable_text(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>, skipped: 
 /// A comment is neither: HTML5's "in table" insertion mode inserts a comment token
 /// as a child of the current node (the table itself), so it is not lost and needs
 /// no repair.
-fn is_foster_parenting_candidate(child: tl::NodeHandle, parser: &tl::Parser) -> bool {
+fn is_foster_parenting_candidate(child: crate::dom::NodeHandle, parser: &crate::dom::Parser) -> bool {
     match child.get(parser) {
-        Some(tl::Node::Raw(bytes)) => {
+        Some(crate::dom::Node::Raw(bytes)) => {
             let raw = bytes.as_utf8_str();
             let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
             !is_ascii_whitespace_only(&decoded)
         }
-        Some(tl::Node::Tag(tag)) => !is_table_structural_child(&normalized_tag_name(tag.name().as_utf8_str())),
+        Some(crate::dom::Node::Tag(tag)) => !is_table_structural_child(&normalized_tag_name(tag.name().as_utf8_str())),
         _ => false,
     }
 }
@@ -512,15 +513,19 @@ fn is_table_structural_child(tag_name: &str) -> bool {
 /// True when `name` is a `<tr>`/`<row>` or table section (`<thead>`/`<tbody>`/`<tfoot>`) with a
 /// child outside the set valid in that context (see [`is_row_structural_child`] and
 /// [`is_section_structural_child`]), including meaningful text that needs foster-parenting.
-fn is_row_context_with_misplaced_content(name: &str, children: &[tl::NodeHandle], parser: &tl::Parser) -> bool {
+fn is_row_context_with_misplaced_content(
+    name: &str,
+    children: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
+) -> bool {
     let valid: fn(&str) -> bool = match name {
         "tr" | "row" => is_row_structural_child,
         "thead" | "tbody" | "tfoot" => is_section_structural_child,
         _ => return false,
     };
     children.iter().any(|child| match child.get(parser) {
-        Some(tl::Node::Tag(tag)) => !valid(&normalized_tag_name(tag.name().as_utf8_str())),
-        Some(tl::Node::Raw(bytes)) => {
+        Some(crate::dom::Node::Tag(tag)) => !valid(&normalized_tag_name(tag.name().as_utf8_str())),
+        Some(crate::dom::Node::Raw(bytes)) => {
             let raw = bytes.as_utf8_str();
             let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
             decoded.chars().any(|character| !character.is_whitespace())
@@ -607,7 +612,7 @@ fn cell_ancestor_state_for(tag_name: &str, inherited: bool) -> bool {
 ///   (e.g. `<div class="sidebar">`). Drops elements with noise-related classes/roles.
 pub fn should_drop_for_preprocessing(
     tag_name: &str,
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     options: &ConversionOptions,
     is_page_header: bool,
 ) -> bool {
@@ -665,7 +670,7 @@ pub fn should_drop_for_preprocessing(
     false
 }
 
-pub fn is_page_header(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn is_page_header(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     let mut ancestor = dom_ctx.parent_of(node_handle.get_inner());
     let mut in_document_body = false;
     while let Some(node_id) = ancestor {
@@ -681,7 +686,7 @@ pub fn is_page_header(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx
 }
 
 /// Check if an element has noise-related hints (ads, cookie banners, social sharing).
-fn element_has_noise_hint(tag: &tl::HTMLTag) -> bool {
+fn element_has_noise_hint(tag: &crate::dom::HTMLTag) -> bool {
     const NOISE_KEYWORDS: &[&str] = &[
         "cookie",
         "consent",
@@ -705,19 +710,19 @@ mod tests {
     use super::{has_discarded_end_tag, readable_text_len};
 
     fn discards_an_end_tag_of_an_open_element(html: &str) -> bool {
-        let dom = tl::parse(html, tl::ParserOptions::default()).expect("parse");
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("parse");
         has_discarded_end_tag(&dom, dom.parser(), html)
     }
 
     #[test]
     fn should_leave_a_discarded_end_tag_as_source_between_two_sibling_nodes() {
         let html = "<div><p>one</div>two</p>";
-        let dom = tl::parse(html, tl::ParserOptions::default()).expect("parse");
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("parse");
         let parser = dom.parser();
         let paragraph = dom
             .nodes()
             .iter()
-            .filter_map(tl::Node::as_tag)
+            .filter_map(crate::dom::Node::as_tag)
             .find(|tag| tag.name() == "p")
             .expect("paragraph");
         let texts: Vec<(usize, &[u8])> = paragraph
@@ -725,7 +730,7 @@ mod tests {
             .top()
             .iter()
             .filter_map(|child| match child.get(parser) {
-                Some(tl::Node::Raw(text)) => Some(text.as_bytes()),
+                Some(crate::dom::Node::Raw(text)) => Some(text.as_bytes()),
                 _ => None,
             })
             .map(|text| (text.as_ptr() as usize - html.as_ptr() as usize, text))
@@ -774,7 +779,7 @@ mod tests {
     }
 
     fn text_len(html: &str) -> usize {
-        readable_text_len(&tl::parse(html, tl::ParserOptions::default()).expect("parse"))
+        readable_text_len(&crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("parse"))
     }
 
     #[test]

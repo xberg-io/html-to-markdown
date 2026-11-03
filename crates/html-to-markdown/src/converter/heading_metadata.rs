@@ -53,7 +53,7 @@ impl HeaderCapture {
         }
     }
 
-    fn begin(&mut self, node: u32, depth: usize, name: &str, tag: &tl::HTMLTag<'_>) {
+    fn begin(&mut self, node: u32, depth: usize, name: &str, tag: &crate::dom::HTMLTag<'_>) {
         let heading = matches!(name, "h1" | "h2" | "h3" | "h4" | "h5" | "h6").then(|| Heading {
             start: self.events.len(),
             level: name.as_bytes()[1] - b'0',
@@ -167,7 +167,7 @@ fn push_boundary_space(text: &mut String, after_break: bool, trim_boundary: &mut
     }
 }
 
-pub(super) fn begin(ctx: &Context, node: u32, depth: usize, name: &str, tag: &tl::HTMLTag<'_>) -> Option<u32> {
+pub(super) fn begin(ctx: &Context, node: u32, depth: usize, name: &str, tag: &crate::dom::HTMLTag<'_>) -> Option<u32> {
     let capture = ctx.header_capture.as_ref()?;
     capture.borrow_mut().begin(node, depth, name, tag);
     Some(node)
@@ -233,19 +233,19 @@ pub(super) fn insert_space(ctx: &Context, start: Option<usize>) {
     }
 }
 
-pub(super) fn preserved(node: &tl::NodeHandle, parser: &tl::Parser, handler: HandlerContext<'_>) {
+pub(super) fn preserved(node: &crate::dom::NodeHandle, parser: &crate::dom::Parser, handler: HandlerContext<'_>) {
     if !active(handler.ctx) {
         return;
     }
     let mut stack = vec![(*node, handler.ctx.in_code, 0)];
     while let Some((handle, in_code, depth)) = stack.pop() {
         match handle.get(parser) {
-            Some(tl::Node::Raw(bytes)) => {
+            Some(crate::dom::Node::Raw(bytes)) => {
                 let raw = bytes.as_utf8_str();
                 let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
                 record(handler.ctx, TextEvent::Text(decoded.into_owned(), in_code));
             }
-            Some(tl::Node::Tag(tag)) => {
+            Some(crate::dom::Node::Tag(tag)) => {
                 if let Some(event) = preserved_leaf(tag, parser, handler, in_code, depth) {
                     record(handler.ctx, event);
                     continue;
@@ -269,8 +269,8 @@ pub(super) fn preserved(node: &tl::NodeHandle, parser: &tl::Parser, handler: Han
 }
 
 fn preserved_leaf(
-    tag: &tl::HTMLTag<'_>,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
     in_code: bool,
     depth: usize,

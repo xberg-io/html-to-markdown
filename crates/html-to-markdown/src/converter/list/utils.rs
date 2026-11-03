@@ -7,7 +7,6 @@ use super::{ListContext, is_list_item};
 use crate::converter::main_helpers::{tag_name_eq, trim_trailing_whitespace};
 use crate::converter::utility::content::normalized_tag_name;
 use crate::options::{ConversionOptions, ListIndentType, OutputFormat};
-use tl;
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -85,13 +84,17 @@ pub const fn tabs_for_column(list_indent_columns: usize) -> usize {
 const BLOCK_FORCING_CHILD_TAGS: [&str; 6] = ["div", "blockquote", "pre", "table", "hr", "dl"];
 
 /// Resolve a node's normalized tag name via the `DomContext` cache, falling back to the raw
-/// `tl` tag when no cached `TagInfo` exists for it.
-fn resolve_tag_name(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> Option<String> {
+/// The parser tag when no cached `TagInfo` exists for it.
+fn resolve_tag_name(
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+) -> Option<String> {
     if let Some(info) = dom_ctx.tag_info(node_handle.get_inner(), parser) {
         return Some(info.name.clone());
     }
     match node_handle.get(parser) {
-        Some(tl::Node::Tag(tag)) => Some(normalized_tag_name(tag.name().as_utf8_str()).into_owned()),
+        Some(crate::dom::Node::Tag(tag)) => Some(normalized_tag_name(tag.name().as_utf8_str()).into_owned()),
         _ => None,
     }
 }
@@ -120,13 +123,13 @@ fn resolve_tag_name(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &
 ///   <li>Item 2</li>
 /// </ul>
 /// ```
-pub fn is_loose_list(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+pub fn is_loose_list(node_handle: crate::dom::NodeHandle, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return false;
     };
 
     let children = tag.children();
-    let items: Vec<tl::NodeHandle> = children
+    let items: Vec<crate::dom::NodeHandle> = children
         .top()
         .iter()
         .copied()
@@ -135,7 +138,7 @@ pub fn is_loose_list(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: 
                 || {
                     matches!(
                         child_handle.get(parser),
-                        Some(tl::Node::Tag(child_tag))
+                        Some(crate::dom::Node::Tag(child_tag))
                             if tag_name_eq(child_tag.name().as_utf8_str(), "li")
                     )
                 },
@@ -148,7 +151,7 @@ pub fn is_loose_list(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: 
     };
 
     for (index, item_handle) in items.iter().enumerate() {
-        let Some(tl::Node::Tag(item_tag)) = item_handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(item_tag)) = item_handle.get(parser) else {
             continue;
         };
         let is_last = index == last_index;
@@ -490,8 +493,8 @@ fn paragraph_is_open(output: &str, enclosing_column: usize, previous: Option<(us
 /// ~keep this check only fires for the exact position where CommonMark assigns the comment
 /// ~keep separator meaning.
 pub fn preceding_same_type_list_separator_comment(
-    node_handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     tag_name: &str,
 ) -> Option<String> {
@@ -512,8 +515,8 @@ pub fn preceding_same_type_list_separator_comment(
     loop {
         cursor = cursor.checked_sub(1)?;
         match siblings.get(cursor)?.get(parser) {
-            Some(tl::Node::Comment(_)) => break,
-            Some(tl::Node::Raw(raw)) if raw.as_utf8_str().trim().is_empty() => {}
+            Some(crate::dom::Node::Comment(_)) => break,
+            Some(crate::dom::Node::Raw(raw)) if raw.as_utf8_str().trim().is_empty() => {}
             _ => return None,
         }
     }
@@ -521,7 +524,7 @@ pub fn preceding_same_type_list_separator_comment(
     let previous_list_name = loop {
         cursor = cursor.checked_sub(1)?;
         let sibling = *siblings.get(cursor)?;
-        if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
+        if let Some(crate::dom::Node::Raw(raw)) = sibling.get(parser) {
             if raw.as_utf8_str().trim().is_empty() {
                 continue;
             }
@@ -862,8 +865,8 @@ impl<'a> ListChildProcessor<'a> {
 
     fn marker_before(
         &mut self,
-        child_handle: tl::NodeHandle,
-        parser: &tl::Parser,
+        child_handle: crate::dom::NodeHandle,
+        parser: &crate::dom::Parser,
         output: &mut String,
     ) -> MarkerPosition {
         let context = self.config.list.ctx;
@@ -929,7 +932,7 @@ impl<'a> ListChildProcessor<'a> {
         }
     }
 
-    fn advance_counter(&mut self, child_handle: tl::NodeHandle, parser: &tl::Parser) {
+    fn advance_counter(&mut self, child_handle: crate::dom::NodeHandle, parser: &crate::dom::Parser) {
         if !self.config.ordered || !is_list_item(child_handle, parser, self.config.list.dom_ctx) {
             return;
         }
@@ -945,7 +948,7 @@ impl<'a> ListChildProcessor<'a> {
         }
     }
 
-    fn render(&mut self, child_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String) {
+    fn render(&mut self, child_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, output: &mut String) {
         if self.config.ordered {
             self.item_ctx.list_counter = self.counter;
         }
@@ -966,18 +969,18 @@ impl<'a> ListChildProcessor<'a> {
     }
 }
 
-fn is_whitespace_node(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> bool {
-    matches!(node_handle.get(parser), Some(tl::Node::Raw(bytes)) if bytes.as_utf8_str().trim().is_empty())
+fn is_whitespace_node(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser) -> bool {
+    matches!(node_handle.get(parser), Some(crate::dom::Node::Raw(bytes)) if bytes.as_utf8_str().trim().is_empty())
 }
 
 /// Process a list's children while maintaining marker and counter state.
 pub(super) fn process_list_children(
-    node_handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListChildrenContext<'_>,
 ) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     let mut processor = ListChildProcessor::new(context);

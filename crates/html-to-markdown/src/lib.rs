@@ -15,8 +15,8 @@
 // ~keep (e.g., code_block handles <pre>, <code>, <samp>, language attrs, visitor callbacks,
 // ~keep metadata collection, and feature-gated paths) — splitting would obscure the logic.
 #![allow(clippy::too_many_lines)]
-// ~keep reason: DOM API uses tl::NodeHandle (4-byte Copy) passed as &NodeHandle throughout
-// ~keep because that is the established calling convention from the tl parser crate.
+// ~keep reason: DOM API uses crate::dom::NodeHandle (4-byte Copy) passed as &NodeHandle throughout
+// ~keep because that is the established calling convention from the parser.
 // ~keep Changing to pass-by-value would require updating hundreds of call sites and
 // ~keep would break the parallel with html5ever's API which also uses handles by reference.
 #![allow(clippy::trivially_copy_pass_by_ref)]
@@ -84,6 +84,9 @@ mod convert_api;
 // ~keep that would otherwise require fine-grained #[cfg] gates on every internal helper.
 #[allow(dead_code)]
 pub(crate) mod converter;
+// ~keep `build_document_structure` takes this DOM. It is not a supported API of its own.
+#[doc(hidden)]
+pub mod dom;
 mod exports;
 
 // ~keep Re-export internal test/benchmark modules when the testkit feature is active.

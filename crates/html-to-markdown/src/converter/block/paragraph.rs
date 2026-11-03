@@ -10,9 +10,9 @@
 use crate::converter::block::container::HandlerContext;
 use crate::converter::main_helpers::is_ascii_whitespace_only;
 use crate::converter::walk::{Close, Open};
+use crate::dom::{NodeHandle, Parser};
 use crate::options::{ConversionOptions, NewlineStyle};
 use std::rc::Rc;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -114,7 +114,7 @@ fn list_paragraph_children(
     dom_ctx: &DomContext,
     children: &mut Vec<NodeHandle>,
 ) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     let child_handles: std::borrow::Cow<'_, [NodeHandle]> = match dom_ctx.children_of(node_handle.get_inner()) {
@@ -136,7 +136,7 @@ fn should_skip_interstitial_whitespace(
     child_handles: &[NodeHandle],
     parser: &Parser,
 ) -> bool {
-    let Some(tl::Node::Raw(bytes)) = child_handle.get(parser) else {
+    let Some(crate::dom::Node::Raw(bytes)) = child_handle.get(parser) else {
         return false;
     };
     let text = bytes.as_utf8_str();
@@ -153,7 +153,7 @@ fn should_skip_interstitial_whitespace(
 fn is_image_element(node_handle: &NodeHandle, parser: &Parser) -> bool {
     matches!(
         node_handle.get(parser),
-        Some(tl::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("img")
+        Some(crate::dom::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("img")
     )
 }
 
@@ -211,7 +211,7 @@ fn ends_with_bare_list_marker(output: &str, options: &ConversionOptions) -> bool
 fn is_empty_inline_element(node_handle: &NodeHandle, parser: &Parser) -> bool {
     if let Some(node) = node_handle.get(parser) {
         match node {
-            tl::Node::Tag(tag) => {
+            crate::dom::Node::Tag(tag) => {
                 let tag_name = tag.name().as_utf8_str();
                 matches!(tag_name.as_ref(), "br" | "hr" | "img" | "input" | "meta" | "link")
             }

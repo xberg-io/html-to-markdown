@@ -1,7 +1,7 @@
 use super::content::{DomContext, get_text_content};
+use crate::dom::{Node, NodeHandle, Parser};
 use crate::options::HiddenContent;
 use crate::text;
-use tl::{Node, NodeHandle, Parser};
 
 enum Step {
     Visit(NodeHandle, bool),
@@ -136,7 +136,7 @@ pub(super) fn semantics_slots(input: &str) -> std::collections::BTreeSet<usize> 
     {
         return slots;
     }
-    let Ok(dom) = tl::parse(input, tl::ParserOptions::default()) else {
+    let Ok(dom) = crate::dom::parse(input, crate::dom::ParserOptions::default()) else {
         return slots;
     };
     let parser = dom.parser();
@@ -161,7 +161,7 @@ pub(super) fn semantics_slots(input: &str) -> std::collections::BTreeSet<usize> 
     slots
 }
 
-fn is_html_integration(tag: &tl::HTMLTag) -> bool {
+fn is_html_integration(tag: &crate::dom::HTMLTag) -> bool {
     let name = tag.name().as_utf8_str();
     if is_token(name.as_ref()) {
         return true;

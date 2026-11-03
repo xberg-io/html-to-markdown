@@ -68,8 +68,8 @@ pub struct FormContext<'a> {
 /// ```
 pub fn dispatch_form_handler(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) -> bool {

@@ -5,10 +5,10 @@
 
 use crate::converter::block::container::HandlerContext;
 use crate::converter::main_helpers::{emit_table_cell_break, hard_break_marker, trim_trailing_whitespace};
+use crate::dom::{NodeHandle, Parser};
 use crate::options::ConversionOptions;
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -207,7 +207,7 @@ fn visit_line_break(
     let node_id = node_handle.get_inner();
     let parent_tag = handler.dom_ctx.parent_tag_name(node_id, parser);
     let index_in_parent = handler.dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-    let node_ctx = if let Some(tl::Node::Tag(t)) = node_handle.get(parser) {
+    let node_ctx = if let Some(crate::dom::Node::Tag(t)) = node_handle.get(parser) {
         NodeContext::with_lazy_attributes(
             NodeType::Br,
             Cow::Borrowed("br"),

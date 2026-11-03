@@ -30,14 +30,14 @@ use std::borrow::Cow;
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_figure(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
     // ~keep In an inline context the dispatcher gives the children to the walk and this handler
     // ~keep does not run.
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         #[cfg(feature = "visitor")]
         if visit_figure_start(tag, node_handle, parser, output, handler) {
             return;
@@ -80,7 +80,11 @@ pub fn handle_figure(
     }
 }
 
-fn collect_figure_content(tag: &tl::HTMLTag<'_>, parser: &tl::Parser, handler: super::HandlerContext<'_>) -> String {
+fn collect_figure_content(
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
+    handler: super::HandlerContext<'_>,
+) -> String {
     let mut content = String::new();
     super::walk_tag_children(tag, parser, &mut content, handler);
     content
@@ -88,9 +92,9 @@ fn collect_figure_content(tag: &tl::HTMLTag<'_>, parser: &tl::Parser, handler: s
 
 #[cfg(feature = "visitor")]
 fn visit_figure_start(
-    tag: &tl::HTMLTag<'_>,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag<'_>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) -> bool {
@@ -138,8 +142,8 @@ fn visit_figure_start(
 #[cfg(feature = "visitor")]
 fn render_custom_figure(
     node_context: &crate::visitor::NodeContext<'_>,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     custom: &str,
     ctx: &super::Context,
@@ -174,9 +178,9 @@ fn render_custom_figure(
 
 #[cfg(feature = "visitor")]
 fn visit_figure_end(
-    tag: &tl::HTMLTag<'_>,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag<'_>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     figure_start: usize,
     handler: super::HandlerContext<'_>,
@@ -258,8 +262,8 @@ fn record_visitor_error(ctx: &super::Context, error: String) {
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_figcaption(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
@@ -285,12 +289,12 @@ pub fn handle_figcaption(
 }
 
 pub fn open_figcaption(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: super::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -305,12 +309,12 @@ pub fn open_figcaption(
 
 pub fn close_figcaption(
     content: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     #[cfg(not(feature = "visitor"))]
@@ -337,9 +341,9 @@ pub fn close_figcaption(
 
 #[cfg(feature = "visitor")]
 fn visit_figcaption(
-    tag: &tl::HTMLTag<'_>,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag<'_>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     text: &str,
     handler: super::HandlerContext<'_>,
@@ -412,8 +416,8 @@ fn separate_caption(output: &mut String) {
 /// Routes `<figure>` and `<figcaption>` elements to their respective handlers.
 pub fn handle(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
@@ -426,14 +430,14 @@ pub fn handle(
 
 pub fn open_figure(
     site: crate::converter::inline::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
     let node_handle = site.node_handle;
     let parser = site.parser;
     let output = site.output;
     #[cfg(feature = "visitor")]
     let handler = super::HandlerContext::new(site.options, site.context, site.depth, site.dom_context);
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     #[cfg(feature = "visitor")]
@@ -450,12 +454,12 @@ pub fn open_figure(
 pub fn close_figure(
     figure_start: usize,
     content: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     #[cfg(not(feature = "visitor"))]
