@@ -6,11 +6,6 @@ number = 0
 status = "accepted"
 blake3 = "a3f66d430832f402381010d5983006c7a3caa9be4f41c9c50f9d1b4b0af3e611"
 
-[adrs."adrs/0001-parse-with-the-astral-tl-fork-of-tl.md"]
-number = 1
-status = "accepted"
-blake3 = "4a73b152407333313bdf7a25f72a62d39334c77ba30d47633b30ba59b3a7107e"
-
 [adrs."adrs/0002-repair-malformed-html-with-html5ever.md"]
 number = 2
 status = "accepted"
