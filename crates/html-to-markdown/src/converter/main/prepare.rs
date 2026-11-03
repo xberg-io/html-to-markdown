@@ -7,9 +7,9 @@ use crate::converter::main_helpers::{has_custom_element_tags, preserves_menu, re
 #[cfg(feature = "metadata")]
 use crate::converter::utility::preprocessing::strip_script_and_style_tags_for_second_pass;
 use crate::converter::utility::preprocessing::{
-    KeptScripts, normalize_menu_elements, normalize_split_closing_tags, normalize_unclosed_list_items,
-    owner_mark_numbers, preprocess_html, strip_bogus_comments, strip_hidden_elements, strip_html_cdata,
-    strip_script_and_style_tags, strip_script_and_style_tags_with_kept_scripts,
+    KeptScripts, normalize_menu_elements, normalize_unclosed_list_items, owner_mark_numbers, preprocess_html,
+    strip_bogus_comments, strip_hidden_elements, strip_html_cdata, strip_script_and_style_tags,
+    strip_script_and_style_tags_with_kept_scripts,
 };
 use crate::error::Result;
 use crate::options::{ConversionOptions, HiddenContent};
@@ -104,7 +104,6 @@ fn clean_up(first_pass: &str, options: &ConversionOptions, hidden_content: Hidde
     } else {
         exclusions::remove_kept_tags(&stripped, hidden_content, &options.exclude_selectors)?
     };
-    let stripped = normalize_split_closing_tags(&stripped);
     // ~keep Implicit list-item closes prevent deeply nested parser output on large changelogs.
     let stripped = normalize_unclosed_list_items(&stripped);
     let stripped = normalize_menu_elements(&stripped, preserves_menu(options));
@@ -115,7 +114,6 @@ pub(super) fn preprocess_repaired_html(html: &str, preserve_menu: bool, hidden_c
     let stripped = strip_html_cdata(html);
     let stripped = strip_script_and_style_tags(&stripped);
     let stripped = strip_hidden(&stripped, hidden_content);
-    let stripped = normalize_split_closing_tags(&stripped);
     let stripped = normalize_unclosed_list_items(&stripped);
     let stripped = normalize_menu_elements(&stripped, preserve_menu);
     preprocess_html(&stripped).into_owned()

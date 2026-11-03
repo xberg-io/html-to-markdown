@@ -4,8 +4,8 @@ use super::markup::second_pass;
 use super::raw_text::{FirstPass, PassRead};
 use super::{
     find_closing_tag_bytes, find_closing_tag_bytes_nested, find_tag_end, normalize_menu_elements,
-    normalize_split_closing_tags, normalize_unclosed_list_items, restore_preserved_menu_elements,
-    sanitize_markdown_url, strip_bogus_comments, strip_hidden_elements, unwrap_kept_inert_elements,
+    normalize_unclosed_list_items, restore_preserved_menu_elements, sanitize_markdown_url, strip_bogus_comments,
+    strip_hidden_elements, unwrap_kept_inert_elements,
 };
 use crate::options::HiddenContent;
 
@@ -86,72 +86,6 @@ fn should_distinguish_bogus_markers_from_recognized_prefixes() {
         assert_eq!(actual.as_ref(), expected, "input: {input}");
         assert_eq!(matches!(actual, Cow::Borrowed(_)), input == expected, "input: {input}");
     }
-}
-
-#[test]
-fn should_preserve_split_closing_tag_boundaries_and_borrowing() {
-    let cases = [
-        ("é\ntext</", "é\ntext</", false),
-        ("é\ntext<", "é\ntext<", false),
-        ("\n<", "\n<", false),
-        ("\n</</a\n>", "\n</</a>", true),
-        ("\n</a!></b\r\n >", "\n</a!></b>", true),
-        ("é</custom-42\n>終</B\n>", "é</custom-42>終</B>", true),
-        ("\n</a ", "\n</a ", false),
-        ("</a\r>", "</a\r>", false),
-        ("\n</a\r>", "\n</a>", true),
-        ("\n</ a\n>", "\n</ a\n>", false),
-        ("<!-- </a\n> -->", "<!-- </a> -->", true),
-        ("<x a='</b\n>'>", "<x a='</b>'>", true),
-    ];
-    for (input, expected, owned) in cases {
-        let actual = normalize_split_closing_tags(input);
-        assert_eq!(actual, expected, "input: {input:?}");
-        assert_eq!(matches!(actual, Cow::Owned(_)), owned, "input: {input:?}");
-    }
-}
-
-#[test]
-fn normalize_split_closing_tags_collapses_newline_before_close_bracket() {
-    let input = "<a href=\"#x\">text</a\n>";
-    let result = normalize_split_closing_tags(input);
-    assert_eq!(result.as_ref(), "<a href=\"#x\">text</a>");
-}
-
-#[test]
-fn normalize_split_closing_tags_collapses_indented_newline_before_close_bracket() {
-    let input = "<a href=\"#x\">text</a\n  >";
-    let result = normalize_split_closing_tags(input);
-    assert_eq!(result.as_ref(), "<a href=\"#x\">text</a>");
-}
-
-#[test]
-fn normalize_split_closing_tags_leaves_well_formed_closing_tags_unchanged() {
-    let input = "<a href=\"#x\">text</a>";
-    let result = normalize_split_closing_tags(input);
-    assert_eq!(result.as_ref(), input);
-}
-
-#[test]
-fn normalize_split_closing_tags_handles_multiple_split_closing_tags() {
-    let input = "<li><a href=\"#a\">A</a\n  >\n<a href=\"#b\">B</a\n>";
-    let result = normalize_split_closing_tags(input);
-    assert_eq!(result.as_ref(), "<li><a href=\"#a\">A</a>\n<a href=\"#b\">B</a>");
-}
-
-#[test]
-fn normalize_split_closing_tags_does_not_collapse_inline_whitespace() {
-    let input = "<a href=\"#x\">text</a >";
-    let result = normalize_split_closing_tags(input);
-    // ~keep A space before > is actually valid HTML and the parser handles it fine.
-    // ~keep We must not touch it to avoid over-normalising.
-    assert_eq!(result.as_ref(), input);
-}
-
-#[test]
-fn normalize_split_closing_tags_empty_input() {
-    let result = normalize_split_closing_tags("");
-    assert_eq!(result.as_ref(), "");
 }
 
 #[test]
