@@ -25,7 +25,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 | WebAssembly          | —                 | `@xberg-io/html-to-markdown-wasm` on npm                  |
 | Swift                | Swift 6.0         | `HtmlToMarkdown` SwiftPM package                           |
 | Dart                 | 3.11              | `h2m` on pub.dev                                           |
-| Kotlin Android       | Android minSdk 21 | `io.xberg:html-to-markdown-android` on Maven Central  |
+| Kotlin Android       | Android minSdk 24 | `io.xberg:html-to-markdown-android` on Maven Central  |
 | Zig                  | 0.16              | `html_to_markdown_rs` Zig package                          |
 
 ---
@@ -126,7 +126,7 @@ console.log(result.content);
 // # Hello
 ```
 
-Requires Node.js 18+. The package ships both ESM and CJS outputs with bundled TypeScript types. No separate `@types/` package needed.
+Requires Node.js 22+. The package ships both ESM and CJS outputs with bundled TypeScript types. No separate `@types/` package needed.
 
 </TabItem>
 <TabItem label="Go">
@@ -155,7 +155,7 @@ func main() {
 }
 ```
 
-Requires Go 1.26+. The module bundles a precompiled `libhtml_to_markdown.a` static library for each supported platform — no separate Rust toolchain needed.
+Requires Go 1.27+. The module bundles a precompiled `libhtml_to_markdown.a` static library for each supported platform — no separate Rust toolchain needed.
 
 </TabItem>
 <TabItem label="Ruby">
@@ -177,7 +177,7 @@ ruby -e "require 'html_to_markdown'; puts HtmlToMarkdown.convert('<h1>Hello</h1>
 # # Hello
 ```
 
-Requires Ruby 3.2+. Precompiled native gems are available for Linux and macOS. On unsupported platforms `bundle install` will compile the extension from source, which requires a Rust toolchain.
+Requires Ruby 3.3+. Precompiled native gems are available for Linux and macOS. On unsupported platforms `bundle install` will compile the extension from source, which requires a Rust toolchain.
 
 </TabItem>
 <TabItem label="PHP">
@@ -199,7 +199,7 @@ echo $result->content;
 // # Hello
 ```
 
-Requires PHP 8.2+. PIE downloads the prebuilt extension binary matching your PHP version and platform from the GitHub release (PHP 8.2–8.5 on Linux x86_64/arm64, macOS arm64, and Windows x86_64).
+Requires PHP 8.3+. PIE downloads the prebuilt extension binary matching your PHP version and platform from the GitHub release (PHP 8.3–8.5 on Linux x86_64/arm64, macOS arm64, and Windows x86_64).
 
 </TabItem>
 <TabItem label="Java">
@@ -291,7 +291,7 @@ IO.puts(result.content)
 # # Hello
 ```
 
-Requires Elixir 1.14+. Uses Rustler NIFs — precompiled NIF binaries are fetched automatically via `RustlerPrecompiled`. Set `RUSTLER_PRECOMPILED_GLOBAL_CACHE_PATH` to control cache location.
+Requires Elixir 1.17+. Uses Rustler NIFs — precompiled NIF binaries are fetched automatically via `RustlerPrecompiled`. Set `RUSTLER_PRECOMPILED_GLOBAL_CACHE_PATH` to control cache location.
 
 </TabItem>
 <TabItem label="R">
@@ -309,7 +309,7 @@ cat(result$content)
 # # Hello
 ```
 
-Requires R 4.2+. Available on CRAN for Linux (x86_64), macOS (arm64, x86_64), and Windows.
+Requires R 4.4+. Available on CRAN for Linux (x86_64), macOS (arm64, x86_64), and Windows.
 
 </TabItem>
 <TabItem label="C">
@@ -396,7 +396,7 @@ let result = try convert(html: "<h1>Hello</h1>")
 print(result.content()?.toString() ?? "")
 ```
 
-Requires Swift 6.0+. The package currently targets macOS 13+ and iOS 16+.
+Requires Swift 6.2+. The package currently targets macOS 26+ and iOS 16+.
 
 </TabItem>
 <TabItem label="Dart">
@@ -417,7 +417,7 @@ final result = await H2mBridge.convert('<h1>Hello</h1>');
 print(result.content);
 ```
 
-Requires Dart 3.11+. The generated package is pure Dart from the caller's point of view and uses flutter_rust_bridge under the hood.
+Requires Dart 3.13+. The generated package is pure Dart from the caller's point of view and uses flutter_rust_bridge under the hood.
 
 </TabItem>
 <TabItem label="Kotlin Android">
@@ -428,7 +428,7 @@ Add the Android artifact:
 implementation("io.xberg:html-to-markdown-android:3.10.6")
 ```
 
-Requires Android minSdk 21. This is an Android AAR with bundled JNI libraries; Kotlin/JVM users should use the Java artifact (`io.xberg:html-to-markdown`) directly.
+Requires Android minSdk 24. This is an Android AAR with bundled JNI libraries; Kotlin/JVM users should use the Java artifact (`io.xberg:html-to-markdown`) directly.
 
 </TabItem>
 <TabItem label="Zig">
@@ -439,7 +439,7 @@ Use the Zig package `html_to_markdown_rs` from the release artifacts or the repo
 const html_to_markdown = @import("html_to_markdown_rs");
 ```
 
-Requires Zig 0.16+. The package wraps the generated C FFI library.
+Requires Zig 0.17+. The package wraps the generated C FFI library.
 
 </TabItem>
 </Tabs>

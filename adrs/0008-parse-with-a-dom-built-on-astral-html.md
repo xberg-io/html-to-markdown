@@ -24,7 +24,7 @@ Chosen option: "Build the DOM in this crate on the `astral_html` tokenizer", bec
 
 * The `dom` module owns the stack rule of the parser: an end tag closes the element on top when it spells that name, and closes nothing otherwise. The repair gates of the converter depend on this rule.
 * `astral-html` is pinned exactly. It is pre-1.0, so each bump runs the document acceptance comparison.
-* The minimum Rust version is 1.97, the minimum of `astral-html`.
+* `astral-html` needs Rust 1.97. The workspace minimum of 1.99 covers it.
 * The parse takes longer than `astral-tl` and uses less peak memory. End to end, the difference stays inside the noise of the benchmark.
 
 ## More Information

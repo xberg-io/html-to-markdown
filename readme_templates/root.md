@@ -53,7 +53,7 @@ You get more than the text: pull page metadata (Open Graph, Twitter, JSON-LD) an
 cargo add html-to-markdown-rs
 ```
 
-The Rust crate needs Rust 1.97 or newer.
+The Rust crate needs Rust 1.99 or newer.
 
 See [Rust README](https://github.com/xberg-io/html-to-markdown/tree/main/crates/html-to-markdown) for full documentation.
 

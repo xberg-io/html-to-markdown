@@ -3,7 +3,7 @@ name = "html-to-markdown-fuzz"
 version = "0.0.0"
 publish = false
 edition = "2024"
-rust-version = "1.97"
+rust-version = "1.99"
 
 [package.metadata]
 cargo-fuzz = true

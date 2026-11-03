@@ -1314,7 +1314,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.2", "8.3", "8.4", "8.5"]
+        php: ["8.3", "8.4", "8.5"]
         platform:
           - { os: ubuntu-latest, label: linux-x86_64, target: x86_64-unknown-linux-gnu }
           - { os: ubuntu-24.04-arm, label: linux-arm64, target: aarch64-unknown-linux-gnu }
@@ -3095,11 +3095,8 @@ jobs:
             libhtml_to_markdown_nif-*.tar.gz
             # PHP PIE — explicit per-cell patterns so a single dropped
             # matrix cell (the recurring #333 failure) is named in the failure
-            # output instead of hiding inside a wildcard. 4 PHP versions ×
+            # output instead of hiding inside a wildcard. 3 PHP versions ×
             # {arm64-darwin, arm64-linux, x86_64-linux} unix + windows x86_64.
-            php_html_to_markdown-*_php8.2-arm64-darwin-bsdlibc-nts.tgz
-            php_html_to_markdown-*_php8.2-arm64-linux-glibc-nts.tgz
-            php_html_to_markdown-*_php8.2-x86_64-linux-glibc-nts.tgz
             php_html_to_markdown-*_php8.3-arm64-darwin-bsdlibc-nts.tgz
             php_html_to_markdown-*_php8.3-arm64-linux-glibc-nts.tgz
             php_html_to_markdown-*_php8.3-x86_64-linux-glibc-nts.tgz
@@ -3109,7 +3106,6 @@ jobs:
             php_html_to_markdown-*_php8.5-arm64-darwin-bsdlibc-nts.tgz
             php_html_to_markdown-*_php8.5-arm64-linux-glibc-nts.tgz
             php_html_to_markdown-*_php8.5-x86_64-linux-glibc-nts.tgz
-            php_html_to_markdown-*-8.2-nts-vs*-x86_64.zip
             php_html_to_markdown-*-8.3-nts-vs*-x86_64.zip
             php_html_to_markdown-*-8.4-nts-vs*-x86_64.zip
             php_html_to_markdown-*-8.5-nts-vs*-x86_64.zip

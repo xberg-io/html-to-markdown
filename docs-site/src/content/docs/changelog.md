@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The Rust core now parses HTML with `astral-html` in place of `astral-tl`. The minimum supported Rust version is 1.97, and the R package needs the same compiler. The R package's `DESCRIPTION` still states `rustc (>= 1.91)`, because alef 0.115.7 writes that value (xberg-io/alef#846). Projects on an older compiler stay on 3.19.
+- The Rust core now parses HTML with `astral-html` in place of `astral-tl`.
 - **Breaking:** `build_document_structure` takes a DOM from `html_to_markdown_rs::dom::parse` in place of a `tl::VDom`. The `dom` module is the public parser API: it replaces the types of `tl` that the function took before.
 - A tag name that runs into the next `<` and a stray quote in a tag now follow the HTML tokenizer: `<b<i>t</i>` gives `t`, not bold text. Attributes of a preserved tag keep their source order, and a slash splits an attribute name.
+- Minimum supported versions raised: Node.js 22, Ruby 3.3, PHP 8.3, Elixir 1.17, Android API 24, macOS 26, Rust 1.99.
 - Python 3.11 is now the minimum supported version; Python 3.10 reached end of life.
 
 ### Fixed
