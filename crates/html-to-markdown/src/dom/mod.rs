@@ -474,14 +474,78 @@ impl Scopes {
         let top = self.open.last().and_then(|id| parser.tags[*id as usize].as_tag());
         top.is_some_and(|tag| tag.name.as_bytes().eq_ignore_ascii_case(name))
     }
+
+    /// True when the nearest open `svg` is not under an element that holds HTML again.
+    fn in_svg(&self, parser: &Parser<'_>) -> bool {
+        let names = self
+            .open
+            .iter()
+            .rev()
+            .filter_map(|id| parser.tags[*id as usize].as_tag());
+        for tag in names {
+            match tag.name.as_bytes() {
+                b"svg" => return true,
+                b"foreignObject" | b"desc" | b"title" => return false,
+                _ => {}
+            }
+        }
+        false
+    }
 }
 
-fn source_name<'a>(parser: &Parser<'a>, start: usize, name: &str) -> Bytes<'a> {
-    let from = start + 1;
-    let spelled = parser.source.as_bytes().get(from..from + name.len());
-    match spelled {
-        Some(bytes) if bytes.eq_ignore_ascii_case(name.as_bytes()) => parser.slice(from, from + name.len()),
-        _ => Bytes(Cow::Owned(name.as_bytes().to_vec())),
+/// The SVG element names that HTML spells in mixed case, keyed by their lower-case form.
+const SVG_ELEMENTS: [(&str, &str); 37] = [
+    ("altglyph", "altGlyph"),
+    ("altglyphdef", "altGlyphDef"),
+    ("altglyphitem", "altGlyphItem"),
+    ("animatecolor", "animateColor"),
+    ("animatemotion", "animateMotion"),
+    ("animatetransform", "animateTransform"),
+    ("clippath", "clipPath"),
+    ("feblend", "feBlend"),
+    ("fecolormatrix", "feColorMatrix"),
+    ("fecomponenttransfer", "feComponentTransfer"),
+    ("fecomposite", "feComposite"),
+    ("feconvolvematrix", "feConvolveMatrix"),
+    ("fediffuselighting", "feDiffuseLighting"),
+    ("fedisplacementmap", "feDisplacementMap"),
+    ("fedistantlight", "feDistantLight"),
+    ("fedropshadow", "feDropShadow"),
+    ("feflood", "feFlood"),
+    ("fefunca", "feFuncA"),
+    ("fefuncb", "feFuncB"),
+    ("fefuncg", "feFuncG"),
+    ("fefuncr", "feFuncR"),
+    ("fegaussianblur", "feGaussianBlur"),
+    ("feimage", "feImage"),
+    ("femerge", "feMerge"),
+    ("femergenode", "feMergeNode"),
+    ("femorphology", "feMorphology"),
+    ("feoffset", "feOffset"),
+    ("fepointlight", "fePointLight"),
+    ("fespecularlighting", "feSpecularLighting"),
+    ("fespotlight", "feSpotLight"),
+    ("fetile", "feTile"),
+    ("feturbulence", "feTurbulence"),
+    ("foreignobject", "foreignObject"),
+    ("glyphref", "glyphRef"),
+    ("lineargradient", "linearGradient"),
+    ("radialgradient", "radialGradient"),
+    ("textpath", "textPath"),
+];
+
+/// The name of an element as HTML reads it: lower case, with the mixed-case SVG names inside `svg`.
+fn element_name<'a>(parser: &Parser<'a>, scopes: &Scopes, name: Cow<'a, str>) -> Bytes<'a> {
+    let svg_name = SVG_ELEMENTS
+        .iter()
+        .find(|(lower, _)| *lower == name)
+        .map(|(_, mixed)| *mixed);
+    match svg_name {
+        Some(mixed) if scopes.in_svg(parser) => Bytes::from(mixed),
+        _ => match name {
+            Cow::Borrowed(name) => Bytes::from(name),
+            Cow::Owned(name) => Bytes(Cow::Owned(name.into_bytes())),
+        },
     }
 }
 
@@ -500,10 +564,9 @@ fn attributes_of(list: Vec<astral_html::Attribute<'_>>) -> Attributes<'_> {
 }
 
 fn start_tag<'a>(parser: &mut Parser<'a>, scopes: &mut Scopes, tag: astral_html::Tag<'a>, start: usize, end: usize) {
-    let name = tag.name.as_ref();
-    let closed = tag.self_closing || VOID.contains(&name);
+    let closed = tag.self_closing || VOID.contains(&tag.name.as_ref());
     let node = HTMLTag {
-        name: source_name(parser, start, name),
+        name: element_name(parser, scopes, tag.name),
         attributes: attributes_of(tag.attributes),
         children: RawChildren::new(),
         raw: parser.slice(start, end),
@@ -517,11 +580,21 @@ fn start_tag<'a>(parser: &mut Parser<'a>, scopes: &mut Scopes, tag: astral_html:
     }
 }
 
+/// ~keep The name as the start tag spells it. An end tag closes the element only in this spelling,
+/// ~keep as in astral-tl, so `<div>a</DIV>` stays open and the page keeps its repair route.
+fn start_tag_spelling<'t>(tag: &'t HTMLTag<'_>) -> &'t [u8] {
+    let name = tag.name.as_bytes();
+    match tag.raw.as_bytes().get(1..=name.len()) {
+        Some(spelled) if spelled.eq_ignore_ascii_case(name) => spelled,
+        _ => name,
+    }
+}
+
 fn end_tag(parser: &mut Parser<'_>, scopes: &mut Scopes, start: usize, end: usize) {
     let source = parser.source.as_bytes();
     let spelled = source.get(start + 2..end.saturating_sub(1)).unwrap_or_default();
     let closes = scopes.open.last().is_some_and(|id| match &parser.tags[*id as usize] {
-        Node::Tag(tag) => tag.name.as_bytes() == spelled,
+        Node::Tag(tag) => start_tag_spelling(tag) == spelled,
         _ => false,
     });
     if !closes {
