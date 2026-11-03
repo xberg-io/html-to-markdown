@@ -334,7 +334,7 @@ fn render_li_content<'a>(
     }
     if contains_checkbox(node_handle, parser, checkbox, context) {
         if let Some(crate::dom::Node::Tag(node_tag)) = node_handle.get(parser) {
-            for child_handle in node_tag.children().top().iter() {
+            for child_handle in node_tag.children().top() {
                 render_li_content(
                     child_handle,
                     parser,
@@ -371,7 +371,7 @@ fn collect_task_text(
 ) -> String {
     let mut task_text = String::new();
     let item_ctx = item_ctx.with_inline_break_owner(&task_text);
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         render_li_content(
             child_handle,
             parser,
@@ -479,7 +479,7 @@ fn write_regular_children(
     let item_start = output.len();
     let item_ctx = render.item_ctx.with_inline_break_owner(output);
     let mut text_end = item_start;
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         let is_nested_list = child_handle.get(parser).is_some_and(|node| {
             let crate::dom::Node::Tag(child_tag) = node else {
                 return false;

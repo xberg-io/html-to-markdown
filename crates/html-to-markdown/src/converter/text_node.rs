@@ -896,7 +896,7 @@ mod tests {
                     "</span>".repeat(depth) + "&nbsp;b"
                 };
                 let source = format!("<ul><li>a\n{}<p></p>{ending}</li></ul>", "<span>".repeat(depth));
-                let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("input nodes");
+                let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("input nodes");
                 assert_cold_previous_span(&dom, source.len());
                 let nodes = dom.nodes().len();
                 crate::converter::utility::siblings::PREVIOUS_CONTENT_BLOCK_READS.with(|reads| reads.set(0));

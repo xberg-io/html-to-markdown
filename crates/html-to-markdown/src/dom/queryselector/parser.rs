@@ -9,7 +9,8 @@ pub struct Parser<'a> {
 
 impl<'a> Parser<'a> {
     /// Creates a new query selector parser
-    pub fn new(input: &'a [u8]) -> Self {
+    #[must_use]
+    pub const fn new(input: &'a [u8]) -> Self {
         Self {
             stream: Stream::new(input),
         }
@@ -32,9 +33,8 @@ impl<'a> Parser<'a> {
             let is_ident = self.stream.current().copied().is_some_and(util::is_ident);
             if !is_ident {
                 break;
-            } else {
-                self.stream.advance();
             }
+            self.stream.advance();
         }
 
         self.stream.slice(start, self.stream.idx)
@@ -92,7 +92,7 @@ impl<'a> Parser<'a> {
                 self.stream.expect_and_skip(b']')?;
                 Selector::AttributeValue(attribute, value)
             }
-            Some(c @ b'~' | c @ b'^' | c @ b'$' | c @ b'*') => {
+            Some(c @ (b'~' | b'^' | b'$' | b'*')) => {
                 self.stream.advance();
                 self.stream.expect_and_skip(b'=')?;
                 let quote = self.stream.expect_oneof_and_skip(b"\"'");

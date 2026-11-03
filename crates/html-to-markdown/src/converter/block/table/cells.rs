@@ -208,7 +208,7 @@ fn append_layout_cell_text(cell_handle: &crate::dom::NodeHandle, row_text: &mut 
         ..env.ctx.clone()
     };
     let cell_children = cell_tag.children();
-    for cell_child in cell_children.top().iter() {
+    for cell_child in cell_children.top() {
         super::super::super::walk_node(
             cell_child,
             env.parser,
@@ -245,7 +245,7 @@ pub fn append_layout_row(row_handle: &crate::dom::NodeHandle, output: &mut Strin
     };
     let mut row_text = String::new();
     let row_children = row_tag.children();
-    for cell_handle in row_children.top().iter() {
+    for cell_handle in row_children.top() {
         append_layout_cell_text(cell_handle, &mut row_text, env, depth);
     }
 
@@ -626,7 +626,7 @@ fn visitor_cell_text(
     let mut text = String::new();
     if let Some(crate::dom::Node::Tag(tag)) = cell_handle.get(env.parser) {
         let cell_ctx = collect_ctx.for_cell(*cell_handle, env.parser, env.dom_ctx, env.options.br_in_tables);
-        for child_handle in tag.children().top().iter() {
+        for child_handle in tag.children().top() {
             super::super::super::walk_node(
                 child_handle,
                 env.parser,

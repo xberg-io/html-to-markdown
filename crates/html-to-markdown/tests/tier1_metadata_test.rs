@@ -602,7 +602,7 @@ fn should_give_the_document_structure_the_metadata_block_of_the_head_the_metadat
             Some("Kept"),
         ),
     ] {
-        let dom = html_to_markdown_rs::dom::parse(html, html_to_markdown_rs::dom::ParserOptions::default()).unwrap();
+        let dom = html_to_markdown_rs::dom::parse(html, html_to_markdown_rs::dom::ParserOptions).unwrap();
         let blocks: Vec<Option<String>> = build_document_structure(&dom)
             .nodes
             .into_iter()

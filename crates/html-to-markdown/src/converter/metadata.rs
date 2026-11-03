@@ -96,7 +96,7 @@ fn collect_json_ld_from_children(children: &crate::dom::Children, parser: &Parse
     let Some(collector) = handler.ctx.metadata_collector.as_ref() else {
         return;
     };
-    for child_handle in children.top().iter() {
+    for child_handle in children.top() {
         let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(parser) else {
             continue;
         };
@@ -220,7 +220,7 @@ mod tests {
     fn a_script_with_no_owner_mark_gives_its_text_with_nothing_decoded() {
         let (_, kept_scripts) = strip_script_and_style_tags_with_kept_scripts("");
         let page = r#"<script type="application/ld+json">{"a":"&lt;"}</script>"#;
-        let dom = crate::dom::parse(page, crate::dom::ParserOptions::default()).expect("the page");
+        let dom = crate::dom::parse(page, crate::dom::ParserOptions).expect("the page");
         let tag = dom.nodes()[0].as_tag().expect("the script");
         let json = json_ld_from_tag(0, tag, dom.parser(), &kept_scripts);
         assert_eq!(json.as_deref(), Some(r#"{"a":"&lt;"}"#));

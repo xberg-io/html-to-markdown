@@ -447,7 +447,7 @@ fn keep_inline_image_for_ancestors(input: &[u8], stack: &[OpenTag], keep: &[Stri
 }
 
 /// Byte-level ASCII case-insensitive comparison — no allocation.
-fn eq_ascii_ignore_case(a: &[u8], b: &[u8]) -> bool {
+const fn eq_ascii_ignore_case(a: &[u8], b: &[u8]) -> bool {
     a.eq_ignore_ascii_case(b)
 }
 

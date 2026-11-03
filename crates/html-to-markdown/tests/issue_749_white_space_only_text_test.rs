@@ -433,7 +433,7 @@ fn should_convert_white_space_only_text_under_each_output_option() {
 
 /// The structure that `build_document_structure` returns for `html`, or the reason it panics.
 fn built_structure(html: &str) -> Result<DocumentStructure, String> {
-    let dom = html_to_markdown_rs::dom::parse(html, html_to_markdown_rs::dom::ParserOptions::default())
+    let dom = html_to_markdown_rs::dom::parse(html, html_to_markdown_rs::dom::ParserOptions)
         .map_err(|error| error.to_string())?;
     catch_unwind(AssertUnwindSafe(|| build_document_structure(&dom)))
         .map_err(|_| "the structure builder panics".to_owned())

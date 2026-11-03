@@ -455,8 +455,8 @@ fn should_keep_authored_script_attributes_while_removing_only_transport_ownershi
     for converted in [repaired, closed] {
         let content = converted.content.as_deref().expect("content");
         assert!(content.ends_with("tail\n"));
-        let dom = html_to_markdown_rs::dom::parse(content, html_to_markdown_rs::dom::ParserOptions::default())
-            .expect("preserved HTML");
+        let dom =
+            html_to_markdown_rs::dom::parse(content, html_to_markdown_rs::dom::ParserOptions).expect("preserved HTML");
         let handle = dom.query_selector("script").expect("selector").next().expect("script");
         let tag = handle
             .get(dom.parser())
@@ -564,7 +564,7 @@ fn should_keep_quoted_and_unquoted_slash_attribute_values_in_repaired_scripts() 
             let script_start = content.find("<script ").expect("preserved script");
             let raw_start = content.find(json).expect("original JSON bytes");
             let opening = format!("{}</script>", &content[script_start..raw_start]);
-            let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions::default())
+            let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions)
                 .expect("preserved opener");
             let tag = dom
                 .query_selector("script")
@@ -614,7 +614,7 @@ fn should_keep_authored_owner_attributes_from_claiming_another_scripts_body() {
         .expect("authored ownership lookalike");
         let content = converted.content.as_deref().expect("preserved content");
         let end = content.find("</script>").expect("authored script close") + "</script>".len();
-        let dom = html_to_markdown_rs::dom::parse(&content[..end], html_to_markdown_rs::dom::ParserOptions::default())
+        let dom = html_to_markdown_rs::dom::parse(&content[..end], html_to_markdown_rs::dom::ParserOptions)
             .expect("closed authored script");
         let tag = dom
             .query_selector("script")
@@ -666,7 +666,7 @@ fn should_keep_repaired_script_bytes_after_a_slash_in_a_boolean_attribute_name()
         let start = content.find("<script ").expect("preserved script");
         let body = content.find(json).expect("absolute original JSON bytes");
         let opening = format!("{}</script>", &content[start..body]);
-        let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions::default())
+        let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions)
             .expect("preserved attributes");
         let tag = dom
             .query_selector("script")
@@ -705,7 +705,7 @@ fn should_keep_original_script_bytes_when_standalone_slashes_precede_an_attribut
             let start = content.find("<script ").expect("preserved script");
             let body = content.find(json).expect("original JSON bytes");
             let opening = format!("{}</script>", &content[start..body]);
-            let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions::default())
+            let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions)
                 .expect("script attributes");
             let tag = dom
                 .query_selector("script")
@@ -848,9 +848,8 @@ fn should_reserve_owner_names_and_markers_formed_by_bogus_comment_removal() {
             .content
             .expect("content");
             let end = content.find("</script>").expect("first script close") + "</script>".len();
-            let dom =
-                html_to_markdown_rs::dom::parse(&content[..end], html_to_markdown_rs::dom::ParserOptions::default())
-                    .expect("authored DOM");
+            let dom = html_to_markdown_rs::dom::parse(&content[..end], html_to_markdown_rs::dom::ParserOptions)
+                .expect("authored DOM");
             let tag = dom
                 .query_selector("script")
                 .expect("selector")

@@ -578,7 +578,7 @@ mod tests {
         for depth in [4, 16, 64, 256] {
             for newline_style in [crate::NewlineStyle::Spaces, crate::NewlineStyle::Backslash] {
                 let source = format!("<p><b>a</b>{}<br>{}b</p>", "<em>".repeat(depth), "</em>".repeat(depth));
-                let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("nested break nodes");
+                let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("nested break nodes");
                 let nodes = dom.nodes().len();
                 assert_eq!(nodes, depth + 5);
                 super::BLANK_PREFIX_NODE_READS.with(|reads| reads.set(0));

@@ -177,7 +177,7 @@ pub fn serialize_element_at_depth(node_handle: &NodeHandle, parser: &Parser, dep
                 );
             } else {
                 let children = tag.children();
-                for child_handle in children.top().iter() {
+                for child_handle in children.top() {
                     html.push_str(&serialize_node_at_depth(child_handle, parser, depth + 1, max_depth));
                 }
             }
@@ -386,7 +386,7 @@ fn graphic_text_with_depth(
             }
             Some(crate::dom::Node::Tag(tag)) if is_hidden_in_graphic(tag, hidden_content) => {}
             Some(crate::dom::Node::Tag(tag)) => {
-                visit_graphic_tag(tag, parser, scope, &mut stack, &mut out, remaining_depth)
+                visit_graphic_tag(tag, parser, scope, &mut stack, &mut out, remaining_depth);
             }
             _ => {}
         }
@@ -745,7 +745,7 @@ mod attribute_escaping_tests {
         // double-quoted attribute without escaping manufactures a real `onclick` that never
         // existed as an attribute in the original document.
         let html = r#"<foo title='x" onclick="alert(1)" y=' data-safe="1">"#;
-        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).unwrap();
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions).unwrap();
         let parser = dom.parser();
         let node_handle = dom
             .children()

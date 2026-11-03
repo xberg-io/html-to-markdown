@@ -14,7 +14,7 @@ impl<'a> Walker<'a> {
             },
             ..scope
         };
-        for handle in tag.children().top().iter() {
+        for handle in tag.children().top() {
             if let Some(crate::dom::Node::Tag(child)) = handle.get(parser)
                 && child.name().as_utf8_str().eq_ignore_ascii_case("caption")
             {
@@ -59,7 +59,7 @@ impl<'a> Walker<'a> {
         scheduled: &mut Vec<Frame<'a>>,
     ) {
         let mut first = true;
-        for handle in row.children().top().iter() {
+        for handle in row.children().top() {
             if scope.state.excludes(handle) {
                 continue;
             }

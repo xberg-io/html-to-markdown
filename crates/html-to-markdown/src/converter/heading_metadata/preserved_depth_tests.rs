@@ -12,7 +12,7 @@ fn source(wrappers: usize, inner: &str, prefix: &str) -> String {
 }
 
 fn inspect(html: &str, target: &str, expected_depth: usize) -> Vec<(usize, String)> {
-    let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("actual source/output must parse");
+    let dom = crate::dom::parse(html, crate::dom::ParserOptions).expect("actual source/output must parse");
     let root = dom
         .query_selector("x-keep")
         .expect("the real preserved element must be selectable")

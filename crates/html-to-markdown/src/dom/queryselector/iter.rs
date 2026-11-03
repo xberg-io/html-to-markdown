@@ -14,7 +14,7 @@ pub struct QuerySelectorIterator<'a, 'b, Q: QueryIterable<'a>> {
     _a: PhantomData<&'a ()>,
 }
 
-impl<'a, 'b, Q: QueryIterable<'a>> Clone for QuerySelectorIterator<'a, 'b, Q> {
+impl<'a, Q: QueryIterable<'a>> Clone for QuerySelectorIterator<'a, '_, Q> {
     fn clone(&self) -> Self {
         Self {
             selector: self.selector.clone(),
@@ -41,7 +41,7 @@ impl<'a, 'b, Q: QueryIterable<'a>> QuerySelectorIterator<'a, 'b, Q> {
     }
 }
 
-impl<'a, 'b, Q: QueryIterable<'a>> Iterator for QuerySelectorIterator<'a, 'b, Q> {
+impl<'a, Q: QueryIterable<'a>> Iterator for QuerySelectorIterator<'a, '_, Q> {
     type Item = NodeHandle;
 
     fn next(&mut self) -> Option<Self::Item> {

@@ -53,7 +53,7 @@ impl TextDirection {
     /// ```
     #[must_use]
     #[cfg_attr(alef, alef(skip))]
-    pub fn parse(s: &str) -> Option<Self> {
+    pub const fn parse(s: &str) -> Option<Self> {
         if s.eq_ignore_ascii_case("ltr") {
             return Some(Self::LeftToRight);
         }

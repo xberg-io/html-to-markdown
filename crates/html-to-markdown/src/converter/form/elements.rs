@@ -135,7 +135,7 @@ pub fn handle_form(
         if ctx.convert_as_inline {
             let children = tag.children();
             {
-                for child_handle in children.top().iter() {
+                for child_handle in children.top() {
                     super::walk_node(
                         child_handle,
                         parser,
@@ -156,7 +156,7 @@ pub fn handle_form(
                 list_item_open: false,
                 ..ctx.clone()
             };
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 walk_node(
                     child_handle,
                     parser,
@@ -252,7 +252,7 @@ pub fn handle_legend(
 
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::walk_node(
                     child_handle,
                     parser,
@@ -302,7 +302,7 @@ fn write_code_form_group(
         convert_as_inline: true,
         ..context.ctx.clone()
     };
-    for child in tag.children().top().iter() {
+    for child in tag.children().top() {
         walk_node(
             child,
             parser,
@@ -344,7 +344,7 @@ pub fn handle_label(
         let children = tag.children();
         // ~keep A code block shows the text of a label as written, so nothing is trimmed (issue #822).
         if ctx.in_code_block {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::walk_node(
                     child_handle,
                     parser,
@@ -359,7 +359,7 @@ pub fn handle_label(
         let first = first_content(tag, parser);
         let mut first_button_wrote = false;
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 ctx.button_wrote.set(false);
                 super::walk_node(
                     child_handle,

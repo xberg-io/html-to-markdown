@@ -185,7 +185,7 @@ pub(super) fn open(
     };
     if let Some((cell, depth)) = wrapper.filter(|_| matches!(walk.mode, Mode::Wrapper)) {
         if let Some(crate::dom::Node::Tag(cell)) = cell.get(parser) {
-            for child in cell.children().top().iter() {
+            for child in cell.children().top() {
                 walk.push(
                     *child,
                     Step::Direct {
@@ -433,7 +433,7 @@ impl TableWalk {
     fn plan_cell(&mut self, spec: CellSpec, parser: &crate::dom::Parser, children: &mut Vec<crate::dom::NodeHandle>) {
         self.push(spec.node, Step::Cell(spec), children);
         if let Some(crate::dom::Node::Tag(tag)) = spec.node.get(parser) {
-            for &node in tag.children().top().iter() {
+            for &node in tag.children().top() {
                 self.push(
                     node,
                     Step::Content {

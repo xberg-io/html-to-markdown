@@ -5,7 +5,7 @@ pub struct Stream<'a, T> {
     data: &'a [T],
 }
 
-impl<'a, T: Copy> Stream<'a, T> {
+impl<T: Copy> Stream<'_, T> {
     /// Returns a copy of the current element
     #[inline]
     pub fn current_cpy(&self) -> Option<T> {
@@ -13,7 +13,7 @@ impl<'a, T: Copy> Stream<'a, T> {
     }
 }
 
-impl<'a, T: Eq + Copy> Stream<'a, T> {
+impl<T: Eq + Copy> Stream<'_, T> {
     /// Increases internal index by 1 if the given element matches the current element
     /// If it does match, the expected character is returned
     #[inline]
@@ -50,12 +50,12 @@ impl<'a, T: Eq + Copy> Stream<'a, T> {
 impl<'a, T> Stream<'a, T> {
     /// Creates a new stream
     #[inline]
-    pub fn new(data: &'a [T]) -> Stream<'a, T> {
+    pub const fn new(data: &'a [T]) -> Self {
         Self { data, idx: 0 }
     }
 
     #[inline]
-    pub fn advance(&mut self) {
+    pub const fn advance(&mut self) {
         self.idx += 1;
     }
 
@@ -67,7 +67,7 @@ impl<'a, T> Stream<'a, T> {
 
     /// Checks whether the stream has reached the end
     #[inline]
-    pub fn is_eof(&self) -> bool {
+    pub const fn is_eof(&self) -> bool {
         self.idx >= self.data.len()
     }
 

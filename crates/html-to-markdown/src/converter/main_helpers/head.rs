@@ -184,7 +184,7 @@ fn collect_title_head_metadata(
 
     let mut title_content = String::new();
     let title_children = child_tag.children();
-    for title_child in title_children.top().iter() {
+    for title_child in title_children.top() {
         if let Some(crate::dom::Node::Raw(raw)) = title_child.get(parser) {
             title_content.push_str(raw.as_utf8_str().as_ref());
         }

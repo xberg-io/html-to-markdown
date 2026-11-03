@@ -156,7 +156,7 @@ pub fn is_loose_list(node_handle: crate::dom::NodeHandle, parser: &crate::dom::P
         };
         let is_last = index == last_index;
         let li_children = item_tag.children();
-        for li_child_handle in li_children.top().iter() {
+        for li_child_handle in li_children.top() {
             let Some(name) = resolve_tag_name(*li_child_handle, parser, dom_ctx) else {
                 continue;
             };
@@ -984,7 +984,7 @@ pub(super) fn process_list_children(
         return;
     };
     let mut processor = ListChildProcessor::new(context);
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         if !is_whitespace_node(child_handle, parser) {
             processor.render(child_handle, parser, output);
         }

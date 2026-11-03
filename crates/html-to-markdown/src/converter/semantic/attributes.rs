@@ -38,7 +38,7 @@ pub fn handle_dfn(
         let mut content = String::with_capacity(32);
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::walk_node(
                     child_handle,
                     parser,
@@ -101,7 +101,7 @@ pub fn handle_abbr(
         let mut content = String::with_capacity(32);
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::walk_node(
                     child_handle,
                     parser,
@@ -155,7 +155,7 @@ pub fn handle_time_data(
     if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::walk_node(
                     child_handle,
                     parser,
@@ -192,7 +192,7 @@ pub fn handle_cite(
         let mut content = String::with_capacity(32);
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::walk_node(
                     child_handle,
                     parser,

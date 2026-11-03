@@ -70,7 +70,7 @@ pub fn table_total_columns(
     let mut cells = Vec::new();
 
     if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
-        for child_handle in tag.children().top().iter() {
+        for child_handle in tag.children().top() {
             max_cols = max_cols.max(table_child_columns(child_handle, parser, dom_ctx, ctx, &mut cells));
         }
     }
@@ -177,7 +177,7 @@ fn render_layout_table(
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         render_layout_child(child_handle, parser, output, handler);
     }
     if !output.ends_with('\n') {
@@ -206,7 +206,7 @@ fn render_layout_child(
     };
     match tag_name.as_ref() {
         "thead" | "tbody" | "tfoot" => {
-            for row_handle in child_tag.children().top().iter() {
+            for row_handle in child_tag.children().top() {
                 if is_tag_name(row_handle, parser, handler.dom_ctx, "tr") {
                     append_layout_row(row_handle, output, env, handler.depth + 1);
                 }
@@ -238,7 +238,7 @@ fn render_wrapper_cell(
     let Some(crate::dom::Node::Tag(cell)) = cell_handle.get(parser) else {
         return;
     };
-    for child in cell.children().top().iter() {
+    for child in cell.children().top() {
         super::super::super::walk_node(
             child,
             parser,
@@ -295,7 +295,7 @@ fn render_data_table(
         rendered_widths: visitor_rendered_widths(handler),
     };
     let env = DataEnv { parser, handler, scan };
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         render_data_child(child_handle, output, env, &mut state);
     }
     // ~keep Source media can count as table content but be excluded or skipped during rendering (#817).
@@ -375,7 +375,7 @@ pub(super) fn column_widths(
         rowspan: vec![None; total_cols],
         cell_cache,
     };
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         collect_width_child(child_handle, env, handler.depth + 1, &mut state);
     }
     state.widths
@@ -405,7 +405,7 @@ fn collect_width_child(
     let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
     match tag_name.as_ref() {
         "thead" | "tbody" | "tfoot" => {
-            for row_handle in child_tag.children().top().iter() {
+            for row_handle in child_tag.children().top() {
                 if is_tag_name(row_handle, env.parser, env.dom_ctx, "tr") {
                     collect_width_row(row_handle, env, depth, state);
                 } else if env.options.hidden_content == crate::options::HiddenContent::All {
@@ -415,7 +415,7 @@ fn collect_width_child(
         }
         "tr" | "row" => collect_width_row(child_handle, env, depth, state),
         "template" | "noscript" if env.options.hidden_content == crate::options::HiddenContent::All => {
-            for child in child_tag.children().top().iter() {
+            for child in child_tag.children().top() {
                 collect_width_child(child, env, depth + 1, state);
             }
         }
@@ -461,7 +461,7 @@ fn render_data_child(
         "caption" => render_caption(child_tag, output, env),
         "thead" | "tbody" | "tfoot" => {
             let is_header = tag_name.as_ref() == "thead";
-            for row_handle in child_tag.children().top().iter() {
+            for row_handle in child_tag.children().top() {
                 if is_tag_name(row_handle, env.parser, env.handler.dom_ctx, "tr") {
                     render_data_row(row_handle, output, env, state, is_header);
                 }
@@ -490,7 +490,7 @@ fn render_caption(tag: &crate::dom::HTMLTag<'_>, output: &mut String, env: DataE
         ..env.handler.ctx.clone()
     };
     let mut text = String::new();
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         super::super::super::walk_node(
             child_handle,
             env.parser,

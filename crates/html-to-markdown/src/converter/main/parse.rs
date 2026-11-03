@@ -23,7 +23,7 @@ pub(super) fn parse_html(input: &str) -> Result<crate::dom::VDom<'_>> {
     if FORCE_INVALID_LENGTH.with(std::cell::Cell::get) {
         return Err(invalid_length(input));
     }
-    crate::dom::parse(input, crate::dom::ParserOptions::default())
+    crate::dom::parse(input, crate::dom::ParserOptions)
         .map_err(|crate::dom::ParseError::InvalidLength| invalid_length(input))
 }
 

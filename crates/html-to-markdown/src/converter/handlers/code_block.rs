@@ -236,7 +236,7 @@ fn emit_code_content(content: &str, handler: &mut HandlerContext<'_>) {
 }
 
 fn walk_children(tag: &crate::dom::HTMLTag<'_>, output: &mut String, context: &Context, handler: &HandlerContext<'_>) {
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         walk_node(
             child_handle,
             handler.parser,

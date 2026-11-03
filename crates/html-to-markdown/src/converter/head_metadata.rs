@@ -16,7 +16,7 @@ pub fn extract_frontmatter(
     let prefix_end = crate::converter::utility::preprocessing::metadata_prefix_end(html);
     let prefix = crate::converter::utility::preprocessing::normalize_bogus_comment_endings(&html[..prefix_end]);
 
-    let dom = match crate::dom::parse(&prefix, crate::dom::ParserOptions::default()) {
+    let dom = match crate::dom::parse(&prefix, crate::dom::ParserOptions) {
         Ok(d) => d,
         Err(_) => return None,
     };

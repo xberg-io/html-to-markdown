@@ -12,13 +12,13 @@ pub enum Selector<'a> {
     /// All selector: *
     All,
     /// And combinator: .foo.bar
-    And(Box<Selector<'a>>, Box<Selector<'a>>),
+    And(Box<Self>, Box<Self>),
     /// Or combinator: .foo, .bar
-    Or(Box<Selector<'a>>, Box<Selector<'a>>),
+    Or(Box<Self>, Box<Self>),
     /// Descendant combinator: .foo .bar
-    Descendant(Box<Selector<'a>>, Box<Selector<'a>>),
+    Descendant(Box<Self>, Box<Self>),
     /// Parent combinator: .foo > .bar
-    Parent(Box<Selector<'a>>, Box<Selector<'a>>),
+    Parent(Box<Self>, Box<Self>),
     /// Attribute: \[foo\]
     Attribute(&'a [u8]),
     /// Attribute with value: [foo=bar]
@@ -33,9 +33,10 @@ pub enum Selector<'a> {
     AttributeValueSubstring(&'a [u8], &'a [u8]),
 }
 
-impl<'a> Selector<'a> {
+impl Selector<'_> {
     /// Checks if the given node matches this selector
-    pub fn matches<'b>(&self, node: &Node<'b>) -> bool {
+    #[must_use]
+    pub fn matches(&self, node: &Node<'_>) -> bool {
         match self {
             Self::Tag(tag) => node.as_tag().is_some_and(|t| t.name().as_bytes().eq(*tag)),
             Self::Id(id) => node

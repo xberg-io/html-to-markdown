@@ -204,7 +204,7 @@ fn collect_grid_child(
     match tag_name.as_ref() {
         "thead" | "tbody" | "tfoot" => {
             let is_header_section = tag_name.as_ref() == "thead";
-            for row_handle in child_tag.children().top().iter() {
+            for row_handle in child_tag.children().top() {
                 if is_tag_name(row_handle, parser, handler.dom_ctx, "tr") {
                     collect_grid_row(row_handle, parser, handler, state, is_header_section);
                 }
@@ -301,7 +301,7 @@ fn collect_grid_cell_content(
         cell_ctx.inline_collector = None;
     }
     if let Some(crate::dom::Node::Tag(cell_tag)) = cell_handle.get(parser) {
-        for child_handle in cell_tag.children().top().iter() {
+        for child_handle in cell_tag.children().top() {
             super::super::walk_node(
                 child_handle,
                 parser,
