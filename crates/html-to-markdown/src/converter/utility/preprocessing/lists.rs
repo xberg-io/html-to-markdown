@@ -117,7 +117,7 @@ const fn scan_list_tag(bytes: &[u8], tag_start: usize, len: usize) -> ListTagSca
 ///
 /// Extracted from `normalize_unclosed_list_items`'s main scan loop — identical tag-name checks,
 /// unchanged.
-fn is_verbatim_tag_name(name_bytes: &[u8]) -> bool {
+const fn is_verbatim_tag_name(name_bytes: &[u8]) -> bool {
     name_bytes.eq_ignore_ascii_case(b"pre")
         || name_bytes.eq_ignore_ascii_case(b"code")
         || name_bytes.eq_ignore_ascii_case(b"script")

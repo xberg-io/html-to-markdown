@@ -104,7 +104,7 @@ fn serialize_element_at_depth(
                 );
             } else {
                 let children = tag.children();
-                for child_handle in children.top().iter() {
+                for child_handle in children.top() {
                     html.push_str(&serialize_node_at_depth(child_handle, parser, depth + 1));
                 }
             }
@@ -178,7 +178,7 @@ fn serialize_node_to_html_at_depth(
                 );
             } else {
                 let children = tag.children();
-                for child_handle in children.top().iter() {
+                for child_handle in children.top() {
                     serialize_node_to_html_at_depth(child_handle, parser, output, depth + 1);
                 }
             }
@@ -228,7 +228,7 @@ mod tests {
         for _ in 0..60 {
             let dom = crate::dom::parse(
                 "<script type='application/ld+json' nonce='n' data-x='v'>{}</script>",
-                crate::dom::ParserOptions::default(),
+                crate::dom::ParserOptions,
             )
             .expect("closed script");
             let handle = dom.children()[0];
@@ -240,7 +240,7 @@ mod tests {
 
     #[test]
     fn should_escape_a_quote_inside_serialize_element_attribute_reconstruction() {
-        let dom = crate::dom::parse(QUOTE_BREAKING_HTML, crate::dom::ParserOptions::default()).unwrap();
+        let dom = crate::dom::parse(QUOTE_BREAKING_HTML, crate::dom::ParserOptions).unwrap();
         let parser = dom.parser();
         let node_handle = dom
             .children()
@@ -256,7 +256,7 @@ mod tests {
 
     #[test]
     fn should_escape_a_quote_inside_serialize_tag_to_html_attribute_reconstruction() {
-        let dom = crate::dom::parse(QUOTE_BREAKING_HTML, crate::dom::ParserOptions::default()).unwrap();
+        let dom = crate::dom::parse(QUOTE_BREAKING_HTML, crate::dom::ParserOptions).unwrap();
         let parser = dom.parser();
         let node_handle = dom
             .children()

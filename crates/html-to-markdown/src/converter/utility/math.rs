@@ -136,7 +136,7 @@ pub(super) fn semantics_slots(input: &str) -> std::collections::BTreeSet<usize> 
     {
         return slots;
     }
-    let Ok(dom) = crate::dom::parse(input, crate::dom::ParserOptions::default()) else {
+    let Ok(dom) = crate::dom::parse(input, crate::dom::ParserOptions) else {
         return slots;
     };
     let parser = dom.parser();

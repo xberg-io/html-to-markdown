@@ -44,7 +44,7 @@ pub fn handle_option_list(
             };
             handle_option(tag_name, node_handle, parser, &mut rendered, list_context);
         } else {
-            for child_handle in tag.children().top().iter() {
+            for child_handle in tag.children().top() {
                 walk_node(
                     child_handle,
                     parser,
@@ -79,7 +79,7 @@ pub fn handle_option(
         let mut text = String::new();
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::walk_node(
                     child_handle,
                     parser,

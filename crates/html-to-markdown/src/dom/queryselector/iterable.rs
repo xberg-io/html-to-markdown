@@ -14,7 +14,7 @@ pub trait QueryIterable<'a>: private::Sealed {
     fn start(&self) -> Option<InnerNodeHandle>;
 }
 
-impl<'a> private::Sealed for VDom<'a> {}
+impl private::Sealed for VDom<'_> {}
 impl<'a> QueryIterable<'a> for VDom<'a> {
     #[inline]
     fn get<'b>(&'b self, parser: &'b Parser<'a>, index: usize) -> Option<(&'b Node<'a>, NodeHandle)> {

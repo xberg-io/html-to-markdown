@@ -91,7 +91,7 @@ pub fn collect_table_cells(
     }
     if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
-        for child_handle in children.top().iter() {
+        for child_handle in children.top() {
             if ctx.excluded_node_ids.contains(&child_handle.get_inner()) {
                 continue;
             }
@@ -206,7 +206,7 @@ fn render_cell_content(
         .for_cell(*node_handle, parser, handler.dom_ctx, handler.options.br_in_tables);
     let handler = HandlerContext::new(handler.options, &cell_ctx, handler.depth, handler.dom_ctx);
     let mut table_ends = Vec::new();
-    for child_handle in children.top().iter() {
+    for child_handle in children.top() {
         render_cell_child(child_handle, parser, text, handler, deferred_tables);
         if deferred_tables.is_none() && super::utils::is_or_contains_table(child_handle, parser, handler.dom_ctx) {
             table_ends.push(text.len());

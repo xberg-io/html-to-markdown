@@ -21,8 +21,7 @@ fn should_walk_deep_plain_text_on_a_256_kib_stack() {
                     ("<ul><li>", "</li></ul>", 400, format!("{}- deep\n", "-\n".repeat(399))),
                 ] {
                     let html = format!("{}deep{}", open.repeat(depth), close.repeat(depth));
-                    let dom =
-                        crate::dom::parse(&html, crate::dom::ParserOptions::default()).expect("parse nested markup");
+                    let dom = crate::dom::parse(&html, crate::dom::ParserOptions).expect("parse nested markup");
                     let options = ConversionOptions {
                         output_format: OutputFormat::Plain,
                         max_depth: Some(1024),
@@ -76,7 +75,7 @@ fn should_keep_plain_capture_output_and_callbacks_at_deep_nesting() {
             visitor: Some(recorder.clone()),
             ..Default::default()
         };
-        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("parse captures");
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions).expect("parse captures");
         let text = extract_plain_text(&dom, dom.parser(), &options, Default::default());
         let callbacks = recorder.lock().expect("callback recorder").0.clone();
         (text, callbacks)

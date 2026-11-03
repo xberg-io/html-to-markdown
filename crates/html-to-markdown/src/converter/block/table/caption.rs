@@ -28,7 +28,7 @@ pub fn handle_caption(
         let mut text = String::new();
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 super::super::super::walk_node(
                     child_handle,
                     parser,

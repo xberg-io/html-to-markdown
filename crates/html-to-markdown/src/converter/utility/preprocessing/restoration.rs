@@ -17,7 +17,7 @@ fn script_owners(dom: &crate::dom::VDom<'_>, originals: &HashMap<String, String>
         // ~keep The parser can mis-nest an HTML-source script under SVG after mixed-case closes;
         // ~keep the allocated owner proves origin.
         if name.eq_ignore_ascii_case("script") {
-            for child in tag.children().top().iter() {
+            for child in tag.children().top() {
                 let Some(raw) = child.get(parser).and_then(crate::dom::Node::as_raw) else {
                     continue;
                 };
@@ -89,7 +89,7 @@ mod tests {
         let source = format!(
             "<script data-h2m-script-0='h2m_script_body_1_end'>{marker}</script><script data-h2m-script-0='{marker}'>{marker}</script>"
         );
-        let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("two scripts");
+        let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("two scripts");
         let originals = HashMap::from([(marker.into(), "JSON".into())]);
         let ids = restore_inert_bodies(&mut dom, &originals).expect("restoration");
         assert_eq!(ids.len(), 1);
@@ -123,7 +123,7 @@ mod tests {
         let source = format!(
             "<p data-h2m-script-0='{marker}'>{marker}</p><script data-h2m-script-0='{marker}'>{marker}</script><script>{marker}</script>"
         );
-        let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("DOM");
+        let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("DOM");
         let originals = HashMap::from([(marker.into(), json.into())]);
         let restored = restore_inert_bodies(&mut dom, &originals).expect("owned restoration");
         assert_eq!(restored.len(), 1);
@@ -164,8 +164,7 @@ mod tests {
             let (marker, attribute) = preserved.protect_script(json);
             assert_eq!(marker, "h2m_script_body_1_end");
             let source = format!("{authored}<script {attribute}='{marker}'>{marker}</script>");
-            let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions::default())
-                .expect("foreign DOM and owned sibling");
+            let mut dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("foreign DOM and owned sibling");
             let ids = restore_inert_bodies(&mut dom, &preserved.originals).expect("source-proven restoration");
             assert_eq!(ids.len(), 1);
             let handles: Vec<_> = dom.query_selector("script").expect("selector").collect();

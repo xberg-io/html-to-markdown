@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn should_render_a_section_through_the_synchronous_handler_bridge() {
         let html = "<section>x</section>";
-        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("section parses");
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions).expect("section parses");
         let parser = dom.parser();
         let dom_ctx = crate::converter::utility::caching::build_dom_context(&dom, parser, html.len());
         let options = crate::options::ConversionOptions::default();

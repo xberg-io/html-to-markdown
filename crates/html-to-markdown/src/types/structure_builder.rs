@@ -187,7 +187,7 @@ fn extract_table_grid(table_tag: &crate::dom::HTMLTag, parser: &crate::dom::Pars
         let mut col_idx: u32 = 0;
         let row_children = row_tag.children();
 
-        for child_handle in row_children.top().iter() {
+        for child_handle in row_children.top() {
             let Some(crate::dom::Node::Tag(cell_tag)) = child_handle.get(parser) else {
                 continue;
             };
@@ -288,7 +288,7 @@ fn collect_definition_items(dl_tag: &crate::dom::HTMLTag, parser: &crate::dom::P
     let mut pending_terms: Vec<String> = Vec::new();
 
     let children = dl_tag.children();
-    for handle in children.top().iter() {
+    for handle in children.top() {
         let Some(crate::dom::Node::Tag(child_tag)) = handle.get(parser) else {
             continue;
         };
@@ -328,7 +328,7 @@ fn extract_head_metadata_entries(head_tag: &crate::dom::HTMLTag, parser: &crate:
     let mut entries: Vec<MetadataEntry> = Vec::new();
 
     let children = head_tag.children();
-    for handle in children.top().iter() {
+    for handle in children.top() {
         let Some(crate::dom::Node::Tag(child_tag)) = handle.get(parser) else {
             continue;
         };
@@ -628,7 +628,7 @@ fn walk_children(
     parent_idx: Option<u32>,
     depth: usize,
 ) {
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         walk(state, child_handle, parser, parent_idx, depth + 1);
     }
 }
@@ -651,7 +651,7 @@ fn process_code_block(
 }
 
 fn find_code_child(tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> Option<(String, Option<String>)> {
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(parser) else {
             continue;
         };

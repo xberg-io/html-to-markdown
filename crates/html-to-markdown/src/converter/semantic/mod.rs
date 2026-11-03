@@ -46,7 +46,7 @@ pub fn walk_tag_children(
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         walk_node(
             child_handle,
             parser,

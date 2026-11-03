@@ -148,7 +148,7 @@ fn scan_row_cells(
 ) -> (usize, bool) {
     let mut cell_count = 0;
     let mut has_span = false;
-    for child in row_tag.children().top().iter() {
+    for child in row_tag.children().top() {
         if ctx.excluded_node_ids.contains(&child.get_inner()) {
             continue;
         }

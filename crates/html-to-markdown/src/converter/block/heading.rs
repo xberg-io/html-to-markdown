@@ -443,7 +443,7 @@ pub fn find_single_heading_child(node_handle: NodeHandle, parser: &Parser) -> Op
     let children = tag.children();
     let mut heading_data: Option<(usize, NodeHandle)> = None;
 
-    for child_handle in children.top().iter() {
+    for child_handle in children.top() {
         let Some(child_node) = child_handle.get(parser) else {
             continue;
         };

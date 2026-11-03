@@ -643,7 +643,7 @@ pub fn repair_head_content_outside_head(
 /// body and is in no `<head>` element.
 pub fn has_head_content_outside_head(input: &str) -> bool {
     may_hold_head_content_outside_head(input)
-        && crate::dom::parse(input, crate::dom::ParserOptions::default())
+        && crate::dom::parse(input, crate::dom::ParserOptions)
             .is_ok_and(|dom| document_head_search(dom.children(), dom.parser()).content_outside_head)
 }
 

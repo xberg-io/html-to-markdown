@@ -88,7 +88,7 @@ pub(super) fn walk_table_parts<'a>(
                 }));
                 if should_descend {
                     let start = pending.len();
-                    for child in tag.children().top().iter() {
+                    for child in tag.children().top() {
                         pending.push(TablePartStep::Enter(*child, depth + 1, context.clone()));
                     }
                     pending[start..].reverse();

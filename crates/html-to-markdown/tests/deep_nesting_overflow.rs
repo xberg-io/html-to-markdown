@@ -247,7 +247,7 @@ fn document_structure_builder_does_not_overflow_stack() {
         thread::Builder::new()
             .stack_size(8 * 1024 * 1024)
             .spawn(move || {
-                let dom = html_to_markdown_rs::dom::parse(&html, html_to_markdown_rs::dom::ParserOptions::default())
+                let dom = html_to_markdown_rs::dom::parse(&html, html_to_markdown_rs::dom::ParserOptions)
                     .expect("parse deep html");
                 let document = html_to_markdown_rs::types::build_document_structure(&dom);
                 !document.nodes.is_empty()

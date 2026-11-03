@@ -56,7 +56,7 @@ pub fn open(
     let has_rtc = tag_sequence.iter().any(|tag| tag == "rtc");
     let interleaved = !has_rtc && tag_sequence.windows(2).any(|tags| tags[0] == "rb" && tags[1] == "rt");
     let mut parts = Vec::new();
-    for child_handle in tag.children().top().iter() {
+    for child_handle in tag.children().top() {
         let part = match child_handle.get(parser) {
             Some(crate::dom::Node::Tag(child_tag)) => {
                 match crate::converter::normalized_tag_name(child_tag.name().as_utf8_str()).as_ref() {

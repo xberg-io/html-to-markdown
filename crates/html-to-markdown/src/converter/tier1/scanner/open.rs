@@ -50,7 +50,7 @@ fn emit_svg_from_slice(
     // ~keep Re-parse just the SVG fragment.  Wrap it in a minimal document so
     // the parser has proper context — the same pattern used by head_metadata.rs.
     let wrapped = format!("<html><body>{svg_slice}</body></html>");
-    let dom = match crate::dom::parse(&wrapped, crate::dom::ParserOptions::default()) {
+    let dom = match crate::dom::parse(&wrapped, crate::dom::ParserOptions) {
         Ok(d) => d,
         Err(_) => {
             // ~keep Parse failure: emit nothing rather than bail — matches

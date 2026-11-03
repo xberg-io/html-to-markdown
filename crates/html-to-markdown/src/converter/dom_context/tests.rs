@@ -1,7 +1,7 @@
 #[test]
 fn should_keep_ordinary_negative_break_memo_when_no_owner_was_omitted() {
     let source = "<b><span> </span></b>";
-    let dom = crate::dom::parse(source, crate::dom::ParserOptions::default()).expect("blank nodes");
+    let dom = crate::dom::parse(source, crate::dom::ParserOptions).expect("blank nodes");
     let context = crate::converter::utility::caching::build_dom_context(&dom, dom.parser(), source.len());
     let root = dom.children()[0].get_inner();
     let child = context.children_of(root).expect("one span")[0].get_inner();
@@ -19,7 +19,7 @@ fn should_keep_ordinary_negative_break_memo_when_no_owner_was_omitted() {
 fn should_refresh_cached_break_ancestors_without_forgetting_siblings() {
     let source = "<b><span><br></span><i><br></i></b>";
     for order in [[0, 1], [1, 0]] {
-        let dom = crate::dom::parse(source, crate::dom::ParserOptions::default()).expect("break siblings");
+        let dom = crate::dom::parse(source, crate::dom::ParserOptions).expect("break siblings");
         let parser = dom.parser();
         let context = crate::converter::utility::caching::build_dom_context(&dom, parser, source.len());
         let root = dom.children()[0].get_inner();
@@ -45,7 +45,7 @@ fn should_refresh_cached_break_ancestors_without_forgetting_siblings() {
 fn should_invalidate_omitted_subtree_ancestors_and_keep_retained_siblings() {
     let source = "<b><span><br></span><i><br></i></b>";
     for order in [[0, 1], [1, 0]] {
-        let dom = crate::dom::parse(source, crate::dom::ParserOptions::default()).expect("break subtrees");
+        let dom = crate::dom::parse(source, crate::dom::ParserOptions).expect("break subtrees");
         let parser = dom.parser();
         let context = crate::converter::utility::caching::build_dom_context(&dom, parser, source.len());
         let root = dom.children()[0].get_inner();
@@ -72,7 +72,7 @@ fn should_bound_observed_font_registration_and_boundary_reads() {
                 "</font>".repeat(depth) + "&nbsp;"
             };
             let source = format!("<p>a{} {closing}b</p>", "<font>".repeat(depth));
-            let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("font nodes");
+            let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("font nodes");
             let nodes = dom.nodes().len();
             super::HOLDS_TEXT_NODE_READS.with(|reads| reads.set(0));
             super::FONT_RENDER_BYTE_READS.with(|reads| reads.set(0));
@@ -135,7 +135,7 @@ fn should_bound_font_registration_with_growing_custom_child_whitespace() {
             "<font>".repeat(depth),
             "</font>".repeat(depth)
         );
-        let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("custom font nodes");
+        let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("custom font nodes");
         let nodes = dom.nodes().len();
         let visitor = Arc::new(Mutex::new(BlankChild { width: depth, calls: 0 }));
         super::HOLDS_TEXT_NODE_READS.with(|reads| reads.set(0));
@@ -181,7 +181,7 @@ fn should_bound_observed_unknown_registration_and_boundary_reads() {
                 "</x-y>".repeat(depth) + "&nbsp;"
             };
             let source = format!("<p>a{} {closing}b</p>", "<x-y>".repeat(depth));
-            let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("unknown nodes");
+            let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("unknown nodes");
             let nodes = dom.nodes().len();
             assert_eq!(nodes, if overlapping { 2 * depth + 3 } else { depth + 4 });
             super::HOLDS_TEXT_NODE_READS.with(|reads| reads.set(0));
@@ -252,7 +252,7 @@ fn should_bound_unknown_registration_with_growing_custom_child_whitespace() {
             "<x-y>".repeat(depth),
             "</x-y>".repeat(depth)
         );
-        let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("custom unknown nodes");
+        let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("custom unknown nodes");
         let nodes = dom.nodes().len();
         assert_eq!(nodes, depth + 4);
         let visitor = Arc::new(Mutex::new(BlankChild { width: depth, calls: 0 }));
@@ -303,7 +303,7 @@ fn should_classify_visible_void_descendants_below_inline_wrappers() {
         ("<b><hr></b>", true),
     ] {
         let source = format!("<span>{body}</span>");
-        let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("parse descendants");
+        let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("parse descendants");
         let parser = dom.parser();
         let context = crate::converter::utility::caching::build_dom_context(&dom, parser, source.len());
         let root = dom.children()[0].get_inner();
@@ -331,7 +331,7 @@ fn should_keep_literal_preformatted_content_when_inline_line_ends_are_empty() {
         ("<pre><code><span>\n</span></code></pre>", true),
     ] {
         let source = format!("<span>{body}</span>");
-        let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("parse literal ownership");
+        let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("parse literal ownership");
         let parser = dom.parser();
         let context = crate::converter::utility::caching::build_dom_context(&dom, parser, source.len());
         assert_eq!(
@@ -355,7 +355,7 @@ fn should_preserve_deep_pre_ownership_without_changing_text_cache() {
         "<span>".repeat(depth),
         "</span>".repeat(depth)
     );
-    let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("parse deep literal ownership");
+    let dom = crate::dom::parse(&source, crate::dom::ParserOptions).expect("parse deep literal ownership");
     let parser = dom.parser();
     let context = crate::converter::utility::caching::build_dom_context(&dom, parser, source.len());
     super::HOLDS_TEXT_NODE_READS.with(|reads| reads.set(0));

@@ -641,7 +641,7 @@ mod tests {
             ("<!--c-->&nbsp;word", FollowingContent::Inline),
         ] {
             let html = format!("<span>x</span>{suffix}");
-            let dom = crate::dom::parse(&html, crate::dom::ParserOptions::default()).expect("parse HTML");
+            let dom = crate::dom::parse(&html, crate::dom::ParserOptions).expect("parse HTML");
             let parser = dom.parser();
             let ctx = crate::converter::utility::caching::build_dom_context(&dom, parser, html.len());
             let first = dom.children()[0].get_inner();

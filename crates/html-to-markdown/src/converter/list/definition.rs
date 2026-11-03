@@ -33,7 +33,7 @@ pub fn handle_dl(
     if ctx.convert_as_inline {
         let children = tag.children();
         {
-            for child_handle in children.top().iter() {
+            for child_handle in children.top() {
                 use crate::converter::walk_node;
                 walk_node(
                     child_handle,
@@ -50,7 +50,7 @@ pub fn handle_dl(
     let children = tag.children();
     {
         let dl_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
-        for child_handle in children.top().iter() {
+        for child_handle in children.top() {
             crate::converter::walk_node(
                 child_handle,
                 parser,
@@ -101,7 +101,7 @@ pub fn handle_dt(
     let child_context =
         crate::converter::block::container::HandlerContext::new(options, &child_ctx, depth + 1, dom_ctx);
     let children = tag.children();
-    for child_handle in children.top().iter() {
+    for child_handle in children.top() {
         crate::converter::walk_node(child_handle, parser, &mut rendered, child_context);
     }
     strip_trailing_backslash_breaks_from_fresh_buffer(&mut rendered, options.newline_style);
@@ -245,7 +245,7 @@ pub fn handle_dd(
     let child_ctx = ctx.with_inline_break_owner(&rendered);
     let children = tag.children();
     {
-        for child_handle in children.top().iter() {
+        for child_handle in children.top() {
             crate::converter::walk_node(
                 child_handle,
                 parser,

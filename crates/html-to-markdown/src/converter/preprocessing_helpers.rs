@@ -710,14 +710,14 @@ mod tests {
     use super::{has_discarded_end_tag, readable_text_len};
 
     fn discards_an_end_tag_of_an_open_element(html: &str) -> bool {
-        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("parse");
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions).expect("parse");
         has_discarded_end_tag(&dom, dom.parser(), html)
     }
 
     #[test]
     fn should_leave_a_discarded_end_tag_as_source_between_two_sibling_nodes() {
         let html = "<div><p>one</div>two</p>";
-        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("parse");
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions).expect("parse");
         let parser = dom.parser();
         let paragraph = dom
             .nodes()
@@ -779,7 +779,7 @@ mod tests {
     }
 
     fn text_len(html: &str) -> usize {
-        readable_text_len(&crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("parse"))
+        readable_text_len(&crate::dom::parse(html, crate::dom::ParserOptions).expect("parse"))
     }
 
     #[test]
