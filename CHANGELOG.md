@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fully remove visitor-skipped children after exclusions trim whitespace, including UTF-8 text and
   nested table buffers.
 - An end tag with white space before its `>` closes its element without a rewrite of the page, so text in comments and attribute values keeps its bytes (#965).
+- Self-closing markup in text the author wrote, such as `<br/>` in a `textarea`, an `xmp` or escaped markup, keeps its bytes and gains no space before `/>` (#965).
 
 ## [3.19.2] - 2026-10-31
 
