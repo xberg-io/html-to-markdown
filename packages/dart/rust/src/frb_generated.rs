@@ -1267,8 +1267,8 @@ const _: fn() = || {
             observed_size,
             max_size,
         } => {
-            let _: i64 = observed_size;
-            let _: i64 = max_size;
+            let _: u64 = observed_size;
+            let _: u64 = max_size;
         }
         crate::ConversionError::Other { field0 } => {
             let _: String = field0;
@@ -1317,8 +1317,8 @@ const _: fn() = || {
         let _: crate::OutputFormat = ConversionOptions.output_format;
         let _: bool = ConversionOptions.include_document_structure;
         let _: bool = ConversionOptions.extract_images;
-        let _: i64 = ConversionOptions.max_image_size;
-        let _: Option<i64> = ConversionOptions.max_input_size;
+        let _: u64 = ConversionOptions.max_image_size;
+        let _: Option<u64> = ConversionOptions.max_input_size;
         let _: bool = ConversionOptions.capture_svg;
         let _: bool = ConversionOptions.infer_dimensions;
         let _: Option<i64> = ConversionOptions.max_depth;
@@ -1370,8 +1370,8 @@ const _: fn() = || {
         let _: Option<crate::OutputFormat> = ConversionOptionsUpdate.output_format;
         let _: Option<bool> = ConversionOptionsUpdate.include_document_structure;
         let _: Option<bool> = ConversionOptionsUpdate.extract_images;
-        let _: Option<i64> = ConversionOptionsUpdate.max_image_size;
-        let _: Option<i64> = ConversionOptionsUpdate.max_input_size;
+        let _: Option<u64> = ConversionOptionsUpdate.max_image_size;
+        let _: Option<u64> = ConversionOptionsUpdate.max_input_size;
         let _: Option<bool> = ConversionOptionsUpdate.capture_svg;
         let _: Option<bool> = ConversionOptionsUpdate.infer_dimensions;
         let _: Option<i64> = ConversionOptionsUpdate.max_depth;
@@ -2290,8 +2290,8 @@ impl SseDecode for crate::ConversionError {
                 return crate::ConversionError::InvalidInput { field0: var_field0 };
             }
             6 => {
-                let mut var_observedSize = <i64>::sse_decode(deserializer);
-                let mut var_maxSize = <i64>::sse_decode(deserializer);
+                let mut var_observedSize = <u64>::sse_decode(deserializer);
+                let mut var_maxSize = <u64>::sse_decode(deserializer);
                 return crate::ConversionError::InputTooLarge {
                     observed_size: var_observedSize,
                     max_size: var_maxSize,
@@ -2352,8 +2352,8 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_outputFormat = <crate::OutputFormat>::sse_decode(deserializer);
         let mut var_includeDocumentStructure = <bool>::sse_decode(deserializer);
         let mut var_extractImages = <bool>::sse_decode(deserializer);
-        let mut var_maxImageSize = <i64>::sse_decode(deserializer);
-        let mut var_maxInputSize = <Option<i64>>::sse_decode(deserializer);
+        let mut var_maxImageSize = <u64>::sse_decode(deserializer);
+        let mut var_maxInputSize = <Option<u64>>::sse_decode(deserializer);
         let mut var_captureSvg = <bool>::sse_decode(deserializer);
         let mut var_inferDimensions = <bool>::sse_decode(deserializer);
         let mut var_maxDepth = <Option<i64>>::sse_decode(deserializer);
@@ -2460,8 +2460,8 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_outputFormat = <Option<crate::OutputFormat>>::sse_decode(deserializer);
         let mut var_includeDocumentStructure = <Option<bool>>::sse_decode(deserializer);
         let mut var_extractImages = <Option<bool>>::sse_decode(deserializer);
-        let mut var_maxImageSize = <Option<i64>>::sse_decode(deserializer);
-        let mut var_maxInputSize = <Option<i64>>::sse_decode(deserializer);
+        let mut var_maxImageSize = <Option<u64>>::sse_decode(deserializer);
+        let mut var_maxInputSize = <Option<u64>>::sse_decode(deserializer);
         let mut var_captureSvg = <Option<bool>>::sse_decode(deserializer);
         let mut var_inferDimensions = <Option<bool>>::sse_decode(deserializer);
         let mut var_maxDepth = <Option<i64>>::sse_decode(deserializer);
@@ -3471,6 +3471,17 @@ impl SseDecode for Option<crate::TierStrategy> {
     }
 }
 
+impl SseDecode for Option<u64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u64>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::UrlEscapeStyle> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3673,6 +3684,13 @@ impl SseDecode for crate::TierStrategy {
             2 => crate::TierStrategy::Tier1,
             _ => unreachable!("Invalid variant for TierStrategy: {}", inner),
         };
+    }
+}
+
+impl SseDecode for u64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_u64::<NativeEndian>().unwrap()
     }
 }
 
@@ -5123,8 +5141,8 @@ impl SseEncode for crate::ConversionError {
                 max_size,
             } => {
                 <i32>::sse_encode(6, serializer);
-                <i64>::sse_encode(observed_size, serializer);
-                <i64>::sse_encode(max_size, serializer);
+                <u64>::sse_encode(observed_size, serializer);
+                <u64>::sse_encode(max_size, serializer);
             }
             crate::ConversionError::Other { field0 } => {
                 <i32>::sse_encode(7, serializer);
@@ -5181,8 +5199,8 @@ impl SseEncode for crate::ConversionOptions {
         <crate::OutputFormat>::sse_encode(self.output_format, serializer);
         <bool>::sse_encode(self.include_document_structure, serializer);
         <bool>::sse_encode(self.extract_images, serializer);
-        <i64>::sse_encode(self.max_image_size, serializer);
-        <Option<i64>>::sse_encode(self.max_input_size, serializer);
+        <u64>::sse_encode(self.max_image_size, serializer);
+        <Option<u64>>::sse_encode(self.max_input_size, serializer);
         <bool>::sse_encode(self.capture_svg, serializer);
         <bool>::sse_encode(self.infer_dimensions, serializer);
         <Option<i64>>::sse_encode(self.max_depth, serializer);
@@ -5237,8 +5255,8 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<crate::OutputFormat>>::sse_encode(self.output_format, serializer);
         <Option<bool>>::sse_encode(self.include_document_structure, serializer);
         <Option<bool>>::sse_encode(self.extract_images, serializer);
-        <Option<i64>>::sse_encode(self.max_image_size, serializer);
-        <Option<i64>>::sse_encode(self.max_input_size, serializer);
+        <Option<u64>>::sse_encode(self.max_image_size, serializer);
+        <Option<u64>>::sse_encode(self.max_input_size, serializer);
         <Option<bool>>::sse_encode(self.capture_svg, serializer);
         <Option<bool>>::sse_encode(self.infer_dimensions, serializer);
         <Option<i64>>::sse_encode(self.max_depth, serializer);
@@ -6088,6 +6106,16 @@ impl SseEncode for Option<crate::TierStrategy> {
     }
 }
 
+impl SseEncode for Option<u64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u64>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::UrlEscapeStyle> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -6271,6 +6299,13 @@ impl SseEncode for crate::TierStrategy {
             },
             serializer,
         );
+    }
+}
+
+impl SseEncode for u64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_u64::<NativeEndian>(self).unwrap();
     }
 }
 

@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@xberg-io/html-to-markdown-wasm": "^3.19.2",
-    "rollup": "^4.63.1",
-    "vitest": "^5.0.0"
+    "rollup": "^4.67.2",
+    "vitest": "^5.0.5"
   }
 }
