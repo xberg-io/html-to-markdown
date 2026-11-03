@@ -5,7 +5,7 @@ defmodule E2eElixir.MixProject do
     [
       app: :e2e_elixir,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.17",
       deps: deps()
     ]
   end

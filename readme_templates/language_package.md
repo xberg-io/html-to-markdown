@@ -23,7 +23,7 @@
   {% elif language == "ruby" %}
 - **Ruby extension** — Magnus-backed native extension with idiomatic Ruby objects and no separate service process.
   {% elif language == "php" %}
-- **PHP extension** — typed PHP 8.2+ API with stubs suitable for PHPStan and production Composer projects.
+- **PHP extension** — typed PHP 8.3+ API with stubs suitable for PHPStan and production Composer projects.
   {% elif language == "go" %}
 - **Go module** — cgo-backed binding with the Rust renderer behind ordinary Go functions and errors.
   {% elif language == "java" %}

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Minimum supported versions raised: Node.js 22, Ruby 3.3, PHP 8.3, Elixir 1.17, Android API 24, macOS 26, Rust 1.99.
 - Python 3.11 is now the minimum supported version; Python 3.10 reached end of life.
 
 ### Fixed

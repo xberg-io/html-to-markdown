@@ -37,7 +37,7 @@ documentation = "https://docs.rs/html-to-markdown-rs"
 readme = "README.md"
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing", "web-programming"]
-rust-version = "1.88"
+rust-version = "1.99"
 
 [workspace.dependencies]
 ahash = { version = "0.8", default-features = false, features = ["std", "compile-time-rng"] }

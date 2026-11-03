@@ -8,7 +8,7 @@ Requires Python 3.11+. Wheels are published for Linux, macOS, and Windows on PyP
 **Troubleshooting on Windows:** If `pip install` fails on Python 3.14+, use `pip install --only-binary=:all: html-to-markdown` to force the prebuilt wheel. If sdist fallback is required, install Microsoft Visual Studio Build Tools with the "Desktop development with C++" workload and ensure MSVC's `link.exe` precedes GNU variants in `PATH` (check with `where link`). Update `pip` with `pip install --upgrade pip` to ensure correct wheel matching for Python 3.14.
 {% elif language == 'typescript' %}
 
-Requires Node.js 18+ or Bun. Native bindings provide superior performance.
+Requires Node.js 22+ or Bun. Native bindings provide superior performance.
 
 **npm:**
 
@@ -42,10 +42,10 @@ pnpm add @xberg-io/html-to-markdown-wasm
 
 {% elif language == 'ruby' %}
 
-Requires Ruby 3.2+ with Magnus native extension bindings. Published for Linux, macOS.
+Requires Ruby 3.3+ with Magnus native extension bindings. Published for Linux, macOS.
 {% elif language == 'php' %}
 
-Requires PHP 8.2+. Install the native extension via PIE:
+Requires PHP 8.3+. Install the native extension via PIE:
 
 ```bash
 pie install xberg-io/html-to-markdown
@@ -59,7 +59,7 @@ composer require xberg-io/html-to-markdown
 
 {% elif language == 'go' %}
 
-Requires Go 1.25+. After installing the package, run `go generate` to automatically download the platform-specific FFI library:
+Requires Go 1.27+. After installing the package, run `go generate` to automatically download the platform-specific FFI library:
 
 ```bash
 go generate
@@ -98,7 +98,7 @@ dotnet add package XbergIo.HtmlToMarkdown
 
 {% elif language == 'elixir' %}
 
-Requires Elixir 1.14+. Add to your `mix.exs`:
+Requires Elixir 1.17+. Add to your `mix.exs`:
 
 ```elixir
 def deps do
@@ -110,7 +110,7 @@ end
 
 {% elif language == 'r' %}
 
-Requires R 4.3+ and a Rust toolchain (cargo, rustc).
+Requires R 4.4+ and a Rust toolchain (cargo, rustc).
 
 ```r
 install.packages("htmltomarkdown", repos = "https://xberg-io.r-universe.dev")
