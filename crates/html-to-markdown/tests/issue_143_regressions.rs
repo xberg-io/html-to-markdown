@@ -100,3 +100,35 @@ fn should_close_each_link_at_an_end_tag_split_over_lines() {
     let result = convert(html, None).expect("conversion should succeed");
     assert_eq!(result, "[A](#a) [B](#b) after\n");
 }
+
+#[test]
+fn should_close_each_element_at_an_end_tag_split_by_any_line_break() {
+    for (html, expected) in [
+        (
+            "<p><a href=\"#a\">A</a\r\n  >\n<a href=\"#b\">B</a\n> after</p>",
+            "[A](#a) [B](#b) after\n",
+        ),
+        ("<p><custom-42>x</custom-42\n>y</p>", "xy\n"),
+        ("<p><B>bold</B\n> after</p>", "**bold** after\n"),
+    ] {
+        let result = convert(html, None).expect("conversion should succeed");
+        assert_eq!(result, expected, "input: {html:?}");
+    }
+}
+
+#[test]
+fn should_leave_a_split_end_tag_inside_a_comment_and_a_value_as_written() {
+    let comment = convert("<p>a<!-- </a\n> -->b</p>", None).expect("conversion should succeed");
+    assert_eq!(comment, "ab\n");
+
+    let html = "<div title=\"</b\n>\">t</div><p>u</p>";
+    let plain = convert(html, None).expect("conversion should succeed");
+    assert_eq!(plain, "t\n\nu\n");
+
+    let options = ConversionOptions {
+        preserve_tags: vec!["div".to_owned()],
+        ..Default::default()
+    };
+    let preserved = convert(html, Some(options)).expect("conversion should succeed");
+    assert_eq!(preserved, "<div title=\"</b\n>\">t</div>\n\nu\n");
+}
