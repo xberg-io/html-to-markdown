@@ -89,6 +89,57 @@ fn should_distinguish_bogus_markers_from_recognized_prefixes() {
 }
 
 #[test]
+fn should_preserve_hidden_style_markers_without_false_negative_skips() {
+    let cases = [
+        ("<ul><li>a<li>b<li>c</ul>\n", "<ul><li>a<li>b<li>c</ul>\n", false),
+        ("é<div>visible</div>", "é<div>visible</div>", false),
+        ("<b HIDDEN>x</b>", "", true),
+        ("<b STYLE='DISPLAY:NONE'>x</b>", "", true),
+        ("<b style='display:none'>x</b>", "", true),
+        ("<b title='HIDDEN STYLE'>x</b>", "<b title='HIDDEN STYLE'>x</b>", false),
+    ];
+    for (input, expected, owned) in cases {
+        let actual = strip_hidden_elements(input);
+        assert_eq!(actual, expected, "input: {input:?}");
+        assert_eq!(matches!(actual, Cow::Owned(_)), owned, "input: {input:?}");
+    }
+}
+
+#[test]
+fn should_preserve_hidden_element_scan_boundaries_and_borrowing() {
+    let cases = [
+        ("é text<", "é text<", false),
+        ("<span hidden", "<span hidden", false),
+        ("<<span hidden>x</span>終", "<終", true),
+        ("< span hidden>x</ span>", "< span hidden>x</ span>", false),
+        // ~keep A `<` inside a tag is part of an attribute value, not the start of an element: the
+        // ~keep value stays whole. The pass used to cut the "element" out of the value, and the
+        // ~keep scan from every such `<` is what made a long tag quadratic (#765).
+        (
+            "<div title='<span hidden>x</span>'>ok</div>",
+            "<div title='<span hidden>x</span>'>ok</div>",
+            false,
+        ),
+        ("<i hidden>x</i><b hidden>y</b>z", "z", true),
+        (
+            "<div data-hidden='true'>x</div>",
+            "<div data-hidden='true'>x</div>",
+            false,
+        ),
+        (
+            "<div style='font-size:0'><b style='font-size:12px'>x</b></div>",
+            "<div style='font-size:0'><b style='font-size:12px'>x</b></div>",
+            false,
+        ),
+    ];
+    for (input, expected, owned) in cases {
+        let actual = strip_hidden_elements(input);
+        assert_eq!(actual, expected, "input: {input:?}");
+        assert_eq!(matches!(actual, Cow::Owned(_)), owned, "input: {input:?}");
+    }
+}
+
+#[test]
 fn normalize_menu_elements_rewrites_open_and_close_tags() {
     let input = "<ul><li><MeNu class='commands'><li>x</li></MENU></li></ul>";
     assert_eq!(
