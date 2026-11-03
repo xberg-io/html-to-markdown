@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::raw_text::{PageReads, PassRead, opens_a_tag, removed_element_name, skip_opaque_region, track_svg_tag};
+use super::raw_text::{PageReads, PassRead, removed_element_name, track_svg_tag};
 
 /// Find `needle` in `haystack` at or after `from`, returning its start offset.
 pub(super) fn find_subslice(haystack: &[u8], from: usize, needle: &[u8]) -> Option<usize> {
@@ -17,88 +17,6 @@ pub fn find_html_comment_end(bytes: &[u8], from: usize) -> Option<usize> {
         let preceding = &rest[..offset];
         (preceding.ends_with(b"--") || preceding.ends_with(b"--!")).then_some(from + offset + 1)
     })
-}
-
-/// Normalize bogus HTML comment endings that confuse the parser.
-pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
-    let bytes = input.as_bytes();
-    let len = bytes.len();
-
-    if len < 5 || !bytes.windows(4).any(|w| w == b"<!--") {
-        return Cow::Borrowed(input);
-    }
-
-    let mut idx = 0;
-    let mut last = 0;
-    let mut output: Option<String> = None;
-    let mut reads = PageReads::new(|_| {});
-
-    while idx + 3 < len {
-        if bytes[idx] != b'<' {
-            idx += 1;
-            continue;
-        }
-        if !(bytes[idx] == b'<' && bytes[idx + 1] == b'!' && bytes[idx + 2] == b'-' && bytes[idx + 3] == b'-') {
-            // ~keep Comment-shaped text in a quoted tag or an opaque body is literal source (#905).
-            if opens_a_tag(bytes, idx) {
-                let Some(tag_end) = reads.tag_end(bytes, idx) else {
-                    // ~keep With no remaining `>`, neither a tag nor a comment can end (#905).
-                    break;
-                };
-                idx = skip_opaque_region(bytes, idx).unwrap_or(tag_end);
-            } else {
-                idx = skip_opaque_region(bytes, idx).unwrap_or(idx + 1);
-            }
-            continue;
-        }
-
-        idx += 4;
-
-        // ~keep Abrupt empty comments share the opening dashes, so a close search after the opening misses them.
-        if bytes.get(idx) == Some(&b'>') {
-            let out = output.get_or_insert_with(|| String::with_capacity(len));
-            out.push_str(&input[last..idx - 4]);
-            out.push_str("<!---->");
-            idx += 1;
-            last = idx;
-            continue;
-        }
-        if bytes.get(idx) == Some(&b'-') && bytes.get(idx + 1) == Some(&b'>') {
-            let out = output.get_or_insert_with(|| String::with_capacity(len));
-            out.push_str(&input[last..idx - 4]);
-            out.push_str("<!---->");
-            idx += 2;
-            last = idx;
-            continue;
-        }
-
-        let Some(end) = find_html_comment_end(bytes, idx) else {
-            break;
-        };
-        let ends_with_bang = bytes[end - 2] == b'!';
-        let dash_end = end - 1 - usize::from(ends_with_bang);
-        let mut close_start = dash_end;
-        while close_start > idx && bytes[close_start - 1] == b'-' {
-            close_start -= 1;
-        }
-        if ends_with_bang || dash_end - close_start > 2 {
-            let out = output.get_or_insert_with(|| String::with_capacity(len));
-            out.push_str(&input[last..close_start]);
-            out.push_str("-->");
-            last = end;
-        }
-        idx = end;
-    }
-
-    match output {
-        Some(mut out) => {
-            if last < len {
-                out.push_str(&input[last..]);
-            }
-            Cow::Owned(out)
-        }
-        None => Cow::Borrowed(input),
-    }
 }
 
 /// Normalize closing tags whose `>` appears on a subsequent line.

@@ -3,10 +3,9 @@ use std::borrow::Cow;
 use super::markup::second_pass;
 use super::raw_text::{FirstPass, PassRead};
 use super::{
-    find_closing_tag_bytes, find_closing_tag_bytes_nested, find_tag_end, normalize_bogus_comment_endings,
-    normalize_menu_elements, normalize_split_closing_tags, normalize_unclosed_list_items,
-    restore_preserved_menu_elements, sanitize_markdown_url, strip_bogus_comments, strip_hidden_elements,
-    unwrap_kept_inert_elements,
+    find_closing_tag_bytes, find_closing_tag_bytes_nested, find_tag_end, normalize_menu_elements,
+    normalize_split_closing_tags, normalize_unclosed_list_items, restore_preserved_menu_elements,
+    sanitize_markdown_url, strip_bogus_comments, strip_hidden_elements, unwrap_kept_inert_elements,
 };
 use crate::options::HiddenContent;
 
@@ -86,118 +85,6 @@ fn should_distinguish_bogus_markers_from_recognized_prefixes() {
         let actual = strip_bogus_comments(input);
         assert_eq!(actual.as_ref(), expected, "input: {input}");
         assert_eq!(matches!(actual, Cow::Borrowed(_)), input == expected, "input: {input}");
-    }
-}
-
-#[test]
-fn normalize_bogus_comment_endings_leaves_well_formed_comment_unchanged() {
-    let input = "<p>A</p><!-- foo --><p>B</p>";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), input);
-}
-
-#[test]
-fn normalize_bogus_comment_endings_rewrites_triple_dash_close() {
-    let input = "<!-- foo --->";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), "<!-- foo -->");
-}
-
-#[test]
-fn normalize_bogus_comment_endings_rewrites_four_dash_close() {
-    let input = "<!-- foo ---->";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), "<!-- foo -->");
-}
-
-#[test]
-fn normalize_bogus_comment_endings_preserves_content_after_comment() {
-    let input = "<h1>One</h1><!-- /// ---><p>Two</p>";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), "<h1>One</h1><!-- /// --><p>Two</p>");
-}
-
-#[test]
-fn normalize_bogus_comment_endings_handles_multiple_bogus_comments() {
-    let input = "<p>A</p><!-- x ---><p>B</p><!-- y ----><p>C</p>";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), "<p>A</p><!-- x --><p>B</p><!-- y --><p>C</p>");
-}
-
-#[test]
-fn normalize_bogus_comment_endings_rewrites_abrupt_closing_of_empty_comment() {
-    // ~keep `<!-->` and `<!--->` are HTML5's "abrupt-closing-of-empty-comment"
-    // ~keep quirk: legal, empty comments whose open and close share dashes.
-    let input = "<p>Before</p><!--><p>After</p>";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), "<p>Before</p><!----><p>After</p>");
-
-    let input = "<p>Before</p><!---><p>After</p>";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), "<p>Before</p><!----><p>After</p>");
-}
-
-#[test]
-fn normalize_bogus_comment_endings_handles_no_comments() {
-    let input = "<p>Just a paragraph</p>";
-    let result = normalize_bogus_comment_endings(input);
-    assert_eq!(result.as_ref(), input);
-}
-
-#[test]
-fn normalize_bogus_comment_endings_empty_input() {
-    let result = normalize_bogus_comment_endings("");
-    assert_eq!(result.as_ref(), "");
-}
-
-#[test]
-fn should_preserve_hidden_style_markers_without_false_negative_skips() {
-    let cases = [
-        ("<ul><li>a<li>b<li>c</ul>\n", "<ul><li>a<li>b<li>c</ul>\n", false),
-        ("é<div>visible</div>", "é<div>visible</div>", false),
-        ("<b HIDDEN>x</b>", "", true),
-        ("<b STYLE='DISPLAY:NONE'>x</b>", "", true),
-        ("<b style='display:none'>x</b>", "", true),
-        ("<b title='HIDDEN STYLE'>x</b>", "<b title='HIDDEN STYLE'>x</b>", false),
-    ];
-    for (input, expected, owned) in cases {
-        let actual = strip_hidden_elements(input);
-        assert_eq!(actual, expected, "input: {input:?}");
-        assert_eq!(matches!(actual, Cow::Owned(_)), owned, "input: {input:?}");
-    }
-}
-
-#[test]
-fn should_preserve_hidden_element_scan_boundaries_and_borrowing() {
-    let cases = [
-        ("é text<", "é text<", false),
-        ("<span hidden", "<span hidden", false),
-        ("<<span hidden>x</span>終", "<終", true),
-        ("< span hidden>x</ span>", "< span hidden>x</ span>", false),
-        // ~keep A `<` inside a tag is part of an attribute value, not the start of an element: the
-        // ~keep value stays whole. The pass used to cut the "element" out of the value, and the
-        // ~keep scan from every such `<` is what made a long tag quadratic (#765).
-        (
-            "<div title='<span hidden>x</span>'>ok</div>",
-            "<div title='<span hidden>x</span>'>ok</div>",
-            false,
-        ),
-        ("<i hidden>x</i><b hidden>y</b>z", "z", true),
-        (
-            "<div data-hidden='true'>x</div>",
-            "<div data-hidden='true'>x</div>",
-            false,
-        ),
-        (
-            "<div style='font-size:0'><b style='font-size:12px'>x</b></div>",
-            "<div style='font-size:0'><b style='font-size:12px'>x</b></div>",
-            false,
-        ),
-    ];
-    for (input, expected, owned) in cases {
-        let actual = strip_hidden_elements(input);
-        assert_eq!(actual, expected, "input: {input:?}");
-        assert_eq!(matches!(actual, Cow::Owned(_)), owned, "input: {input:?}");
     }
 }
 

@@ -116,3 +116,24 @@ fn should_still_drop_real_comments() {
     assert_eq!(convert("<!-- real comment -->"), "");
     assert_eq!(convert("<p>a<!-- c -->b</p>"), "ab\n");
 }
+
+#[test]
+fn should_end_a_comment_at_extra_dashes_or_a_bang_and_keep_what_follows() {
+    for (html, expected) in [
+        ("<h1>One</h1><!-- /// ---><p>Two</p>", "# One\n\nTwo\n"),
+        ("<p>A</p><!-- x ---><p>B</p><!-- y ----><p>C</p>", "A\n\nB\n\nC\n"),
+        ("<p>A</p><!-- x --!><p>B</p>", "A\n\nB\n"),
+        ("<p>Before</p><!--><p>After</p>", "Before\n\nAfter\n"),
+        ("<p>Before</p><!---><p>After</p>", "Before\n\nAfter\n"),
+    ] {
+        assert_eq!(convert(html), expected, "input: {html:?}");
+    }
+}
+
+#[test]
+fn should_read_the_head_after_a_comment_that_ends_with_extra_dashes() {
+    let html = "<html><head><!-- x ---><title>T</title></head><body><p>b</p></body></html>";
+    let out = convert(html);
+    assert!(out.lines().any(|line| line == "title: T"), "actual: {out:?}");
+    assert!(out.ends_with("b\n"), "actual: {out:?}");
+}
