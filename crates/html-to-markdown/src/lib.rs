@@ -84,8 +84,6 @@ mod convert_api;
 // ~keep that would otherwise require fine-grained #[cfg] gates on every internal helper.
 #[allow(dead_code)]
 pub(crate) mod converter;
-// ~keep `build_document_structure` takes this DOM. It is not a supported API of its own.
-#[doc(hidden)]
 pub mod dom;
 mod exports;
 

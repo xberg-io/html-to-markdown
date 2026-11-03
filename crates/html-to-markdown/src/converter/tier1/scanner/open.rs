@@ -48,7 +48,7 @@ fn emit_svg_from_slice(
     use base64::{Engine as _, engine::general_purpose::STANDARD};
 
     // ~keep Re-parse just the SVG fragment.  Wrap it in a minimal document so
-    // The parser has proper context — the same pattern used by head_metadata.rs.
+    // the parser has proper context — the same pattern used by head_metadata.rs.
     let wrapped = format!("<html><body>{svg_slice}</body></html>");
     let dom = match crate::dom::parse(&wrapped, crate::dom::ParserOptions::default()) {
         Ok(d) => d,

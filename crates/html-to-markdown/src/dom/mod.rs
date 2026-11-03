@@ -2,11 +2,13 @@
 
 use std::borrow::Cow;
 
+/// CSS selectors over a parsed document.
 pub mod queryselector;
 mod stream;
 mod util;
 pub use queryselector::Selector;
 
+/// The index of a node in the parser's node list.
 pub type InnerNodeHandle = u32;
 
 const VOID: [&str; 15] = [
@@ -14,30 +16,39 @@ const VOID: [&str; 15] = [
     "wbr",
 ];
 
+/// A byte string that borrows from the source or owns an edited value.
 #[derive(Debug, Clone, Default, Eq)]
 pub struct Bytes<'a>(Cow<'a, [u8]>);
 
+/// The error of [`Bytes::set`].
 #[derive(Debug)]
 pub enum SetBytesError {
+    /// The value is too long to store.
     LengthOverflow,
 }
 
 impl<'a> Bytes<'a> {
+    /// Returns an empty byte string.
     pub fn new() -> Self {
         Self::default()
     }
+    /// Returns the bytes as text, with invalid UTF-8 replaced.
     pub fn as_utf8_str(&self) -> Cow<'_, str> {
         String::from_utf8_lossy(&self.0)
     }
+    /// Returns the bytes as text, or `None` if they are not valid UTF-8.
     pub fn try_as_utf8_str(&self) -> Option<&str> {
         std::str::from_utf8(&self.0).ok()
     }
+    /// Returns the raw bytes.
     pub fn as_bytes(&self) -> &[u8] {
         &self.0
     }
+    /// Returns a pointer to the first byte.
     pub fn as_ptr(&self) -> *const u8 {
         self.0.as_ptr()
     }
+    /// Replaces the bytes with an owned value.
     pub fn set<B: Into<Vec<u8>>>(&mut self, data: B) -> Result<Option<Box<[u8]>>, SetBytesError> {
         self.0 = Cow::Owned(data.into());
         Ok(None)
@@ -91,16 +102,20 @@ impl TryFrom<String> for Bytes<'static> {
     }
 }
 
+/// Options of [`parse`]. It holds none.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct ParserOptions;
 impl ParserOptions {
+    /// Returns the default options.
     pub fn new() -> Self {
         Self
     }
 }
 
+/// The error of [`parse`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ParseError {
+    /// The input is longer than `u32::MAX` bytes.
     InvalidLength,
 }
 impl std::fmt::Display for ParseError {
@@ -110,37 +125,47 @@ impl std::fmt::Display for ParseError {
 }
 impl std::error::Error for ParseError {}
 
+/// A handle to a node in a [`Parser`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct NodeHandle(u32);
 impl NodeHandle {
+    /// Returns the handle of the node at this index.
     pub fn new(node: u32) -> Self {
         Self(node)
     }
+    /// Returns the node this handle points to.
     pub fn get<'p, 'buf>(&self, parser: &'p Parser<'buf>) -> Option<&'p Node<'buf>> {
         parser.tags.get(self.0 as usize)
     }
+    /// Returns the node this handle points to, for an edit.
     pub fn get_mut<'p, 'buf>(&self, parser: &'p mut Parser<'buf>) -> Option<&'p mut Node<'buf>> {
         parser.tags.get_mut(self.0 as usize)
     }
+    /// Returns the index of the node.
     pub fn get_inner(&self) -> u32 {
         self.0
     }
 }
 
+/// The direct children of an element.
 pub type RawChildren = smallvec::SmallVec<[NodeHandle; 4]>;
 
+/// The attributes of an element, in source order.
 #[derive(Debug, Clone, Default)]
 pub struct Attributes<'a> {
     raw: Vec<(Bytes<'a>, Option<Bytes<'a>>)>,
 }
 
 impl<'a> Attributes<'a> {
+    /// Returns the number of attributes.
     pub fn len(&self) -> usize {
         self.raw.len()
     }
+    /// Returns `true` if the element has no attributes.
     pub fn is_empty(&self) -> bool {
         self.raw.is_empty()
     }
+    /// Returns the value of the first attribute with this name. The inner `None` is an attribute with no value.
     pub fn get<B: Into<Bytes<'a>>>(&self, key: B) -> Option<Option<&Bytes<'a>>> {
         let key = key.into();
         self.raw
@@ -148,19 +173,23 @@ impl<'a> Attributes<'a> {
             .find(|(name, _)| *name == key)
             .map(|(_, value)| value.as_ref())
     }
+    /// Returns `true` if an attribute has this name.
     pub fn contains<B: Into<Bytes<'a>>>(&self, key: B) -> bool {
         self.get(key).is_some()
     }
+    /// Removes the first attribute with this name and returns its value.
     pub fn remove<B: Into<Bytes<'a>>>(&mut self, key: B) -> Option<Option<Bytes<'a>>> {
         let key = key.into();
         let index = self.raw.iter().position(|(name, _)| *name == key)?;
         Some(self.raw.remove(index).1)
     }
+    /// Returns each attribute as a name and an optional value, in source order.
     pub fn iter(&self) -> impl Iterator<Item = (Cow<'_, str>, Option<Cow<'_, str>>)> + '_ {
         self.raw
             .iter()
             .map(|(name, value)| (name.as_utf8_str(), value.as_ref().map(Bytes::as_utf8_str)))
     }
+    /// Returns `true` if the `class` attribute holds this class name.
     pub fn is_class_member<B: AsRef<[u8]>>(&self, member: B) -> bool {
         self.class().is_some_and(|class| {
             class
@@ -169,14 +198,17 @@ impl<'a> Attributes<'a> {
                 .any(|name| name.as_bytes() == member.as_ref())
         })
     }
+    /// Returns the value of the `id` attribute.
     pub fn id(&self) -> Option<&Bytes<'a>> {
         self.get("id").flatten()
     }
+    /// Returns the value of the `class` attribute.
     pub fn class(&self) -> Option<&Bytes<'a>> {
         self.get("class").flatten()
     }
 }
 
+/// An element with its name, attributes, children and source bytes.
 #[derive(Debug, Clone)]
 pub struct HTMLTag<'a> {
     name: Bytes<'a>,
@@ -188,28 +220,36 @@ pub struct HTMLTag<'a> {
 }
 
 impl<'a> HTMLTag<'a> {
+    /// Returns the children of the element.
     pub fn children(&self) -> Children<'a, '_> {
         Children(self)
     }
+    /// Returns the children of the element, for an edit.
     pub fn children_mut(&mut self) -> ChildrenMut<'a, '_> {
         ChildrenMut(self)
     }
+    /// Returns the tag name as written in the source.
     pub fn name(&self) -> &Bytes<'a> {
         &self.name
     }
+    /// Returns the attributes of the element.
     pub fn attributes(&self) -> &Attributes<'a> {
         &self.attributes
     }
+    /// Returns the attributes of the element, for an edit.
     pub fn attributes_mut(&mut self) -> &mut Attributes<'a> {
         &mut self.attributes
     }
+    /// Returns the source bytes of the element, from its start tag to its end tag.
     pub fn raw(&self) -> &Bytes<'a> {
         &self.raw
     }
+    /// Returns the first and the last byte offset of the element in the source.
     pub fn boundaries(&self, parser: &Parser<'a>) -> (usize, usize) {
         let offset = self.raw.as_ptr() as usize - parser.source.as_ptr() as usize;
         (offset, offset + self.raw.as_bytes().len() - 1)
     }
+    /// Returns the text of every descendant text node, joined.
     pub fn inner_text<'p>(&self, parser: &'p Parser<'a>) -> Cow<'p, str> {
         let mut text = String::new();
         for node in &parser.tags[self.id as usize + 1..self.subtree_end as usize] {
@@ -221,33 +261,43 @@ impl<'a> HTMLTag<'a> {
     }
 }
 
+/// The children of an element.
 pub struct Children<'a, 'b>(&'b HTMLTag<'a>);
 
 impl<'a, 'b> Children<'a, 'b> {
+    /// Returns the direct children.
     pub fn top(&self) -> &'b RawChildren {
         &self.0.children
     }
+    /// Returns every descendant node, in document order.
     pub fn all(&self, parser: &'b Parser<'a>) -> &'b [Node<'a>] {
         &parser.tags[self.0.id as usize + 1..self.0.subtree_end as usize]
     }
 }
 
+/// The children of an element, for an edit.
 pub struct ChildrenMut<'a, 'b>(&'b mut HTMLTag<'a>);
 
 impl ChildrenMut<'_, '_> {
+    /// Returns the direct children, for an edit.
     pub fn top_mut(&mut self) -> &mut RawChildren {
         &mut self.0.children
     }
 }
 
+/// A node of the tree.
 #[derive(Debug, Clone)]
 pub enum Node<'a> {
+    /// An element.
     Tag(HTMLTag<'a>),
+    /// A text node.
     Raw(Bytes<'a>),
+    /// A comment, with its delimiters.
     Comment(Bytes<'a>),
 }
 
 impl<'a> Node<'a> {
+    /// Returns the text of the node and its descendants.
     pub fn inner_text<'s, 'p: 's>(&'s self, parser: &'p Parser<'a>) -> Cow<'s, str> {
         match self {
             Node::Tag(tag) => tag.inner_text(parser),
@@ -255,36 +305,42 @@ impl<'a> Node<'a> {
             Node::Comment(_) => Cow::Borrowed(""),
         }
     }
+    /// Returns the children of an element, or `None` for another node.
     pub fn children(&self) -> Option<Children<'a, '_>> {
         match self {
             Node::Tag(tag) => Some(tag.children()),
             _ => None,
         }
     }
+    /// Returns the element, or `None` for another node.
     pub fn as_tag(&self) -> Option<&HTMLTag<'a>> {
         match self {
             Node::Tag(tag) => Some(tag),
             _ => None,
         }
     }
+    /// Returns the element for an edit, or `None` for another node.
     pub fn as_tag_mut(&mut self) -> Option<&mut HTMLTag<'a>> {
         match self {
             Node::Tag(tag) => Some(tag),
             _ => None,
         }
     }
+    /// Returns the comment, or `None` for another node.
     pub fn as_comment(&self) -> Option<&Bytes<'a>> {
         match self {
             Node::Comment(bytes) => Some(bytes),
             _ => None,
         }
     }
+    /// Returns the text, or `None` for another node.
     pub fn as_raw(&self) -> Option<&Bytes<'a>> {
         match self {
             Node::Raw(bytes) => Some(bytes),
             _ => None,
         }
     }
+    /// Returns the text for an edit, or `None` for another node.
     pub fn as_raw_mut(&mut self) -> Option<&mut Bytes<'a>> {
         match self {
             Node::Raw(bytes) => Some(bytes),
@@ -293,6 +349,7 @@ impl<'a> Node<'a> {
     }
 }
 
+/// The node list of a parsed document.
 #[derive(Debug, Clone)]
 pub struct Parser<'a> {
     pub(crate) tags: Vec<Node<'a>>,
@@ -301,6 +358,7 @@ pub struct Parser<'a> {
 }
 
 impl<'a> Parser<'a> {
+    /// Returns the node at this index.
     pub fn resolve_node_id(&self, id: u32) -> Option<&Node<'a>> {
         self.tags.get(id as usize)
     }
@@ -327,27 +385,34 @@ impl<'a> Parser<'a> {
     }
 }
 
+/// A parsed document.
 #[derive(Debug, Clone)]
 pub struct VDom<'a> {
     parser: Parser<'a>,
 }
 
 impl<'a> VDom<'a> {
+    /// Returns the node list.
     pub fn parser(&self) -> &Parser<'a> {
         &self.parser
     }
+    /// Returns the node list, for an edit.
     pub fn parser_mut(&mut self) -> &mut Parser<'a> {
         &mut self.parser
     }
+    /// Returns every node, in document order.
     pub fn nodes(&self) -> &[Node<'a>] {
         &self.parser.tags
     }
+    /// Returns every node, for an edit.
     pub fn nodes_mut(&mut self) -> &mut [Node<'a>] {
         &mut self.parser.tags
     }
+    /// Returns the top-level nodes.
     pub fn children(&self) -> &[NodeHandle] {
         &self.parser.ast
     }
+    /// Returns the elements that match a CSS selector, or `None` if the selector does not parse.
     pub fn query_selector<'b>(
         &'b self,
         selector: &'b str,
@@ -509,6 +574,7 @@ fn read_region<'a>(parser: &mut Parser<'a>, scopes: &mut Scopes, tokens: &mut im
     flush_text(parser, scopes, &mut text);
 }
 
+/// Parses an HTML document into a tree.
 pub fn parse(input: &str, _options: ParserOptions) -> Result<VDom<'_>, ParseError> {
     let Ok(_) = u32::try_from(input.len()) else {
         return Err(ParseError::InvalidLength);
