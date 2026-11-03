@@ -34,11 +34,11 @@ const MIN_FENCE_LENGTH: usize = 3;
 /// In code the element writes nothing of its own. Else the walk captures the text of the
 /// children for [`close_code`], with the links that they hold.
 pub fn open_code(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     context: &Context,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Open {
     children.extend(tag.children().top().iter().copied());
     if context.code_element_is_transparent() {
@@ -64,7 +64,7 @@ pub fn open_code(
             links,
             breaks,
             source_whitespace_only: children.iter().all(|child| {
-                matches!(child.get(parser), Some(tl::Node::Raw(raw))
+                matches!(child.get(parser), Some(crate::dom::Node::Raw(raw))
                     if crate::text::decode_html_entities_cow(&raw.as_utf8_str()).trim().is_empty())
             }),
         })),
@@ -89,7 +89,7 @@ pub fn close_code(end: &CodeEnd, content: &str, mut handler: HandlerContext<'_>)
     }
 
     #[cfg(feature = "visitor")]
-    if let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) {
         if tag.name().as_utf8_str().eq_ignore_ascii_case("code") {
             if let Some(custom_output) = visit_inline_code(tag, content, &handler) {
                 handler.output.push_str(&custom_output);
@@ -142,10 +142,10 @@ pub fn close_code(end: &CodeEnd, content: &str, mut handler: HandlerContext<'_>)
 }
 
 /// Whether the element holds a link. An `<a>` with no `href` is no link: it is text of the code.
-pub(in crate::converter) fn contains_anchor(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> bool {
+pub(in crate::converter) fn contains_anchor(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser<'_>) -> bool {
     let mut pending = tag.children().top().to_vec();
     while let Some(handle) = pending.pop() {
-        if let Some(tl::Node::Tag(child)) = handle.get(parser) {
+        if let Some(crate::dom::Node::Tag(child)) = handle.get(parser) {
             if child.name().as_utf8_str().eq_ignore_ascii_case("a") && child.attributes().get("href").is_some() {
                 return true;
             }
@@ -235,7 +235,7 @@ fn emit_code_content(content: &str, handler: &mut HandlerContext<'_>) {
     );
 }
 
-fn walk_children(tag: &tl::HTMLTag<'_>, output: &mut String, context: &Context, handler: &HandlerContext<'_>) {
+fn walk_children(tag: &crate::dom::HTMLTag<'_>, output: &mut String, context: &Context, handler: &HandlerContext<'_>) {
     for child_handle in tag.children().top().iter() {
         walk_node(
             child_handle,
@@ -252,7 +252,7 @@ fn walk_children(tag: &tl::HTMLTag<'_>, output: &mut String, context: &Context, 
 }
 
 #[cfg(feature = "visitor")]
-fn visit_inline_code(tag: &tl::HTMLTag<'_>, content: &str, handler: &HandlerContext<'_>) -> Option<String> {
+fn visit_inline_code(tag: &crate::dom::HTMLTag<'_>, content: &str, handler: &HandlerContext<'_>) -> Option<String> {
     use crate::visitor::{NodeContext, NodeType};
 
     let visitor_handle = handler.context.visitor.as_ref()?;
@@ -299,8 +299,8 @@ pub(in crate::converter) fn emit_inline_code(
     content: &str,
     output: &mut String,
     options: &ConversionOptions,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
 ) {
     let separator = crate::converter::main_helpers::hard_break_marker(options);
@@ -331,7 +331,7 @@ pub(in crate::converter) fn emit_inline_code(
 /// - Supporting multiple code block styles (indented, backticks, tildes)
 /// - Invoking visitor callbacks when the visitor feature is enabled
 /// - Generating appropriate markdown output
-pub fn handle_pre(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
+pub fn handle_pre(tag: &crate::dom::HTMLTag, handler: HandlerContext<'_>) {
     let cell_break_offsets = (handler.context.in_table_cell && handler.options.br_in_tables).then(|| {
         std::rc::Rc::new(std::cell::RefCell::new(
             crate::converter::context::CapturedOffsets::default(),
@@ -437,8 +437,8 @@ fn start_pre_line(output: &mut String) {
 
 /// Write the content of a plain block container that is inside a code block, on lines of its own.
 pub(in crate::converter) fn handle_line_element_in_pre(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
 ) {
@@ -447,10 +447,10 @@ pub(in crate::converter) fn handle_line_element_in_pre(
     start_pre_line(output);
 }
 
-fn detect_language(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> Option<String> {
+fn detect_language(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser<'_>) -> Option<String> {
     language_from_class(tag).or_else(|| {
         tag.children().top().iter().find_map(|child_handle| {
-            let tl::Node::Tag(child_tag) = child_handle.get(parser)? else {
+            let crate::dom::Node::Tag(child_tag) = child_handle.get(parser)? else {
                 return None;
             };
             (child_tag.name() == "code")
@@ -460,7 +460,7 @@ fn detect_language(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> Option<Str
     })
 }
 
-fn language_from_class(tag: &tl::HTMLTag<'_>) -> Option<String> {
+fn language_from_class(tag: &crate::dom::HTMLTag<'_>) -> Option<String> {
     let classes = tag.attributes().get("class")??;
     let class_text = classes.as_utf8_str();
     let classes = crate::text::decode_attribute_value_cow(&class_text);
@@ -499,7 +499,7 @@ pub(in crate::converter) fn process_pre_content(
 
 #[cfg(feature = "visitor")]
 fn visit_code_block(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     language: Option<&str>,
     content: &str,
     handler: &HandlerContext<'_>,
@@ -873,11 +873,11 @@ pub struct PreEnd {
 }
 
 pub fn open_pre(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     context: &Context,
     options: &ConversionOptions,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Open {
     let offsets = (context.in_table_cell && options.br_in_tables).then(|| {
         Rc::new(std::cell::RefCell::new(
@@ -904,7 +904,7 @@ pub fn close_pre(end: &PreEnd, captured: &str, handler: HandlerContext<'_>) {
     if captured.is_empty() {
         return;
     }
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return;
     };
     #[cfg(not(feature = "visitor"))]
@@ -966,12 +966,12 @@ pub fn close_pre(end: &PreEnd, captured: &str, handler: HandlerContext<'_>) {
 }
 
 pub fn open_line_element_in_pre(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     start_pre_line(output);

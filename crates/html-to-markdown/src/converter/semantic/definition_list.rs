@@ -21,12 +21,12 @@
 /// - No special formatting is applied at the hgroup level
 pub fn handle_hgroup(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         super::walk_tag_children(tag, parser, output, handler);
     }
 }
@@ -43,12 +43,12 @@ pub fn handle_hgroup(
 /// - **Block mode**: Content is collected and wrapped with proper spacing
 pub fn handle_dl(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         if handler.ctx.convert_as_inline {
             super::walk_tag_children(tag, parser, output, handler);
             return;
@@ -88,12 +88,12 @@ pub fn handle_dl(
 /// - **Block mode**: Content is followed by a newline
 pub fn handle_dt(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(64);
         super::walk_tag_children(tag, parser, &mut content, handler);
 
@@ -129,12 +129,12 @@ pub fn handle_dt(
 /// - **Block mode**: Content is output as a block
 pub fn handle_dd(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(128);
         super::walk_tag_children(tag, parser, &mut content, handler);
 
@@ -173,8 +173,8 @@ pub fn handle_dd(
 /// - Proper blank-line spacing is maintained
 pub fn handle_menu(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {
@@ -201,8 +201,8 @@ pub fn handle_menu(
 /// to their respective handlers.
 pub fn handle(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: super::HandlerContext<'_>,
 ) {

@@ -19,7 +19,7 @@ All paths are under `crates/html-to-markdown/src/`.
 
 - `convert()` in `convert_api.rs` checks `max_input_size`, normalizes the input, tries Tier-1, then falls back to Tier-2.
 - Tier-1: byte scanner in `converter/tier1/`.
-- Tier-2: astral-tl DOM walk, `walk_node` in `converter/main.rs`; html5ever is used for tree repair.
+- Tier-2: DOM walk over the `dom` module, built on astral-html, `walk_node` in `converter/main.rs`; html5ever is used for tree repair.
 - `ConversionOptions::tier_strategy` (`Auto` default, `Tier2`, `Tier1` testkit only) picks the path.
 - Per-element converters live under `converter/` (`block/`, `inline/`, `list/`, `form/`, `media/`, `semantic/`, `text/`).
 - Output is shaped by `ConversionOptions` in `options/conversion.rs` (heading style, list indent, code block style, newline style, whitespace mode).

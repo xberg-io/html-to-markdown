@@ -161,10 +161,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "astral-tl"
-version = "0.8.0"
+name = "astral-html"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04d4bb5df351abb6758a04240b0193794ddaf34a7c0b9452fab3c25dcce39e88"
+checksum = "d050c4dc17bfd8bf50da08bda9ef724b44a1b4ec09a5811f193f978cb6fbadbb"
 dependencies = [
  "memchr",
 ]
@@ -1423,7 +1423,6 @@ name = "html-to-markdown-bench"
 version = "3.19.2"
 dependencies = [
  "anyhow",
- "astral-tl",
  "clap",
  "html-to-markdown-rs",
  "humantime",
@@ -1519,7 +1518,7 @@ name = "html-to-markdown-rs"
 version = "3.19.2"
 dependencies = [
  "ahash",
- "astral-tl",
+ "astral-html",
  "axum",
  "base64",
  "bitflags",
@@ -1535,6 +1534,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "smallvec",
  "thiserror 2.0.21",
  "tokio",
  "toml 1.1.8+spec-1.1.0",

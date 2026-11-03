@@ -1,4 +1,4 @@
-//! Builds a [`DocumentStructure`] from a parsed `tl::VDom`.
+//! Builds a [`DocumentStructure`] from a parsed `dom::VDom`.
 //!
 //! Walk the DOM once, mapping each HTML element to the appropriate [`NodeContent`] variant,
 //! collecting inline [`TextAnnotation`]s, tracking parent/child relationships, and generating
@@ -11,7 +11,7 @@ use crate::options::conversion::NATIVE_STACK_SAFE_DEPTH;
 use super::document::{AnnotationKind, DocumentNode, DocumentStructure, MetadataEntry, NodeContent, TextAnnotation};
 use super::tables::{GridCell, TableGrid};
 
-fn reversed_child_handles(tag: &tl::HTMLTag) -> Vec<tl::NodeHandle> {
+fn reversed_child_handles(tag: &crate::dom::HTMLTag) -> Vec<crate::dom::NodeHandle> {
     let children = tag.children();
     let mut handles: Vec<_> = children.top().iter().copied().collect();
     handles.reverse();
@@ -19,7 +19,7 @@ fn reversed_child_handles(tag: &tl::HTMLTag) -> Vec<tl::NodeHandle> {
 }
 
 /// Extract plain text from a tag's descendants, decoding HTML entities.
-fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
+fn extract_text(tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> String {
     let mut buf = String::new();
     let mut stack = reversed_child_handles(tag);
 
@@ -28,12 +28,12 @@ fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
             continue;
         };
         match node {
-            tl::Node::Raw(bytes) => {
+            crate::dom::Node::Raw(bytes) => {
                 let raw = bytes.as_utf8_str();
                 let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
                 buf.push_str(&decoded);
             }
-            tl::Node::Tag(child_tag) => {
+            crate::dom::Node::Tag(child_tag) => {
                 let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
                 if matches!(name.as_str(), "script" | "style" | "head") {
                     continue;
@@ -42,7 +42,7 @@ fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
                     stack.push(child_handle);
                 }
             }
-            tl::Node::Comment(_) => {}
+            crate::dom::Node::Comment(_) => {}
         }
     }
 
@@ -53,9 +53,14 @@ fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
 ///
 /// `text` is the pre-extracted full text of the enclosing block node; annotation
 /// byte offsets are computed relative to that string.
-fn collect_annotations(tag: &tl::HTMLTag, parser: &tl::Parser, text: &str, annotations: &mut Vec<TextAnnotation>) {
+fn collect_annotations(
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
+    text: &str,
+    annotations: &mut Vec<TextAnnotation>,
+) {
     enum Frame {
-        Visit(tl::NodeHandle),
+        Visit(crate::dom::NodeHandle),
         Finish { start: usize, kind: Option<AnnotationKind> },
     }
 
@@ -84,12 +89,12 @@ fn collect_annotations(tag: &tl::HTMLTag, parser: &tl::Parser, text: &str, annot
             continue;
         };
         match node {
-            tl::Node::Raw(bytes) => {
+            crate::dom::Node::Raw(bytes) => {
                 let raw = bytes.as_utf8_str();
                 let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
                 offset += decoded.len();
             }
-            tl::Node::Tag(child_tag) => {
+            crate::dom::Node::Tag(child_tag) => {
                 let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
                 if matches!(name.as_str(), "script" | "style" | "head") {
                     continue;
@@ -102,12 +107,12 @@ fn collect_annotations(tag: &tl::HTMLTag, parser: &tl::Parser, text: &str, annot
                     stack.push(Frame::Visit(child_handle));
                 }
             }
-            tl::Node::Comment(_) => {}
+            crate::dom::Node::Comment(_) => {}
         }
     }
 }
 
-pub(crate) fn annotation_kind_for_tag(name: &str, tag: &tl::HTMLTag) -> Option<AnnotationKind> {
+pub(crate) fn annotation_kind_for_tag(name: &str, tag: &crate::dom::HTMLTag) -> Option<AnnotationKind> {
     match name {
         "strong" | "b" => Some(AnnotationKind::Bold),
         "em" | "i" => Some(AnnotationKind::Italic),
@@ -135,7 +140,7 @@ pub(crate) fn annotation_kind_for_tag(name: &str, tag: &tl::HTMLTag) -> Option<A
     }
 }
 
-fn collect_annotated_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> (String, Vec<TextAnnotation>) {
+fn collect_annotated_text(tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> (String, Vec<TextAnnotation>) {
     let raw_text = extract_text(tag, parser);
     let mut annotations = Vec::new();
     collect_annotations(tag, parser, &raw_text, &mut annotations);
@@ -167,15 +172,15 @@ pub(super) fn trim_annotated_text(text: &str, mut annotations: Vec<TextAnnotatio
 }
 
 /// Build a [`TableGrid`] from a `<table>` element.
-fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid {
-    let mut row_handles: Vec<tl::NodeHandle> = Vec::new();
+fn extract_table_grid(table_tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> TableGrid {
+    let mut row_handles: Vec<crate::dom::NodeHandle> = Vec::new();
     collect_tr_handles(table_tag, parser, &mut row_handles);
 
     let mut cells: Vec<GridCell> = Vec::new();
     let mut max_col: u32 = 0;
 
     for (row_idx, row_handle) in row_handles.iter().enumerate() {
-        let Some(tl::Node::Tag(row_tag)) = row_handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(row_tag)) = row_handle.get(parser) else {
             continue;
         };
 
@@ -183,7 +188,7 @@ fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid
         let row_children = row_tag.children();
 
         for child_handle in row_children.top().iter() {
-            let Some(tl::Node::Tag(cell_tag)) = child_handle.get(parser) else {
+            let Some(crate::dom::Node::Tag(cell_tag)) = child_handle.get(parser) else {
                 continue;
             };
             let cell_name = cell_tag.name().as_utf8_str().to_ascii_lowercase();
@@ -237,12 +242,16 @@ fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid
 }
 
 /// Collect all `<tr>` `NodeHandle`s from within a table element.
-fn collect_tr_handles(tag: &tl::HTMLTag, parser: &tl::Parser, result: &mut Vec<tl::NodeHandle>) {
+fn collect_tr_handles(
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
+    result: &mut Vec<crate::dom::NodeHandle>,
+) {
     let mut stack = crate::converter::utility::siblings::table_children(tag, parser);
     stack.reverse();
 
     while let Some(handle) = stack.pop() {
-        if let Some(tl::Node::Tag(child_tag)) = handle.get(parser) {
+        if let Some(crate::dom::Node::Tag(child_tag)) = handle.get(parser) {
             let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
             if name == "tr" {
                 result.push(handle);
@@ -274,13 +283,13 @@ fn make_node_id(node_type: &str, text: &str, index: usize) -> String {
 ///
 /// Returns `(term_text, definition_text)` tuples.  Consecutive `<dt>` elements share
 /// the next `<dd>`; orphan `<dd>`s use an empty term.
-fn collect_definition_items(dl_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<(String, String)> {
+fn collect_definition_items(dl_tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> Vec<(String, String)> {
     let mut items: Vec<(String, String)> = Vec::new();
     let mut pending_terms: Vec<String> = Vec::new();
 
     let children = dl_tag.children();
     for handle in children.top().iter() {
-        let Some(tl::Node::Tag(child_tag)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(child_tag)) = handle.get(parser) else {
             continue;
         };
         let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
@@ -315,12 +324,12 @@ fn collect_definition_items(dl_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<(S
 }
 
 /// Extract `<meta name=… content=…>` and `<title>` entries from a `<head>` element.
-fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) -> Vec<MetadataEntry> {
+fn extract_head_metadata_entries(head_tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> Vec<MetadataEntry> {
     let mut entries: Vec<MetadataEntry> = Vec::new();
 
     let children = head_tag.children();
     for handle in children.top().iter() {
-        let Some(tl::Node::Tag(child_tag)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(child_tag)) = handle.get(parser) else {
             continue;
         };
         let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
@@ -359,11 +368,11 @@ struct BuilderState {
     /// Stack of open heading-group indices: `(heading_level, node_index)`.
     group_stack: Vec<(u8, u32)>,
     /// The document's head, the only `<head>` that gives a metadata block.
-    head: Option<tl::NodeHandle>,
+    head: Option<crate::dom::NodeHandle>,
 }
 
 impl BuilderState {
-    const fn new(head: Option<tl::NodeHandle>) -> Self {
+    const fn new(head: Option<crate::dom::NodeHandle>) -> Self {
         Self {
             nodes: Vec::new(),
             group_stack: Vec::new(),
@@ -400,7 +409,7 @@ impl BuilderState {
     }
 }
 
-/// Build a [`DocumentStructure`] from an already-parsed `tl::VDom`.
+/// Build a [`DocumentStructure`] from an already-parsed `dom::VDom`.
 ///
 /// Walks the DOM once, mapping HTML elements to semantic [`NodeContent`] variants,
 /// tracking parent/child relationships, extracting inline [`TextAnnotation`]s, and
@@ -419,15 +428,15 @@ impl BuilderState {
 ///
 /// ```rust,no_run
 /// use html_to_markdown_rs::types::build_document_structure;
+/// use html_to_markdown_rs::dom::{ParserOptions, parse};
 ///
-/// let dom = tl::parse("<h1>Title</h1><p>Body</p>", tl::ParserOptions::default())
-///     .expect("valid HTML");
+/// let dom = parse("<h1>Title</h1><p>Body</p>", ParserOptions::default()).expect("valid HTML");
 /// let doc = build_document_structure(&dom);
 /// assert_eq!(doc.source_format.as_deref(), Some("html"));
 /// assert!(!doc.nodes.is_empty());
 /// ```
 #[must_use]
-pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
+pub fn build_document_structure(dom: &crate::dom::VDom<'_>) -> DocumentStructure {
     let parser = dom.parser();
     let mut state = BuilderState::new(crate::converter::document_head(dom.children(), parser));
 
@@ -444,7 +453,13 @@ pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
 /// Recursive DOM walker.
 ///
 /// `parent_idx` is the flat-list index of the nearest structural parent, if any.
-fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, parent_idx: Option<u32>, depth: usize) {
+fn walk(
+    state: &mut BuilderState,
+    handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    parent_idx: Option<u32>,
+    depth: usize,
+) {
     if depth >= NATIVE_STACK_SAFE_DEPTH {
         return;
     }
@@ -454,8 +469,8 @@ fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, 
     };
 
     match node {
-        tl::Node::Raw(_) | tl::Node::Comment(_) => {}
-        tl::Node::Tag(tag) => {
+        crate::dom::Node::Raw(_) | crate::dom::Node::Comment(_) => {}
+        crate::dom::Node::Tag(tag) => {
             let tag_name = tag.name().as_utf8_str().to_ascii_lowercase();
             if tag_name == "head" && state.head != Some(*handle) {
                 return;
@@ -469,8 +484,8 @@ fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, 
 fn process_tag(
     state: &mut BuilderState,
     tag_name: &str,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     parent_idx: Option<u32>,
     depth: usize,
 ) {
@@ -537,8 +552,8 @@ fn process_tag(
 fn process_raw_block(
     state: &mut BuilderState,
     tag_name: &str,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     parent_idx: Option<u32>,
 ) {
     let format = if tag_name == "script" {
@@ -563,7 +578,7 @@ fn process_raw_block(
     });
 }
 
-fn process_head(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser) {
+fn process_head(state: &mut BuilderState, tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) {
     let entries = extract_head_metadata_entries(tag, parser);
     if entries.is_empty() {
         return;
@@ -581,8 +596,8 @@ fn process_head(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser
 fn process_section_group(
     state: &mut BuilderState,
     tag_name: &str,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     parent_idx: Option<u32>,
     depth: usize,
 ) {
@@ -608,8 +623,8 @@ fn process_section_group(
 
 fn walk_children(
     state: &mut BuilderState,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     parent_idx: Option<u32>,
     depth: usize,
 ) {
@@ -618,7 +633,12 @@ fn walk_children(
     }
 }
 
-fn process_code_block(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser, parent_idx: Option<u32>) {
+fn process_code_block(
+    state: &mut BuilderState,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
+    parent_idx: Option<u32>,
+) {
     let (text, language) = find_code_child(tag, parser).unwrap_or_else(|| (extract_text(tag, parser), None));
     state.push_attached(DocumentNode {
         id: make_node_id("code", &text, state.nodes.len()),
@@ -630,9 +650,9 @@ fn process_code_block(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::
     });
 }
 
-fn find_code_child(tag: &tl::HTMLTag, parser: &tl::Parser) -> Option<(String, Option<String>)> {
+fn find_code_child(tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> Option<(String, Option<String>)> {
     for child_handle in tag.children().top().iter() {
-        let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(parser) else {
             continue;
         };
         if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("code") {
@@ -651,8 +671,8 @@ fn find_code_child(tag: &tl::HTMLTag, parser: &tl::Parser) -> Option<(String, Op
 
 fn process_quote(
     state: &mut BuilderState,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     parent_idx: Option<u32>,
     depth: usize,
 ) {
@@ -667,7 +687,12 @@ fn process_quote(
     walk_children(state, tag, parser, Some(quote_idx), depth);
 }
 
-fn process_definition_list(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser, parent_idx: Option<u32>) {
+fn process_definition_list(
+    state: &mut BuilderState,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
+    parent_idx: Option<u32>,
+) {
     let list_idx = state.push_attached(DocumentNode {
         id: make_node_id("definition_list", "dl", state.nodes.len()),
         content: NodeContent::DefinitionList,
@@ -688,7 +713,12 @@ fn process_definition_list(state: &mut BuilderState, tag: &tl::HTMLTag, parser: 
     }
 }
 
-fn process_paragraph(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser, parent_idx: Option<u32>) {
+fn process_paragraph(
+    state: &mut BuilderState,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
+    parent_idx: Option<u32>,
+) {
     let (text, annotations) = collect_annotated_text(tag, parser);
     if text.is_empty() {
         return;
@@ -706,8 +736,8 @@ fn process_paragraph(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::P
 fn process_list(
     state: &mut BuilderState,
     ordered: bool,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     parent_idx: Option<u32>,
     depth: usize,
 ) {
@@ -723,7 +753,12 @@ fn process_list(
     walk_children(state, tag, parser, Some(list_idx), depth);
 }
 
-fn process_list_item(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser, parent_idx: Option<u32>) {
+fn process_list_item(
+    state: &mut BuilderState,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
+    parent_idx: Option<u32>,
+) {
     let (text, annotations) = collect_annotated_text(tag, parser);
     if text.is_empty() {
         return;
@@ -738,7 +773,12 @@ fn process_list_item(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::P
     });
 }
 
-fn process_table(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser, parent_idx: Option<u32>) {
+fn process_table(
+    state: &mut BuilderState,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
+    parent_idx: Option<u32>,
+) {
     let grid = extract_table_grid(tag, parser);
     state.push_attached(DocumentNode {
         id: make_node_id("table", &grid.rows.to_string(), state.nodes.len()),
@@ -750,7 +790,7 @@ fn process_table(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parse
     });
 }
 
-fn process_image(state: &mut BuilderState, tag: &tl::HTMLTag, parent_idx: Option<u32>) {
+fn process_image(state: &mut BuilderState, tag: &crate::dom::HTMLTag, parent_idx: Option<u32>) {
     let src = tag
         .attributes()
         .get("src")
@@ -779,8 +819,8 @@ fn process_image(state: &mut BuilderState, tag: &tl::HTMLTag, parent_idx: Option
 fn process_heading(
     state: &mut BuilderState,
     tag_name: &str,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     parent_idx: Option<u32>,
 ) {
     let level = tag_name[1..].parse::<u8>().unwrap_or(1);
@@ -824,7 +864,7 @@ fn process_heading(
 ///
 /// Only `id`, `class`, `lang`, `dir`, and `data-*` attributes are kept.
 /// Event handlers (`on*`) and other potentially unsafe attributes are dropped.
-fn collect_attributes(tag: &tl::HTMLTag) -> Option<HashMap<String, String>> {
+fn collect_attributes(tag: &crate::dom::HTMLTag) -> Option<HashMap<String, String>> {
     let raw = tag.attributes().clone();
     let mut map: HashMap<String, String> = HashMap::new();
 

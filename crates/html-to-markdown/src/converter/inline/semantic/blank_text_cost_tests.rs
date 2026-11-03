@@ -257,7 +257,7 @@ fn blank_marks_should_keep_line_break_code_and_fallback_policies() {
 
 #[test]
 fn blank_text_eligibility_should_accept_multiple_raw_nodes_and_reject_other_children() {
-    let dom = tl::parse(
+    let dom = crate::dom::parse(
         "<mark> </mark><mark>\r\n\u{2000}</mark><span>x</span>",
         Default::default(),
     )
@@ -265,12 +265,12 @@ fn blank_text_eligibility_should_accept_multiple_raw_nodes_and_reject_other_chil
     let parser = dom.parser();
     let mut tag = dom.children()[0]
         .get(parser)
-        .and_then(tl::Node::as_tag)
+        .and_then(crate::dom::Node::as_tag)
         .expect("first mark")
         .clone();
     let second = dom.children()[1]
         .get(parser)
-        .and_then(tl::Node::as_tag)
+        .and_then(crate::dom::Node::as_tag)
         .expect("second mark");
     let raw = second
         .children()
@@ -291,10 +291,10 @@ fn blank_text_eligibility_should_accept_multiple_raw_nodes_and_reject_other_chil
         "<mark><span></span></mark>",
         "<mark>x</mark>",
     ] {
-        let dom = tl::parse(html, Default::default()).expect("parse nonblank control");
+        let dom = crate::dom::parse(html, Default::default()).expect("parse nonblank control");
         let tag = dom.children()[0]
             .get(dom.parser())
-            .and_then(tl::Node::as_tag)
+            .and_then(crate::dom::Node::as_tag)
             .expect("mark");
         assert!(!super::has_only_blank_text_children(tag, dom.parser()), "{html:?}");
     }

@@ -9,9 +9,9 @@ use crate::converter::utility::svg_attrs::canonical_svg_attr;
 use crate::options::conversion::NATIVE_STACK_SAFE_DEPTH;
 use crate::options::{ConversionOptions, HiddenContent};
 // ~keep reason: BTreeMap is only used when the inline-images feature is active.
+use crate::dom::{NodeHandle, Parser};
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
-use tl::{NodeHandle, Parser};
 
 #[cfg(feature = "inline-images")]
 use crate::inline_images::{InlineImageBuild, InlineImageCollector, InlineImageFormat, InlineImageSource};
@@ -130,7 +130,7 @@ pub fn serialize_node(node_handle: &NodeHandle, parser: &Parser) -> String {
 /// emitted; only its descendants are dropped once the budget is exhausted.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn serialize_element_at_depth(node_handle: &NodeHandle, parser: &Parser, depth: usize, max_depth: usize) -> String {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let tag_name = normalized_tag_name(tag.name().as_utf8_str());
         let mut html = String::with_capacity(256);
         html.push('<');
@@ -141,7 +141,7 @@ pub fn serialize_element_at_depth(node_handle: &NodeHandle, parser: &Parser, dep
         for (key, value_opt) in attrs {
             html.push(' ');
             // ~keep Restore camelCase for SVG/MathML attributes whose canonical
-            // ~keep WHATWG spelling is mixed-case.  tl lowercases all attribute
+            // ~keep WHATWG spelling is mixed-case.  the parser lowercases all attribute
             // ~keep names when it re-parses a wrapped fragment (Tier-1 path via
             // ~keep emit_svg_from_slice), but preserves case on a full-document
             // ~keep parse (Tier-2 path).  Applying the lookup in both paths is
@@ -151,7 +151,7 @@ pub fn serialize_element_at_depth(node_handle: &NodeHandle, parser: &Parser, dep
             let canonical = canonical_svg_attr(key_str);
             html.push_str(canonical.unwrap_or(key_str));
             if let Some(value) = value_opt {
-                // ~keep Treat empty value identically to a bare attribute.  When tl
+                // ~keep Treat empty value identically to a bare attribute.  When the parser
                 // ~keep re-parses a wrapped SVG slice (Tier-1's emit_svg_from_slice)
                 // ~keep it yields `None` for `attr=""` while a single full-document
                 // ~keep parse (Tier-2) yields `Some("")`.  Both forms are
@@ -199,8 +199,8 @@ pub fn serialize_element_at_depth(node_handle: &NodeHandle, parser: &Parser, dep
 pub fn serialize_node_at_depth(node_handle: &NodeHandle, parser: &Parser, depth: usize, max_depth: usize) -> String {
     if let Some(node) = node_handle.get(parser) {
         match node {
-            tl::Node::Raw(bytes) => bytes.as_utf8_str().to_string(),
-            tl::Node::Tag(_) => serialize_element_at_depth(node_handle, parser, depth, max_depth),
+            crate::dom::Node::Raw(bytes) => bytes.as_utf8_str().to_string(),
+            crate::dom::Node::Tag(_) => serialize_element_at_depth(node_handle, parser, depth, max_depth),
             _ => String::new(),
         }
     } else {
@@ -234,7 +234,7 @@ enum GraphicScope {
 }
 
 enum GraphicStep {
-    Visit(tl::NodeHandle, GraphicScope, usize),
+    Visit(crate::dom::NodeHandle, GraphicScope, usize),
     Space,
     EndPart,
 }
@@ -259,7 +259,7 @@ impl GraphicParts {
     }
 }
 
-fn is_aria_hidden(tag: &tl::HTMLTag<'_>) -> bool {
+fn is_aria_hidden(tag: &crate::dom::HTMLTag<'_>) -> bool {
     tag.attributes()
         .get("aria-hidden")
         .flatten()
@@ -273,7 +273,7 @@ fn is_aria_hidden(tag: &tl::HTMLTag<'_>) -> bool {
 /// ~keep outside one are hidden by one decision. An element hidden by its `style` or by the
 /// ~keep `hidden` attribute is already gone when the graphic is parsed. A caller that keeps hidden
 /// ~keep content keeps this text too, so no element is hidden for it.
-fn is_hidden_in_graphic(tag: &tl::HTMLTag<'_>, hidden_content: HiddenContent) -> bool {
+fn is_hidden_in_graphic(tag: &crate::dom::HTMLTag<'_>, hidden_content: HiddenContent) -> bool {
     use crate::converter::utility::preprocessing::{HiddenStyleReason, style_value_hidden_reason};
 
     hidden_content == HiddenContent::Drop
@@ -286,7 +286,7 @@ fn is_hidden_in_graphic(tag: &tl::HTMLTag<'_>, hidden_content: HiddenContent) ->
 }
 
 /// Whether the `systemLanguage` test of a child of a `switch` holds for a reader of English.
-fn system_language_holds(tag: &tl::HTMLTag<'_>) -> bool {
+fn system_language_holds(tag: &crate::dom::HTMLTag<'_>) -> bool {
     // ~keep The parser keeps the case of the name in a page and lowers it in a fragment.
     let Some(value) = ["systemLanguage", "systemlanguage"]
         .iter()
@@ -316,7 +316,7 @@ fn system_language_holds(tag: &tl::HTMLTag<'_>) -> bool {
 /// the title and the description, and keeps drawn text. A graphic with none of these gives the
 /// empty string. When `use_accessible_names` is false, only drawn text is collected.
 pub fn graphic_text(
-    svg: &tl::HTMLTag<'_>,
+    svg: &crate::dom::HTMLTag<'_>,
     parser: &Parser<'_>,
     options: &ConversionOptions,
     policy: crate::convert_api::AccessibleNamePolicy,
@@ -327,7 +327,7 @@ pub fn graphic_text(
 // ~keep Preserved HTML emits cutoff-node attributes but never its children; semantic SVG labels share that budget.
 #[cfg(feature = "metadata")]
 pub(in crate::converter) fn preserved_graphic_text(
-    svg: &tl::HTMLTag<'_>,
+    svg: &crate::dom::HTMLTag<'_>,
     parser: &Parser<'_>,
     options: &ConversionOptions,
     policy: crate::convert_api::AccessibleNamePolicy,
@@ -337,7 +337,7 @@ pub(in crate::converter) fn preserved_graphic_text(
 }
 
 fn graphic_text_with_depth(
-    svg: &tl::HTMLTag<'_>,
+    svg: &crate::dom::HTMLTag<'_>,
     parser: &Parser<'_>,
     options: &ConversionOptions,
     policy: crate::convert_api::AccessibleNamePolicy,
@@ -380,12 +380,14 @@ fn graphic_text_with_depth(
             }
         };
         match handle.get(parser) {
-            Some(tl::Node::Raw(bytes)) if !matches!(scope, GraphicScope::Drawing { .. }) => {
+            Some(crate::dom::Node::Raw(bytes)) if !matches!(scope, GraphicScope::Drawing { .. }) => {
                 out.current
                     .push_str(&crate::text::decode_html_entities_cow(bytes.as_utf8_str().as_ref()));
             }
-            Some(tl::Node::Tag(tag)) if is_hidden_in_graphic(tag, hidden_content) => {}
-            Some(tl::Node::Tag(tag)) => visit_graphic_tag(tag, parser, scope, &mut stack, &mut out, remaining_depth),
+            Some(crate::dom::Node::Tag(tag)) if is_hidden_in_graphic(tag, hidden_content) => {}
+            Some(crate::dom::Node::Tag(tag)) => {
+                visit_graphic_tag(tag, parser, scope, &mut stack, &mut out, remaining_depth)
+            }
             _ => {}
         }
     }
@@ -395,7 +397,7 @@ fn graphic_text_with_depth(
 
 fn push_graphic_children(
     stack: &mut Vec<GraphicStep>,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     scope: GraphicScope,
     remaining_depth: usize,
 ) {
@@ -416,7 +418,7 @@ fn push_graphic_children(
 fn push_graphic_part(
     stack: &mut Vec<GraphicStep>,
     out: &mut GraphicParts,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     scope: GraphicScope,
     remaining_depth: usize,
 ) {
@@ -426,7 +428,7 @@ fn push_graphic_part(
 }
 
 fn visit_graphic_tag(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     parser: &Parser<'_>,
     scope: GraphicScope,
     stack: &mut Vec<GraphicStep>,
@@ -495,7 +497,7 @@ fn visit_graphic_tag(
 
 fn push_graphic_switch(
     stack: &mut Vec<GraphicStep>,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     parser: &Parser<'_>,
     named: bool,
     remaining_depth: usize,
@@ -507,7 +509,10 @@ fn push_graphic_switch(
         .children()
         .top()
         .iter()
-        .find(|child| matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if system_language_holds(child_tag)))
+        .find(|child| {
+            matches!(child.get(parser), Some(crate::dom::Node::Tag(child_tag))
+            if system_language_holds(child_tag))
+        })
         .copied();
     stack.extend(first.map(|child| {
         GraphicStep::Visit(
@@ -524,7 +529,7 @@ fn push_graphic_switch(
 /// and for `alt_text_only`) or a base64-encoded image with that text as its alt text.
 pub fn handle_svg(
     node_handle: &NodeHandle,
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     parser: &Parser,
     output: &mut String,
     context: MediaContext<'_>,
@@ -571,7 +576,7 @@ pub fn handle_svg(
 fn collect_inline_svg(
     collector_ref: &InlineCollectorHandle,
     node_handle: NodeHandle,
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     parser: &Parser,
     dom_ctx: &crate::converter::DomContext,
 ) {
@@ -580,7 +585,8 @@ fn collect_inline_svg(
         .top()
         .iter()
         .find(|child| {
-            matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if child_tag.name().as_utf8_str().eq_ignore_ascii_case("title"))
+            matches!(child.get(parser), Some(crate::dom::Node::Tag(child_tag))
+                if child_tag.name().as_utf8_str().eq_ignore_ascii_case("title"))
         })
         .map(|child| {
             crate::converter::utility::content::get_text_content(child, parser, dom_ctx)
@@ -668,7 +674,7 @@ fn write_graphic_as_image(
 /// Outputs visible `MathML` text content with escaping.
 pub fn handle_math(
     node_handle: &NodeHandle,
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     parser: &Parser,
     output: &mut String,
     context: MediaContext<'_>,
@@ -739,12 +745,12 @@ mod attribute_escaping_tests {
         // double-quoted attribute without escaping manufactures a real `onclick` that never
         // existed as an attribute in the original document.
         let html = r#"<foo title='x" onclick="alert(1)" y=' data-safe="1">"#;
-        let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
+        let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).unwrap();
         let parser = dom.parser();
         let node_handle = dom
             .children()
             .iter()
-            .find(|handle| matches!(handle.get(parser), Some(tl::Node::Tag(_))))
+            .find(|handle| matches!(handle.get(parser), Some(crate::dom::Node::Tag(_))))
             .expect("tag node");
         let result = serialize_element(node_handle, parser);
         assert_eq!(

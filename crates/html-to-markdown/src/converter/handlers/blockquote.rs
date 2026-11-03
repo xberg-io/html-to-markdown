@@ -24,9 +24,9 @@ use std::borrow::Cow;
 /// - Invoking visitor callbacks when the visitor feature is enabled
 /// - Adding proper spacing and blockquote prefix formatting
 pub fn open_blockquote(
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     handler: &HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
     use crate::converter::walk::{CaptureEnd, Close, Open};
     children.extend(tag.children().top().iter().copied());
@@ -61,7 +61,7 @@ pub fn open_blockquote(
 }
 
 pub fn close_blockquote(content: &str, mut handler: HandlerContext<'_>) {
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return;
     };
     let mut content = content.to_owned();
@@ -113,8 +113,8 @@ pub fn close_blockquote(content: &str, mut handler: HandlerContext<'_>) {
 /// ~keep `handlers::blockquote` is itself only `pub` within the crate): the description of a
 /// ~keep definition list in `list/definition.rs` trims its content by the same rule.
 pub fn container_content<'p, 'a, 'c>(
-    tag: &'p tl::HTMLTag<'a>,
-    parser: &'p tl::Parser<'a>,
+    tag: &'p crate::dom::HTMLTag<'a>,
+    parser: &'p crate::dom::Parser<'a>,
     content: &'c str,
     style: crate::options::CodeBlockStyle,
 ) -> &'c str {
@@ -129,7 +129,7 @@ pub fn container_content<'p, 'a, 'c>(
 
 /// Whether the first content of `tag` is a `pre` element, directly or as the first content of its
 /// first element.
-fn starts_with_code_block<'p, 'a>(tag: &'p tl::HTMLTag<'a>, parser: &'p tl::Parser<'a>) -> bool {
+fn starts_with_code_block<'p, 'a>(tag: &'p crate::dom::HTMLTag<'a>, parser: &'p crate::dom::Parser<'a>) -> bool {
     let mut current = tag;
     loop {
         let first = current
@@ -137,8 +137,8 @@ fn starts_with_code_block<'p, 'a>(tag: &'p tl::HTMLTag<'a>, parser: &'p tl::Pars
             .top()
             .iter()
             .find_map(|child| match child.get(parser) {
-                Some(tl::Node::Tag(element)) => Some(Some(element)),
-                Some(tl::Node::Raw(text)) if !text.as_utf8_str().trim().is_empty() => Some(None),
+                Some(crate::dom::Node::Tag(element)) => Some(Some(element)),
+                Some(crate::dom::Node::Raw(text)) if !text.as_utf8_str().trim().is_empty() => Some(None),
                 _ => None,
             });
         match first.flatten() {
@@ -150,7 +150,7 @@ fn starts_with_code_block<'p, 'a>(tag: &'p tl::HTMLTag<'a>, parser: &'p tl::Pars
 }
 
 #[cfg(feature = "visitor")]
-fn visit_blockquote(tag: &tl::HTMLTag<'_>, content: &str, handler: &mut HandlerContext<'_>) -> bool {
+fn visit_blockquote(tag: &crate::dom::HTMLTag<'_>, content: &str, handler: &mut HandlerContext<'_>) -> bool {
     use crate::visitor::{NodeContext, NodeType, VisitResult};
 
     let Some(visitor) = handler.context.visitor.as_ref() else {

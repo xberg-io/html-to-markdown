@@ -7,9 +7,9 @@
 //! - Visitor callbacks for custom heading processing
 
 use crate::converter::block::container::HandlerContext;
+use crate::dom::{NodeHandle, Parser};
 use crate::options::{ConversionOptions, HeadingStyle, OutputFormat};
 use std::borrow::Cow;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -56,7 +56,7 @@ pub fn open(
 ) -> Option<crate::converter::walk::Open> {
     let level = tag_name.chars().last().and_then(|c| c.to_digit(10)).unwrap_or(1) as usize;
     separate_heading(output, handler.options, handler.ctx, level);
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -365,7 +365,7 @@ fn visitor_heading_output(
         push_heading(&mut buf, ctx, handler.options, level, normalized);
         return Some(buf);
     };
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     let id_attr = tag
@@ -436,7 +436,7 @@ fn visitor_heading_output(
 pub fn find_single_heading_child(node_handle: NodeHandle, parser: &Parser) -> Option<(usize, NodeHandle)> {
     let node = node_handle.get(parser)?;
 
-    let tl::Node::Tag(tag) = node else {
+    let crate::dom::Node::Tag(tag) = node else {
         return None;
     };
 
@@ -449,12 +449,12 @@ pub fn find_single_heading_child(node_handle: NodeHandle, parser: &Parser) -> Op
         };
 
         match child_node {
-            tl::Node::Raw(bytes) => {
+            crate::dom::Node::Raw(bytes) => {
                 if !bytes.as_utf8_str().trim().is_empty() {
                     return None;
                 }
             }
-            tl::Node::Tag(child_tag) => {
+            crate::dom::Node::Tag(child_tag) => {
                 let name = crate::converter::utility::content::normalized_tag_name(child_tag.name().as_utf8_str());
                 {
                     let level = heading_level_from_name(name.as_ref())?;
@@ -464,7 +464,7 @@ pub fn find_single_heading_child(node_handle: NodeHandle, parser: &Parser) -> Op
                     heading_data = Some((level, *child_handle));
                 }
             }
-            tl::Node::Comment(_) => return None,
+            crate::dom::Node::Comment(_) => return None,
         }
     }
 

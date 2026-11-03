@@ -6,13 +6,13 @@ use super::{
 #[cfg(feature = "visitor")]
 use super::{ItemRenderContext, visit_regular_item};
 pub fn open_regular(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     let task = TaskInfo::new(node_handle, parser, context);
@@ -67,7 +67,7 @@ impl crate::converter::walk::ChildHook for RegularItemHook {
     }
     fn after_child(&mut self, _index: usize, _own: Option<String>, _site: &mut crate::converter::walk::HookSite<'_>) {}
     fn close(self: Box<Self>, site: &mut crate::converter::walk::HookSite<'_>) {
-        let Some(tl::Node::Tag(tag)) = site.node_handle.get(site.parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = site.node_handle.get(site.parser) else {
             return;
         };
         let marker = ItemMarker::new(self.task, site.context, site.options);
@@ -114,14 +114,14 @@ pub struct TaskItemEnd {
 }
 
 fn open_task(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
     task: TaskInfo,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     let marker = ItemMarker::new(task, context.ctx, context.options);

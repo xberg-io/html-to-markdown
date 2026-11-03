@@ -19,12 +19,12 @@ use crate::converter::block::container::HandlerContext;
 /// * `depth` - Current recursion depth
 /// * `dom_ctx` - DOM context for tag name resolution
 pub fn handle_caption(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let mut text = String::new();
         let children = tag.children();
         {

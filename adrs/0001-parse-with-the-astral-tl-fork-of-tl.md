@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by [ADR-0008](0008-parse-with-a-dom-built-on-astral-html.md)
 date: 2025-11-20
 decision-makers: ["Na'aman Hirschfeld"]
 ---

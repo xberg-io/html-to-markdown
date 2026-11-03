@@ -30,7 +30,7 @@
 //!
 //! The conversion process follows these steps:
 //!
-//! 1. **Parse HTML**: Input HTML is parsed into a DOM tree using the astral-tl parser
+//! 1. **Parse HTML**: Input HTML is parsed into a DOM tree using the `dom` module
 //! 2. **Walk Tree**: Recursive tree walk starting from the root document node
 //! 3. **Dispatch**: Each element is dispatched to its handler based on tag name
 //! 4. **Convert**: Handler transforms the element to Markdown representation

@@ -37,10 +37,11 @@ documentation = "https://docs.rs/html-to-markdown-rs"
 readme = "README.md"
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing", "web-programming"]
-rust-version = "1.88"
+rust-version = "1.97"
 
 [workspace.dependencies]
 ahash = { version = "0.8", default-features = false, features = ["std", "compile-time-rng"] }
+astral-html = "=0.0.4"
 base64 = "0.23"
 clap = { version = "4.6", features = ["derive"] }
 clap_complete = "4.6"
@@ -56,10 +57,10 @@ rayon = "1.12"
 regex = "1.13"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+smallvec = "1"
 tempfile = "3.27"
 thiserror = "2.0"
 tikv-jemallocator = "0.7"
-tl = { package = "astral-tl", version = "0.8.0" }
 toml = "1.1"
 tracing = "0.1"
 url = "2.5"

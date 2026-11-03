@@ -20,8 +20,8 @@ pub mod semantic;
 pub mod wrapped;
 
 pub struct HandlerContext<'a> {
-    pub node_handle: &'a tl::NodeHandle,
-    pub parser: &'a tl::Parser<'a>,
+    pub node_handle: &'a crate::dom::NodeHandle,
+    pub parser: &'a crate::dom::Parser<'a>,
     pub output: &'a mut String,
     pub options: &'a crate::options::ConversionOptions,
     pub context: &'a crate::converter::Context,
@@ -30,8 +30,8 @@ pub struct HandlerContext<'a> {
 }
 
 type HandlerParts<'a> = (
-    &'a tl::NodeHandle,
-    &'a tl::Parser<'a>,
+    &'a crate::dom::NodeHandle,
+    &'a crate::dom::Parser<'a>,
     &'a mut String,
     &'a crate::options::ConversionOptions,
     &'a crate::converter::Context,

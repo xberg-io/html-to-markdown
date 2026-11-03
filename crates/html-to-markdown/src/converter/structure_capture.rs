@@ -38,7 +38,7 @@ pub(super) fn is_text_capture_active(ctx: &Context) -> bool {
 
 pub(super) fn begin_element(
     tag_name: &str,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     ctx: &Context,
     node: u32,
     depth: usize,
@@ -75,7 +75,12 @@ pub(super) fn begin_element(
     }
 }
 
-pub(super) fn finish_element(capture: ElementTextCapture, tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context) {
+pub(super) fn finish_element(
+    capture: ElementTextCapture,
+    tag_name: &str,
+    tag: &crate::dom::HTMLTag<'_>,
+    ctx: &Context,
+) {
     #[cfg(feature = "metadata")]
     super::heading_metadata::finish(ctx, capture.metadata_node);
     if let Some(collector) = ctx.structure_collector.as_ref() {
@@ -124,7 +129,7 @@ pub(super) fn replace_element(ctx: &Context, replacement: Option<&str>) {
 
 pub(super) fn replace_element_at_start(
     tag_name: &str,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     ctx: &Context,
     replacement: &str,
     node: u32,
@@ -165,7 +170,7 @@ fn begin_block(tag_name: &str, ctx: &Context) -> Option<BlockTextCapture> {
     Some(BlockTextCapture { id, kind })
 }
 
-fn finish_block(capture: Option<BlockTextCapture>, tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context) {
+fn finish_block(capture: Option<BlockTextCapture>, tag_name: &str, tag: &crate::dom::HTMLTag<'_>, ctx: &Context) {
     let Some(capture) = capture else { return };
     let Some(collector) = ctx.structure_collector.as_ref() else {
         return;
@@ -198,7 +203,7 @@ fn finish_block(capture: Option<BlockTextCapture>, tag_name: &str, tag: &tl::HTM
 pub(super) struct VisitorEndCapture<'a, 'parser> {
     pub state: Option<&'a crate::converter::visitor_hooks::VisitorElementState<'parser>>,
     pub tag_name: &'a str,
-    pub tag: &'a tl::HTMLTag<'a>,
+    pub tag: &'a crate::dom::HTMLTag<'a>,
     pub output: &'a mut String,
     pub element_output_start: usize,
     pub ctx: &'a Context,

@@ -38,8 +38,8 @@ type Context = crate::converter::Context;
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn process_text_node(
     raw: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
@@ -79,8 +79,8 @@ impl ProcessedText {
 }
 
 struct TextProcessor<'dom, 'output, 'handler> {
-    node_handle: &'dom tl::NodeHandle,
-    parser: &'dom tl::Parser<'dom>,
+    node_handle: &'dom crate::dom::NodeHandle,
+    parser: &'dom crate::dom::Parser<'dom>,
     output: &'output mut String,
     handler: HandlerContext<'handler>,
 }
@@ -595,7 +595,7 @@ impl TextProcessor<'_, '_, '_> {
         let dom_ctx = self.handler.dom_ctx;
         let options = self.handler.options;
         let max_depth = crate::converter::main_helpers::effective_max_depth(options);
-        let mut stack = vec![(tl::NodeHandle::new(node_id), self.handler.depth)];
+        let mut stack = vec![(crate::dom::NodeHandle::new(node_id), self.handler.depth)];
         while let Some((handle, depth)) = stack.pop() {
             if depth >= max_depth || self.handler.ctx.excluded_node_ids.contains(&handle.get_inner()) {
                 continue;
@@ -603,14 +603,14 @@ impl TextProcessor<'_, '_, '_> {
             #[cfg(test)]
             DATALIST_NODE_READS.with(|reads| reads.set(reads.get() + 1));
             match handle.get(self.parser) {
-                Some(tl::Node::Raw(raw)) => {
+                Some(crate::dom::Node::Raw(raw)) => {
                     let raw_text = raw.as_utf8_str();
                     let decoded = text::decode_html_entities_cow(raw_text.as_ref());
                     if !decoded.trim().is_empty() {
                         return true;
                     }
                 }
-                Some(tl::Node::Tag(tag)) => {
+                Some(crate::dom::Node::Tag(tag)) => {
                     let Some(info) = dom_ctx.tag_info(handle.get_inner(), self.parser) else {
                         continue;
                     };
@@ -707,8 +707,8 @@ impl TextProcessor<'_, '_, '_> {
 /// Where a piece of running text is written: the node it comes from and the state of the walk.
 #[derive(Clone, Copy)]
 pub struct TextSite<'a> {
-    pub node_handle: &'a tl::NodeHandle,
-    pub parser: &'a tl::Parser<'a>,
+    pub node_handle: &'a crate::dom::NodeHandle,
+    pub parser: &'a crate::dom::Parser<'a>,
     pub options: &'a crate::options::ConversionOptions,
     pub ctx: &'a crate::converter::Context,
     pub dom_ctx: &'a DomContext,
@@ -828,8 +828,8 @@ fn strip_single_leading_line_ending(text: &str) -> Option<&str> {
 /// renders `a<span>\n</span>b` and `a<span>\n</span><span>b</span>` identically, so asking only
 /// about a following *tag* dropped the separator and welded the words together (issue #491). ~keep
 fn newline_span_needs_separating_space(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     in_option_list: bool,
 ) -> bool {
@@ -896,7 +896,7 @@ mod tests {
                     "</span>".repeat(depth) + "&nbsp;b"
                 };
                 let source = format!("<ul><li>a\n{}<p></p>{ending}</li></ul>", "<span>".repeat(depth));
-                let dom = tl::parse(&source, tl::ParserOptions::default()).expect("input nodes");
+                let dom = crate::dom::parse(&source, crate::dom::ParserOptions::default()).expect("input nodes");
                 assert_cold_previous_span(&dom, source.len());
                 let nodes = dom.nodes().len();
                 crate::converter::utility::siblings::PREVIOUS_CONTENT_BLOCK_READS.with(|reads| reads.set(0));
@@ -932,7 +932,7 @@ mod tests {
         assert_eq!(jobs, 6);
     }
 
-    fn assert_cold_previous_span(dom: &tl::VDom<'_>, source_len: usize) {
+    fn assert_cold_previous_span(dom: &crate::dom::VDom<'_>, source_len: usize) {
         let context = crate::converter::utility::caching::build_dom_context(dom, dom.parser(), source_len);
         let span = dom
             .query_selector("span")
@@ -944,7 +944,7 @@ mod tests {
             .nodes()
             .iter()
             .enumerate()
-            .find(|(_, node)| matches!(node, tl::Node::Raw(raw) if raw.as_utf8_str().ends_with('b')))
+            .find(|(_, node)| matches!(node, crate::dom::Node::Raw(raw) if raw.as_utf8_str().ends_with('b')))
             .map(|(index, _)| u32::try_from(index).expect("small input"))
             .expect("tail node");
         assert_eq!(context.prev_tag_map[tail as usize].get().copied().flatten(), Some(span));

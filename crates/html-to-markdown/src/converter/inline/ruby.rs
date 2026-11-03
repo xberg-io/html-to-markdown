@@ -43,13 +43,13 @@ type Context = crate::converter::Context;
 /// Lists the children that write text in `children`. The walk visits each of them between two
 /// calls of the hook that this function gives, and the hook writes the ruby.
 pub fn open(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
     context: &Context,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     let tag_sequence = ruby_tag_sequence(tag, parser);
@@ -58,7 +58,7 @@ pub fn open(
     let mut parts = Vec::new();
     for child_handle in tag.children().top().iter() {
         let part = match child_handle.get(parser) {
-            Some(tl::Node::Tag(child_tag)) => {
+            Some(crate::dom::Node::Tag(child_tag)) => {
                 match crate::converter::normalized_tag_name(child_tag.name().as_utf8_str()).as_ref() {
                     "rt" => RubyPart::Annotation,
                     "rp" => continue,
@@ -67,7 +67,7 @@ pub fn open(
                     _ => RubyPart::Base,
                 }
             }
-            Some(tl::Node::Raw(_)) => RubyPart::Base,
+            Some(crate::dom::Node::Raw(_)) => RubyPart::Base,
             _ => continue,
         };
         children.push(*child_handle);
@@ -159,13 +159,13 @@ impl ChildHook for RubyHook {
 /// the children of the other parts for [`close_text`] or [`close_annotation`].
 pub fn open_part(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
     context: &Context,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -197,12 +197,12 @@ pub fn close_annotation(text: &str, output: &mut String) {
     }
 }
 
-fn ruby_tag_sequence(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> Vec<String> {
+fn ruby_tag_sequence(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser<'_>) -> Vec<String> {
     tag.children()
         .top()
         .iter()
         .filter_map(|child_handle| {
-            let tl::Node::Tag(child_tag) = child_handle.get(parser)? else {
+            let crate::dom::Node::Tag(child_tag) = child_handle.get(parser)? else {
                 return None;
             };
             let tag_name = crate::converter::normalized_tag_name(child_tag.name().as_utf8_str());

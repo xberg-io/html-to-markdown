@@ -12,9 +12,8 @@ use super::utils::{
     calculate_list_nesting_depth, is_loose_list, parse_ordered_list_start, preceding_same_type_list_separator_comment,
     process_list_children, switched_delimiter,
 };
-use tl;
 
-fn ordered_start(tag: &tl::HTMLTag) -> i64 {
+fn ordered_start(tag: &crate::dom::HTMLTag) -> i64 {
     tag.attributes()
         .get("start")
         .flatten()
@@ -24,8 +23,8 @@ fn ordered_start(tag: &tl::HTMLTag) -> i64 {
 }
 
 fn leading_separator_delimiter(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
 ) -> Option<char> {
@@ -48,7 +47,12 @@ fn leading_separator_delimiter(
 /// Extracts the `start` attribute to set initial counter value,
 /// detects loose/tight list format, and processes list items.
 #[allow(clippy::too_many_arguments)]
-pub fn handle_ol(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, context: ListContext<'_>) {
+pub fn handle_ol(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    context: ListContext<'_>,
+) {
     if super::render_itemless_list_as_div(node_handle, parser, output, context) {
         return;
     }
@@ -58,7 +62,7 @@ pub fn handle_ol(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
     let nested_depth = calculate_list_nesting_depth(ctx);
     let is_loose = is_loose_list(*node_handle, parser, dom_ctx);
 
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
 
@@ -119,11 +123,11 @@ pub fn handle_ol(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
 }
 
 pub fn open(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
     if !super::has_list_item_child(*node_handle, parser, context.dom_ctx) {
         return crate::converter::block::div::open(
@@ -145,7 +149,7 @@ pub fn open(
     let nested_depth = calculate_list_nesting_depth(ctx);
     let is_loose = is_loose_list(*node_handle, parser, dom_ctx);
 
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
 

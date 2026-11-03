@@ -10,13 +10,13 @@ pub struct ListWalkEnd {
 }
 
 pub fn open_children_walk(
-    node: tl::NodeHandle,
-    parser: &tl::Parser,
+    node: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     context: ListChildrenContext<'_>,
     end: ListWalkEnd,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> crate::converter::walk::Open {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return crate::converter::walk::Open::children_only();
     };
     let handles: Vec<_> = tag
@@ -55,7 +55,7 @@ struct ListHook {
     loose: bool,
     nested_depth: usize,
     end: ListWalkEnd,
-    handles: Vec<tl::NodeHandle>,
+    handles: Vec<crate::dom::NodeHandle>,
 }
 
 impl ListHook {
@@ -115,7 +115,7 @@ impl crate::converter::walk::ChildHook for ListHook {
         self.counter_saturated = saturated;
     }
     fn close(self: Box<Self>, site: &mut crate::converter::walk::HookSite<'_>) {
-        let Some(tl::Node::Tag(tag)) = site.node_handle.get(site.parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = site.node_handle.get(site.parser) else {
             return;
         };
         if !site.context.in_table_cell {

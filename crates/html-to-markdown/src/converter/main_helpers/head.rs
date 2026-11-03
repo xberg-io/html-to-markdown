@@ -125,7 +125,7 @@ const fn is_yaml_printable(c: char) -> bool {
 /// `preserve_tags` for `"meta"`. The first tag per key wins, comparing keys in any letter case;
 /// `seen` holds the lower-cased keys recorded so far.
 fn collect_meta_head_metadata(
-    child_tag: &tl::HTMLTag,
+    child_tag: &crate::dom::HTMLTag,
     options: &ConversionOptions,
     metadata: &mut BTreeMap<String, String>,
     seen: &mut HashSet<String>,
@@ -165,8 +165,8 @@ fn collect_meta_head_metadata(
 /// records the `title` key, empty, so the element's presence survives even though its text does
 /// not (#527). `seen_title` is whether a title came before.
 fn collect_title_head_metadata(
-    child_tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    child_tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     options: &ConversionOptions,
     metadata: &mut BTreeMap<String, String>,
     seen_title: &mut bool,
@@ -185,7 +185,7 @@ fn collect_title_head_metadata(
     let mut title_content = String::new();
     let title_children = child_tag.children();
     for title_child in title_children.top().iter() {
-        if let Some(tl::Node::Raw(raw)) = title_child.get(parser) {
+        if let Some(crate::dom::Node::Raw(raw)) = title_child.get(parser) {
             title_content.push_str(raw.as_utf8_str().as_ref());
         }
     }
@@ -195,7 +195,7 @@ fn collect_title_head_metadata(
 }
 
 /// Record the decoded href of the first `<link rel="canonical">` into `metadata`.
-fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
+fn collect_link_head_metadata(child_tag: &crate::dom::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("link") {
         return;
     }
@@ -217,8 +217,8 @@ fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<S
 /// Extract metadata from the head element below `roots`, recording `document_base_href` as
 /// `base` whether or not the source has a `<head>` tag.
 pub fn extract_head_metadata(
-    roots: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    roots: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     options: &ConversionOptions,
     document_base_href: Option<&str>,
     metadata_end: usize,
@@ -232,8 +232,8 @@ pub fn extract_head_metadata(
 
 /// Title, meta and canonical link fields before the body starts, with optional head tags.
 fn head_element_metadata(
-    roots: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    roots: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     options: &ConversionOptions,
     metadata_end: usize,
 ) -> BTreeMap<String, String> {
@@ -244,7 +244,7 @@ fn head_element_metadata(
     let mut work: Vec<_> = roots.iter().rev().map(|handle| (*handle, false)).collect();
     while let Some((handle, in_head)) = work.pop() {
         match handle.get(parser) {
-            Some(tl::Node::Tag(tag)) => {
+            Some(crate::dom::Node::Tag(tag)) => {
                 if tag.boundaries(parser).0 >= metadata_end {
                     break;
                 }
@@ -270,9 +270,9 @@ fn head_element_metadata(
                     collect_link_head_metadata(tag, &mut metadata);
                 }
             }
-            Some(tl::Node::Raw(text)) => {
+            Some(crate::dom::Node::Raw(text)) => {
                 let next_is_html = matches!(work.last().and_then(|(next, _)| next.get(parser)),
-                    Some(tl::Node::Tag(tag)) if tag.name().as_bytes().eq_ignore_ascii_case(b"html"));
+                    Some(crate::dom::Node::Tag(tag)) if tag.name().as_bytes().eq_ignore_ascii_case(b"html"));
                 if !is_ignorable_before_head(&text.as_utf8_str(), next_is_html) {
                     break;
                 }
@@ -285,14 +285,14 @@ fn head_element_metadata(
 
 /// The first `<head>` element below `roots` before the body starts. A browser's parser ignores
 /// a `<head>` tag once the body has started, at text or at a tag that [`starts_body`].
-pub fn document_head(roots: &[tl::NodeHandle], parser: &tl::Parser) -> Option<tl::NodeHandle> {
+pub fn document_head(roots: &[crate::dom::NodeHandle], parser: &crate::dom::Parser) -> Option<crate::dom::NodeHandle> {
     document_head_search(roots, parser).head
 }
 
 /// What [`document_head_search`] finds before the body starts.
 pub(super) struct HeadSearch {
     /// The `<head>` element.
-    head: Option<tl::NodeHandle>,
+    head: Option<crate::dom::NodeHandle>,
     /// True when a browser's parser puts an element in the head that this tree holds outside
     /// one: head content in front of the `<head>` tag, or a `title` before the body that is in
     /// no `<head>` element, with a `<head>` tag on the page or not (issue #816).
@@ -301,7 +301,7 @@ pub(super) struct HeadSearch {
 
 /// Walks from the start of the document to the start of the body. The walk does not stop at
 /// the `<head>` element: a `title` between `</head>` and the body is in the head for a browser.
-pub(super) fn document_head_search(roots: &[tl::NodeHandle], parser: &tl::Parser) -> HeadSearch {
+pub(super) fn document_head_search(roots: &[crate::dom::NodeHandle], parser: &crate::dom::Parser) -> HeadSearch {
     let mut head = None;
     let mut content_before_head = false;
     let mut saw_head_content = false;
@@ -310,16 +310,16 @@ pub(super) fn document_head_search(roots: &[tl::NodeHandle], parser: &tl::Parser
     let mut work: Vec<_> = roots.iter().rev().copied().collect();
     while let Some(handle) = work.pop() {
         match handle.get(parser) {
-            Some(tl::Node::Raw(text)) => {
+            Some(crate::dom::Node::Raw(text)) => {
                 let next_is_html = matches!(
                     work.last().and_then(|next| next.get(parser)),
-                    Some(tl::Node::Tag(tag)) if tag.name().as_bytes().eq_ignore_ascii_case(b"html")
+                    Some(crate::dom::Node::Tag(tag)) if tag.name().as_bytes().eq_ignore_ascii_case(b"html")
                 );
                 if !is_ignorable_before_head(&text.as_utf8_str(), next_is_html) {
                     break;
                 }
             }
-            Some(tl::Node::Tag(tag)) => {
+            Some(crate::dom::Node::Tag(tag)) => {
                 let name = tag.name().as_bytes().to_ascii_lowercase();
                 match name.as_slice() {
                     b"head" => {
@@ -327,7 +327,7 @@ pub(super) fn document_head_search(roots: &[tl::NodeHandle], parser: &tl::Parser
                             head = Some(handle);
                             content_before_head = saw_head_content;
                             misplaced_image = tag.children().top().iter().any(|child| {
-                                matches!(child.get(parser), Some(tl::Node::Tag(child))
+                                matches!(child.get(parser), Some(crate::dom::Node::Tag(child))
                                     if child.name().as_bytes().eq_ignore_ascii_case(b"img"))
                             });
                         }

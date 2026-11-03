@@ -118,7 +118,7 @@ pub fn convert_html_impl(
     let mut ctx = create_conversion_context(html, options, parameters, reference_collector.as_ref(), kept_scripts);
     if !options.skip_images
         && dom.nodes().iter().any(|node| {
-            matches!(node, tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("img")
+            matches!(node, crate::dom::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("img")
                 || tag.name().as_utf8_str().eq_ignore_ascii_case("svg"))
         })
     {
@@ -157,7 +157,7 @@ fn create_reference_collector(
     })
 }
 
-fn trace_parse_complete(dom: &tl::VDom<'_>, input_len: usize) {
+fn trace_parse_complete(dom: &crate::dom::VDom<'_>, input_len: usize) {
     tracing::debug!(
         target: "html_to_markdown::convert",
         node_count = dom.nodes().len(),
@@ -183,7 +183,7 @@ fn trace_render_complete(output: &str, tables: &[crate::types::TableData]) {
     );
 }
 
-fn apply_exclusions(dom: &tl::VDom<'_>, options: &ConversionOptions, ctx: &mut Context) {
+fn apply_exclusions(dom: &crate::dom::VDom<'_>, options: &ConversionOptions, ctx: &mut Context) {
     if options.exclude_selectors.is_empty() {
         return;
     }
@@ -197,8 +197,8 @@ fn apply_exclusions(dom: &tl::VDom<'_>, options: &ConversionOptions, ctx: &mut C
 }
 
 fn walk_document(
-    dom: &tl::VDom<'_>,
-    parser: &tl::Parser<'_>,
+    dom: &crate::dom::VDom<'_>,
+    parser: &crate::dom::Parser<'_>,
     output: &mut String,
     options: &ConversionOptions,
     ctx: &Context,
@@ -250,8 +250,8 @@ fn append_references(
 }
 
 fn finalize_output(
-    dom: &tl::VDom<'_>,
-    parser: &tl::Parser<'_>,
+    dom: &crate::dom::VDom<'_>,
+    parser: &crate::dom::Parser<'_>,
     options: &ConversionOptions,
     mut output: String,
     frontmatter: &str,
@@ -271,8 +271,8 @@ fn finalize_output(
 }
 
 fn prepare_frontmatter(
-    dom: &tl::VDom<'_>,
-    parser: &tl::Parser<'_>,
+    dom: &crate::dom::VDom<'_>,
+    parser: &crate::dom::Parser<'_>,
     parsed_source: &str,
     options: &ConversionOptions,
     document_base_href: Option<&str>,
@@ -317,8 +317,8 @@ const fn check_visitor_error(_ctx: &Context) -> Result<()> {
 
 #[cfg(feature = "metadata")]
 fn populate_metadata_collector(
-    dom: &tl::VDom<'_>,
-    parser: &tl::Parser<'_>,
+    dom: &crate::dom::VDom<'_>,
+    parser: &crate::dom::Parser<'_>,
     metadata_collector: Option<&crate::metadata::MetadataCollectorHandle>,
     head_metadata: std::collections::BTreeMap<String, String>,
     wants_document: bool,
@@ -344,13 +344,13 @@ fn populate_metadata_collector(
 
 #[cfg(feature = "metadata")]
 fn document_language_and_direction(
-    children: &[tl::NodeHandle],
-    parser: &tl::Parser<'_>,
+    children: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser<'_>,
 ) -> (Option<String>, Option<String>) {
     let mut language = None;
     let mut direction = None;
     for child_handle in children {
-        let Some(tl::Node::Tag(tag)) = child_handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = child_handle.get(parser) else {
             continue;
         };
         if !matches!(tag.name().as_utf8_str().as_ref(), "html" | "body") {
@@ -413,9 +413,9 @@ fn finish_structure_collector(
 /// ~keep Inside a list item the same holds, and `CommonMark` keeps a block in the item only when
 /// ~keep its lines start at the item's content column: see `separate_in_list_item`.
 fn separate_from_block(
-    node: &tl::Node,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::Node,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
@@ -480,30 +480,35 @@ fn ends_with_block_line_end(output: &str) -> bool {
 }
 
 /// Whether `node` is inline content: non-blank text or an inline element.
-fn is_inline_content(node: &tl::Node, node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn is_inline_content(
+    node: &crate::dom::Node,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+) -> bool {
     match node {
-        tl::Node::Raw(bytes) => !bytes.as_utf8_str().trim().is_empty(),
-        tl::Node::Tag(_) => dom_ctx
+        crate::dom::Node::Raw(bytes) => !bytes.as_utf8_str().trim().is_empty(),
+        crate::dom::Node::Tag(_) => dom_ctx
             .tag_info(node_handle.get_inner(), parser)
             .is_some_and(|info| is_inline_element(&info.name)),
-        tl::Node::Comment(_) => false,
+        crate::dom::Node::Comment(_) => false,
     }
 }
 
 /// Whether `node` is text that starts with whitespace.
-fn starts_with_space(node: &tl::Node) -> bool {
-    matches!(node, tl::Node::Raw(bytes) if bytes.as_bytes().first().is_some_and(u8::is_ascii_whitespace))
+fn starts_with_space(node: &crate::dom::Node) -> bool {
+    matches!(node, crate::dom::Node::Raw(bytes) if bytes.as_bytes().first().is_some_and(u8::is_ascii_whitespace))
 }
 
 /// Whether `node_handle` is a `<br>` element.
-fn is_line_break(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn is_line_break(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     dom_ctx
         .tag_info(node_handle.get_inner(), parser)
         .is_some_and(|info| info.name == "br")
 }
 
 /// Whether the parent of `node_handle` is a `<ul>` or `<ol>` (text or items between list items).
-fn parent_is_list(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn parent_is_list(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     dom_ctx
         .parent_of(node_handle.get_inner())
         .and_then(|parent_id| dom_ctx.tag_info(parent_id, parser))
@@ -512,7 +517,12 @@ fn parent_is_list(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &D
 
 /// Walk `node_handle` with its subtree and write the Markdown to `output`.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn walk_node(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, handler: HandlerContext<'_>) {
+pub fn walk_node(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    handler: HandlerContext<'_>,
+) {
     walk_nodes(std::slice::from_ref(node_handle), parser, output, handler);
 }
 
@@ -582,9 +592,9 @@ enum Begun<'a> {
 }
 
 fn begin_tag<'a>(
-    node_handle: &tl::NodeHandle,
-    tag: &'a tl::HTMLTag<'a>,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &'a crate::dom::HTMLTag<'a>,
+    parser: &'a crate::dom::Parser<'a>,
     output: &mut String,
     handler: HandlerContext<'_>,
     dom_ctx: &'a DomContext,
@@ -648,8 +658,8 @@ fn begin_tag<'a>(
 #[cfg(feature = "visitor")]
 pub(super) fn start_visitor_element(
     state: &crate::converter::visitor_hooks::VisitorElementState<'_>,
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag<'_>,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag<'_>,
     output: &mut String,
     handler: HandlerContext<'_>,
     tag_name: &str,
@@ -692,7 +702,7 @@ pub(super) fn start_visitor_element(
 fn capture_custom_start(
     handler: HandlerContext<'_>,
     tag_name: &str,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     node_id: u32,
     replacement: &str,
 ) {
@@ -708,7 +718,7 @@ fn capture_custom_start(
 fn finish_tag(
     capture: TagCapture<'_>,
     tag_name: &str,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     output: &mut String,
     handler: HandlerContext<'_>,
     stop: bool,
@@ -775,9 +785,9 @@ fn finish_tag(
 }
 
 fn normalized_node_tag_name<'a>(
-    node_handle: &tl::NodeHandle,
-    tag: &'a tl::HTMLTag<'a>,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &'a crate::dom::HTMLTag<'a>,
+    parser: &'a crate::dom::Parser<'a>,
     dom_ctx: &'a DomContext,
 ) -> Cow<'a, str> {
     match dom_ctx.tag_info(node_handle.get_inner(), parser) {
@@ -787,8 +797,8 @@ fn normalized_node_tag_name<'a>(
 }
 
 fn djot_context(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     tag_name: &str,
     handler: HandlerContext<'_>,
 ) -> Option<Context> {
@@ -817,9 +827,9 @@ enum TagRoute {
 
 fn skip_or_render_tag(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag<'_>,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) -> TagRoute {
@@ -870,9 +880,9 @@ fn skip_or_render_tag(
 
 pub(super) fn should_skip_tag(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag<'_>,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
 ) -> bool {
     #[cfg(feature = "visitor")]
@@ -892,8 +902,8 @@ pub(super) fn should_skip_tag(
 
 fn render_preserved_tag(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
     preserved_menu_placeholder: bool,
@@ -928,7 +938,7 @@ fn render_preserved_tag(
 }
 
 #[cfg(feature = "metadata")]
-fn collect_document_attributes(tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Context) {
+fn collect_document_attributes(tag_name: &str, tag: &crate::dom::HTMLTag<'_>, ctx: &Context) {
     if !matches!(tag_name, "html" | "head" | "body") || !ctx.metadata_wants.document {
         return;
     }
@@ -945,7 +955,7 @@ fn collect_document_attributes(tag_name: &str, tag: &tl::HTMLTag<'_>, ctx: &Cont
 }
 
 #[cfg(not(feature = "metadata"))]
-const fn collect_document_attributes(_tag_name: &str, _tag: &tl::HTMLTag<'_>, _ctx: &Context) {}
+const fn collect_document_attributes(_tag_name: &str, _tag: &crate::dom::HTMLTag<'_>, _ctx: &Context) {}
 
 /// ~keep Block dispatch is where a trailing hard-break run becomes knowably
 /// ineffective; container endings handle the no-following-sibling case themselves.
@@ -955,16 +965,20 @@ fn strip_breaks_before_block(tag_name: &str, output: &mut String, options: &Conv
     }
 }
 
-fn djot_rule_like_lines(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> Vec<bool> {
+fn djot_rule_like_lines(
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+) -> Vec<bool> {
     let mut text = String::with_capacity(64);
     let mut stack = vec![node_handle];
     while let Some(handle) = stack.pop() {
         match handle.get(parser) {
-            Some(tl::Node::Raw(bytes)) => {
+            Some(crate::dom::Node::Raw(bytes)) => {
                 let raw = bytes.as_utf8_str();
                 text.push_str(crate::text::decode_html_entities_cow(raw.as_ref()).as_ref());
             }
-            Some(tl::Node::Tag(tag)) => {
+            Some(crate::dom::Node::Tag(tag)) => {
                 if dom_ctx.tag_name_for(handle, parser).as_deref() == Some("br") {
                     text.push('\n');
                 } else if let Some(children) = dom_ctx.children_of(handle.get_inner()) {
@@ -975,7 +989,7 @@ fn djot_rule_like_lines(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ct
                     stack.extend(children);
                 }
             }
-            Some(tl::Node::Comment(_)) | None => {}
+            Some(crate::dom::Node::Comment(_)) | None => {}
         }
     }
     text.split('\n').map(crate::text::is_djot_rule_like).collect()

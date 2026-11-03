@@ -38,7 +38,12 @@ pub struct VisitorElementEndContext<'a> {
 }
 
 impl<'p> VisitorElementState<'p> {
-    fn build_node_ctx<'a>(&'a self, tag_name: &'a str, tag: &'a tl::HTMLTag<'a>, depth: usize) -> NodeContext<'a>
+    fn build_node_ctx<'a>(
+        &'a self,
+        tag_name: &'a str,
+        tag: &'a crate::dom::HTMLTag<'a>,
+        depth: usize,
+    ) -> NodeContext<'a>
     where
         'p: 'a,
     {
@@ -57,8 +62,8 @@ impl<'p> VisitorElementState<'p> {
 /// Captures the state shared by an element's start and end visitor callbacks.
 pub fn build_visitor_element_state<'p>(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &'p tl::Parser<'p>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &'p crate::dom::Parser<'p>,
     dom_ctx: &'p crate::converter::DomContext,
 ) -> VisitorElementState<'p> {
     VisitorElementState {
@@ -72,7 +77,7 @@ pub fn build_visitor_element_state<'p>(
 pub fn handle_visitor_element_start(
     visitor_handle: &crate::visitor::VisitorHandle,
     tag_name: &str,
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     state: &VisitorElementState<'_>,
     output: &mut String,
     depth: usize,
@@ -112,7 +117,7 @@ pub fn handle_visitor_element_end(
     visitor_handle: &crate::visitor::VisitorHandle,
     tag_name: &str,
     state: &VisitorElementState<'_>,
-    tag: &tl::HTMLTag,
+    tag: &crate::dom::HTMLTag,
     end: VisitorElementEndContext<'_>,
 ) -> VisitAction {
     if matches!(tag_name, "table") {

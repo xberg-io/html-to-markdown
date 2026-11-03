@@ -4,8 +4,8 @@ use crate::converter::walk::{CaptureEnd, Close, Open};
 
 #[cfg(feature = "visitor")]
 pub(super) fn walks_kept_inert_element(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
 ) -> bool {
     if handler.ctx.visitor.is_none() || handler.options.hidden_content != crate::options::HiddenContent::All {
@@ -28,8 +28,8 @@ pub(super) fn walks_kept_inert_element(
 
 #[cfg(not(feature = "visitor"))]
 pub(super) const fn walks_kept_inert_element(
-    _node: &tl::NodeHandle,
-    _parser: &tl::Parser,
+    _node: &crate::dom::NodeHandle,
+    _parser: &crate::dom::Parser,
     _handler: HandlerContext<'_>,
 ) -> bool {
     false
@@ -37,12 +37,12 @@ pub(super) const fn walks_kept_inert_element(
 
 struct TagDispatcher<'a, 'output> {
     tag_name: &'a str,
-    node_handle: &'a tl::NodeHandle,
-    tag: &'a tl::HTMLTag<'a>,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &'a crate::dom::NodeHandle,
+    tag: &'a crate::dom::HTMLTag<'a>,
+    parser: &'a crate::dom::Parser<'a>,
     output: &'output mut String,
     handler: HandlerContext<'a>,
-    children: &'output mut Vec<tl::NodeHandle>,
+    children: &'output mut Vec<crate::dom::NodeHandle>,
     opened: Option<Open>,
 }
 
@@ -56,13 +56,13 @@ pub(super) enum Dispatched {
 
 pub(super) fn dispatch_tag<'a>(
     tag_name: &'a str,
-    node_handle: &'a tl::NodeHandle,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &'a crate::dom::NodeHandle,
+    parser: &'a crate::dom::Parser<'a>,
     output: &mut String,
     handler: HandlerContext<'a>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Dispatched {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return Dispatched::Complete { stop: false };
     };
     // ~keep In a table cell a code block is one code span, which has no lines.
@@ -135,7 +135,7 @@ fn opened_or_complete(opened: Option<Open>) -> Dispatched {
 }
 
 /// Run the second half of the handler that opened an element.
-pub(super) fn close_tag(close: Close, parser: &tl::Parser, output: &mut String, handler: HandlerContext<'_>) {
+pub(super) fn close_tag(close: Close, parser: &crate::dom::Parser, output: &mut String, handler: HandlerContext<'_>) {
     match close {
         Close::Nothing => {}
         Close::WithOptions(options, inner) => close_tag(
@@ -164,9 +164,9 @@ pub(super) fn close_tag(close: Close, parser: &tl::Parser, output: &mut String, 
 /// Run the second half of the handler of an element that captured its children in `content`.
 pub(super) fn close_capture<'a>(
     close: CaptureEnd,
-    node_handle: &'a tl::NodeHandle,
+    node_handle: &'a crate::dom::NodeHandle,
     content: &str,
-    parser: &'a tl::Parser<'a>,
+    parser: &'a crate::dom::Parser<'a>,
     output: &'a mut String,
     handler: HandlerContext<'a>,
 ) {
@@ -235,8 +235,8 @@ pub(super) fn close_capture<'a>(
 fn close_definition(
     kind: &str,
     content: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {

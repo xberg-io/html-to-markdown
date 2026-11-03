@@ -146,19 +146,18 @@ fn script_before_html(end_tag: &str) -> String {
     format!("{OPEN}{JSON}{end_tag}<html><head><title>T</title></head><body><p>v</p></body></html>")
 }
 
-/// A script with no end tag before `<html>` keeps its record as plain text with
-/// `preserve_tags = ["script"]`, as on the integration branch. The same script with an end tag
-/// has no record there, as on the integration branch. No text of the script is written.
+/// A script before `<html>` keeps its record as plain text with `preserve_tags = ["script"]`,
+/// with an end tag and with none. No text of the script is written.
 #[test]
-fn a_preserved_script_before_html_gives_as_plain_text_no_record_with_an_end_tag_and_its_record_with_none() {
-    for (end_tag, raw_json) in END_TAGS.into_iter().zip([&[][..], &[JSON][..]]) {
+fn a_preserved_script_before_html_keeps_its_record_as_plain_text_with_an_end_tag_and_with_none() {
+    for end_tag in END_TAGS {
         let html = script_before_html(end_tag);
         assert_eq!(
             content_and_raw_json(&html, |options| {
                 options.output_format = OutputFormat::Plain;
                 options.preserve_tags = vec!["script".to_string()];
             }),
-            on_each_route("v", raw_json),
+            on_each_route("v", &[JSON]),
             "{html:?}"
         );
     }
@@ -230,10 +229,11 @@ mod with_a_visitor {
         }
     }
 
-    /// Decision: a visitor is shown a script with no end tag before `<html>` as often as the
-    /// same script with an end tag, and the page gives the same content and the same record.
+    /// A script before `<html>` is shown to a visitor as often with an end tag as with none, and
+    /// the page gives the same content and the same record. The first pass removes the script,
+    /// so the visitor sees no element for it.
     #[test]
-    fn a_visitor_is_shown_a_script_before_html_with_an_end_tag_and_with_none() {
+    fn a_visitor_gets_the_same_page_for_a_script_before_html_with_an_end_tag_and_with_none() {
         let shown = [Shown::default(), Shown::default()];
         for (end_tag, shown) in END_TAGS.into_iter().zip(&shown) {
             let html = script_before_html(end_tag);
@@ -248,7 +248,10 @@ mod with_a_visitor {
             );
         }
         let [with_an_end_tag, with_none] = shown.map(|count| count.load(Ordering::Relaxed));
-        assert_ne!(with_an_end_tag, 0, "the visitor is shown the script with an end tag");
+        assert_eq!(
+            with_an_end_tag, 0,
+            "the visitor is not shown the script with an end tag"
+        );
         assert_eq!(with_an_end_tag, with_none, "with an end tag, and with none");
     }
 

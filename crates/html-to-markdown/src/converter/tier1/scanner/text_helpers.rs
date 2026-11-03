@@ -422,7 +422,7 @@ const fn is_preprocessing_skip_candidate(name_lower: &[u8]) -> bool {
 ///
 /// Called only for tags that passed [`is_preprocessing_skip_candidate`].
 /// Uses the raw attribute byte slices collected by [`parse::collect_attrs`]
-/// instead of the Tier-2 `tl::HTMLTag` DOM node.
+/// instead of the Tier-2 `dom::HTMLTag` DOM node.
 fn should_skip_preprocessing(
     name_lower: &[u8],
     attrs: &[(&[u8], Option<&[u8]>)],
@@ -486,7 +486,7 @@ fn matches_ignore_ascii_case(value: &[u8], candidates: &[&[u8]]) -> bool {
 
 /// Byte-level equivalent of `element_has_navigation_hint` for use in the
 /// Tier-1 scanner where attributes are raw `&[u8]` slices rather than a
-/// parsed `tl::HTMLTag`.
+/// parsed `dom::HTMLTag`.
 fn byte_attrs_have_navigation_hint(attrs: &[(&[u8], Option<&[u8]>)]) -> bool {
     if let Some(role) = find_attr(attrs, b"role") {
         let role_lc = role.to_ascii_lowercase();

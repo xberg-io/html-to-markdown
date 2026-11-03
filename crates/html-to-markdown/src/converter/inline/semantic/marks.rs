@@ -26,7 +26,7 @@ type Context = crate::converter::Context;
 ///
 /// Asks the visitor, then lists the children in `children`. Returns `None` when the visitor
 /// wrote or skipped the element.
-pub fn open_mark(handler: HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Option<Open> {
+pub fn open_mark(handler: HandlerContext<'_>, children: &mut Vec<crate::dom::NodeHandle>) -> Option<Open> {
     use crate::options::HighlightStyle;
     let site = handler.inline_site();
     let HandlerContext {
@@ -38,7 +38,7 @@ pub fn open_mark(handler: HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>
         depth,
         ..
     } = handler;
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
 
@@ -107,7 +107,12 @@ pub fn close_mark(content: &str, handler: HandlerContext<'_>) {
     );
 }
 
-fn unmarked_buffer_context(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>, context: &Context, output: &str) -> Context {
+fn unmarked_buffer_context(
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser<'_>,
+    context: &Context,
+    output: &str,
+) -> Context {
     if has_only_blank_text_children(tag, parser) {
         context.clone()
     } else if has_only_raw_text_children(tag, parser) {
@@ -119,19 +124,19 @@ fn unmarked_buffer_context(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>, conte
 
 // ~keep Blank raw text returns before Markdown text-content processing, without reading inline line state.
 // ~keep Tags and comments retain column-aware child context; parent hooks ran first.
-fn has_only_blank_text_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> bool {
+fn has_only_blank_text_children(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser<'_>) -> bool {
     tag.children().top().iter().all(|handle| {
-        matches!(handle.get(parser), Some(tl::Node::Raw(raw))
+        matches!(handle.get(parser), Some(crate::dom::Node::Raw(raw))
             if crate::converter::utility::white_space::is_blank(raw.as_utf8_str().as_ref()))
     })
 }
 
 // ~keep Encoded tags and text-hook replacements stay text; only real child tags can consume list columns.
-fn has_only_raw_text_children(tag: &tl::HTMLTag<'_>, parser: &tl::Parser<'_>) -> bool {
+fn has_only_raw_text_children(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser<'_>) -> bool {
     tag.children()
         .top()
         .iter()
-        .all(|handle| matches!(handle.get(parser), Some(tl::Node::Raw(_))))
+        .all(|handle| matches!(handle.get(parser), Some(crate::dom::Node::Raw(_))))
 }
 
 // ~keep A guaranteed opening marker makes the last-line column irrelevant to list rendering.
@@ -240,7 +245,7 @@ fn emit_inserted_wrapped(output: &mut String, content: &str, site: InlineSite<'_
 pub fn open_strikethrough(
     tag_name: &str,
     handler: &HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
     let tag_name = match tag_name {
         "del" => "del",
@@ -256,9 +261,9 @@ pub fn open_strikethrough(
 ///
 /// Lists the children in `children`, as [`open_strikethrough`] does.
 // ~keep In code `<ins>` writes no `==`, as `<del>` writes no `~~`: there the mark is text.
-pub fn open_inserted(handler: HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Option<Open> {
+pub fn open_inserted(handler: HandlerContext<'_>, children: &mut Vec<crate::dom::NodeHandle>) -> Option<Open> {
     if handler.options.output_format != OutputFormat::Djot && !handler.context.in_code {
-        let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
             return None;
         };
         #[cfg(feature = "visitor")]
@@ -283,8 +288,12 @@ pub fn open_inserted(handler: HandlerContext<'_>, children: &mut Vec<tl::NodeHan
     open_marked(&handler, children, CaptureEnd::Inserted)
 }
 
-fn open_marked(handler: &HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>, end: CaptureEnd) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+fn open_marked(
+    handler: &HandlerContext<'_>,
+    children: &mut Vec<crate::dom::NodeHandle>,
+    end: CaptureEnd,
+) -> Option<Open> {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -304,7 +313,7 @@ pub fn close_strikethrough(tag_name: &str, content: &str, handler: HandlerContex
     let _ = tag_name;
     #[cfg(feature = "visitor")]
     {
-        let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
             return;
         };
         let kind = SemanticKind::Strikethrough(tag_name);
@@ -326,7 +335,7 @@ pub fn close_inserted(content: &str, handler: HandlerContext<'_>) {
     let site = handler.inline_site();
     #[cfg(feature = "visitor")]
     {
-        let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
             return;
         };
         if let Some(outcome) = visit_semantic(tag, SemanticKind::Underline("ins"), handler.depth, site) {
@@ -350,12 +359,12 @@ pub fn close_inserted(content: &str, handler: HandlerContext<'_>) {
 /// Returns whether the visitor wrote or skipped the element, so that the walk does not open it.
 #[cfg(feature = "visitor")]
 pub fn visit_underline(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
 ) -> bool {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return false;
     };
     let site = InlineSite {
@@ -392,7 +401,7 @@ enum VisitorOutcome {
 
 #[cfg(feature = "visitor")]
 fn visit_semantic(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     kind: SemanticKind<'_>,
     depth: usize,
     site: InlineSite<'_>,

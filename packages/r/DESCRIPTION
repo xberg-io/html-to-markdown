@@ -13,7 +13,7 @@ Suggests:
     testthat (>= 3.0.0),
     withr,
     roxygen2
-SystemRequirements: Cargo (Rust's package manager), rustc (>= 1.91)
+SystemRequirements: Cargo (Rust's package manager), rustc (>= 1.97)
 Config/rextendr/version: 0.5.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

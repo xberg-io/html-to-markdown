@@ -30,9 +30,9 @@ use std::borrow::Cow;
 /// written as a `div`.
 #[cfg(feature = "visitor")]
 pub fn dispatch_form_visitor(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) -> bool {
@@ -115,8 +115,8 @@ pub fn dispatch_form_visitor(
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_form(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -126,7 +126,7 @@ pub fn handle_form(
         depth,
         dom_ctx,
     } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         #[cfg(feature = "visitor")]
         if dispatch_form_visitor(node_handle, tag, parser, output, context) {
             return;
@@ -190,8 +190,8 @@ pub fn handle_form(
 /// - **Empty content**: Skipped entirely
 pub fn handle_fieldset(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -202,7 +202,7 @@ pub fn handle_fieldset(
         dom_ctx,
     } = context;
     if ctx.in_code && !ctx.in_code_block {
-        if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+        if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
             write_code_form_group(tag, parser, output, context);
         }
         return;
@@ -227,8 +227,8 @@ pub fn handle_fieldset(
 /// - Uses the configured strong/emphasis symbol from `ConversionOptions`
 pub fn handle_legend(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -238,7 +238,7 @@ pub fn handle_legend(
         depth,
         dom_ctx,
     } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         if ctx.in_code && !ctx.in_code_block {
             write_code_form_group(tag, parser, output, context);
             return;
@@ -288,8 +288,8 @@ pub fn handle_legend(
 // ~keep Form-group block boundaries collapse to spaces inside one code span (#815),
 // ~keep and children stay in its buffer so collected link ranges remain valid.
 fn write_code_form_group(
-    tag: &tl::HTMLTag<'_>,
-    parser: &tl::Parser<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser<'_>,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -329,8 +329,8 @@ fn write_code_form_group(
 /// it do not join.
 pub fn handle_label(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -340,7 +340,7 @@ pub fn handle_label(
         depth,
         dom_ctx,
     } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
         // ~keep A code block shows the text of a label as written, so nothing is trimmed (issue #822).
         if ctx.in_code_block {
@@ -390,7 +390,7 @@ pub fn handle_label(
 }
 
 /// The first child with content after transparent spans, white space and comments are ignored.
-fn first_content(tag: &tl::HTMLTag, parser: &tl::Parser) -> Option<tl::NodeHandle> {
+fn first_content(tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser) -> Option<crate::dom::NodeHandle> {
     tag.children()
         .top()
         .iter()
@@ -399,17 +399,20 @@ fn first_content(tag: &tl::HTMLTag, parser: &tl::Parser) -> Option<tl::NodeHandl
 }
 
 // ~keep Spans are transparent to control boundaries; an iterative search avoids source-controlled recursion.
-fn first_visible_content(handle: tl::NodeHandle, parser: &tl::Parser) -> Option<tl::NodeHandle> {
+fn first_visible_content(
+    handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+) -> Option<crate::dom::NodeHandle> {
     let mut pending = vec![handle];
     while let Some(handle) = pending.pop() {
         match handle.get(parser) {
-            Some(tl::Node::Raw(raw)) if !raw.as_utf8_str().trim().is_empty() => return Some(handle),
-            Some(tl::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("span") => {
+            Some(crate::dom::Node::Raw(raw)) if !raw.as_utf8_str().trim().is_empty() => return Some(handle),
+            Some(crate::dom::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("span") => {
                 let start = pending.len();
                 pending.extend(tag.children().top().iter().copied());
                 pending[start..].reverse();
             }
-            Some(tl::Node::Tag(_)) => return Some(handle),
+            Some(crate::dom::Node::Tag(_)) => return Some(handle),
             _ => {}
         }
     }
@@ -421,15 +424,15 @@ fn first_visible_content(handle: tl::NodeHandle, parser: &tl::Parser) -> Option<
 /// only when it wrote text of its own (`button_wrote`): an empty button, or one whose visitor
 /// skipped it or wrote text for it, does not separate.
 fn starts_with_control(
-    first: Option<tl::NodeHandle>,
-    parser: &tl::Parser,
+    first: Option<crate::dom::NodeHandle>,
+    parser: &crate::dom::Parser,
     dom_ctx: &crate::converter::DomContext,
     button_wrote: bool,
 ) -> bool {
     let Some(handle) = first.and_then(|handle| first_visible_content(handle, parser)) else {
         return false;
     };
-    let Some(tl::Node::Tag(control)) = handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(control)) = handle.get(parser) else {
         return false;
     };
     match crate::converter::utility::content::normalized_tag_name(control.name().as_utf8_str()).as_ref() {
@@ -440,7 +443,7 @@ fn starts_with_control(
 }
 
 /// Whether the `type` of the input `tag` is `checkbox`.
-fn has_checkbox_type(tag: &tl::HTMLTag) -> bool {
+fn has_checkbox_type(tag: &crate::dom::HTMLTag) -> bool {
     tag.attributes()
         .get("type")
         .flatten()
@@ -449,7 +452,7 @@ fn has_checkbox_type(tag: &tl::HTMLTag) -> bool {
 
 /// The checked state of `tag` when it is a checkbox a reader sees as one. An input whose `role`
 /// names another role is not one: `role="button"` marks the switch of a menu.
-pub fn checkbox_state(tag: &tl::HTMLTag) -> Option<bool> {
+pub fn checkbox_state(tag: &crate::dom::HTMLTag) -> Option<bool> {
     let attributes = tag.attributes();
     let is_checkbox = has_checkbox_type(tag);
     let has_other_role = attributes.get("role").flatten().is_some_and(|role| {
@@ -467,11 +470,16 @@ pub fn checkbox_state(tag: &tl::HTMLTag) -> Option<bool> {
 /// its state there.
 ///
 /// ~keep The task marker `[ ]` of a list item belongs to `list/item.rs`.
-fn emit_input(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, context: FormContext<'_>) {
+fn emit_input(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    context: FormContext<'_>,
+) {
     let FormContext {
         options, ctx, dom_ctx, ..
     } = context;
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     if !has_checkbox_type(tag) {
@@ -510,8 +518,8 @@ fn ends_with_a_space_between_words(output: &str) -> bool {
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_input(
     _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -522,7 +530,7 @@ pub fn handle_input(
     if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+        if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
@@ -589,12 +597,12 @@ pub fn handle_input(
 ///
 /// This is the first half: it records where the control starts and lists its children.
 pub fn open_line_end_control(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -610,13 +618,13 @@ pub fn open_line_end_control(
 /// What `close_line_end_control` needs from `open_line_end_control`.
 pub struct LineEndControlEnd {
     start: ControlStart,
-    node: tl::NodeHandle,
+    node: crate::dom::NodeHandle,
 }
 
 /// Ends the line of a control after its text.
 pub fn close_line_end_control(
     end: &LineEndControlEnd,
-    parser: &tl::Parser,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
 ) {
@@ -646,15 +654,15 @@ pub fn close_line_end_control(
 /// its line: without a visitor result, `open_line_end_control` writes it.
 #[cfg(feature = "visitor")]
 pub fn visit_button(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) -> bool {
     let FormContext {
         ctx, depth, dom_ctx, ..
     } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         if let Some(ref visitor_handle) = ctx.visitor {
             use crate::converter::get_text_content;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -707,8 +715,8 @@ pub fn visit_button(
 /// Routes all form-related elements to their respective handlers.
 pub fn handle(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: FormContext<'_>,
 ) {
@@ -730,16 +738,16 @@ pub fn handle(
 pub struct ButtonEnd {
     start: ControlStart,
     content_start: usize,
-    node: tl::NodeHandle,
+    node: crate::dom::NodeHandle,
 }
 
 pub fn open_button(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -755,7 +763,7 @@ pub fn open_button(
 
 pub fn close_button(
     end: &ButtonEnd,
-    parser: &tl::Parser,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
 ) {
@@ -780,11 +788,11 @@ pub struct CodeGroupEnd {
 }
 
 pub fn open_fieldset(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
     if handler.ctx.in_code && !handler.ctx.in_code_block {
         return open_code_group(node, parser, output, handler, children);
@@ -793,13 +801,13 @@ pub fn open_fieldset(
 }
 
 fn open_code_group(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     let original_len = output.len();
@@ -829,13 +837,13 @@ pub fn close_code_group(end: &CodeGroupEnd, output: &mut String) {
 }
 
 pub fn open_label(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
     context: FormContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -858,8 +866,8 @@ pub fn open_label(
 struct LabelHook {
     content: String,
     ctx: std::rc::Rc<super::Context>,
-    handles: Vec<tl::NodeHandle>,
-    first: Option<tl::NodeHandle>,
+    handles: Vec<crate::dom::NodeHandle>,
+    first: Option<crate::dom::NodeHandle>,
     first_button_wrote: bool,
 }
 
@@ -907,16 +915,16 @@ impl crate::converter::walk::ChildHook for LabelHook {
 }
 
 pub fn open_legend(
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<Open> {
     if handler.ctx.in_code && !handler.ctx.in_code_block {
         return open_code_group(node, parser, output, handler, children);
     }
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -932,8 +940,8 @@ pub fn open_legend(
 
 pub fn close_legend(
     rendered: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: crate::converter::block::container::HandlerContext<'_>,
 ) {

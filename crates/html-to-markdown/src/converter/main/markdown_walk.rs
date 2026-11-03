@@ -15,15 +15,15 @@ use crate::converter::walk::{Child, Close, HookSite, Open, Scratch, Walker, driv
 
 /// Walk each node of `nodes` with its subtree, in order, and write the Markdown to `output`.
 pub(super) fn walk_nodes(
-    nodes: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    nodes: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
     // ~keep Text and comments open no element, so a walk of them needs no vector.
     let opens = nodes
         .iter()
-        .any(|node| matches!(node.get(parser), Some(tl::Node::Tag(_))));
+        .any(|node| matches!(node.get(parser), Some(crate::dom::Node::Tag(_))));
     let spares = &handler.ctx.walk_spares;
     let mut scratch = if opens { spares.take() } else { Scratch::default() };
     let mut walk = MarkdownWalk {
@@ -44,21 +44,21 @@ pub(super) fn walk_nodes(
 /// ~keep A handler that the walk does not drive yet starts a walk for each child. Without the
 /// ~keep spare vectors each of those walks allocates its own.
 #[derive(Default)]
-pub struct WalkSpares(std::cell::RefCell<Vec<Scratch<tl::NodeHandle, Frame<'static>>>>);
+pub struct WalkSpares(std::cell::RefCell<Vec<Scratch<crate::dom::NodeHandle, Frame<'static>>>>);
 
 impl WalkSpares {
-    fn take<'a>(&self) -> Scratch<tl::NodeHandle, Frame<'a>> {
+    fn take<'a>(&self) -> Scratch<crate::dom::NodeHandle, Frame<'a>> {
         self.0.borrow_mut().pop().unwrap_or_default().with_frames()
     }
 
-    fn give(&self, scratch: Scratch<tl::NodeHandle, Frame<'_>>) {
+    fn give(&self, scratch: Scratch<crate::dom::NodeHandle, Frame<'_>>) {
         self.0.borrow_mut().push(scratch.with_frames());
     }
 }
 
 /// The Markdown walk of one buffer: `root` is the state of the nodes the walk starts from.
 struct MarkdownWalk<'a, 'output> {
-    parser: &'a tl::Parser<'a>,
+    parser: &'a crate::dom::Parser<'a>,
     output: &'output mut String,
     root: HandlerContext<'a>,
     /// The buffers of the open elements that capture their children, the innermost last.
@@ -91,7 +91,7 @@ fn end_media_boundary(
 
 /// Where the output of the node starts, when the node is among those that a task item watches
 /// for its first writer.
-fn first_writer_start(scope: &Context, node_handle: &tl::NodeHandle, output: &str) -> Option<usize> {
+fn first_writer_start(scope: &Context, node_handle: &crate::dom::NodeHandle, output: &str) -> Option<usize> {
     scope
         .first_writer
         .as_ref()
@@ -166,7 +166,7 @@ impl std::ops::Deref for Scope<'_> {
 
 /// An element whose children the walk visits before it ends the element.
 struct Frame<'a> {
-    node: tl::NodeHandle,
+    node: crate::dom::NodeHandle,
     /// The state of the element.
     scope: Scope<'a>,
     /// The state of the children, when the handler made one for them.
@@ -194,7 +194,7 @@ impl Frame<'_> {
 
 /// What ends an element after its children: the second half of its handler, then `finish_tag`.
 struct TagEnd<'a> {
-    tag: &'a tl::HTMLTag<'a>,
+    tag: &'a crate::dom::HTMLTag<'a>,
     tag_name: Cow<'a, str>,
     capture: TagCapture<'a>,
     close: Close,
@@ -213,14 +213,14 @@ enum Entered<'a> {
 }
 
 impl<'a> Walker for MarkdownWalk<'a, '_> {
-    type Node = tl::NodeHandle;
+    type Node = crate::dom::NodeHandle;
     type Frame = Frame<'a>;
 
     fn enter(
         &mut self,
-        node_handle: tl::NodeHandle,
+        node_handle: crate::dom::NodeHandle,
         parent: Option<&Frame<'a>>,
-        children: &mut Vec<tl::NodeHandle>,
+        children: &mut Vec<crate::dom::NodeHandle>,
     ) -> Option<Frame<'a>> {
         // ~keep The node reads the state of its parent in place. Only an element that opens takes
         // ~keep a share of it, so text costs no count of shares.
@@ -402,8 +402,8 @@ impl<'a> Walker for MarkdownWalk<'a, '_> {
 
 /// The element of a hook, as the hook sees it: `output` is the buffer of the element.
 const fn hook_site<'s>(
-    node_handle: &'s tl::NodeHandle,
-    parser: &'s tl::Parser<'s>,
+    node_handle: &'s crate::dom::NodeHandle,
+    parser: &'s crate::dom::Parser<'s>,
     output: &'s mut String,
     handler: HandlerContext<'s>,
 ) -> HookSite<'s> {
@@ -420,12 +420,12 @@ const fn hook_site<'s>(
 
 /// Convert one DOM node up to its children.
 fn enter_node<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &'a crate::dom::Parser<'a>,
     output: &mut String,
     handler: HandlerContext<'_>,
     dom_ctx: &'a DomContext,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Entered<'a> {
     let options = handler.options;
     let ctx = handler.ctx;
@@ -443,7 +443,7 @@ fn enter_node<'a>(
         return Entered::Complete;
     }
     if ctx.task_checkbox_ancestors.contains(&node_handle.get_inner()) {
-        if let tl::Node::Tag(tag) = node {
+        if let crate::dom::Node::Tag(tag) = node {
             children.extend(tag.children().top().iter().copied());
             return Entered::Children {
                 scope: None,
@@ -457,7 +457,7 @@ fn enter_node<'a>(
 
     let output_start = output.len();
     match node {
-        tl::Node::Raw(bytes) => {
+        crate::dom::Node::Raw(bytes) => {
             let raw = bytes.as_utf8_str();
             crate::converter::text_node::process_text_node(
                 raw.as_ref(),
@@ -468,7 +468,7 @@ fn enter_node<'a>(
             );
         }
 
-        tl::Node::Tag(_) => {
+        crate::dom::Node::Tag(_) => {
             if let Some(opened) = enter_tag(node_handle, parser, output, handler, dom_ctx, children) {
                 return Entered::Children {
                     scope: opened.scope,
@@ -479,7 +479,7 @@ fn enter_node<'a>(
             }
         }
 
-        tl::Node::Comment(_) => {}
+        crate::dom::Node::Comment(_) => {}
     }
     end_fresh_block_start(ctx, output, output_start);
     Entered::Complete
@@ -500,8 +500,8 @@ fn end_fresh_block_start(ctx: &Context, output: &str, node_output_start: usize) 
 
 /// End the walk of one node: the report to the task item and to the list state.
 fn leave_node(
-    node_handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
     ctx: &Context,
     first_writer_start: Option<usize>,
@@ -523,14 +523,14 @@ struct OpenedTag<'a> {
 /// Start the element of `node_handle` and run its handler, or the first half of it. Returns
 /// `None` when the element is complete.
 fn enter_tag<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &'a crate::dom::Parser<'a>,
     output: &mut String,
     handler: HandlerContext<'_>,
     dom_ctx: &'a DomContext,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<OpenedTag<'a>> {
-    let tl::Node::Tag(tag) = node_handle.get(parser)? else {
+    let crate::dom::Node::Tag(tag) = node_handle.get(parser)? else {
         return None;
     };
     let tag_name = normalized_node_tag_name(node_handle, tag, parser, dom_ctx);
@@ -576,10 +576,10 @@ fn enter_tag<'a>(
 /// ~keep This is the bridge for a handler that the walk does not drive yet: such a handler calls
 /// ~keep the handler of another element and needs the whole of its output on return.
 pub fn walk_opened(
-    parser: &tl::Parser,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
-    open: impl FnOnce(&mut String, &mut Vec<tl::NodeHandle>) -> Option<Open>,
+    open: impl FnOnce(&mut String, &mut Vec<crate::dom::NodeHandle>) -> Option<Open>,
 ) {
     let mut children = Vec::new();
     let Some(Open { scope, close }) = open(output, &mut children) else {

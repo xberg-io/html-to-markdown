@@ -641,7 +641,7 @@ fn normalize_input(html: &str) -> Result<Cow<'_, str>> {
 /// Insert a space before `/>` in XHTML-style self-closing tags so the underlying
 /// HTML parser does not greedily consume the trailing slash as part of the tag name.
 ///
-/// The bundled astral-tl parser treats `/` as an identifier character, so `<td/>`
+/// The parser treats `/` as an identifier character, so `<td/>`
 /// is parsed as a tag literally named `"td/"` and subsequent siblings become its
 /// children — silently truncating the table and dropping the rest of the document.
 /// Rewriting to `<td />` (with a space) lets the parser recognise the self-closing

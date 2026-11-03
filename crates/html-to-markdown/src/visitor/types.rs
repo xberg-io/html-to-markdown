@@ -229,13 +229,13 @@ enum AttributesInner<'a> {
     Borrowed(&'a BTreeMap<String, String>),
     /// Owned map (returned by reference on access).
     Owned(BTreeMap<String, String>),
-    /// Lazy: materialize from the tl tag on first access.
+    /// Lazy: materialize from the the parser tag on first access.
     ///
-    /// `tl` does not appear in the public signature of `AttributesSource` or
+    /// The parser does not appear in the public signature of `AttributesSource` or
     /// `NodeContext`; this variant is only reachable via `with_lazy_attributes`
     /// which is `pub(crate)`.
     Lazy {
-        tag: &'a tl::HTMLTag<'a>,
+        tag: &'a crate::dom::HTMLTag<'a>,
         cell: OnceCell<BTreeMap<String, String>>,
     },
 }
@@ -255,10 +255,10 @@ impl<'a> AttributesSource<'a> {
         }
     }
 
-    /// Construct the lazy variant backed by a `tl::HTMLTag`.
+    /// Construct the lazy variant backed by a `dom::HTMLTag`.
     ///
     /// Only callable within the `html-to-markdown-rs` crate.
-    pub(crate) const fn lazy(tag: &'a tl::HTMLTag<'a>) -> Self {
+    pub(crate) const fn lazy(tag: &'a crate::dom::HTMLTag<'a>) -> Self {
         Self {
             inner: AttributesInner::Lazy {
                 tag,
@@ -506,19 +506,19 @@ impl<'a> NodeContext<'a> {
     }
 
     /// Construct a `NodeContext` with lazy attribute evaluation backed by a
-    /// `tl::HTMLTag`.
+    /// `dom::HTMLTag`.
     ///
     /// Attributes are only materialized (via `collect_tag_attributes`) if
     /// [`NodeContext::attributes`] is actually called. This eliminates the
     /// per-element `BTreeMap` allocation on the hot path when visitors do not
     /// read attributes.
     ///
-    /// This constructor is `pub(crate)` to keep `tl` out of the public API.
+    /// This constructor is `pub(crate)` to keep the parser out of the public API.
     #[cfg(feature = "visitor")]
     pub(crate) const fn with_lazy_attributes(
         node_type: NodeType,
         tag_name: Cow<'a, str>,
-        tag: &'a tl::HTMLTag<'a>,
+        tag: &'a crate::dom::HTMLTag<'a>,
         depth: usize,
         index_in_parent: usize,
         parent_tag: Option<Cow<'a, str>>,

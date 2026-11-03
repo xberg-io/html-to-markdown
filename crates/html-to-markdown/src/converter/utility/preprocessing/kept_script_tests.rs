@@ -15,7 +15,7 @@ struct Script {
 
 /// The scripts of `page` in the order of the tree, read as the conversion reads them.
 fn scripts(page: &str, kept_scripts: KeptScripts) -> Vec<Script> {
-    let mut dom = tl::parse(page, tl::ParserOptions::default()).expect("the page");
+    let mut dom = crate::dom::parse(page, crate::dom::ParserOptions::default()).expect("the page");
     let kept_scripts = kept_scripts.with_owner_marks_taken(&mut dom).expect("the owner marks");
     let parser = dom.parser();
     let mut scripts = Vec::new();
@@ -208,12 +208,12 @@ fn an_owner_mark_in_the_text_of_the_tree_is_taken_out() {
     let as_text = page
         .replacen("<script", "<textarea>x data-h2m-script-7 &lt;script", 1)
         .replacen("</script>", "&lt;/script></textarea>", 1);
-    let mut dom = tl::parse(&as_text, tl::ParserOptions::default()).expect("the page");
+    let mut dom = crate::dom::parse(&as_text, crate::dom::ParserOptions::default()).expect("the page");
     kept_scripts.with_owner_marks_taken(&mut dom).expect("the owner marks");
     let texts: Vec<String> = dom
         .nodes()
         .iter()
-        .filter_map(tl::Node::as_raw)
+        .filter_map(crate::dom::Node::as_raw)
         .map(|text| text.as_utf8_str().into_owned())
         .collect();
     let attributes = &OPEN["<script".len()..];

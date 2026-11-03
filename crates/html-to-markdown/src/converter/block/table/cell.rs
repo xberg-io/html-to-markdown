@@ -20,8 +20,8 @@ const MAX_TABLE_COLS: usize = 1000;
 /// # Returns
 /// The colspan value (minimum 1, maximum `MAX_TABLE_COLS`)
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn get_colspan(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> usize {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+pub fn get_colspan(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser) -> usize {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         if let Some(Some(bytes)) = tag.attributes().get("colspan") {
             if let Ok(colspan) = bytes.as_utf8_str().parse::<usize>() {
                 return clamp_table_span(colspan);
@@ -42,8 +42,8 @@ pub fn get_colspan(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> usize {
 /// # Returns
 /// A tuple of (colspan, rowspan), both minimum 1 and maximum `MAX_TABLE_COLS`
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn get_colspan_rowspan(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> (usize, usize) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+pub fn get_colspan_rowspan(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser) -> (usize, usize) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let attrs = tag.attributes();
         let colspan = attrs
             .get("colspan")
@@ -79,17 +79,17 @@ fn clamp_table_span(value: usize) -> usize {
 /// * `cells` - Mutable vector to populate with cell handles
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn collect_table_cells(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
-    cells: &mut Vec<tl::NodeHandle>,
+    cells: &mut Vec<crate::dom::NodeHandle>,
 ) {
     cells.clear();
     if ctx.excluded_node_ids.contains(&node_handle.get_inner()) {
         return;
     }
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
         for child_handle in children.top().iter() {
             if ctx.excluded_node_ids.contains(&child_handle.get_inner()) {
@@ -119,8 +119,8 @@ pub fn collect_table_cells(
 /// * `depth` - Current recursion depth (the cell's own depth; children are walked at `depth + 1`)
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn cell_text_content(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     options: &crate::options::ConversionOptions,
     ctx: &super::super::super::Context,
     dom_ctx: &super::super::super::DomContext,
@@ -162,8 +162,8 @@ const CELL_TEXT_CAPACITY: usize = 128;
 /// sharing its row with a sibling) flattens nested rows without table syntax (#760).
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn render_cell_text(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
     mut deferred_tables: Option<&mut Vec<String>>,
 ) -> String {
@@ -173,22 +173,24 @@ pub fn render_cell_text(
 }
 
 fn render_cell_content(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     text: &mut String,
     handler: HandlerContext<'_>,
     deferred_tables: &mut Option<&mut Vec<String>>,
 ) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     let children = tag.children();
     // ~keep A comment splits the text of the cell in two nodes. The walk writes each of them
     // ~keep with the rules of running text, as Tier-1 does; the shortcut is for one text alone.
-    let has_tag_or_comment_child = children
-        .top()
-        .iter()
-        .any(|child_handle| matches!(child_handle.get(parser), Some(tl::Node::Tag(_) | tl::Node::Comment(_))));
+    let has_tag_or_comment_child = children.top().iter().any(|child_handle| {
+        matches!(
+            child_handle.get(parser),
+            Some(crate::dom::Node::Tag(_) | crate::dom::Node::Comment(_))
+        )
+    });
     if !has_tag_or_comment_child {
         let raw = handler.dom_ctx.text_content(*node_handle, parser);
         let normalized = if handler.options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
@@ -244,8 +246,8 @@ pub fn separate_nested_table_following_content(text: &mut String, table_ends: &[
 /// ~keep text has them too, or the rule under the header is short by one character for each.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn nested_table_width_text(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
     br_in_tables: bool,
@@ -259,7 +261,7 @@ pub fn nested_table_width_text(
             continue;
         }
         match handle.get(parser) {
-            Some(tl::Node::Raw(bytes)) => {
+            Some(crate::dom::Node::Raw(bytes)) => {
                 let raw = bytes.as_utf8_str();
                 let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
                 if decoded.trim().is_empty() {
@@ -276,7 +278,7 @@ pub fn nested_table_width_text(
                 cell_gap = false;
                 text.push_str(decoded.as_ref());
             }
-            Some(tl::Node::Tag(tag)) => {
+            Some(crate::dom::Node::Tag(tag)) => {
                 row_gap |= super::utils::is_tag_name(&handle, parser, dom_ctx, "tr");
                 cell_gap |= ["td", "th"]
                     .iter()
@@ -299,8 +301,8 @@ pub fn nested_table_width_text(
 /// ~keep from a single-cell row or flattened to cell content with explicit row separators;
 /// ~keep otherwise reparsing widens and eventually truncates the outer row (issues #469/#484/#488).
 fn render_cell_child(
-    child_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    child_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     text: &mut String,
     handler: HandlerContext<'_>,
     deferred_tables: &mut Option<&mut Vec<String>>,
@@ -444,8 +446,8 @@ fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> 
 /// * `deferred_tables` - See [`render_cell_text`]; forwarded unchanged.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn convert_table_cell(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
     col_width: Option<usize>,
@@ -461,8 +463,8 @@ pub fn convert_table_cell(
 /// pre-pass can be emitted without walking its subtree a second time.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn emit_cell_text(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     text: &str,
     col_width: Option<usize>,

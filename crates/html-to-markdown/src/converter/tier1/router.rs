@@ -11,7 +11,7 @@ use crate::options::{
 pub enum RouterDecision {
     /// Use the Tier-1 single-pass byte scanner.
     Tier1,
-    /// Use the Tier-2 `tl::parse` + walk-node path.
+    /// Use the Tier-2 `dom::parse` + walk-node path.
     Tier2,
 }
 
@@ -32,10 +32,10 @@ pub enum RouterDecision {
 /// - `!options.preserve_tags.is_empty()` — tag preservation requires DOM awareness
 /// - `options.debug` — debug output is consistent only on Tier-2
 /// - `!options.exclude_selectors.is_empty()` — Tier-1 is a byte scanner with no
-///   CSS selector engine; it cannot evaluate `tl`-compatible selectors, so any
+///   CSS selector engine; it cannot evaluate DOM selectors, so any
 ///   configured exclusion would silently pass excluded content straight
 ///   through instead of dropping it (see `converter/main.rs`'s
-///   `tl::Selector`-based exclusion pass, outside tier1/)
+///   `dom::Selector`-based exclusion pass, outside tier1/)
 /// - `options.strip_newlines` — Tier-1 never strips `\r`/`\n` from text runs;
 ///   Tier-2 applies it per text node (`converter/text_node.rs`)
 ///

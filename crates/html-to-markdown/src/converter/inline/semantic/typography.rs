@@ -48,8 +48,12 @@ pub struct ScriptEnd {
 /// Open a subscript (`sub`) or a superscript (`sup`): the marks come from the options, and the
 /// walk captures the text of the children for [`close_script`].
 // ~keep In code the dispatcher gives the children to the walk and this handler does not run.
-pub fn open_script(tag_name: &str, handler: &HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+pub fn open_script(
+    tag_name: &str,
+    handler: &HandlerContext<'_>,
+    children: &mut Vec<crate::dom::NodeHandle>,
+) -> Option<Open> {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return None;
     };
     let (kind, symbol, djot_marker) = if tag_name == "sub" {
@@ -70,7 +74,7 @@ pub fn open_script(tag_name: &str, handler: &HandlerContext<'_>, children: &mut 
 pub fn close_script(end: &ScriptEnd, content: &str, handler: HandlerContext<'_>) {
     #[cfg(feature = "visitor")]
     {
-        let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
             return;
         };
         if let Some(custom_output) = visit_script(tag, end.kind, &handler) {
@@ -101,7 +105,7 @@ pub fn close_script(end: &ScriptEnd, content: &str, handler: HandlerContext<'_>)
 }
 
 #[cfg(feature = "visitor")]
-fn visit_script(tag: &tl::HTMLTag<'_>, kind: ScriptKind, handler: &HandlerContext<'_>) -> Option<String> {
+fn visit_script(tag: &crate::dom::HTMLTag<'_>, kind: ScriptKind, handler: &HandlerContext<'_>) -> Option<String> {
     use crate::converter::{get_text_content, serialize_node};
     use crate::visitor::{NodeContext, NodeType, VisitResult};
 
@@ -166,8 +170,8 @@ fn visit_script(tag: &tl::HTMLTag<'_>, kind: ScriptKind, handler: &HandlerContex
 ///
 /// In code the children write to the buffer of the element and no mark is written. Otherwise
 /// the walk captures their text for [`close_italic_semantic`].
-pub fn open_italic_semantic(handler: &HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+pub fn open_italic_semantic(handler: &HandlerContext<'_>, children: &mut Vec<crate::dom::NodeHandle>) -> Option<Open> {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -199,8 +203,8 @@ pub fn close_italic_semantic(content: &str, handler: HandlerContext<'_>) {
 
 /// Open an abbreviation (`abbr`): the walk captures the text of the children for
 /// [`close_abbreviation`].
-pub fn open_abbreviation(handler: &HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+pub fn open_abbreviation(handler: &HandlerContext<'_>, children: &mut Vec<crate::dom::NodeHandle>) -> Option<Open> {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -224,7 +228,7 @@ pub fn close_abbreviation(content: &str, handler: HandlerContext<'_>) {
         ..
     } = handler;
 
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
 
@@ -263,12 +267,12 @@ pub fn close_abbreviation(content: &str, handler: HandlerContext<'_>) {
 ///
 /// Writes what a span writes before its children and lists the children in `children`.
 pub fn open_span(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
 

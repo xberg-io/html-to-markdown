@@ -16,11 +16,11 @@ use crate::converter::block::container::HandlerContext;
 /// Return the content cell of a one-cell layout wrapper containing a nested table.
 /// Stop at that cell, so nested data headers do not give the wrapper table semantics.
 pub(super) fn nested_table_wrapper_cell(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     scan: &TableScan,
     ctx: &super::super::super::Context,
-) -> Option<(tl::NodeHandle, usize)> {
+) -> Option<(crate::dom::NodeHandle, usize)> {
     if scan.row_counts != [1] || scan.nested_table_count == 0 || scan.has_span || !scan.has_text {
         return None;
     }
@@ -30,7 +30,7 @@ pub(super) fn nested_table_wrapper_cell(
         if ctx.excluded_node_ids.contains(&handle.get_inner()) {
             continue;
         }
-        let Some(tl::Node::Tag(child)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(child)) = handle.get(parser) else {
             continue;
         };
         match child.name().as_utf8_str().to_ascii_lowercase().as_str() {
@@ -61,15 +61,15 @@ const MAX_TABLE_COLS: usize = 1000;
 /// Maximum column count (minimum 1, maximum `MAX_TABLE_COLS`)
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn table_total_columns(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
 ) -> usize {
     let mut max_cols = 0usize;
     let mut cells = Vec::new();
 
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) {
         for child_handle in tag.children().top().iter() {
             max_cols = max_cols.max(table_child_columns(child_handle, parser, dom_ctx, ctx, &mut cells));
         }
@@ -79,11 +79,11 @@ pub fn table_total_columns(
 }
 
 fn table_child_columns(
-    child_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    child_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
-    cells: &mut Vec<tl::NodeHandle>,
+    cells: &mut Vec<crate::dom::NodeHandle>,
 ) -> usize {
     let mut pending = vec![*child_handle];
     let mut max_cols = 0;
@@ -91,7 +91,7 @@ fn table_child_columns(
         if ctx.excluded_node_ids.contains(&node.get_inner()) {
             continue;
         }
-        let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
             continue;
         };
         let name = dom_ctx
@@ -109,11 +109,11 @@ fn table_child_columns(
 }
 
 fn row_columns(
-    row_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    row_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &super::super::super::DomContext,
     ctx: &super::super::super::Context,
-    cells: &mut Vec<tl::NodeHandle>,
+    cells: &mut Vec<crate::dom::NodeHandle>,
 ) -> usize {
     collect_table_cells(row_handle, parser, dom_ctx, ctx, cells);
     cells.iter().fold(0usize, |count, handle| {
@@ -156,9 +156,9 @@ pub(super) const fn cell_text_reuse_allowed(ctx: &super::super::super::Context, 
 /// ~keep Ragged row widths alone do not imply layout: the regular renderer pads them. Layout
 /// ~keep requires stronger evidence such as nested tables, borderless spans, blanks, or dense links.
 pub(super) fn is_layout_table(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     scan: &TableScan,
-    wrapper_cell: Option<(tl::NodeHandle, usize)>,
+    wrapper_cell: Option<(crate::dom::NodeHandle, usize)>,
 ) -> bool {
     if wrapper_cell.is_some() || scan.has_header || scan.has_caption {
         return false;
@@ -171,7 +171,12 @@ pub(super) fn is_layout_table(
     looks_like_layout || !scan.has_text || (scan.row_counts.len() <= 2 && scan.link_count >= 3)
 }
 
-fn render_layout_table(tag: &tl::HTMLTag<'_>, parser: &tl::Parser, output: &mut String, handler: HandlerContext<'_>) {
+fn render_layout_table(
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    handler: HandlerContext<'_>,
+) {
     for child_handle in tag.children().top().iter() {
         render_layout_child(child_handle, parser, output, handler);
     }
@@ -181,15 +186,15 @@ fn render_layout_table(tag: &tl::HTMLTag<'_>, parser: &tl::Parser, output: &mut 
 }
 
 fn render_layout_child(
-    child_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    child_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
     if handler.ctx.excluded_node_ids.contains(&child_handle.get_inner()) {
         return;
     }
-    let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(parser) else {
         return;
     };
     let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
@@ -224,13 +229,13 @@ fn render_layout_child(
 }
 
 fn render_wrapper_cell(
-    cell_handle: tl::NodeHandle,
+    cell_handle: crate::dom::NodeHandle,
     cell_depth: usize,
-    parser: &tl::Parser,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
-    let Some(tl::Node::Tag(cell)) = cell_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(cell)) = cell_handle.get(parser) else {
         return;
     };
     for child in cell.children().top().iter() {
@@ -261,15 +266,15 @@ struct DataTableState {
 
 #[derive(Clone, Copy)]
 struct DataEnv<'a> {
-    parser: &'a tl::Parser<'a>,
+    parser: &'a crate::dom::Parser<'a>,
     handler: HandlerContext<'a>,
     scan: &'a TableScan,
 }
 
 fn render_data_table(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag<'_>,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
     scan: &TableScan,
@@ -332,8 +337,8 @@ pub(super) const fn visitor_rendered_widths(_handler: HandlerContext<'_>) -> Opt
 /// ~keep Width measurement is an internal walk. When rendered text cannot be reused, collectors
 /// ~keep are detached so the pre-pass cannot duplicate caller-visible metadata or structure.
 pub(super) fn column_widths(
-    tag: &tl::HTMLTag<'_>,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag<'_>,
+    parser: &crate::dom::Parser,
     handler: HandlerContext<'_>,
     total_cols: usize,
     reuse_cell_text: bool,
@@ -382,14 +387,19 @@ struct WidthState<'a> {
     cell_cache: &'a mut CellTextCache,
 }
 
-fn collect_width_child(child_handle: &tl::NodeHandle, env: RowEnv<'_>, depth: usize, state: &mut WidthState<'_>) {
+fn collect_width_child(
+    child_handle: &crate::dom::NodeHandle,
+    env: RowEnv<'_>,
+    depth: usize,
+    state: &mut WidthState<'_>,
+) {
     if depth >= crate::converter::main_helpers::effective_max_depth(env.options) {
         return;
     }
     if env.ctx.excluded_node_ids.contains(&child_handle.get_inner()) {
         return;
     }
-    let Some(tl::Node::Tag(child_tag)) = child_handle.get(env.parser) else {
+    let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(env.parser) else {
         return;
     };
     let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
@@ -413,7 +423,7 @@ fn collect_width_child(child_handle: &tl::NodeHandle, env: RowEnv<'_>, depth: us
     }
 }
 
-fn collect_width_row(row_handle: &tl::NodeHandle, env: RowEnv<'_>, depth: usize, state: &mut WidthState<'_>) {
+fn collect_width_row(row_handle: &crate::dom::NodeHandle, env: RowEnv<'_>, depth: usize, state: &mut WidthState<'_>) {
     if env.ctx.excluded_node_ids.contains(&row_handle.get_inner()) {
         return;
     }
@@ -427,11 +437,16 @@ fn collect_width_row(row_handle: &tl::NodeHandle, env: RowEnv<'_>, depth: usize,
     );
 }
 
-fn render_data_child(child_handle: &tl::NodeHandle, output: &mut String, env: DataEnv<'_>, state: &mut DataTableState) {
+fn render_data_child(
+    child_handle: &crate::dom::NodeHandle,
+    output: &mut String,
+    env: DataEnv<'_>,
+    state: &mut DataTableState,
+) {
     if env.handler.ctx.excluded_node_ids.contains(&child_handle.get_inner()) {
         return;
     }
-    let Some(tl::Node::Tag(child_tag)) = child_handle.get(env.parser) else {
+    let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(env.parser) else {
         return;
     };
     let tag_name = env
@@ -468,7 +483,7 @@ fn render_data_child(child_handle: &tl::NodeHandle, output: &mut String, env: Da
     }
 }
 
-fn render_caption(tag: &tl::HTMLTag<'_>, output: &mut String, env: DataEnv<'_>) {
+fn render_caption(tag: &crate::dom::HTMLTag<'_>, output: &mut String, env: DataEnv<'_>) {
     let caption_ctx = super::super::super::Context {
         text_in_markers: true,
         escapes_hyphens: true,
@@ -498,7 +513,7 @@ fn render_caption(tag: &tl::HTMLTag<'_>, output: &mut String, env: DataEnv<'_>) 
 }
 
 fn render_data_row(
-    row_handle: &tl::NodeHandle,
+    row_handle: &crate::dom::NodeHandle,
     output: &mut String,
     env: DataEnv<'_>,
     state: &mut DataTableState,
@@ -557,10 +572,10 @@ pub(super) struct TableVisitorState {
 
 #[cfg(feature = "visitor")]
 pub(super) fn begin_table_visit(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     handler: HandlerContext<'_>,
 ) -> Option<TableVisitorState> {
     use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -611,10 +626,10 @@ pub(super) fn begin_table_visit(
 
 #[cfg(feature = "visitor")]
 pub(super) fn finish_table_visit(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     handler: HandlerContext<'_>,
     state: TableVisitorState,
 ) {
@@ -643,8 +658,8 @@ pub(super) fn finish_table_visit(
 #[cfg(feature = "visitor")]
 fn apply_table_visit_result(
     result: crate::visitor::VisitResult,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
     state: TableVisitorState,
@@ -700,12 +715,12 @@ fn apply_table_visit_result(
 /// * `depth` - Nesting depth
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn handle_table(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     handler: HandlerContext<'_>,
 ) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     #[cfg(feature = "visitor")]

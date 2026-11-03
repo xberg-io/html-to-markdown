@@ -32,7 +32,7 @@ use crate::converter::walk::Open;
 /// - Abbr: pass through content with optional title in parentheses
 ///
 /// Lists the children in `children`. Returns `None` for an element that is complete.
-pub fn open(tag_name: &str, context: HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Option<Open> {
+pub fn open(tag_name: &str, context: HandlerContext<'_>, children: &mut Vec<crate::dom::NodeHandle>) -> Option<Open> {
     match tag_name {
         "mark" => marks::open_mark(context, children),
         "del" | "s" | "strike" => marks::open_strikethrough(tag_name, &context, children),

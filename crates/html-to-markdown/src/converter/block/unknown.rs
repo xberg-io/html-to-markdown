@@ -10,9 +10,9 @@
 #[cfg(feature = "visitor")]
 use crate::converter::block::container::HandlerContext;
 use crate::converter::walk::{Close, Open};
+use crate::dom::{NodeHandle, Parser};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -39,7 +39,7 @@ type DomContext = crate::converter::DomContext;
 /// This is the first half: it measures the output before the children and lists them in
 /// `children`. With a visitor, `visit` runs before it and decides whether it runs at all.
 pub fn open(node_handle: &NodeHandle, parser: &Parser, output: &str, children: &mut Vec<NodeHandle>) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
 
@@ -106,7 +106,7 @@ pub fn visit(node_handle: &NodeHandle, parser: &Parser, output: &mut String, han
     let Some(ref visitor_handle) = handler.ctx.visitor else {
         return false;
     };
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return false;
     };
     let tag_name = tag.name().as_utf8_str();

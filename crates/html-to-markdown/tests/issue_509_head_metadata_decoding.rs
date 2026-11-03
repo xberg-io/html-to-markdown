@@ -161,7 +161,8 @@ fn document_structure_meta_content_is_decoded() {
         r#"<html><head><title>Tom &amp; Jerry</title><meta name="description" content="Tom &amp; Jerry&#x27;s"></head>"#,
         "<body><p>body</p></body></html>",
     );
-    let dom = tl::parse(html, tl::ParserOptions::default()).expect("parse html");
+    let dom =
+        html_to_markdown_rs::dom::parse(html, html_to_markdown_rs::dom::ParserOptions::default()).expect("parse html");
     let document = html_to_markdown_rs::types::build_document_structure(&dom);
     let entries = document
         .nodes

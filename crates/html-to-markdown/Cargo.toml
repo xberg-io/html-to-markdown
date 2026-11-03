@@ -15,8 +15,8 @@ homepage.workspace = true
 documentation.workspace = true
 readme = "README.md"
 rust-version.workspace = true
-description = "High-performance HTML to Markdown converter using the astral-tl parser. Part of the Xberg ecosystem."
-keywords = ["html", "markdown", "converter", "astral-tl", "doc-processing"]
+description = "High-performance HTML to Markdown converter using the astral-html tokenizer. Part of the Xberg ecosystem."
+keywords = ["html", "markdown", "converter", "astral-html", "doc-processing"]
 categories = ["parsing", "text-processing", "web-programming"]
 
 [package.metadata.cargo-machete]
@@ -42,6 +42,7 @@ axum = { version = "0.8", optional = true }
 base64.workspace = true
 bitflags = "2"
 html-escape = "0.3.0"
+astral-html.workspace = true
 html5ever.workspace = true
 image = { version = "0.25", default-features = false, features = [
     "gif",
@@ -65,7 +66,7 @@ schemars = { version = "1.2.3", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
 serde_json = { version = "1.0", features = ["raw_value"] }
 thiserror.workspace = true
-tl.workspace = true
+smallvec.workspace = true
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std"], optional = true }
 tower = { version = "0.5", default-features = false, features = ["limit", "timeout"], optional = true }
 tower-http = { version = "0.7", default-features = false, features = ["limit"], optional = true }

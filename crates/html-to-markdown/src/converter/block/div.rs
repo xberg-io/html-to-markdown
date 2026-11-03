@@ -9,9 +9,9 @@
 use crate::converter::block::container::HandlerContext;
 use crate::converter::main_helpers::{strip_trailing_backslash_breaks, trim_trailing_whitespace};
 use crate::converter::walk::{Close, Open};
+use crate::dom::{NodeHandle, Parser};
 use crate::options::{ConversionOptions, NewlineStyle};
 use std::rc::Rc;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 
@@ -55,7 +55,7 @@ pub fn open(
 ) -> Option<Open> {
     let HandlerContext { options, ctx, .. } = handler;
 
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
 
@@ -136,7 +136,7 @@ pub fn close(end: DivEnd, output: &mut String, handler: HandlerContext<'_>) {
 }
 
 fn open_inline(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     output: &mut String,
     handler: HandlerContext<'_>,
     is_table_continuation: bool,

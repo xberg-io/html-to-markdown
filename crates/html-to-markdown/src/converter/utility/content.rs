@@ -18,7 +18,7 @@ pub use crate::converter::DomContext;
 /// Boolean attributes (those with `None` as the value) are skipped; only
 /// attributes that carry an explicit value are included.
 #[cfg(feature = "visitor")]
-pub fn collect_tag_attributes(tag: &tl::HTMLTag) -> BTreeMap<String, String> {
+pub fn collect_tag_attributes(tag: &crate::dom::HTMLTag) -> BTreeMap<String, String> {
     tag.attributes()
         .iter()
         .filter_map(|(k, v)| v.as_ref().map(|val| (k.to_string(), val.to_string())))
@@ -220,13 +220,17 @@ pub fn merge_adjacent_emphasis(output: &mut String, symbol: char, count: usize) 
 
 /// Get the text content of a node and its children.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn get_text_content(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> String {
+pub fn get_text_content(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+) -> String {
     dom_ctx.text_content(*node_handle, parser)
 }
 
 pub(in crate::converter) fn get_math_text_content(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     hidden_content: HiddenContent,
 ) -> String {
@@ -382,8 +386,8 @@ pub const ZERO_WIDTH_SPACE: char = '\u{200b}';
 /// ~keep direct-children partition (issue #490) -- both need the identical block/inline
 /// ~keep classification, or a byte could end up assigned to neither half, or both.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn node_is_block_level(handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
-    let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+pub fn node_is_block_level(handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
+    let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) else {
         return false;
     };
     dom_ctx.tag_info(handle.get_inner(), parser).map_or_else(
@@ -397,12 +401,12 @@ pub fn node_is_block_level(handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx
 
 /// Collect inline text for link labels, skipping block-level descendants.
 pub fn collect_link_label_text(
-    children: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    children: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     options: &ConversionOptions,
     policy: crate::convert_api::AccessibleNamePolicy,
-) -> (LinkText, Vec<tl::NodeHandle>, bool) {
+) -> (LinkText, Vec<crate::dom::NodeHandle>, bool) {
     let mut block_nodes = Vec::new();
     let text = walk_link_text(children, parser, dom_ctx, options, policy, |handle| {
         block_nodes.push(handle);
@@ -414,8 +418,8 @@ pub fn collect_link_label_text(
 
 /// The text of every descendant of a link, block-level ones included.
 pub fn link_text_content(
-    children: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    children: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     options: &ConversionOptions,
     policy: crate::convert_api::AccessibleNamePolicy,
@@ -444,12 +448,12 @@ pub fn link_accessible_name<'a>(aria_label: Option<&'a str>, title: Option<&'a s
 /// ~keep style sheets and scripts, which became the label of an icon link.
 #[allow(clippy::match_wildcard_for_single_variants)]
 fn walk_link_text(
-    children: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    children: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
     options: &ConversionOptions,
     policy: crate::convert_api::AccessibleNamePolicy,
-    mut enter_block: impl FnMut(tl::NodeHandle) -> bool,
+    mut enter_block: impl FnMut(crate::dom::NodeHandle) -> bool,
 ) -> LinkText {
     let mut text = String::new();
     let mut breaks: Option<(usize, usize)> = None;
@@ -460,20 +464,20 @@ fn walk_link_text(
             continue;
         };
         match node {
-            tl::Node::Raw(bytes) => {
+            crate::dom::Node::Raw(bytes) => {
                 let raw = bytes.as_utf8_str();
                 let decoded = text::decode_html_entities_cow(raw.as_ref());
                 text.push_str(decoded.as_ref());
             }
-            tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("svg") => {
+            crate::dom::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("svg") => {
                 text.push_str(&crate::converter::media::svg::graphic_text(
                     tag, parser, options, policy,
                 ));
             }
-            tl::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("br") => {
+            crate::dom::Node::Tag(tag) if tag.name().as_utf8_str().eq_ignore_ascii_case("br") => {
                 breaks = Some((breaks.map_or(text.len(), |(first, _)| first), text.len()));
             }
-            tl::Node::Tag(tag) => {
+            crate::dom::Node::Tag(tag) => {
                 if !node_is_block_level(&handle, parser, dom_ctx) || enter_block(handle) {
                     push_label_children(&mut stack, handle, tag, dom_ctx);
                 }
@@ -485,9 +489,9 @@ fn walk_link_text(
 }
 
 fn push_label_children(
-    stack: &mut Vec<tl::NodeHandle>,
-    handle: tl::NodeHandle,
-    tag: &tl::HTMLTag<'_>,
+    stack: &mut Vec<crate::dom::NodeHandle>,
+    handle: crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag<'_>,
     dom_ctx: &DomContext,
 ) {
     if let Some(children) = dom_ctx.children_of(handle.get_inner()) {

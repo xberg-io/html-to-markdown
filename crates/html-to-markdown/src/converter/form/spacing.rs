@@ -35,7 +35,7 @@ pub fn line_goes_on_in(parent: Option<&TagSpec>) -> bool {
 }
 
 /// Whether the line of node `id` goes on after its parent element.
-pub fn line_goes_on_after_parent(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn line_goes_on_after_parent(id: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     dom_ctx
         .parent_tag_name(id, parser)
         .is_some_and(|name| line_goes_on_in(lookup(name.as_bytes())))
@@ -97,8 +97,8 @@ pub fn starts_with_word(text: &str) -> Option<bool> {
 /// punctuation.
 pub fn separate_from_next_text(
     output: &mut String,
-    node_handle: tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
 ) {
     if needs_space_before(output) && word_follows(node_handle.get_inner(), parser, dom_ctx) {
@@ -158,7 +158,7 @@ pub fn write_option_list(output: &mut String, options: &str, in_code: bool) -> b
 }
 
 /// The siblings of node `id` that follow it in the source.
-fn siblings_after(id: u32, dom_ctx: &DomContext) -> &[tl::NodeHandle] {
+fn siblings_after(id: u32, dom_ctx: &DomContext) -> &[crate::dom::NodeHandle] {
     let siblings = match dom_ctx.parent_of(id) {
         Some(parent_id) => dom_ctx.children_of(parent_id),
         None => Some(&dom_ctx.root_children),
@@ -170,16 +170,18 @@ fn siblings_after(id: u32, dom_ctx: &DomContext) -> &[tl::NodeHandle] {
 }
 
 /// Whether the source has white space right after node `id`. A comment is not in the way.
-pub fn white_space_follows(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn white_space_follows(id: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     siblings_after(id, dom_ctx)
         .iter()
         .filter_map(|next| next.get(parser))
-        .find(|next| !matches!(next, tl::Node::Comment(_)))
-        .is_some_and(|next| matches!(next, tl::Node::Raw(raw) if raw.as_utf8_str().starts_with(char::is_whitespace)))
+        .find(|next| !matches!(next, crate::dom::Node::Comment(_)))
+        .is_some_and(
+            |next| matches!(next, crate::dom::Node::Raw(raw) if raw.as_utf8_str().starts_with(char::is_whitespace)),
+        )
 }
 
 /// Whether the content after node `id` in its block starts with a word.
-fn word_follows(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn word_follows(mut id: u32, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     let mut budget = MAX_LOOKAHEAD_NODES;
     loop {
         for sibling in siblings_after(id, dom_ctx) {
@@ -199,15 +201,20 @@ fn word_follows(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool 
 }
 
 /// Whether the first content `handle` writes starts with a word, or `None` when it writes nothing.
-fn leading_word(handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext, budget: &mut usize) -> Option<bool> {
+fn leading_word(
+    handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+    budget: &mut usize,
+) -> Option<bool> {
     if *budget == 0 {
         return Some(false);
     }
     *budget -= 1;
     match handle.get(parser)? {
-        tl::Node::Comment(_) => None,
-        tl::Node::Raw(raw) => starts_with_word(raw.as_utf8_str().as_ref()),
-        tl::Node::Tag(tag) => {
+        crate::dom::Node::Comment(_) => None,
+        crate::dom::Node::Raw(raw) => starts_with_word(raw.as_utf8_str().as_ref()),
+        crate::dom::Node::Tag(tag) => {
             let name = dom_ctx.tag_name_for(handle, parser)?;
             match name.as_ref() {
                 // ~keep An input writes no text, so it is not in the way.

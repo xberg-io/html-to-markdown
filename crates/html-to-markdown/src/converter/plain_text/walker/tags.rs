@@ -4,7 +4,13 @@ use crate::converter::form::spacing;
 use crate::converter::media::svg::graphic_text;
 
 impl<'a> Walker<'a> {
-    pub(super) fn dispatch(&mut self, name: &str, tag: &tl::HTMLTag<'_>, scope: Scope<'a>, parser: &tl::Parser) {
+    pub(super) fn dispatch(
+        &mut self,
+        name: &str,
+        tag: &crate::dom::HTMLTag<'_>,
+        scope: Scope<'a>,
+        parser: &crate::dom::Parser,
+    ) {
         let child = Scope {
             state: WalkState {
                 in_document_body: scope.state.in_document_body || name == "body",
@@ -40,7 +46,13 @@ impl<'a> Walker<'a> {
         }
     }
 
-    fn leaf(&mut self, name: &str, tag: &tl::HTMLTag<'_>, scope: Scope<'a>, parser: &tl::Parser) -> bool {
+    fn leaf(
+        &mut self,
+        name: &str,
+        tag: &crate::dom::HTMLTag<'_>,
+        scope: Scope<'a>,
+        parser: &crate::dom::Parser,
+    ) -> bool {
         let buf = &mut self.outputs[scope.output];
         match name {
             "br" => buf.push_mark("\n"),
@@ -61,14 +73,14 @@ impl<'a> Walker<'a> {
         true
     }
 
-    fn pre(&mut self, tag: &tl::HTMLTag<'_>, mut scope: Scope<'a>) {
+    fn pre(&mut self, tag: &crate::dom::HTMLTag<'_>, mut scope: Scope<'a>) {
         scope.state.in_pre = true;
         self.outputs[scope.output].end_block();
         self.frames.push(Frame::EndBlock(scope.output));
         self.tag_children(tag, scope);
     }
 
-    fn block(&mut self, tag: &tl::HTMLTag<'_>, scope: Scope<'a>) {
+    fn block(&mut self, tag: &crate::dom::HTMLTag<'_>, scope: Scope<'a>) {
         if scope.state.item_marker_end != Some(self.outputs[scope.output].len()) {
             self.outputs[scope.output].end_block();
         }
@@ -76,7 +88,7 @@ impl<'a> Walker<'a> {
         self.tag_children(tag, scope);
     }
 
-    fn list(&mut self, tag: &tl::HTMLTag<'_>, mut scope: Scope<'a>, context: ListContext) {
+    fn list(&mut self, tag: &crate::dom::HTMLTag<'_>, mut scope: Scope<'a>, context: ListContext) {
         self.outputs[scope.output].end_line();
         scope.state.in_pre = false;
         scope.list = self.lists.len();
@@ -86,7 +98,7 @@ impl<'a> Walker<'a> {
         self.tag_children(tag, scope);
     }
 
-    fn list_item(&mut self, tag: &tl::HTMLTag<'_>, mut scope: Scope<'a>) {
+    fn list_item(&mut self, tag: &crate::dom::HTMLTag<'_>, mut scope: Scope<'a>) {
         let buf = &mut self.outputs[scope.output];
         buf.end_line();
         match &mut self.lists[scope.list] {
@@ -102,7 +114,7 @@ impl<'a> Walker<'a> {
         self.tag_children(tag, scope);
     }
 
-    fn control(&mut self, tag: &tl::HTMLTag<'_>, scope: Scope<'a>) {
+    fn control(&mut self, tag: &crate::dom::HTMLTag<'_>, scope: Scope<'a>) {
         if !scope.state.in_pre {
             let control = self.outputs[scope.output].start_control();
             self.frames.push(Frame::FinishControl {
@@ -113,7 +125,7 @@ impl<'a> Walker<'a> {
         self.tag_children(tag, scope);
     }
 
-    fn options(&mut self, name: &str, tag: &tl::HTMLTag<'_>, mut scope: Scope<'a>) {
+    fn options(&mut self, name: &str, tag: &crate::dom::HTMLTag<'_>, mut scope: Scope<'a>) {
         let kind = CaptureKind::Options {
             collapse_lines: !scope.state.in_pre && matches!(name, "select" | "datalist"),
             in_pre: scope.state.in_pre,
@@ -136,7 +148,7 @@ impl<'a> Walker<'a> {
         }
     }
 
-    fn option(&mut self, tag: &tl::HTMLTag<'_>, mut scope: Scope<'a>) {
+    fn option(&mut self, tag: &crate::dom::HTMLTag<'_>, mut scope: Scope<'a>) {
         self.frames.push(Frame::FinishCapture {
             output: scope.output,
             own_list: false,

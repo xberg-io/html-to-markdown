@@ -7,8 +7,8 @@
 //! - **source**: Media source elements (handled within parent elements)
 //! - **picture**: Picture elements with responsive image sources
 
+use crate::dom::{HTMLTag, NodeHandle, Parser};
 use std::borrow::Cow;
-use tl::{HTMLTag, NodeHandle, Parser};
 
 use crate::converter::Context;
 use crate::converter::inline::link::{MarkdownLink, append_markdown_link};
@@ -76,7 +76,7 @@ pub(in crate::converter) fn media_element_src<'a>(
         .top()
         .iter()
         .filter_map(|child_handle| match child_handle.get(parser) {
-            Some(tl::Node::Tag(child_tag)) if is_source_element(child_tag) => Some(child_tag),
+            Some(crate::dom::Node::Tag(child_tag)) if is_source_element(child_tag) => Some(child_tag),
             _ => None,
         })
         .map(|source| crate::converter::utility::attributes::decoded_attribute(source, "src"));
@@ -117,7 +117,7 @@ pub fn open_media(
     context: MediaContext<'_>,
     children: &mut Vec<NodeHandle>,
 ) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     if tag_name == "audio" {
@@ -134,7 +134,7 @@ pub fn open_media(
 /// List the fallback content of a media element: each child that is no `source`.
 fn list_media_fallback(tag: &HTMLTag, parser: &Parser, children: &mut Vec<NodeHandle>) {
     children.extend(tag.children().top().iter().copied().filter(|child_handle| {
-        !matches!(child_handle.get(parser), Some(tl::Node::Tag(child_tag)) if is_source_element(child_tag))
+        !matches!(child_handle.get(parser), Some(crate::dom::Node::Tag(child_tag)) if is_source_element(child_tag))
     }));
 }
 

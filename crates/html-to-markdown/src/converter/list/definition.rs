@@ -9,12 +9,16 @@ use super::ListContext;
 use crate::converter::main_helpers::strip_trailing_backslash_breaks_from_fresh_buffer;
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
-use tl;
 
 /// Handle definition list element (<dl>).
 ///
 /// Groups dt/dd pairs and formats them with proper Markdown separation.
-pub fn handle_dl(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, context: ListContext<'_>) {
+pub fn handle_dl(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    context: ListContext<'_>,
+) {
     let ListContext {
         options,
         ctx,
@@ -22,7 +26,7 @@ pub fn handle_dl(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
         dom_ctx,
     } = context;
     let tag = match node_handle.get(parser) {
-        Some(tl::Node::Tag(t)) => t,
+        Some(crate::dom::Node::Tag(t)) => t,
         _ => return,
     };
 
@@ -75,7 +79,12 @@ pub fn handle_dl(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
 ///
 /// Outputs the term text as a separate paragraph.
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
-pub fn handle_dt(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, context: ListContext<'_>) {
+pub fn handle_dt(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    context: ListContext<'_>,
+) {
     let ListContext {
         options,
         ctx,
@@ -83,7 +92,7 @@ pub fn handle_dt(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
         dom_ctx,
     } = context;
     let tag = match node_handle.get(parser) {
-        Some(tl::Node::Tag(t)) => t,
+        Some(crate::dom::Node::Tag(t)) => t,
         _ => return,
     };
 
@@ -157,9 +166,9 @@ pub fn handle_dt(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
 
 #[cfg(feature = "visitor")]
 fn visit_definition_description(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     rendered: &str,
     context: ListContext<'_>,
@@ -215,7 +224,12 @@ fn visit_definition_description(
 ///
 /// Outputs the description as a plain block.
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
-pub fn handle_dd(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, context: ListContext<'_>) {
+pub fn handle_dd(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    context: ListContext<'_>,
+) {
     let ListContext {
         options,
         ctx,
@@ -223,7 +237,7 @@ pub fn handle_dd(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
         dom_ctx,
     } = context;
     let tag = match node_handle.get(parser) {
-        Some(tl::Node::Tag(t)) => t,
+        Some(crate::dom::Node::Tag(t)) => t,
         _ => return,
     };
 
@@ -317,13 +331,13 @@ fn separate_from_preceding_text(output: &mut String, ctx: &crate::converter::Con
 
 pub fn open(
     kind: &'static str,
-    node: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &str,
     context: ListContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());
@@ -342,13 +356,13 @@ pub fn open(
 }
 pub fn close_dl(
     content: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     list: ListContext<'_>,
 ) {
     let ListContext { options, ctx, .. } = list;
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     let rendered = content.to_owned();
@@ -368,8 +382,8 @@ pub fn close_dl(
 }
 pub fn close_dt(
     content: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     list: ListContext<'_>,
 ) {
@@ -379,7 +393,7 @@ pub fn close_dt(
         depth,
         dom_ctx,
     } = list;
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     #[cfg(not(feature = "visitor"))]
@@ -446,13 +460,13 @@ pub fn close_dt(
 }
 pub fn close_dd(
     content: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     list: ListContext<'_>,
 ) {
     let ListContext { options, ctx, .. } = list;
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return;
     };
     let mut rendered = content.to_owned();

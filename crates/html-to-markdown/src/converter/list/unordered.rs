@@ -11,14 +11,18 @@ use super::utils::{
     ListChildrenContext, add_list_leading_separator, add_nested_list_trailing_separator, calculate_list_nesting_depth,
     is_loose_list, preceding_same_type_list_separator_comment, process_list_children,
 };
-use tl;
 
 /// Handle unordered list element (<ul>).
 ///
 /// Detects loose/tight list format, handles nested bullets,
 /// and processes list items with proper indentation.
 #[allow(clippy::too_many_arguments)]
-pub fn handle_ul(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String, context: ListContext<'_>) {
+pub fn handle_ul(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    output: &mut String,
+    context: ListContext<'_>,
+) {
     if super::render_itemless_list_as_div(node_handle, parser, output, context) {
         return;
     }
@@ -38,7 +42,7 @@ pub fn handle_ul(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
     // ~keep reason: `tag` is only used when the visitor feature is active (for attribute collection).
     #[allow(unused_variables)]
     let tag = match node_handle.get(parser) {
-        Some(tl::Node::Tag(t)) => t,
+        Some(crate::dom::Node::Tag(t)) => t,
         _ => return,
     };
 
@@ -95,11 +99,11 @@ pub fn handle_ul(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut
 }
 
 pub fn open(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
-    children: &mut Vec<tl::NodeHandle>,
+    children: &mut Vec<crate::dom::NodeHandle>,
 ) -> Option<crate::converter::walk::Open> {
     if !super::has_list_item_child(*node_handle, parser, context.dom_ctx) {
         return crate::converter::block::div::open(
@@ -131,7 +135,7 @@ pub fn open(
     // ~keep reason: `tag` is only used when the visitor feature is active (for attribute collection).
     #[allow(unused_variables)]
     let tag = match node_handle.get(parser) {
-        Some(tl::Node::Tag(t)) => t,
+        Some(crate::dom::Node::Tag(t)) => t,
         _ => return None,
     };
 

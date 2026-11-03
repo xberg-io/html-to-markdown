@@ -12,7 +12,8 @@ aligned-vec 0.6.4 (MIT): sarah <>
 allocator-api2 0.2.21 (MIT OR Apache-2.0): Zakarum <zaq.dev@icloud.com>
 anyhow 1.0.102 (MIT OR Apache-2.0): David Tolnay <dtolnay@gmail.com>
 arrayvec 0.7.6 (MIT OR Apache-2.0): bluss
-astral-tl 0.7.11 (MIT): y21
+astral-html 0.0.4 (MIT OR Apache-2.0): Astral
+astral-tl 0.8.0 (MIT): y21
 async-trait 0.1.89 (MIT OR Apache-2.0): David Tolnay <dtolnay@gmail.com>
 autocfg 1.5.0 (Apache-2.0 OR MIT): Josh Stone <cuviper@gmail.com>
 backtrace 0.3.76 (MIT OR Apache-2.0): The Rust Project Developers

@@ -1,6 +1,6 @@
 //! Canonical case mappings for SVG and MathML attributes.
 //!
-//! `tl` lowercases all attribute names when it re-parses a wrapped HTML
+//! The parser lowercases all attribute names when it re-parses a wrapped HTML
 //! fragment (e.g. `<html><body><svg …></body></html>`).  Tier-1's
 //! `emit_svg_from_slice` takes that path; Tier-2 parses the full document
 //! once and preserves original case.  This table restores the WHATWG

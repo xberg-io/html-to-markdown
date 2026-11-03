@@ -32,8 +32,8 @@ type Context = crate::converter::Context;
 ///
 /// Lists the children of a `kbd` or a `samp` in `children`. An element that holds a link is
 /// written as a code element.
-pub fn open(handler: HandlerContext<'_>, children: &mut Vec<tl::NodeHandle>) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
+pub fn open(handler: HandlerContext<'_>, children: &mut Vec<crate::dom::NodeHandle>) -> Option<Open> {
+    let Some(crate::dom::Node::Tag(tag)) = handler.node_handle.get(handler.parser) else {
         return None;
     };
 

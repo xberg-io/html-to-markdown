@@ -19,7 +19,7 @@ pub fn find_html_comment_end(bytes: &[u8], from: usize) -> Option<usize> {
     })
 }
 
-/// Normalize bogus HTML comment endings that confuse the `tl` parser.
+/// Normalize bogus HTML comment endings that confuse the parser.
 pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
     let bytes = input.as_bytes();
     let len = bytes.len();
@@ -110,10 +110,10 @@ pub fn normalize_bogus_comment_endings(input: &str) -> Cow<'_, str> {
 /// >
 /// ```
 ///
-/// The `tl` parser does not handle end-tags with a newline before the closing
+/// The parser does not handle end-tags with a newline before the closing
 /// `>`, leaving the element unclosed so all subsequent siblings become children
 /// of the open element.  This pass collapses such patterns to a single-line
-/// closing tag (`</a>`) before the document reaches `tl`.
+/// closing tag (`</a>`) before the document reaches the parser.
 ///
 /// Only the whitespace between the tag name and the closing `>` is normalised;
 /// the rest of the document is untouched.
@@ -236,7 +236,7 @@ fn normalize_self_closing_void(
 
 /// Lowercase the tag name of an HTML5 void element written in upper or mixed case.
 ///
-/// The bundled astral-tl parser compares a tag's raw source bytes against an all-lowercase
+/// The parser compares a tag's raw source bytes against an all-lowercase
 /// void-element table, so `<META>` misses it and is pushed onto the open-element stack as a
 /// *container*. The parent's close tag then cannot pop it and every following sibling is
 /// absorbed as its child: for `<head><META ...></head><body>` that leaves `<body>` a

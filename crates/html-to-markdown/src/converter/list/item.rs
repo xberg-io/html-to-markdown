@@ -16,7 +16,6 @@ use crate::converter::walk_node;
 use crate::options::{ConversionOptions, NewlineStyle, OutputFormat};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
-use tl;
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -26,9 +25,9 @@ type DomContext = crate::converter::DomContext;
 /// Processes list item content with support for task lists (checkboxes),
 /// proper indentation, and block-level element detection.
 pub fn handle_li(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
 ) {
@@ -49,13 +48,13 @@ pub fn handle_li(
 struct TaskInfo {
     is_task: bool,
     checked: bool,
-    checkbox: Option<tl::NodeHandle>,
+    checkbox: Option<crate::dom::NodeHandle>,
 }
 
 /// What the search for the checkbox of a task item met first in a node.
 enum FirstContent {
     /// A checkbox, with its checked state.
-    Checkbox(bool, tl::NodeHandle),
+    Checkbox(bool, crate::dom::NodeHandle),
     /// Content that is not a checkbox: the item is not a task item.
     Other,
     /// Nothing a reader sees.
@@ -68,8 +67,8 @@ enum FirstContent {
 /// ~keep control in the text, not the item's marker.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn find_checkbox<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &'a crate::dom::Parser<'a>,
     options: &ConversionOptions,
     ctx: &Context,
     depth: usize,
@@ -81,8 +80,8 @@ fn find_checkbox<'a>(
             return FirstContent::Other;
         }
         match handle.get(parser) {
-            Some(tl::Node::Raw(raw)) if !raw.as_utf8_str().trim().is_empty() => return FirstContent::Other,
-            Some(tl::Node::Tag(tag)) => {
+            Some(crate::dom::Node::Raw(raw)) if !raw.as_utf8_str().trim().is_empty() => return FirstContent::Other,
+            Some(crate::dom::Node::Tag(tag)) => {
                 match normalized_tag_name(tag.name().as_utf8_str()).as_ref() {
                     "input" => {
                         if let Some(checked) = crate::converter::form::elements::checkbox_state(tag) {
@@ -105,7 +104,7 @@ fn find_checkbox<'a>(
 }
 
 impl TaskInfo {
-    fn new(node_handle: &tl::NodeHandle, parser: &tl::Parser, context: ListContext<'_>) -> Self {
+    fn new(node_handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, context: ListContext<'_>) -> Self {
         match find_checkbox(node_handle, parser, context.options, context.ctx, context.depth) {
             FirstContent::Checkbox(checked, checkbox) => Self {
                 is_task: true,
@@ -223,14 +222,14 @@ fn marker_column(output: &mut String, ctx: &Context, options: &ConversionOptions
     (marker_line_start, column)
 }
 
-fn has_block_children(tag: &tl::HTMLTag, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn has_block_children(tag: &crate::dom::HTMLTag, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     tag.children().top().iter().any(|child_handle| {
         if let Some(info) = dom_ctx.tag_info(child_handle.get_inner(), parser) {
             matches!(
                 info.name.as_str(),
                 "p" | "div" | "blockquote" | "pre" | "table" | "hr" | "dl"
             )
-        } else if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
+        } else if let Some(crate::dom::Node::Tag(child_tag)) = child_handle.get(parser) {
             matches!(
                 normalized_tag_name(child_tag.name().as_utf8_str()).as_ref(),
                 "p" | "div" | "blockquote" | "pre" | "table" | "hr" | "dl"
@@ -284,14 +283,14 @@ fn item_context(
     }
 }
 
-fn is_checkbox_node(node_handle: &tl::NodeHandle, checkbox: Option<tl::NodeHandle>) -> bool {
+fn is_checkbox_node(node_handle: &crate::dom::NodeHandle, checkbox: Option<crate::dom::NodeHandle>) -> bool {
     checkbox.is_some_and(|checkbox| node_handle == &checkbox)
 }
 
 fn contains_checkbox<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &'a tl::Parser<'a>,
-    checkbox: Option<tl::NodeHandle>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &'a crate::dom::Parser<'a>,
+    checkbox: Option<crate::dom::NodeHandle>,
     context: ListContext<'_>,
 ) -> bool {
     if context.depth >= effective_max_depth(context.options) {
@@ -301,7 +300,7 @@ fn contains_checkbox<'a>(
     if is_checkbox_node(node_handle, checkbox) {
         return true;
     }
-    let Some(tl::Node::Tag(node_tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(node_tag)) = node_handle.get(parser) else {
         return false;
     };
     node_tag.children().top().iter().any(|child_handle| {
@@ -318,10 +317,10 @@ fn contains_checkbox<'a>(
 }
 
 fn render_li_content<'a>(
-    node_handle: &tl::NodeHandle,
-    parser: &'a tl::Parser<'a>,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &'a crate::dom::Parser<'a>,
     output: &mut String,
-    checkbox: Option<tl::NodeHandle>,
+    checkbox: Option<crate::dom::NodeHandle>,
     context: ListContext<'_>,
 ) {
     // ~keep Independent recursion from `walk_node` while probing for the nested checkbox,
@@ -334,7 +333,7 @@ fn render_li_content<'a>(
         return;
     }
     if contains_checkbox(node_handle, parser, checkbox, context) {
-        if let Some(tl::Node::Tag(node_tag)) = node_handle.get(parser) {
+        if let Some(crate::dom::Node::Tag(node_tag)) = node_handle.get(parser) {
             for child_handle in node_tag.children().top().iter() {
                 render_li_content(
                     child_handle,
@@ -364,8 +363,8 @@ fn render_li_content<'a>(
 }
 
 fn collect_task_text(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     marker: &ItemMarker<'_>,
     item_ctx: &Context,
     context: ListContext<'_>,
@@ -388,7 +387,7 @@ fn collect_task_text(
     task_text
 }
 
-fn first_task_block<'a>(task_text: &'a str, parser: &tl::Parser, item_ctx: &Context) -> Option<&'a str> {
+fn first_task_block<'a>(task_text: &'a str, parser: &crate::dom::Parser, item_ctx: &Context) -> Option<&'a str> {
     match item_ctx
         .first_writer
         .as_ref()
@@ -449,8 +448,8 @@ fn write_task_content(
 }
 
 fn render_task_item(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     marker: &ItemMarker<'_>,
     item_ctx: &Context,
@@ -472,8 +471,8 @@ struct ItemRenderContext<'render, 'context> {
 }
 
 fn write_regular_children(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     render: &ItemRenderContext<'_, '_>,
 ) -> (usize, usize) {
@@ -482,7 +481,7 @@ fn write_regular_children(
     let mut text_end = item_start;
     for child_handle in tag.children().top().iter() {
         let is_nested_list = child_handle.get(parser).is_some_and(|node| {
-            let tl::Node::Tag(child_tag) = node else {
+            let crate::dom::Node::Tag(child_tag) = node else {
                 return false;
             };
             matches!(
@@ -510,9 +509,9 @@ fn write_regular_children(
 
 #[cfg(feature = "visitor")]
 fn visit_regular_item(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     render: &ItemRenderContext<'_, '_>,
 ) -> bool {
@@ -595,9 +594,9 @@ fn replace_regular_item_output(output: &mut String, line_start: usize, replaceme
 }
 
 fn render_regular_item(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     render: &ItemRenderContext<'_, '_>,
 ) -> bool {
@@ -640,9 +639,9 @@ fn finish_list_item(output: &mut String, ctx: &Context, has_block_children: bool
 /// Write the list item, and set `line_after_text` to the start of its marker line when that line
 /// follows text inside the list and the check with an item that has content wrote no blank line.
 fn write_li(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
     line_after_text: &mut Option<usize>,
@@ -698,7 +697,7 @@ pub struct FirstWriter(std::rc::Rc<std::cell::RefCell<FirstWriterState>>);
 
 #[derive(Default)]
 struct FirstWriterState {
-    node: Option<tl::NodeHandle>,
+    node: Option<crate::dom::NodeHandle>,
     /// The first line that `node` wrote, without its indentation.
     first_line: String,
 }
@@ -710,10 +709,10 @@ impl FirstWriter {
     }
 
     /// Whether the first node that wrote is a block quote.
-    pub(crate) fn starts_with_blockquote(&self, parser: &tl::Parser) -> bool {
+    pub(crate) fn starts_with_blockquote(&self, parser: &crate::dom::Parser) -> bool {
         let state = self.0.borrow();
         state.node.is_some_and(|node| {
-            let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+            let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
                 return false;
             };
             normalized_tag_name(tag.name().as_utf8_str()) == "blockquote"
@@ -721,7 +720,7 @@ impl FirstWriter {
     }
 
     /// Record the render of `node`, which started while no node had written and wrote `written`.
-    pub fn record(&self, node: tl::NodeHandle, parser: &tl::Parser, written: Option<&str>) {
+    pub fn record(&self, node: crate::dom::NodeHandle, parser: &crate::dom::Parser, written: Option<&str>) {
         let child_starts_blockquote = self.starts_with_blockquote(parser);
         let mut state = self.0.borrow_mut();
         let Some(text) = written.map(str::trim_start).filter(|text| !text.is_empty()) else {
@@ -744,9 +743,9 @@ impl FirstWriter {
     ///
     /// ~keep Text is paragraph text on the checkbox line, also when it reads like an opener. An
     /// ~keep element that `preserve_tags` writes as HTML starts a block when its HTML does.
-    fn content(&self, parser: &tl::Parser, ctx: &Context) -> Option<TaskFirstContent> {
+    fn content(&self, parser: &crate::dom::Parser, ctx: &Context) -> Option<TaskFirstContent> {
         let state = self.0.borrow();
-        let Some(tl::Node::Tag(tag)) = state.node?.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = state.node?.get(parser) else {
             return Some(TaskFirstContent::Text);
         };
         let name = normalized_tag_name(tag.name().as_utf8_str());
@@ -763,8 +762,8 @@ impl FirstWriter {
 }
 
 /// Whether `node` is an element without a block opener of its own, like a `<div>` or a `<span>`.
-fn is_container(node: tl::NodeHandle, parser: &tl::Parser) -> bool {
-    let Some(tl::Node::Tag(tag)) = node.get(parser) else {
+fn is_container(node: crate::dom::NodeHandle, parser: &crate::dom::Parser) -> bool {
+    let Some(crate::dom::Node::Tag(tag)) = node.get(parser) else {
         return false;
     };
     block_content(&normalized_tag_name(tag.name().as_utf8_str())).is_none()

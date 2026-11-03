@@ -16,14 +16,15 @@ thread_local! {
     static FORCE_INVALID_LENGTH: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
-pub(super) fn parse_html(input: &str) -> Result<tl::VDom<'_>> {
+pub(super) fn parse_html(input: &str) -> Result<crate::dom::VDom<'_>> {
     #[cfg(test)]
     PARSE_CALLS.with(|calls| calls.set(calls.get() + 1));
     #[cfg(test)]
     if FORCE_INVALID_LENGTH.with(std::cell::Cell::get) {
         return Err(invalid_length(input));
     }
-    tl::parse(input, tl::ParserOptions::default()).map_err(|tl::ParseError::InvalidLength| invalid_length(input))
+    crate::dom::parse(input, crate::dom::ParserOptions::default())
+        .map_err(|crate::dom::ParseError::InvalidLength| invalid_length(input))
 }
 
 fn invalid_length(input: &str) -> ConversionError {
@@ -39,14 +40,14 @@ fn invalid_length(input: &str) -> ConversionError {
 /// limit that stopped the tree builder when the first parse was kept for that reason.
 pub(super) struct ParsedPage<'a> {
     pub(super) source: &'a str,
-    pub(super) dom: tl::VDom<'a>,
+    pub(super) dom: crate::dom::VDom<'a>,
     pub(super) dom_ctx: DomContext,
     pub(super) len: usize,
     pub(super) repair_limit: Option<crate::types::WarningKind>,
 }
 
 impl<'a> ParsedPage<'a> {
-    fn first_parse(dom: tl::VDom<'a>, source: &'a str) -> Self {
+    fn first_parse(dom: crate::dom::VDom<'a>, source: &'a str) -> Self {
         let len = source.len();
         let dom_ctx = build_dom_context(&dom, dom.parser(), len);
         Self {
@@ -64,7 +65,7 @@ impl<'a> ParsedPage<'a> {
 ///
 /// ~keep The repair must never lose text. The tree builder drops text that the first parse
 /// ~keep keeps (all that follows `</frameset>` in a frameset document), and no list of such
-/// ~keep cases is kept here: both pages are read by `tl` and measured by
+/// ~keep cases is kept here: both pages are read by the parser and measured by
 /// ~keep [`readable_text_len`], and a repaired page with a smaller count is not used. The
 /// ~keep page then converts as it did before issue #772.
 ///
@@ -185,7 +186,7 @@ struct Asked {
 }
 
 impl Asked {
-    fn of(dom: &tl::VDom, parser: &tl::Parser<'_>, input: &str, options: &ConversionOptions) -> Self {
+    fn of(dom: &crate::dom::VDom, parser: &crate::dom::Parser<'_>, input: &str, options: &ConversionOptions) -> Self {
         let open_at_the_end = has_omitted_end_tag(dom, parser);
         let reasons = tree_repair_reasons(dom, parser);
         let misnest = reasons.misnest;
@@ -256,8 +257,8 @@ fn narrower_choice_asks(
 /// ~keep from its first parse, so a wider choice keeps its first parse too. Where `drop` takes
 /// ~keep the tree builder, each choice takes it and no choice writes the title.
 fn loses_a_title_of_a_wider_choice(
-    first: &tl::VDom<'_>,
-    second: &tl::VDom<'_>,
+    first: &crate::dom::VDom<'_>,
+    second: &crate::dom::VDom<'_>,
     as_written: Option<&str>,
     options: &ConversionOptions,
     hidden_content: HiddenContent,
@@ -288,7 +289,7 @@ fn asks_for_the_tree_builder(page: &str, options: &ConversionOptions) -> bool {
 /// ~keep No parse comes after this function, so the ids of the nodes are final here. The owner
 /// ~keep marks leave the tree here, before the metadata, a visitor or a writer of HTML reads it.
 pub(super) fn finish_dom_parse(
-    dom: &mut tl::VDom<'_>,
+    dom: &mut crate::dom::VDom<'_>,
     dom_ctx: &mut DomContext,
     inert_bodies: &std::collections::HashMap<String, String>,
     input_len: usize,
@@ -651,7 +652,7 @@ mod tests {
 
     #[test]
     fn should_convert_the_first_parse_when_the_repaired_page_holds_less_text() {
-        // ~keep `tl` leaves a `<frame>` open, so the first page looks like one with no end tag.
+        // ~keep The parser leaves a `<frame>` open, so the first page looks like one with no end tag.
         // ~keep The second call is the parse of the repaired page, which is measured and left.
         for (html, expected) in [
             (

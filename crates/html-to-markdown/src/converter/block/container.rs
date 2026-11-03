@@ -9,8 +9,8 @@
 //! - wbr: Word break opportunity (no-op)
 
 use crate::converter::walk::Open;
+use crate::dom::{NodeHandle, Parser};
 use crate::options::ConversionOptions;
-use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
@@ -37,7 +37,7 @@ impl<'a> HandlerContext<'a> {
 /// Open a container that writes nothing of its own: `body` and `html`, `time` and `data`, `small`,
 /// a stray table part. The walk visits every child with the state of the container.
 pub fn open_children(node_handle: &NodeHandle, parser: &Parser, children: &mut Vec<NodeHandle>) -> Option<Open> {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return None;
     };
     children.extend(tag.children().top().iter().copied());

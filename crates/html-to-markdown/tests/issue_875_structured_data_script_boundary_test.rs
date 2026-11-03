@@ -455,9 +455,13 @@ fn should_keep_authored_script_attributes_while_removing_only_transport_ownershi
     for converted in [repaired, closed] {
         let content = converted.content.as_deref().expect("content");
         assert!(content.ends_with("tail\n"));
-        let dom = tl::parse(content, tl::ParserOptions::default()).expect("preserved HTML");
+        let dom = html_to_markdown_rs::dom::parse(content, html_to_markdown_rs::dom::ParserOptions::default())
+            .expect("preserved HTML");
         let handle = dom.query_selector("script").expect("selector").next().expect("script");
-        let tag = handle.get(dom.parser()).and_then(tl::Node::as_tag).expect("script tag");
+        let tag = handle
+            .get(dom.parser())
+            .and_then(html_to_markdown_rs::dom::Node::as_tag)
+            .expect("script tag");
         assert_eq!(tag.attributes().len(), 3);
         for (key, value) in [
             ("data-h2m-script-0", "authored"),
@@ -560,14 +564,15 @@ fn should_keep_quoted_and_unquoted_slash_attribute_values_in_repaired_scripts() 
             let script_start = content.find("<script ").expect("preserved script");
             let raw_start = content.find(json).expect("original JSON bytes");
             let opening = format!("{}</script>", &content[script_start..raw_start]);
-            let dom = tl::parse(&opening, tl::ParserOptions::default()).expect("preserved opener");
+            let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions::default())
+                .expect("preserved opener");
             let tag = dom
                 .query_selector("script")
                 .expect("selector")
                 .next()
                 .expect("script")
                 .get(dom.parser())
-                .and_then(tl::Node::as_tag)
+                .and_then(html_to_markdown_rs::dom::Node::as_tag)
                 .expect("script tag");
             assert_eq!(tag.attributes().len(), 2, "{attributes}");
             let (key, expected) = if attributes.starts_with("data-note") {
@@ -609,14 +614,15 @@ fn should_keep_authored_owner_attributes_from_claiming_another_scripts_body() {
         .expect("authored ownership lookalike");
         let content = converted.content.as_deref().expect("preserved content");
         let end = content.find("</script>").expect("authored script close") + "</script>".len();
-        let dom = tl::parse(&content[..end], tl::ParserOptions::default()).expect("closed authored script");
+        let dom = html_to_markdown_rs::dom::parse(&content[..end], html_to_markdown_rs::dom::ParserOptions::default())
+            .expect("closed authored script");
         let tag = dom
             .query_selector("script")
             .expect("selector")
             .next()
             .expect("authored script")
             .get(dom.parser())
-            .and_then(tl::Node::as_tag)
+            .and_then(html_to_markdown_rs::dom::Node::as_tag)
             .expect("script tag");
         assert_eq!(tag.attributes().len(), 2);
         assert_eq!(
@@ -660,17 +666,19 @@ fn should_keep_repaired_script_bytes_after_a_slash_in_a_boolean_attribute_name()
         let start = content.find("<script ").expect("preserved script");
         let body = content.find(json).expect("absolute original JSON bytes");
         let opening = format!("{}</script>", &content[start..body]);
-        let dom = tl::parse(&opening, tl::ParserOptions::default()).expect("preserved attributes");
+        let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions::default())
+            .expect("preserved attributes");
         let tag = dom
             .query_selector("script")
             .expect("selector")
             .next()
             .expect("script")
             .get(dom.parser())
-            .and_then(tl::Node::as_tag)
+            .and_then(html_to_markdown_rs::dom::Node::as_tag)
             .expect("script tag");
-        assert_eq!(tag.attributes().len(), 2);
-        assert_eq!(tag.attributes().get("data-x/foo"), Some(None));
+        assert_eq!(tag.attributes().len(), 3);
+        assert_eq!(tag.attributes().get("data-x"), Some(None));
+        assert_eq!(tag.attributes().get("foo"), Some(None));
         assert!(content.ends_with("tail\n") || content.ends_with("<p>tail</p></div>\n"));
     }
 }
@@ -697,14 +705,15 @@ fn should_keep_original_script_bytes_when_standalone_slashes_precede_an_attribut
             let start = content.find("<script ").expect("preserved script");
             let body = content.find(json).expect("original JSON bytes");
             let opening = format!("{}</script>", &content[start..body]);
-            let dom = tl::parse(&opening, tl::ParserOptions::default()).expect("script attributes");
+            let dom = html_to_markdown_rs::dom::parse(&opening, html_to_markdown_rs::dom::ParserOptions::default())
+                .expect("script attributes");
             let tag = dom
                 .query_selector("script")
                 .expect("selector")
                 .next()
                 .expect("script")
                 .get(dom.parser())
-                .and_then(tl::Node::as_tag)
+                .and_then(html_to_markdown_rs::dom::Node::as_tag)
                 .expect("script tag");
             assert_eq!(tag.attributes().len(), 2);
             let expected = if attributes.contains("foo/") { "foo/" } else { "foo" };
@@ -839,14 +848,16 @@ fn should_reserve_owner_names_and_markers_formed_by_bogus_comment_removal() {
             .content
             .expect("content");
             let end = content.find("</script>").expect("first script close") + "</script>".len();
-            let dom = tl::parse(&content[..end], tl::ParserOptions::default()).expect("authored DOM");
+            let dom =
+                html_to_markdown_rs::dom::parse(&content[..end], html_to_markdown_rs::dom::ParserOptions::default())
+                    .expect("authored DOM");
             let tag = dom
                 .query_selector("script")
                 .expect("selector")
                 .next()
                 .expect("first script")
                 .get(dom.parser())
-                .and_then(tl::Node::as_tag)
+                .and_then(html_to_markdown_rs::dom::Node::as_tag)
                 .expect("tag");
             assert_eq!(
                 tag.attributes()

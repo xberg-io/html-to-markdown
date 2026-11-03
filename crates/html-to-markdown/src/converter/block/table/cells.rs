@@ -163,7 +163,7 @@ impl RenderedWidths {
 /// ~keep parameters instead of repeating all four everywhere (too-many-parameters).
 #[derive(Clone, Copy)]
 pub struct RowEnv<'p> {
-    pub parser: &'p tl::Parser<'p>,
+    pub parser: &'p crate::dom::Parser<'p>,
     pub options: &'p crate::options::ConversionOptions,
     pub ctx: &'p super::super::super::Context,
     pub dom_ctx: &'p super::super::super::DomContext,
@@ -174,11 +174,11 @@ pub struct RowEnv<'p> {
 ///
 /// Extracted from `append_layout_row`'s per-cell loop body — identical cell-name check,
 /// inline-image handling, and whitespace trim, unchanged.
-fn append_layout_cell_text(cell_handle: &tl::NodeHandle, row_text: &mut String, env: RowEnv<'_>, depth: usize) {
+fn append_layout_cell_text(cell_handle: &crate::dom::NodeHandle, row_text: &mut String, env: RowEnv<'_>, depth: usize) {
     if env.ctx.excluded_node_ids.contains(&cell_handle.get_inner()) {
         return;
     }
-    let Some(tl::Node::Tag(cell_tag)) = cell_handle.get(env.parser) else {
+    let Some(crate::dom::Node::Tag(cell_tag)) = cell_handle.get(env.parser) else {
         return;
     };
     let cell_name: Cow<'_, str> = env.dom_ctx.tag_info(cell_handle.get_inner(), env.parser).map_or_else(
@@ -236,11 +236,11 @@ fn append_layout_cell_text(cell_handle: &tl::NodeHandle, row_text: &mut String, 
 /// * `env` - Parser, options, conversion context, and DOM context
 /// * `depth` - Current recursion depth (the row's own depth; cell content is walked at `depth + 1`)
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn append_layout_row(row_handle: &tl::NodeHandle, output: &mut String, env: RowEnv<'_>, depth: usize) {
+pub fn append_layout_row(row_handle: &crate::dom::NodeHandle, output: &mut String, env: RowEnv<'_>, depth: usize) {
     if env.ctx.excluded_node_ids.contains(&row_handle.get_inner()) {
         return;
     }
-    let Some(tl::Node::Tag(row_tag)) = row_handle.get(env.parser) else {
+    let Some(crate::dom::Node::Tag(row_tag)) = row_handle.get(env.parser) else {
         return;
     };
     let mut row_text = String::new();
@@ -340,7 +340,7 @@ fn skip_rowspan_columns(col: &mut usize, rowspan_tracker: &mut [Option<usize>]) 
 /// * `depth` - Row's own recursion depth
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn collect_row_cell_widths(
-    node_handle: &tl::NodeHandle,
+    node_handle: &crate::dom::NodeHandle,
     env: RowEnv<'_>,
     col_widths: &mut Vec<usize>,
     rowspan_tracker: &mut Vec<Option<usize>>,
@@ -391,7 +391,7 @@ pub fn collect_row_cell_widths(
 /// [`convert_table_cell`]; see [`super::cell::render_cell_text`] for what it does.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn emit_row_cell(
-    cell_handle: &tl::NodeHandle,
+    cell_handle: &crate::dom::NodeHandle,
     row_text: &mut String,
     env: RowEnv<'_>,
     emission: CellEmission,
@@ -521,7 +521,11 @@ fn emit_rowspan_continuation(
 /// continue as normal. Split out of `convert_table_row` to keep that function under the
 /// cyclomatic-complexity gate.
 #[cfg(feature = "visitor")]
-fn run_row_visitor_hook(node_handle: &tl::NodeHandle, output: &mut String, visit: RowVisit<'_>) -> Option<bool> {
+fn run_row_visitor_hook(
+    node_handle: &crate::dom::NodeHandle,
+    output: &mut String,
+    visit: RowVisit<'_>,
+) -> Option<bool> {
     visit.env.ctx.visitor.as_ref()?;
     let cell_contents = visitor_cell_contents(visit);
     run_row_visitor_with_contents(node_handle, output, visit, &cell_contents)
@@ -529,14 +533,14 @@ fn run_row_visitor_hook(node_handle: &tl::NodeHandle, output: &mut String, visit
 
 #[cfg(feature = "visitor")]
 pub(super) fn run_row_visitor_with_contents(
-    node_handle: &tl::NodeHandle,
+    node_handle: &crate::dom::NodeHandle,
     output: &mut String,
     visit: RowVisit<'_>,
     cell_contents: &[String],
 ) -> Option<bool> {
     use crate::visitor::{NodeContext, NodeType, VisitResult};
     let visitor_handle = visit.env.ctx.visitor.as_ref()?;
-    let tl::Node::Tag(tag) = node_handle.get(visit.env.parser)? else {
+    let crate::dom::Node::Tag(tag) = node_handle.get(visit.env.parser)? else {
         return None;
     };
 
@@ -581,7 +585,7 @@ pub(super) fn run_row_visitor_with_contents(
 #[derive(Clone, Copy)]
 pub(super) struct RowVisit<'a> {
     pub(super) env: RowEnv<'a>,
-    pub(super) cells: &'a [tl::NodeHandle],
+    pub(super) cells: &'a [crate::dom::NodeHandle],
     pub(super) row_index: usize,
     pub(super) is_header: bool,
     pub(super) depth: usize,
@@ -614,13 +618,13 @@ fn visitor_cell_contents(visit: RowVisit<'_>) -> Vec<String> {
 
 #[cfg(feature = "visitor")]
 fn visitor_cell_text(
-    cell_handle: &tl::NodeHandle,
+    cell_handle: &crate::dom::NodeHandle,
     env: RowEnv<'_>,
     collect_ctx: &super::super::super::Context,
     depth: usize,
 ) -> String {
     let mut text = String::new();
-    if let Some(tl::Node::Tag(tag)) = cell_handle.get(env.parser) {
+    if let Some(crate::dom::Node::Tag(tag)) = cell_handle.get(env.parser) {
         let cell_ctx = collect_ctx.for_cell(*cell_handle, env.parser, env.dom_ctx, env.options.br_in_tables);
         for child_handle in tag.children().top().iter() {
             super::super::super::walk_node(
@@ -637,7 +641,7 @@ fn visitor_cell_text(
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn convert_table_row(
-    node_handle: &tl::NodeHandle,
+    node_handle: &crate::dom::NodeHandle,
     output: &mut String,
     env: RowEnv<'_>,
     render: &mut RowRender<'_>,
@@ -652,7 +656,7 @@ pub fn convert_table_row(
     // ~keep existing flatten-and-escape behavior; issue #484 is the single-cell-row shape).
     let is_single_cell_row = cells.len() == 1;
 
-    // ~keep A row whose only children were non-cell elements (e.g. `tl`'s `read_end`
+    // ~keep A row whose only children were non-cell elements (e.g. The parser's `read_end`
     // ~keep dropped an unmatched `</table>`, stranding a `<p>` inside this `<tr>`)
     // ~keep collects zero cells here. Bailing before any output lets the *next* real
     // ~keep row become row 0 -- and thus the header -- matching Tier 1's behavior
@@ -748,7 +752,7 @@ pub struct RowRender<'a> {
 }
 
 fn render_row_cells(
-    cells: &[tl::NodeHandle],
+    cells: &[crate::dom::NodeHandle],
     row_text: &mut String,
     env: RowEnv<'_>,
     render: &mut RowRender<'_>,
@@ -775,7 +779,7 @@ fn render_row_cells(
 }
 
 fn render_spanned_row(
-    cells: &[tl::NodeHandle],
+    cells: &[crate::dom::NodeHandle],
     row_text: &mut String,
     env: RowEnv<'_>,
     render: &mut RowRender<'_>,

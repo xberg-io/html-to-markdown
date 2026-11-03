@@ -12,7 +12,7 @@ fn source(wrappers: usize, inner: &str, prefix: &str) -> String {
 }
 
 fn inspect(html: &str, target: &str, expected_depth: usize) -> Vec<(usize, String)> {
-    let dom = tl::parse(html, tl::ParserOptions::default()).expect("actual source/output must parse");
+    let dom = crate::dom::parse(html, crate::dom::ParserOptions::default()).expect("actual source/output must parse");
     let root = dom
         .query_selector("x-keep")
         .expect("the real preserved element must be selectable")
@@ -23,7 +23,7 @@ fn inspect(html: &str, target: &str, expected_depth: usize) -> Vec<(usize, Strin
     let mut raw = Vec::new();
     while let Some((node, depth)) = stack.pop() {
         match node.get(dom.parser()) {
-            Some(tl::Node::Tag(tag)) => {
+            Some(crate::dom::Node::Tag(tag)) => {
                 if tag.name().as_utf8_str() == target {
                     found.push(depth);
                 }
@@ -36,7 +36,7 @@ fn inspect(html: &str, target: &str, expected_depth: usize) -> Vec<(usize, Strin
                         .map(|child| (*child, depth + 1)),
                 );
             }
-            Some(tl::Node::Raw(bytes)) => raw.push((depth, bytes.as_utf8_str().to_string())),
+            Some(crate::dom::Node::Raw(bytes)) => raw.push((depth, bytes.as_utf8_str().to_string())),
             _ => {}
         }
     }

@@ -59,7 +59,7 @@ fn emit_close_for_implicit(
         TagKind::Figcaption => close_figcaption(state, &frame),
         // ~keep A control that ends its line: emit `\n\n` on EOF close just like explicit close.
         TagKind::LineEndControl => close_line_end_control(state, &frame),
-        // ~keep An unclosed `<table>` at EOF (html5ever/tl both implicitly close every
+        // ~keep An unclosed `<table>` at EOF (html5ever/the parser both implicitly close every
         // open element there, per the loop's own doc comment) used to hit the
         // do-nothing arm below, discarding the WHOLE accumulated table --
         // including fully-formed rows -- instead of rendering it. `close_table`

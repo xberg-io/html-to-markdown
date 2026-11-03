@@ -11,10 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The Rust core now parses HTML with `astral-html` in place of `astral-tl`. The minimum supported Rust version is 1.97, and the R package needs the same compiler. Projects on an older compiler stay on 3.19.
+- `build_document_structure` takes a DOM from `html_to_markdown_rs::dom::parse`.
+- A tag name that runs into the next `<` and a stray quote in a tag now follow the HTML tokenizer: `<b<i>t</i>` gives `t`, not bold text. Attributes of a preserved tag keep their source order, and a slash splits an attribute name.
 - Python 3.11 is now the minimum supported version; Python 3.10 reached end of life.
 
 ### Fixed
 
+- A tag name that holds a dot or other punctuation now closes at its end tag, so later links no longer nest inside the link before it (#965).
 - Keep heading metadata as plain text from the same conversion pass, preserving literal markup,
   admitted image labels and visitor decisions.
 - Fully remove visitor-skipped children after exclusions trim whitespace, including UTF-8 text and

@@ -21,18 +21,22 @@ pub struct ListContext<'a> {
     pub dom_ctx: &'a super::DomContext,
 }
 
-fn is_list_item(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &super::DomContext) -> bool {
+fn is_list_item(node_handle: crate::dom::NodeHandle, parser: &crate::dom::Parser, dom_ctx: &super::DomContext) -> bool {
     if let Some(info) = dom_ctx.tag_info(node_handle.get_inner(), parser) {
         return info.name == "li";
     }
     matches!(
         node_handle.get(parser),
-        Some(tl::Node::Tag(tag)) if crate::converter::main_helpers::tag_name_eq(tag.name().as_utf8_str(), "li")
+        Some(crate::dom::Node::Tag(tag)) if crate::converter::main_helpers::tag_name_eq(tag.name().as_utf8_str(), "li")
     )
 }
 
-fn has_list_item_child(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &super::DomContext) -> bool {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+fn has_list_item_child(
+    node_handle: crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &super::DomContext,
+) -> bool {
+    let Some(crate::dom::Node::Tag(tag)) = node_handle.get(parser) else {
         return false;
     };
     tag.children()
@@ -42,8 +46,8 @@ fn has_list_item_child(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx
 }
 
 pub(super) fn render_itemless_list_as_div(
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
 ) -> bool {
@@ -72,9 +76,9 @@ pub(super) enum ListStartResult {
 
 #[cfg(feature = "visitor")]
 pub(super) fn visit_list_start(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
     ordered: bool,
@@ -128,9 +132,9 @@ pub(super) struct ListVisitorOutput {
 
 #[cfg(feature = "visitor")]
 pub(super) fn visit_list_end(
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
     visitor_output: ListVisitorOutput,
@@ -203,9 +207,9 @@ pub(super) fn visit_list_end(
 /// - `dd`: Definition description - routed to `definition::handle_dd`
 pub fn dispatch_list_handler(
     tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
+    node_handle: &crate::dom::NodeHandle,
+    tag: &crate::dom::HTMLTag,
+    parser: &crate::dom::Parser,
     output: &mut String,
     context: ListContext<'_>,
 ) -> bool {

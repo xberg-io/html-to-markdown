@@ -45,7 +45,7 @@ struct ImageData<'a> {
 /// - Handling inline data URIs when the inline-images feature is enabled
 /// - Invoking visitor callbacks when the visitor feature is enabled
 /// - Generating appropriate markdown output
-pub fn handle_img(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
+pub fn handle_img(tag: &crate::dom::HTMLTag, mut handler: HandlerContext<'_>) {
     let data = image_data(tag, &handler);
     #[cfg(feature = "metadata")]
     let metadata = handler.context.metadata_wants.images.then(|| image_metadata(tag));
@@ -108,9 +108,9 @@ fn collapse_empty_image_boundary(handler: &mut HandlerContext<'_>) {
         .into_iter()
         .flatten()
         .map(|handle| handle.get(handler.parser))
-        .find(|node| !matches!(node, Some(tl::Node::Comment(_))))
+        .find(|node| !matches!(node, Some(crate::dom::Node::Comment(_))))
         .flatten();
-    if let Some(tl::Node::Raw(raw)) = next {
+    if let Some(crate::dom::Node::Raw(raw)) = next {
         let text = raw.as_utf8_str();
         let decoded = crate::text::decode_html_entities_cow(&text);
         if decoded.as_bytes().first().is_some_and(u8::is_ascii_whitespace) {
@@ -119,7 +119,7 @@ fn collapse_empty_image_boundary(handler: &mut HandlerContext<'_>) {
     }
 }
 
-fn image_data<'a>(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> ImageData<'a> {
+fn image_data<'a>(tag: &'a crate::dom::HTMLTag<'a>, handler: &HandlerContext<'_>) -> ImageData<'a> {
     let src = {
         let skip_inline_data = handler.options.inline_data_media != InlineDataMedia::Keep;
         let mut effective_src = resolve_effective_src(tag, skip_inline_data);
@@ -151,7 +151,7 @@ fn image_data<'a>(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Ima
 }
 
 #[cfg(feature = "metadata")]
-fn image_metadata(tag: &tl::HTMLTag<'_>) -> ImageMetadataPayload {
+fn image_metadata(tag: &crate::dom::HTMLTag<'_>) -> ImageMetadataPayload {
     let mut attributes = BTreeMap::new();
     let mut width = None;
     let mut height = None;
@@ -174,7 +174,7 @@ fn image_metadata(tag: &tl::HTMLTag<'_>) -> ImageMetadataPayload {
 /// Gives a `data:` image to the collector of inline images, and returns the index its bytes take
 /// in `ConversionResult::images`, or `None` when none were extracted.
 #[cfg(feature = "inline-images")]
-fn collect_inline_image(tag: &tl::HTMLTag<'_>, data: &ImageData<'_>, context: &Context) -> Option<u32> {
+fn collect_inline_image(tag: &crate::dom::HTMLTag<'_>, data: &ImageData<'_>, context: &Context) -> Option<u32> {
     let collector = context.inline_collector.as_ref()?;
     if !is_inline_data(&data.src) {
         return None;
@@ -204,7 +204,7 @@ fn collect_inline_image(tag: &tl::HTMLTag<'_>, data: &ImageData<'_>, context: &C
 
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 fn render_image(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &ImageData<'_>,
     inline_data: InlineDataMedia,
     handler: &HandlerContext<'_>,
@@ -278,7 +278,7 @@ fn render_image_default(
 
 #[cfg(feature = "visitor")]
 fn visit_image(
-    tag: &tl::HTMLTag<'_>,
+    tag: &crate::dom::HTMLTag<'_>,
     data: &ImageData<'_>,
     handler: &HandlerContext<'_>,
 ) -> std::ops::ControlFlow<Option<String>> {
@@ -416,7 +416,7 @@ const LAZY_SINGLE_URL_ATTRIBUTES: [&str; 3] = ["data-src", "data-lazy-src", "dat
 /// With `skip_inline_data`, every step first passes over a `data:` value or candidate in any case,
 /// so a real address anywhere wins over an inline payload; when there is none, the address the
 /// steps pick without skipping is used, so the caller sees the `data:` payload and not an empty `src`.
-fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>, skip_inline_data: bool) -> Cow<'a, str> {
+fn resolve_effective_src<'a>(tag: &'a crate::dom::HTMLTag<'a>, skip_inline_data: bool) -> Cow<'a, str> {
     // ~keep Every read here goes through `decoded_attribute`: a URL attribute carries
     // ~keep character references like any other (`src="i.png?a=1&amp;b=2"`), and `srcset` is
     // ~keep parsed *after* decoding because the entity is not part of its comma/descriptor
@@ -435,9 +435,13 @@ fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>, skip_inline_data: bool) -
 /// The address a browser loads from the `<source>` elements of the `<picture>` that holds this
 /// `<img>`: the best `srcset` candidate that is not a `data:` URL, from the first `<source>` before
 /// the image that has one. `media` and `type` are not evaluated, so the first such source wins.
-fn picture_source_src(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> Option<String> {
+fn picture_source_src(
+    node_handle: &crate::dom::NodeHandle,
+    parser: &crate::dom::Parser,
+    dom_ctx: &DomContext,
+) -> Option<String> {
     let parent_id = dom_ctx.parent_of(node_handle.get_inner())?;
-    let Some(tl::Node::Tag(picture)) = dom_ctx.node_handle(parent_id)?.get(parser) else {
+    let Some(crate::dom::Node::Tag(picture)) = dom_ctx.node_handle(parent_id)?.get(parser) else {
         return None;
     };
     if !tag_name_eq(picture.name().as_utf8_str(), "picture") {
@@ -449,7 +453,7 @@ fn picture_source_src(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx
         .iter()
         .take_while(|child| child.get_inner() != node_handle.get_inner())
         .filter_map(|child| match child.get(parser) {
-            Some(tl::Node::Tag(source)) if tag_name_eq(source.name().as_utf8_str(), "source") => Some(source),
+            Some(crate::dom::Node::Tag(source)) if tag_name_eq(source.name().as_utf8_str(), "source") => Some(source),
             _ => None,
         })
         .find_map(|source| {
@@ -460,7 +464,7 @@ fn picture_source_src(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx
 
 /// Steps 2 and 3 of [`resolve_effective_src`]: the first lazy-load address, then the best
 /// `srcset` candidate, passing over `data:` values when `skip_inline_data` is set.
-fn fallback_src<'a>(tag: &'a tl::HTMLTag<'a>, skip_inline_data: bool) -> Option<Cow<'a, str>> {
+fn fallback_src<'a>(tag: &'a crate::dom::HTMLTag<'a>, skip_inline_data: bool) -> Option<Cow<'a, str>> {
     let is_placeholder = |value: &str| value.trim().is_empty() || (skip_inline_data && is_inline_data(value));
 
     for attr_name in LAZY_SINGLE_URL_ATTRIBUTES {

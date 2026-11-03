@@ -1,6 +1,6 @@
 //! Phase-isolated timing for deeply nested `<div>` input.
 //!
-//! Times `tl::parse`, `build_dom_context`, and `has_inline_block_misnest` independently
+//! Times `dom::parse`, `build_dom_context`, and `has_inline_block_misnest` independently
 //! for synthetic `<div>*n x </div>*n` input at several nesting depths, to localize which
 //! stage scales quadratically with nesting depth. The input has no scripts, styles,
 //! comments, or unclosed list items, so `convert_html_impl`'s byte-level preprocessing
@@ -34,7 +34,8 @@ fn time_phase_for_depth(depth: usize) {
     let html = deep_nested_divs(depth);
 
     let start = Instant::now();
-    let dom = tl::parse(&html, tl::ParserOptions::default()).expect("parse deep-nested fixture");
+    let dom = html_to_markdown_rs::dom::parse(&html, html_to_markdown_rs::dom::ParserOptions::default())
+        .expect("parse deep-nested fixture");
     let parse_elapsed = start.elapsed();
 
     let parser = dom.parser();

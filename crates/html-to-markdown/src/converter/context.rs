@@ -376,7 +376,7 @@ pub struct Context {
     /// tell a label emptied by that option from an empty one.
     pub(crate) inline_data_replaced: Rc<Cell<bool>>,
     pub(crate) button_wrote: Rc<Cell<bool>>,
-    pub(crate) task_checkbox: Option<tl::NodeHandle>,
+    pub(crate) task_checkbox: Option<crate::dom::NodeHandle>,
     pub(crate) task_checkbox_ancestors: Rc<HashSet<u32>>,
     #[cfg(feature = "inline-images")]
     /// Shared collector for inline images when enabled.
@@ -622,8 +622,8 @@ impl Context {
     /// ~keep between its cells: this copies it only for a cell whose answer differs.
     pub(crate) fn for_cell(
         &self,
-        cell_handle: tl::NodeHandle,
-        parser: &tl::Parser,
+        cell_handle: crate::dom::NodeHandle,
+        parser: &crate::dom::Parser,
         dom_ctx: &crate::converter::DomContext,
         br_in_tables: bool,
     ) -> std::borrow::Cow<'_, Self> {
@@ -736,8 +736,8 @@ impl Context {
     pub(crate) fn resolve_url(
         &self,
         value: &str,
-        node_handle: &tl::NodeHandle,
-        parser: &tl::Parser,
+        node_handle: &crate::dom::NodeHandle,
+        parser: &crate::dom::Parser,
         dom_ctx: &crate::converter::DomContext,
     ) -> Option<String> {
         if dom_ctx.has_raw_text_ancestor(node_handle.get_inner(), parser) {
@@ -748,8 +748,8 @@ impl Context {
     pub(crate) fn resolve_link_url(
         &self,
         value: &str,
-        node_handle: &tl::NodeHandle,
-        parser: &tl::Parser,
+        node_handle: &crate::dom::NodeHandle,
+        parser: &crate::dom::Parser,
         dom_ctx: &crate::converter::DomContext,
     ) -> Option<String> {
         if dom_ctx.has_raw_text_ancestor(node_handle.get_inner(), parser) {

@@ -9,10 +9,10 @@ use crate::converter::{Context, dom_context::DomContext};
 /// ~keep anchor's content must land in exactly one of the two halves, which is also what
 /// ~keep catches a table buried under a block wrapper (`<a><div><table>...`).
 pub(super) fn partition_link_children(
-    children: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    children: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
-) -> (Vec<tl::NodeHandle>, Vec<tl::NodeHandle>) {
+) -> (Vec<crate::dom::NodeHandle>, Vec<crate::dom::NodeHandle>) {
     children
         .iter()
         .copied()
@@ -40,8 +40,8 @@ pub(super) fn partition_link_children(
 /// ~keep `escape_link_label` turned every inner link into `\[One\](/one)` text.
 pub(super) fn should_defer_table_blocks(
     ctx: &Context,
-    deferred: &[tl::NodeHandle],
-    parser: &tl::Parser,
+    deferred: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
     dom_ctx: &DomContext,
 ) -> bool {
     (!ctx.convert_as_inline || ctx.in_layout_cell)
@@ -56,11 +56,11 @@ pub(super) fn should_defer_table_blocks(
 /// ~keep is paid only when the anchor actually has a block child, and the walk stops at the
 /// ~keep first `<table>` found regardless of subtree size.
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn subtree_has_table(handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+fn subtree_has_table(handle: &crate::dom::NodeHandle, parser: &crate::dom::Parser, dom_ctx: &DomContext) -> bool {
     // ~keep Rendering's max_depth does not bound the raw DOM scanned here (issue #923).
     let mut pending = vec![*handle];
     while let Some(handle) = pending.pop() {
-        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+        let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) else {
             continue;
         };
         if normalized_tag_name(tag.name().as_utf8_str()) == "table" {
