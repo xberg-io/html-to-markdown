@@ -9,7 +9,7 @@ includes = ["mise-tasks/shared.toml", "mise-tasks"]
 
 [tools]
 python = "3.15.2"
-uv = "0.13.6"
+uv = "0.13.7"
 node = "26.13.0"
 pnpm = "12.16.1"
 # bun is repository-owned (not in the baseline): the Bun e2e legs and node:*:bun tasks run it. ~keep
@@ -18,7 +18,7 @@ go = "1.27.3"
 java = "temurin-25.0.5+8.0.LTS"
 ruby = "4.0.9"
 zig = "0.17.0"
-"github:Goldziher/poly" = "0.32.1"
+"github:Goldziher/poly" = "0.32.5"
 "github:Goldziher/adrlint" = "0.4.1"
 cargo-deny = "0.20.2"
 "github:taiki-e/cargo-llvm-cov" = "0.9.1"
