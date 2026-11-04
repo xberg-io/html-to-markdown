@@ -269,12 +269,24 @@ pub fn has_omitted_end_tag(dom: &crate::dom::VDom, parser: &crate::dom::Parser) 
 /// True when the source range of `tag` ends with its end tag. For an element that the parser never
 /// closed, the range is the start tag alone.
 fn has_end_tag(tag: &crate::dom::HTMLTag<'_>) -> bool {
+    end_tag_offset(tag).is_some()
+}
+
+/// The offset in the source range of `tag` where its end tag starts, when the range ends with one.
+///
+/// ~keep The parser closes an element at an end tag that names it in any letter case, with white
+/// ~keep space or a `/` before the `>`, so the end tag is the last `</`, the name in any case, and
+/// ~keep nothing but white space or `/` up to the closing `>`.
+fn end_tag_offset(tag: &crate::dom::HTMLTag<'_>) -> Option<usize> {
+    let raw = tag.raw().as_bytes();
+    let body = raw.strip_suffix(b">")?;
+    let at = memchr::memmem::rfind(body, b"</")?;
+    let rest = &body[at + 2..];
     let name = tag.name().as_bytes();
-    tag.raw()
-        .as_bytes()
-        .strip_suffix(b">")
-        .and_then(|raw| raw.strip_suffix(name))
-        .is_some_and(|raw| raw.ends_with(b"</"))
+    let spelled = rest.get(..name.len())?;
+    let tail = &rest[name.len()..];
+    (spelled.eq_ignore_ascii_case(name) && tail.iter().all(|byte| byte.is_ascii_whitespace() || *byte == b'/'))
+        .then_some(at)
 }
 
 /// The position in one element (or the page) in the walk of [`has_discarded_end_tag`].
@@ -346,7 +358,8 @@ pub fn has_discarded_end_tag(dom: &crate::dom::VDom, parser: &crate::dom::Parser
             continue;
         }
         let name = tag.name().as_bytes();
-        let closed = has_end_tag(tag);
+        let end_tag_at = end_tag_offset(tag);
+        let closed = end_tag_at.is_some();
         let name_in_lower_case = lower_case(name);
         *open.entry(name_in_lower_case.clone()).or_insert(0) += 1;
         lists.push(SiblingList {
@@ -354,7 +367,7 @@ pub fn has_discarded_end_tag(dom: &crate::dom::VDom, parser: &crate::dom::Parser
             next: 0,
             // ~keep The source range of an element with no end tag is its start tag.
             previous_end: span.filter(|_| !closed).map(|(_, end)| end),
-            end_tag: span.filter(|_| closed).map(|(_, end)| end - name.len() - 3),
+            end_tag: span.zip(end_tag_at).map(|((start, _), at)| start + at),
             name: Some(name_in_lower_case),
         });
     }
@@ -707,7 +720,7 @@ fn element_has_noise_hint(tag: &crate::dom::HTMLTag) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{has_discarded_end_tag, readable_text_len};
+    use super::{has_discarded_end_tag, has_omitted_end_tag, readable_text_len};
 
     fn discards_an_end_tag_of_an_open_element(html: &str) -> bool {
         let dom = crate::dom::parse(html, crate::dom::ParserOptions).expect("parse");
@@ -776,6 +789,49 @@ mod tests {
         ] {
             assert!(!discards_an_end_tag_of_an_open_element(html), "{html:?}");
         }
+    }
+
+    /// ~keep Pages whose end tags differ from the start tag only in letter case or in white space
+    /// ~keep before `>`. The parser closes each element, so neither gate asks for the tree builder.
+    const CLOSED_IN_ANOTHER_SPELLING: [&str; 6] = [
+        "<div>a</DIV>tail",
+        "<DIV><p>a</P></div>tail",
+        "<p>a</p >tail",
+        "<div><p>a</p\n></div >tail",
+        "<svg><clipPath>x</CLIPPATH></svg>tail",
+        "<div title='</div>'><p>x</P></DIV>",
+    ];
+
+    #[test]
+    fn should_find_no_omitted_end_tag_at_an_end_tag_in_another_spelling() {
+        for html in CLOSED_IN_ANOTHER_SPELLING {
+            let dom = crate::dom::parse(html, crate::dom::ParserOptions).expect("parse");
+            assert!(!has_omitted_end_tag(&dom, dom.parser()), "{html:?}");
+        }
+    }
+
+    #[test]
+    fn should_find_no_discarded_end_tag_at_an_end_tag_in_another_spelling() {
+        for html in CLOSED_IN_ANOTHER_SPELLING {
+            assert!(!discards_an_end_tag_of_an_open_element(html), "{html:?}");
+        }
+    }
+
+    #[test]
+    fn should_still_find_a_discarded_end_tag_inside_an_element_closed_in_another_spelling() {
+        assert!(discards_an_end_tag_of_an_open_element(
+            "<DIV><p>one</div>two</p></DIV>tail"
+        ));
+        assert!(discards_an_end_tag_of_an_open_element(
+            "<div><p>one</DIV >two</p></div >tail"
+        ));
+        // ~keep The discarded `</div>` sits between the last child and the end tag of the `span`.
+        assert!(discards_an_end_tag_of_an_open_element(
+            "<div><span><p>a</p></div></SPAN></div>"
+        ));
+        assert!(discards_an_end_tag_of_an_open_element(
+            "<div><span><p>a</p></div></span ></div>"
+        ));
     }
 
     fn text_len(html: &str) -> usize {
