@@ -138,6 +138,17 @@ fn list_media_fallback(tag: &HTMLTag, parser: &Parser, children: &mut Vec<NodeHa
     }));
 }
 
+/// Visit declarations in source order alongside fallback content when callbacks can observe them.
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
+fn list_media_children(tag: &HTMLTag, parser: &Parser, ctx: &Context, children: &mut Vec<NodeHandle>) {
+    #[cfg(feature = "visitor")]
+    if ctx.visitor.is_some() {
+        children.extend_from_slice(tag.children().top());
+        return;
+    }
+    list_media_fallback(tag, parser, children);
+}
+
 /// Write `fallback`, the text of the fallback content of a media element.
 pub fn close_media_fallback(fallback: &str, output: &mut String, ctx: &Context) {
     if !fallback.is_empty() {
@@ -266,7 +277,7 @@ fn handle_audio(
         }
     }
 
-    list_media_fallback(tag, parser, children);
+    list_media_children(tag, parser, ctx, children);
     if ctx.in_link && inline_data == InlineDataMedia::Keep && !src.is_empty() {
         mark_media_tail(ctx);
     }
@@ -335,7 +346,7 @@ fn handle_video(
         }
     }
 
-    list_media_fallback(tag, parser, children);
+    list_media_children(tag, parser, ctx, children);
     if ctx.in_link && inline_data == InlineDataMedia::Keep && !src.is_empty() {
         mark_media_tail(ctx);
     }

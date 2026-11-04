@@ -272,12 +272,9 @@ impl<'a> AttributesSource<'a> {
         match &self.inner {
             AttributesInner::Borrowed(map) => map,
             AttributesInner::Owned(map) => map,
-            AttributesInner::Lazy { tag, cell } => cell.get_or_init(|| {
-                tag.attributes()
-                    .iter()
-                    .filter_map(|(k, v)| v.as_ref().map(|val| (k.to_string(), val.to_string())))
-                    .collect()
-            }),
+            AttributesInner::Lazy { tag, cell } => {
+                cell.get_or_init(|| crate::converter::utility::content::collect_tag_attributes(tag))
+            }
         }
     }
 }
@@ -446,7 +443,7 @@ impl<'de> serde::Deserialize<'de> for NodeContext<'static> {
 }
 
 impl<'a> NodeContext<'a> {
-    /// Return a reference to the attribute map.
+    /// Return a reference to the attribute map. Parsed HTML values use HTML attribute reference rules.
     ///
     /// If the context was built with [`NodeContext::with_lazy_attributes`], the
     /// map is materialized on the first call and cached for subsequent calls.

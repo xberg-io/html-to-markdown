@@ -77,3 +77,39 @@ def test_visitor_keeps_live_nested_contexts_separate() -> None:
     assert visitor.reads == [{"data-level": "outer"}, {"data-level": "inner"}, {"data-level": "outer"}]
     assert visitor.outer is not None
     assert visitor.outer.attributes() == {}
+
+
+def test_visitor_decodes_href_and_iframe_src_once() -> None:
+    visitor = AttributeVisitor()
+    html = '<a href="/x?a=1&amp;b=2" title="A &quot;q&quot; &lt;" data-nested="&amp;lt;">t</a>'
+    html += '<iframe src="/y?a=1&amp;b=2"></iframe>'
+
+    convert(html, visitor=cast("HtmlVisitor", visitor))
+
+    assert visitor.attributes["a"] == {"href": "/x?a=1&b=2", "title": 'A "q" <', "data-nested": "&lt;"}
+    assert visitor.attributes["iframe"] == {"src": "/y?a=1&b=2"}
+
+
+class MediaChildVisitor(AttributeVisitor):
+    """Record media child end callbacks as well as attributes."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.ends: list[str] = []
+
+    def visit_element_end(self, context: NodeContext, _output: str) -> dict[str, str]:
+        """Record the closed element."""
+        self.ends.append(context.tag_name)
+        return {"type": "continue"}
+
+
+def test_visitor_observes_lazy_media_source_and_track() -> None:
+    visitor = MediaChildVisitor()
+    html = '<div><video controls><source data-src="/x.mp4?a=1&amp;b=2"><track src="/captions.vtt"></video></div>'
+
+    result = convert(html, visitor=cast("HtmlVisitor", visitor))
+
+    assert visitor.attributes["source"] == {"data-src": "/x.mp4?a=1&b=2"}
+    assert visitor.attributes["track"] == {"src": "/captions.vtt"}
+    assert visitor.ends == ["source", "track", "video", "div"]
+    assert result.content == convert(html).content

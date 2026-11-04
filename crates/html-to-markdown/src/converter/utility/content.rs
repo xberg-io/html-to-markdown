@@ -13,7 +13,7 @@ use std::collections::BTreeMap;
 
 pub use crate::converter::DomContext;
 
-/// Collect all attributes from an HTML tag as a `BTreeMap<String, String>`.
+/// Collect explicitly valued attributes with their HTML character references decoded.
 ///
 /// Boolean attributes (those with `None` as the value) are skipped; only
 /// attributes that carry an explicit value are included.
@@ -21,7 +21,9 @@ pub use crate::converter::DomContext;
 pub fn collect_tag_attributes(tag: &crate::dom::HTMLTag) -> BTreeMap<String, String> {
     tag.attributes()
         .iter()
-        .filter_map(|(k, v)| v.as_ref().map(|val| (k.to_string(), val.to_string())))
+        .filter_map(|(name, value)| {
+            value.map(|raw| (name.into_owned(), text::decode_attribute_value_cow(&raw).into_owned()))
+        })
         .collect()
 }
 
