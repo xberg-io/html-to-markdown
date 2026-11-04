@@ -30,7 +30,7 @@ def test_publish_rust_setup_omits_coverage_tool() -> None:
         job: [step for step in body.get("steps", []) if step.get("uses") == "xberg-io/actions/setup-rust@v1"]
         for job, body in workflow["jobs"].items()
     }
-    assert sum(map(len, rust_setup.values())) == 19
+    assert sum(map(len, rust_setup.values())) == 18
     unexpected = {
         job
         for job, steps in rust_setup.items()

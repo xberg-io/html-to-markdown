@@ -123,10 +123,12 @@ jobs:
               output.write(f"sha={sha}\nevent={event}\n")
           PY
 
+      # ~keep Full history: publish-swift-release checks the receipt's source is an ancestor of the tag.
       - name: Check out current recovery tooling
         uses: actions/checkout@v7
         with:
           ref: ${{ github.workflow_sha }}
+          fetch-depth: 0
 
       - name: Check out original release source
         uses: actions/checkout@v7
@@ -157,15 +159,13 @@ jobs:
               output.write(f'version={version}\n')
           PY
 
-      - name: Verify immutable release seed for recovery
+      - name: Download immutable release seed for recovery
         if: ${{ inputs.dry_run != true }}
         shell: bash
         working-directory: release-source
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ inputs.tag }}
-          VERSION: ${{ steps.version.outputs.version }}
-          SOURCE_SHA: ${{ steps.source.outputs.sha }}
         run: |
           set -euo pipefail
           TAG_OBJECT=$(git ls-remote origin "refs/tags/$TAG" | cut -f1)
@@ -174,10 +174,16 @@ jobs:
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
             --pattern HtmlToMarkdown-rs.artifactbundle.zip \
             --pattern HtmlToMarkdown-rs.artifactbundle.release.json --dir dist/swift-artifactbundle
-          python3 "$GITHUB_WORKSPACE/scripts/ci/swift_release.py" verify \
-            --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
-            --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
-            --version "$VERSION" --source "$SOURCE_SHA" --tag "$TAG" --tag-object "$TAG_OBJECT"
+
+      - name: Verify immutable release seed for recovery
+        if: ${{ inputs.dry_run != true }}
+        uses: xberg-io/actions/publish-swift-release@v1
+        with:
+          tag: ${{ inputs.tag }}
+          bundle-zip: release-source/dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip
+          receipt: release-source/dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json
+          dry-run: "true"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/download-artifact@v8
         with:
@@ -400,13 +406,12 @@ jobs:
             echo "gem_version=${gem}"
           } >>"$GITHUB_OUTPUT"
 
-      - name: Verify immutable release seed
+      - name: Download immutable release seed
         id: source
         shell: bash
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           TAG: ${{ steps.meta.outputs.tag }}
-          VERSION: ${{ steps.meta.outputs.version }}
           DRY_RUN: ${{ steps.meta.outputs.dry_run }}
           IS_TAG: ${{ steps.meta.outputs.is_tag }}
         run: |
@@ -432,14 +437,21 @@ jobs:
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
             --pattern HtmlToMarkdown-rs.artifactbundle.zip \
             --pattern HtmlToMarkdown-rs.artifactbundle.release.json --dir dist/swift-artifactbundle
-          python3 scripts/ci/swift_release.py verify \
-            --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
-            --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
-            --version "$VERSION" --source "$SOURCE_SHA" --tag "$TAG" --tag-object "$TAG_OBJECT"
           {
             echo "swift_bundle_sha256=$(sha256sum dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip | cut -d ' ' -f 1)"
             echo "swift_receipt_sha256=$(sha256sum dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json | cut -d ' ' -f 1)"
           } >> "$GITHUB_OUTPUT"
+
+      # ~keep Gates every core publisher: Prepare Swift release attached these bytes before the tag existed.
+      - name: Verify immutable release seed
+        if: ${{ steps.meta.outputs.dry_run != 'true' }}
+        uses: xberg-io/actions/publish-swift-release@v1
+        with:
+          tag: ${{ steps.meta.outputs.tag }}
+          bundle-zip: dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip
+          receipt: dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json
+          dry-run: "true"
+          token: ${{ steps.app-token.outputs.token }}
 
       - uses: actions/upload-artifact@v7
         if: ${{ steps.meta.outputs.dry_run != 'true' }}
@@ -1693,119 +1705,6 @@ jobs:
           path: dist/c-ffi
           retention-days: 14
 
-  swift-artifactbundle:
-    name: Prepare or reuse exact Swift artifact bytes
-    needs: [prepare]
-    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true' }}
-
-    runs-on: macos-26
-    timeout-minutes: 180
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ needs.prepare.outputs.source_sha }}
-          fetch-depth: 0
-          submodules: recursive
-      - name: Resolve final Swift package version
-        id: swift-version
-        shell: bash
-        env:
-          VERSION: ${{ needs.prepare.outputs.version }}
-          DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
-        run: |
-          set -euo pipefail
-          actual=$(python3 -c 'import tomllib; print(tomllib.load(open("Cargo.toml", "rb"))["workspace"]["package"]["version"])')
-          if [[ "$VERSION" != "$actual" ]]; then
-            [[ "$DRY_RUN" == "true" && "$VERSION" == "$actual"-dryrun-* ]] || {
-              echo "Swift release/source version mismatch" >&2
-              exit 1
-            }
-          fi
-          echo "version=$actual" >> "$GITHUB_OUTPUT"
-      - uses: actions/download-artifact@v8
-        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-        with:
-          name: swift-artifactbundle
-          path: dist/swift-artifactbundle
-      - name: Verify reused Swift bytes
-        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-        env:
-          VERSION: ${{ needs.prepare.outputs.version }}
-          SOURCE_SHA: ${{ needs.prepare.outputs.source_sha }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-          TAG_OBJECT: ${{ needs.prepare.outputs.tag_object }}
-        run: |
-          python3 scripts/ci/swift_release.py verify \
-            --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
-            --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
-            --version "$VERSION" --source "$SOURCE_SHA" --tag "$TAG" --tag-object "$TAG_OBJECT"
-      - name: Check Swift checkout before Rust setup
-        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          status=$(git status --porcelain=v1 --untracked-files=all)
-          if [[ -n "$status" ]]; then
-            printf 'Swift release refused: preparation source must be clean before Rust setup\n%s\n' "$status" >&2
-            exit 1
-          fi
-          if [[ -e rust_out || -L rust_out ]]; then
-            echo 'Swift release refused: rust_out already exists before Rust setup' >&2
-            exit 1
-          fi
-      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
-      - uses: xberg-io/actions/setup-rust@v1
-        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
-        with:
-          install-llvm-cov: "false"
-          cache-key-prefix: publish-swift-artifactbundle
-      - name: Check clean Swift preparation source
-        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          status=$(git status --porcelain=v1 --untracked-files=all)
-          # ~keep The shared setup action's rustc stdin lint probes emit rust_out in the checkout.
-          if [[ "$status" == '?? rust_out' && -f rust_out && ! -L rust_out ]]; then
-            rm -- rust_out
-            status=$(git status --porcelain=v1 --untracked-files=all)
-          fi
-          if [[ -n "$status" ]]; then
-            printf 'Swift release refused: preparation source must be clean before build\n%s\n' "$status" >&2
-            exit 1
-          fi
-      - uses: xberg-io/actions/build-swift-artifactbundle@v1
-        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
-        id: build
-        with:
-          crate-name: html-to-markdown-rs-swift
-          artifact-name: HtmlToMarkdown-rs
-          binary-target-name: RustBridgeBinary
-          header-path: target/release/build/html-to-markdown-rs-swift-*/out
-          output-dir: dist/swift-artifactbundle
-          build-profile: release
-          package-version: ${{ steps.swift-version.outputs.version }}
-          receipt-version: ${{ steps.swift-version.outputs.version }}
-      - name: Check the prepared Swift bytes and receipt
-        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
-        env:
-          VERSION: ${{ steps.swift-version.outputs.version }}
-          SOURCE_SHA: ${{ needs.prepare.outputs.source_sha }}
-        run: |
-          python3 scripts/ci/swift_release.py check \
-            --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
-            --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
-            --version "$VERSION" --source "$SOURCE_SHA"
-      - uses: actions/upload-artifact@v7
-        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
-        with:
-          name: swift-artifactbundle
-          path: |
-            dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip
-            dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json
-          if-no-files-found: error
-          retention-days: 14
-
   java-natives:
     name: Build Java FFI library (${{ matrix.platform }})
     needs: [prepare, check-maven]
@@ -2179,13 +2078,13 @@ jobs:
 
   upload-swift-release:
     name: Verify seeded Swift release assets
-    needs: [prepare, validate-versions, swift-artifactbundle]
-    if: ${{ needs.prepare.result == 'success' && ((needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.swift-artifactbundle.result == 'success') }}
+    needs: [prepare, validate-versions]
+    if: ${{ needs.prepare.result == 'success' && ((needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true') }}
 
     runs-on: ubuntu-latest
     steps:
       - name: Prepared Swift bytes remain unchanged
-        run: echo "Swift bytes were prepared before tagging and verified by the bundle job."
+        run: echo "Prepare Swift release attached the bytes before tagging; prepare verified them."
 
   upload-elixir-release:
     name: Upload Elixir NIF archives to GitHub Release
@@ -3449,6 +3348,7 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
       - uses: actions/download-artifact@v8
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         with:
           name: swift-artifactbundle
           path: dist/swift-artifactbundle
@@ -3473,7 +3373,7 @@ jobs:
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         with:
           tag: ${{ needs.prepare.outputs.tag }}
-          bundle-zip: dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip
+          bundle-zip: ""
           receipt: dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json
           token: ${{ steps.app-token.outputs.token }}
       - name: Update release notes with artifact URL

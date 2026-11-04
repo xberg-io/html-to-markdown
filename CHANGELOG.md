@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The core `vX.Y.Z` tag of a Swift release holds the final `Package.swift` checksum before anything publishes. The publish workflow checks it with `xberg-io/actions/publish-swift-release` and never moves a tag or the `release/swift/<version>` branch (#963).
+- The core `vX.Y.Z` tag of a Swift release holds the final `Package.swift` checksum before anything publishes. A release now takes two steps: dispatch Prepare Swift release on main, which builds the bundle, pins its checksum and creates the tag, then Publish Release on the tag. Publish Release verifies the bundle with `xberg-io/actions/publish-swift-release` and never moves a tag or the `release/swift/<version>` branch (#963).
 
 ## [3.20.0] - 2026-11-04
 

@@ -1,0 +1,36 @@
+name: Prepare Swift release
+
+# ~keep Step 1 of a release: run on main after the version bump. It builds the Swift bundle once, pins its
+# ~keep checksum into Package.swift, pushes that commit with the vX.Y.Z tag and attaches the exact ZIP and
+# ~keep receipt to a draft release. Step 2 is Publish Release on the tag, which verifies and reuses them.
+# ~keep https://github.com/xberg-io/actions/blob/v1/prepare-swift-release/README.md
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        default: false
+
+concurrency:
+  group: prepare-swift-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  swift:
+    uses: xberg-io/actions/.github/workflows/reusable-swift-release-prepare.yml@v1
+    secrets:
+      app-id: ${{ secrets.BOT_APP_ID }}
+      app-private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+    with:
+      dry-run: ${{ inputs.dry-run }}
+      crate-name: html-to-markdown-rs-swift
+      artifact-name: HtmlToMarkdown-rs
+      binary-target-name: RustBridgeBinary
+      header-path: target/release/build/html-to-markdown-rs-swift-*/out
+      submodules: recursive
+      expected-triples: >-
+        arm64-apple-macosx,x86_64-apple-macosx,arm64-apple-ios,arm64-apple-ios-simulator,x86_64-apple-ios-simulator,x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu
