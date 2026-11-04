@@ -44,6 +44,8 @@ use self::block_boundary::{separate_in_list_item, separate_words_at_block_bounda
 use self::context_setup::create_conversion_context;
 use self::markdown_walk::walk_nodes;
 pub use self::markdown_walk::{WalkSpares, walk_opened};
+#[cfg(any(test, feature = "testkit"))]
+pub use self::parse::drop_asks_for_the_tree_builder;
 use self::parse::{ParsedPage, finish_dom_parse, parse_for_conversion};
 pub use self::prepare::owner_mark_numbers_after_cleanup;
 use self::prepare::prepare_html;

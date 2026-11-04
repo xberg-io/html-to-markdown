@@ -290,8 +290,9 @@ fn should_start_the_body_where_a_narrower_choice_starts_it() {
     // ~keep end tag of the head, the first `<template>` of a fragment, a hidden element. A wider
     // ~keep choice removes the tags of that element, and the body still starts there.
     //
-    // ~keep Each page has an element with no end tag, so every choice takes the tree builder. The
-    // ~keep first parse holds each title in another element, so the head repair leaves the page.
+    // ~keep Each page has an element with no end tag, so every choice that keeps it takes the tree
+    // ~keep builder: `drop` on each page whose narrowest choice is `reachable`. The first parse
+    // ~keep holds each title in another element, so the head repair leaves the page.
     // ~keep The outputs have no front matter: a title of the head is then written nowhere.
     //
     // ~keep Each row names the narrowest choice that writes the title. The inert-body pass reads
@@ -371,8 +372,14 @@ fn should_start_the_body_where_a_narrower_choice_starts_it() {
             || format!("{html}: `reachable` writes {:?}", outputs[reachable]),
         );
         check_that_no_output_loses_a_word(&mut failures, html, &outputs);
+        if narrowest == reachable {
+            check(&mut failures, drop_takes_the_tree_builder(html) != Some(false), || {
+                format!("{html}: `drop` does not take the tree builder")
+            });
+        }
     }
-    report(&failures, pages.len() * 4);
+    let kept_by_drop = pages.iter().filter(|(_, _, narrowest)| *narrowest == reachable).count();
+    report(&failures, pages.len() * 4 + kept_by_drop);
 }
 
 #[test]
@@ -416,6 +423,20 @@ fn should_empty_a_kept_element_of_the_head_like_a_narrower_choice() {
     }
 }
 
+/// Whether `drop` sends `html` to the HTML tree builder, as the conversion decides it. Without the
+/// testkit feature the decision is not reachable, and every caller reads only the outputs.
+#[cfg(feature = "testkit")]
+fn drop_takes_the_tree_builder(html: &str) -> Option<bool> {
+    let options = ConversionOptions::default();
+    let asks = html_to_markdown_rs::testkit::drop_asks_for_the_tree_builder(html, &options);
+    Some(asks.expect("the page preprocesses"))
+}
+
+#[cfg(not(feature = "testkit"))]
+const fn drop_takes_the_tree_builder(_html: &str) -> Option<bool> {
+    None
+}
+
 /// The output of each choice with no front matter: a title of the head is then written nowhere.
 fn without_front_matter(html: &str) -> [String; 3] {
     CHOICES.map(|hidden_content| {
@@ -443,19 +464,34 @@ fn should_write_a_title_under_a_wider_choice_where_a_narrower_choice_writes_it()
         "<head><title>T1</title><p>W4</p></head><template><div><p>End</p></template>",
         "<head><title>T1</title><p>W4</p></head><noscript><div><p>End</p></noscript>",
     ] {
+        assert_ne!(drop_takes_the_tree_builder(html), Some(true), "{html}");
         let [drop, reachable, all] = without_front_matter(html);
         assert_eq!(drop, "T1\n\nW4\n", "{html}");
         assert_eq!(reachable, drop, "{html}");
         assert_eq!(all, "T1\n\nW4\n\nEnd\n", "{html}");
     }
+    // ~keep An end tag closes its element in any letter case, so a shadow root that closes in
+    // ~keep another case asks for no tree builder under `drop`, as its lower-case twin does.
+    for html in [
+        r#"<head><title>T1</title><p>W4</p></head><div><TEMPLATE shadowrootmode="open"><div><p>End</p></template></div>"#,
+        r#"<head><title>T1</title><p>W4</p></head><div><template shadowrootmode="open"><div><p>End</p></template></div>"#,
+    ] {
+        assert_ne!(drop_takes_the_tree_builder(html), Some(true), "{html}");
+        let [drop, reachable, all] = without_front_matter(html);
+        assert_eq!(drop, "T1\n\nW4\n", "{html}");
+        assert_eq!(reachable, "T1\n\nW4\n\nEnd\n", "{html}");
+        assert_eq!(all, reachable, "{html}");
+    }
     // ~keep Where `drop` takes the tree builder, each choice takes it: no choice writes the title.
     // ~keep The template has no end tag, so the page asks for the tree builder.
     let html = r#"<head><title>T1</title><p>W4</p></head><div><template shadowrootmode="open"><div><p>End</p></div>"#;
+    assert_ne!(drop_takes_the_tree_builder(html), Some(false), "{html}");
     let [drop, reachable, all] = without_front_matter(html);
     assert_eq!(drop, "W4\n", "{html}");
     assert_eq!(reachable, "W4\n\nEnd\n", "{html}");
     assert_eq!(all, reachable, "{html}");
     let html = "<head><title>T1</title><p>W4</p></head><div><p>Mid</p><template><div><p>End</p></template>";
+    assert_ne!(drop_takes_the_tree_builder(html), Some(false), "{html}");
     let [drop, reachable, all] = without_front_matter(html);
     assert_eq!(drop, "W4\n\nMid\n", "{html}");
     assert_eq!(reachable, drop, "{html}");

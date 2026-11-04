@@ -103,6 +103,18 @@ pub mod testkit {
     pub use crate::converter::prescan;
     pub use crate::converter::tier1;
     pub use crate::converter::utility::caching::build_dom_context;
+
+    /// Whether `drop` sends `html`, a page as the caller wrote it, to the HTML tree builder.
+    ///
+    /// # Errors
+    ///
+    /// Returns the error of the preprocessing that the conversion runs before its first parse.
+    pub fn drop_asks_for_the_tree_builder(
+        html: &str,
+        options: &crate::ConversionOptions,
+    ) -> crate::error::Result<bool> {
+        crate::converter::main::drop_asks_for_the_tree_builder(html, options)
+    }
 }
 #[cfg(any(test, feature = "testkit"))]
 pub use converter::prescan;

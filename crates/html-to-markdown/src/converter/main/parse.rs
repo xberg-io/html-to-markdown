@@ -269,9 +269,14 @@ fn loses_a_title_of_a_wider_choice(
     if hidden_content == HiddenContent::Drop || written_title_len(second) >= written_title_len(first) {
         return Ok(false);
     }
+    Ok(!drop_asks_for_the_tree_builder(html, options)?)
+}
+
+/// Whether `drop` sends `html`, a page before the passes of its conversion, to the HTML tree builder.
+pub fn drop_asks_for_the_tree_builder(html: &str, options: &ConversionOptions) -> Result<bool> {
     let (emptied, _) = normalize_inert_bodies_with_preservation(html, false, HiddenContent::Drop);
     let page_of_drop = preprocess_initial_html(&emptied, options, HiddenContent::Drop)?;
-    Ok(!asks_for_the_tree_builder(&page_of_drop, options))
+    Ok(asks_for_the_tree_builder(&page_of_drop, options))
 }
 
 /// Whether the conversion of `page`, a page before its first parse, runs the HTML tree builder.
