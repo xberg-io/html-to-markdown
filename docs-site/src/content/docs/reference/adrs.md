@@ -19,3 +19,4 @@ the same change as a new record.
 | 0005 | [Tier-1 byte scanner with Tier-2 fallback](https://github.com/xberg-io/html-to-markdown/blob/main/adrs/0005-tier-1-byte-scanner-with-tier-2-fallback.md) | accepted | 2026-06-01 |
 | 0006 | [MCP server as a feature-gated core module](https://github.com/xberg-io/html-to-markdown/blob/main/adrs/0006-mcp-server-as-a-feature-gated-core-module.md) | accepted | 2026-06-20 |
 | 0007 | [Tracing as the observability surface](https://github.com/xberg-io/html-to-markdown/blob/main/adrs/0007-tracing-as-the-observability-surface.md) | accepted | 2026-07-30 |
+| 0009 | [Prepare Swift artifacts before creating immutable release tags](https://github.com/xberg-io/html-to-markdown/blob/main/adrs/0009-prepare-swift-artifacts-before-creating-immutable-release-tags.md) | proposed | 2026-11-04 |

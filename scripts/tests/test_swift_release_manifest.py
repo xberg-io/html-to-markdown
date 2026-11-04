@@ -48,35 +48,36 @@ def finalize(repository: Path, checksum: str) -> subprocess.CompletedProcess[str
 
 
 @pytest.mark.parametrize("state", ["placeholder", "stale", "current"])
-def test_finalizer_preserves_one_checksum_commit(tmp_path: Path, state: str) -> None:
-    """Initial, recovery, and idempotent runs keep one checksum-only child."""
+def test_finalizer_verifies_without_creating_or_amending_checksum_commits(tmp_path: Path, state: str) -> None:
+    """Checksum preparation belongs before tagging, including recovery runs."""
     manifest = initialize(tmp_path)
-    original = git(tmp_path, "rev-parse", "HEAD")
     if state != "placeholder":
-        assert finalize(tmp_path, OLD_CHECKSUM).returncode == 0
+        manifest.write_text(f'checksum: "{OLD_CHECKSUM}"\n')
+        git(tmp_path, "add", "Package.swift")
+        git(tmp_path, "commit", "-m", "fixture: precomputed checksum")
+    git(tmp_path, "-c", "tag.gpgsign=false", "tag", "-a", "v3.17.0", "-m", "fixture")
     before = git(tmp_path, "rev-parse", "HEAD")
-
+    refs = git(tmp_path, "show-ref")
+    source = manifest.read_bytes()
     result = finalize(tmp_path, OLD_CHECKSUM if state == "current" else NEW_CHECKSUM)
-
-    assert result.returncode == 0, result.stderr
-    head = git(tmp_path, "rev-parse", "HEAD")
-    assert git(tmp_path, "rev-list", "--count", "HEAD") == "2"
-    assert git(tmp_path, "rev-parse", "HEAD^") == original
-    assert git(tmp_path, "diff", "--name-only", original, head) == "Package.swift"
-    expected = OLD_CHECKSUM if state == "current" else NEW_CHECKSUM
-    assert manifest.read_text() == f'checksum: "{expected}"\n'
-    assert (head == before) is (state == "current")
+    assert (result.returncode == 0) is (state == "current"), result.stderr
+    if state != "current":
+        assert "before tagging" in result.stderr
+    assert git(tmp_path, "rev-parse", "HEAD") == before
+    assert git(tmp_path, "show-ref") == refs
+    assert manifest.read_bytes() == source
 
 
 def test_finalizer_rejects_unrelated_existing_checksum_commit(tmp_path: Path) -> None:
-    """Recovery must not amend an arbitrary post-release source change."""
+    """Recovery cannot amend or hide an unrelated native source change."""
     manifest = initialize(tmp_path)
     manifest.write_text(f'checksum: "{OLD_CHECKSUM}"\n')
     (tmp_path / "source.rs").write_text("changed\n")
     git(tmp_path, "add", "Package.swift", "source.rs")
     git(tmp_path, "commit", "-m", "Unrelated change")
-
+    before = git(tmp_path, "rev-parse", "HEAD")
+    source = manifest.read_bytes()
     result = finalize(tmp_path, NEW_CHECKSUM)
-
     assert result.returncode != 0
-    assert "changes files beyond Package.swift" in result.stderr
+    assert git(tmp_path, "rev-parse", "HEAD") == before
+    assert manifest.read_bytes() == source

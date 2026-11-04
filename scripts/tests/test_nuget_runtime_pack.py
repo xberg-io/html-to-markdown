@@ -89,7 +89,8 @@ def test_recovery_only_accepts_the_original_requested_release(
 ) -> None:
     """Validate actual recovery shell inputs before checking out or publishing artifacts."""
     workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
-    script = workflow["jobs"]["recover-nuget-runtimes"]["steps"][0]["run"]
+    steps = workflow["jobs"]["recover-nuget-runtimes"]["steps"]
+    script = next(step["run"] for step in steps if step.get("id") == "source")
     metadata = {
         "path": ".github/workflows/publish.yaml",
         "event": "release",

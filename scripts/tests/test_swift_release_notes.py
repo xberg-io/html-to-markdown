@@ -1,5 +1,6 @@
 """Exercise the actual Swift release-notes workflow against local release bodies."""
 
+import json
 import os
 import shutil
 import subprocess
@@ -21,7 +22,7 @@ def test_workflow_preserves_notes_and_updates_swift_idempotently(tmp_path: Path,
     workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
     steps = workflow["jobs"]["update-swift-package-manifest"]["steps"]
     script = next(step["run"] for step in steps if step.get("name") == "Update release notes with artifact URL")
-    tooling = tmp_path / ".release-tooling"
+    tooling = tmp_path
     shutil.copytree(ROOT / "scripts", tooling / "scripts")
     body = tmp_path / "body.md"
     body.write_text(existing)
@@ -35,9 +36,9 @@ def test_workflow_preserves_notes_and_updates_swift_idempotently(tmp_path: Path,
         "else:\n    raise SystemExit(2)\n"
     )
     executable.chmod(0o755)
-    checksums = tmp_path / "swift-checksums"
-    checksums.mkdir()
-    checksum_file = checksums / "bundle.checksum"
+    staging = tmp_path / "dist/swift-artifactbundle"
+    staging.mkdir(parents=True)
+    receipt = staging / "HtmlToMarkdown-rs.artifactbundle.release.json"
     environment = {
         **os.environ,
         "PATH": f"{tmp_path}:{os.environ['PATH']}",
@@ -46,7 +47,7 @@ def test_workflow_preserves_notes_and_updates_swift_idempotently(tmp_path: Path,
     }
     previous = ""
     for checksum in ("a" * 64, "b" * 64, "b" * 64):
-        checksum_file.write_text(checksum)
+        receipt.write_text(json.dumps({"sha256": checksum}))
         result = subprocess.run(
             ["bash", "-euc", script], cwd=tmp_path, env=environment, capture_output=True, text=True, check=False
         )
