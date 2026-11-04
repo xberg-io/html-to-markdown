@@ -1682,6 +1682,20 @@ jobs:
             --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
             --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
             --version "$VERSION" --source "$SOURCE_SHA" --tag "$TAG" --tag-object "$TAG_OBJECT"
+      - name: Check Swift checkout before Rust setup
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(git status --porcelain=v1 --untracked-files=all)
+          if [[ -n "$status" ]]; then
+            printf 'Swift release refused: preparation source must be clean before Rust setup\n%s\n' "$status" >&2
+            exit 1
+          fi
+          if [[ -e rust_out || -L rust_out ]]; then
+            echo 'Swift release refused: rust_out already exists before Rust setup' >&2
+            exit 1
+          fi
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         if: ${{ needs.prepare.outputs.dry_run == 'true' }}
@@ -1693,6 +1707,11 @@ jobs:
         run: |
           set -euo pipefail
           status=$(git status --porcelain=v1 --untracked-files=all)
+          # ~keep The shared setup action's rustc stdin lint probes emit rust_out in the checkout.
+          if [[ "$status" == '?? rust_out' && -f rust_out && ! -L rust_out ]]; then
+            rm -- rust_out
+            status=$(git status --porcelain=v1 --untracked-files=all)
+          fi
           if [[ -n "$status" ]]; then
             printf 'Swift release refused: preparation source must be clean before build\n%s\n' "$status" >&2
             exit 1

@@ -210,12 +210,38 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         preflight = next(
             i for i, step in enumerate(steps) if step.get("name") == "Check clean Swift preparation source"
         )
+        initial = next(
+            i for i, step in enumerate(steps) if step.get("name") == "Check Swift checkout before Rust setup"
+        )
+        setup = next(i for i, step in enumerate(steps) if step.get("uses") == "xberg-io/actions/setup-rust@v1")
         builder = next(i for i, step in enumerate(steps) if step.get("id") == "build")
-        assert preflight < builder
-        command = ["bash", "-euo", "pipefail", "-c", steps[preflight]["run"]]
+        assert initial < setup < preflight < builder
+        shell = ["bash", "-euo", "pipefail", "-c"]
+        command = [*shell, steps[preflight]["run"]]
         clean = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
         assert clean.returncode == 0, clean.stderr
 
+        probe = self.work / "rust_out"
+        probe.write_bytes(b"synthetic Rust probe")
+        before_setup = subprocess.run(
+            [*shell, steps[initial]["run"]], cwd=self.work, capture_output=True, text=True, check=False
+        )
+        assert before_setup.returncode != 0
+        assert "?? rust_out" in before_setup.stderr.splitlines()
+        assert probe.exists()
+
+        cleaned = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
+        assert cleaned.returncode == 0, cleaned.stderr
+        assert not probe.exists()
+
+        probe.symlink_to("core.txt")
+        symlink = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
+        assert symlink.returncode != 0
+        assert "?? rust_out" in symlink.stderr.splitlines()
+        assert probe.is_symlink()
+        probe.unlink()
+
+        probe.write_bytes(b"synthetic Rust probe")
         (self.work / "core.txt").write_text("staged native input\n")
         self.git("add", "core.txt")
         (self.work / "unexpected.txt").write_text("untracked build output\n")
@@ -223,6 +249,8 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         assert dirty.returncode != 0
         assert "M  core.txt" in dirty.stderr.splitlines()
         assert "?? unexpected.txt" in dirty.stderr.splitlines()
+        assert "?? rust_out" in dirty.stderr.splitlines()
+        assert probe.read_bytes() == b"synthetic Rust probe"
 
     def test_publication_preserves_tag_object_and_peel_on_first_run_and_retry(self) -> None:
         """Publication preserves tag object and peel on first run and retry."""
