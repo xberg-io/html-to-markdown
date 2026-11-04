@@ -45,8 +45,15 @@ jobs:
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@v1
       - name: Verify public skill exports
+        shell: bash
         working-directory: release-source
-        run: python3 scripts/sync_public_skills.py --check
+        # ~keep Regenerate from verified native skills in a temporary tree so ai-rulez publishes from a clean checkout.
+        run: |
+          set -euo pipefail
+          export_dir="$(mktemp -d "$RUNNER_TEMP/public-skills.XXXXXX")"
+          git archive HEAD scripts/sync_public_skills.py plugin/plugin.json plugin/skills skills | tar -x -C "$export_dir"
+          python3 "$export_dir/scripts/sync_public_skills.py"
+          python3 "$export_dir/scripts/sync_public_skills.py" --check
       - name: Package all supported plugin runtimes
         uses: xberg-io/actions/package-ai-rulez-plugin@v1
         with:

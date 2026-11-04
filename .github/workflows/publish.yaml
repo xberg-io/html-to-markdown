@@ -4067,13 +4067,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.source_sha }}
           fetch-depth: 0
       # ~keep ai-rulez runs at its latest release, never a mise pin (org ADR-0015).
       - name: Install ai-rulez
         uses: xberg-io/actions/setup-ai-rulez@v1
       - name: Verify public skill exports
-        run: python3 scripts/sync_public_skills.py --check
+        shell: bash
+        # ~keep Regenerate from tagged native skills in a temporary tree so ai-rulez publishes from a clean checkout.
+        run: |
+          set -euo pipefail
+          export_dir="$(mktemp -d "$RUNNER_TEMP/public-skills.XXXXXX")"
+          git archive HEAD scripts/sync_public_skills.py plugin/plugin.json plugin/skills skills | tar -x -C "$export_dir"
+          python3 "$export_dir/scripts/sync_public_skills.py"
+          python3 "$export_dir/scripts/sync_public_skills.py" --check
       - name: Package all supported plugin runtimes
         uses: xberg-io/actions/package-ai-rulez-plugin@v1
         with:

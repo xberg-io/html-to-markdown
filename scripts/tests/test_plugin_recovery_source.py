@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -87,3 +88,53 @@ def test_plugin_workflow_verifies_source_before_packaging() -> None:
     assert steps[packaging]["with"]["working-directory"] == "release-source"
     assert "verify_plugin_recovery_source.py" in steps[verifier]["run"]
     assert steps[-1]["with"]["clobber"] == "false"
+
+
+@pytest.mark.parametrize(
+    ("workflow_name", "job"), [("publish.yaml", "publish-plugin-artifacts"), ("plugin-artifacts.yaml", "package")]
+)
+def test_release_verifies_fresh_skills_without_dirtying_tag_checkout(
+    tmp_path: Path, workflow_name: str, job: str
+) -> None:
+    workflow = yaml.safe_load((ROOT / ".github/workflows" / workflow_name).read_text())
+    step = next(step for step in workflow["jobs"][job]["steps"] if step.get("name") == "Verify public skill exports")
+    checkout = tmp_path / "checkout"
+    checkout.mkdir()
+    git(checkout, "init", "--initial-branch=main")
+    git(checkout, "config", "user.name", "Release Test")
+    git(checkout, "config", "user.email", "release-test@example.com")
+
+    scripts = checkout / "scripts"
+    scripts.mkdir()
+    exporter = scripts / "sync_public_skills.py"
+    shutil.copyfile(ROOT / "scripts" / exporter.name, exporter)
+    source = checkout / "plugin/skills/example/SKILL.md"
+    source.parent.mkdir(parents=True)
+    (checkout / "plugin/plugin.json").write_text('{"name":"example"}')
+    skill = "---\nname: example\ndescription: Example skill.\n---\n"
+    source.write_text(skill + "Old body\n")
+    subprocess.run([sys.executable, str(exporter)], check=True, capture_output=True)
+    source.write_text(skill + "Tagged body\n")
+    git(checkout, "add", "plugin", "scripts", "skills")
+    git(checkout, "commit", "-m", "Release source")
+    git(checkout, "tag", "v3.20.0")
+    commit = git(checkout, "rev-parse", "HEAD")
+
+    temp = tmp_path / "runner"
+    temp.mkdir()
+    verified = subprocess.run(
+        ["bash", "-c", step["run"]],
+        cwd=checkout,
+        env={**os.environ, "RUNNER_TEMP": str(temp)},
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert verified.returncode == 0, verified.stderr
+    assert "Public skills: 1 skills, 1 files (verified)" in verified.stdout
+    assert git(checkout, "status", "--porcelain") == ""
+    assert git(checkout, "rev-parse", "HEAD") == git(checkout, "rev-parse", "v3.20.0") == commit
+    assert (checkout / "skills/example/SKILL.md").read_text() == skill + "Old body\n"
+    exports = list(temp.glob("public-skills.*/skills/example/SKILL.md"))
+    assert len(exports) == 1
+    assert exports[0].read_text() == skill + "Tagged body\n"
