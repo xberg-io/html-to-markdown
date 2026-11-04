@@ -682,7 +682,9 @@ jobs:
         uses: xberg-io/actions/check-registry@v1
         with:
           registry: pub
-          package: html_to_markdown
+          # ~keep The pub.dev name is alef.toml `pubspec_name`, not the crate name;
+          # scripts/tests/test_dart_publish_identity.py joins the two.
+          package: h2m
           version: ${{ needs.prepare.outputs.version }}
 
   dart-natives:
