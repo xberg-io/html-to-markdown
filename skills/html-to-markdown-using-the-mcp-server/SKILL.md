@@ -6,7 +6,7 @@ name: html-to-markdown-using-the-mcp-server
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:3c429c4ad8d72a902e49ab130b4956fe0192d6f9ca57e586494fba0d84eb7fef
-Source-Hash: blake3:c3c4ea7c5d8ddfea556dfc80ebeaff91d24f0232960b21b75c1552e961ebab9a
+Source-Hash: blake3:bfb0250d433cfd55fa718ff67818b0672fc28dee5520064f9983bf8b4455febb
 Schema-Version: v1
 -->
 

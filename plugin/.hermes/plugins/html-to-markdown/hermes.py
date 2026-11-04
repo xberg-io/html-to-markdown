@@ -1,6 +1,6 @@
 # AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-# Content-Hash: blake3:8530f8a81a8a0e4db632f90a29a3f3cd3de89dee755f8aec125627667f9f2818
-# Source-Hash: blake3:c3c4ea7c5d8ddfea556dfc80ebeaff91d24f0232960b21b75c1552e961ebab9a
+# Content-Hash: blake3:55d156f6d21a76dfb56c6d51b9dce5258a219d82c013452456cd1ad22f4ba2b8
+# Source-Hash: blake3:c9a47eeba8370e9be2e04b73b3e29c5d1c79284183f355f4e221e0cd45770389
 # Schema-Version: v1
 
 """Register product skills and a local MCP tool bridge with Hermes."""
@@ -11,7 +11,7 @@ import asyncio
 import json
 import os
 import shutil
-from builtins import ExceptionGroup
+from builtins import ExceptionGroup as TaskExceptionGroup
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -34,7 +34,7 @@ REQUEST_TIMEOUT_SECONDS = 300
 
 def error_details(error: BaseException) -> str:
     """Expose SDK task-group causes instead of hiding the actionable failure."""
-    if isinstance(error, ExceptionGroup):
+    if isinstance(error, TaskExceptionGroup):
         return "; ".join(error_details(cause) for cause in error.exceptions)[:1024]
     return str(error)[:1024]
 
@@ -66,7 +66,7 @@ async def call_tool(arguments: dict[str, object], **_kwargs: object) -> dict[str
                 return result.model_dump(mode="json", exclude_none=True)
     except TimeoutError:
         return {"error": f"{CLI_COMMAND} MCP request timed out; prepare models or reduce the workload."}
-    except (McpError, OSError, ExceptionGroup, ValueError) as error:
+    except (McpError, OSError, TaskExceptionGroup, ValueError) as error:
         return {"error": f"{CLI_COMMAND} MCP request failed: {error_details(error)}"}
 
 

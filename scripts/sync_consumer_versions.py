@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import argparse
 import re
-from pathlib import Path
-
 import tomllib
+from pathlib import Path
 
 CONSUMER_PINS = (
     ("test_apps/dart/pubspec.yaml", r"(h2m: \^)[^\s]+", 1),

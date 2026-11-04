@@ -6,9 +6,8 @@ import hashlib
 import json
 import re
 import subprocess
-from pathlib import Path
-
 import tomllib
+from pathlib import Path
 
 LOCK_PATH = ".ai-rulez/ai-rulez.lock"
 

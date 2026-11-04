@@ -6,7 +6,7 @@ import asyncio
 import json
 import os
 import shutil
-from builtins import ExceptionGroup
+from builtins import ExceptionGroup as TaskExceptionGroup
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -29,7 +29,7 @@ REQUEST_TIMEOUT_SECONDS = 300
 
 def error_details(error: BaseException) -> str:
     """Expose SDK task-group causes instead of hiding the actionable failure."""
-    if isinstance(error, ExceptionGroup):
+    if isinstance(error, TaskExceptionGroup):
         return "; ".join(error_details(cause) for cause in error.exceptions)[:1024]
     return str(error)[:1024]
 
@@ -61,7 +61,7 @@ async def call_tool(arguments: dict[str, object], **_kwargs: object) -> dict[str
                 return result.model_dump(mode="json", exclude_none=True)
     except TimeoutError:
         return {"error": f"{CLI_COMMAND} MCP request timed out; prepare models or reduce the workload."}
-    except (McpError, OSError, ExceptionGroup, ValueError) as error:
+    except (McpError, OSError, TaskExceptionGroup, ValueError) as error:
         return {"error": f"{CLI_COMMAND} MCP request failed: {error_details(error)}"}
 
 

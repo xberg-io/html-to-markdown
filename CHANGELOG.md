@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.20.0] - 2026-11-04
+
 ### Changed
 
 - The Rust core now parses HTML with `astral-html` in place of `astral-tl`.
@@ -14,11 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A tag name that runs into the next `<` and a stray quote in a tag now follow the HTML tokenizer: `<b<i>t</i>` gives `t`, not bold text. Attributes of a preserved tag keep their source order, and a slash splits an attribute name.
 - Minimum supported versions raised: Node.js 22, Ruby 3.3, PHP 8.3, Elixir 1.17, Android API 24, macOS 26, Rust 1.99.
 - Python 3.11 is now the minimum supported version; Python 3.10 reached end of life.
-- Regenerate the bindings with Alef 0.122.2. The Zig package now requires Zig 0.17.
+- Regenerate the bindings with Alef 0.123.0. The Zig package now requires Zig 0.17.
 - Python option enums subclass `StrEnum`.
 
 ### Fixed
 
+- Python visitors can read HTML attributes with `NodeContext.attributes()` during a callback.
+  The binding only materializes the attribute map when requested (#969).
+- Preserve parser source ranges after skipped empty end tags.
+- Verify prepared Swift artifacts before creating and publishing an immutable release (#963).
 - A tag name that holds a dot or other punctuation now closes at its end tag, so later links no longer nest inside the link before it (#965).
 - Keep heading metadata as plain text from the same conversion pass, preserving literal markup,
   admitted image labels and visitor decisions.
