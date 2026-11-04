@@ -94,3 +94,19 @@ def test_release_report_accepts_already_finalized_release_and_scoop_manifest() -
     assert 'if [[ "${RESULT_FINALIZE}" != "success" && "${release_is_draft}" != "false" ]]' in script
     assert "repos/xberg-io/scoop-bucket/contents/bucket/html-to-markdown.json" in script
     assert '"${scoop_version}" == "${VERSION}"' in script
+
+
+def test_rubygems_installs_locked_ruby_from_verified_release_source() -> None:
+    """The artifact-only publisher needs the tagged mise configuration before resolving Ruby."""
+    workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
+    steps = workflow["jobs"]["publish-rubygems"]["steps"]
+    checkout = next((step for step in steps if step.get("uses") == "actions/checkout@v7"), None)
+    download = next(step for step in steps if step.get("uses") == "actions/download-artifact@v8")
+    setup = next(step for step in steps if step.get("uses") == "xberg-io/actions/setup-mise@v1")
+
+    assert checkout is not None
+    assert checkout["with"]["ref"] == "${{ needs.prepare.outputs.source_sha }}"
+    assert checkout["with"]["persist-credentials"] is False
+    assert steps.index(checkout) < steps.index(download) < steps.index(setup)
+    assert setup["with"]["tools"] == "ruby"
+    assert download["with"]["pattern"] == "rubygems-*"

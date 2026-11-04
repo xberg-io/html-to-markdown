@@ -2406,6 +2406,11 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          persist-credentials: false
+
       - uses: actions/download-artifact@v8
         with:
           pattern: rubygems-*
