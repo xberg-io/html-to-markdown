@@ -718,15 +718,33 @@ jobs:
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - id: check
-        uses: xberg-io/actions/check-registry@v1
+      - uses: actions/checkout@v7
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         with:
-          registry: github-release
-          package: html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
-          repo: ${{ github.repository }}
-          tag: ${{ needs.prepare.outputs.tag }}
-          asset-prefix: cli-
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+      - id: check
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          exists=false
+          if [[ "$DRY_RUN" != "true" ]]; then
+            exists=$(gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" |
+              python3 scripts/ci/release_inventory.py cli --release-id "$RELEASE_ID" --tag "$TAG")
+          fi
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
 
   check-go:
     name: Check GitHub Release for Go FFI assets
@@ -756,15 +774,33 @@ jobs:
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - id: check
-        uses: xberg-io/actions/check-registry@v1
+      - uses: actions/checkout@v7
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         with:
-          registry: github-release
-          package: html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
-          repo: ${{ github.repository }}
-          tag: ${{ needs.prepare.outputs.tag }}
-          asset-prefix: html-to-markdown-rs-ffi-
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+      - id: check
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          exists=false
+          if [[ "$DRY_RUN" != "true" ]]; then
+            exists=$(gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" |
+              python3 scripts/ci/release_inventory.py c-ffi --release-id "$RELEASE_ID" --tag "$TAG")
+          fi
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
 
   check-elixir-release:
     name: Check GitHub Release for Elixir NIF assets
@@ -926,7 +962,7 @@ jobs:
   assemble-zig-package:
     name: Assemble Zig package with prebuilt FFI libraries
     needs: [prepare, check-c-ffi, c-ffi-libraries]
-    if: ${{ needs.prepare.outputs.release_zig == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') }}
+    if: ${{ !cancelled() && needs.prepare.result == 'success' && needs.prepare.outputs.release_zig == 'true' && (needs.c-ffi-libraries.result == 'success' || (needs.c-ffi-libraries.result == 'skipped' && needs.check-c-ffi.outputs.exists == 'true' && needs.prepare.outputs.force_republish != 'true')) }}
 
     runs-on: ubuntu-latest
     steps:
@@ -937,10 +973,25 @@ jobs:
           submodules: recursive
 
       - uses: actions/download-artifact@v8
+        if: ${{ needs.c-ffi-libraries.result == 'success' }}
         with:
           pattern: c-ffi-*
           path: c-ffi-artifacts
           merge-multiple: true
+
+      - uses: actions/create-github-app-token@v3
+        id: asset-token
+        if: ${{ needs.c-ffi-libraries.result == 'skipped' }}
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+      - name: Download existing C FFI archives
+        if: ${{ needs.c-ffi-libraries.result == 'skipped' }}
+        env:
+          GH_TOKEN: ${{ steps.asset-token.outputs.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "html-to-markdown-rs-ffi-$TAG-*.tar.gz" --dir c-ffi-artifacts
 
       - name: Stage original C FFI archives for the Zig packager
         env:
@@ -2051,6 +2102,7 @@ jobs:
       dry-run: ${{ needs.prepare.outputs.dry_run }}
       build-musl: true
       checksums: true
+      undraft-release: false
 
   verify-binstall:
     # ~keep Must wait for promote-release, not just upload-cli-release. binstall resolves
@@ -2060,10 +2112,10 @@ jobs:
     # `--strategies crate-meta-data` there is no source fallback, so the job failed with
     # "Fallback to cargo-install is disabled" (exit 94) despite every asset being uploaded.
     name: Verify cargo-binstall install
-    needs: [prepare, upload-cli-release, promote-release]
+    needs: [prepare, promote-release]
     # ~keep `promote-release.outputs.promoted`, not `.result`: promote-release now waits on the
     # per-language uploads, so its result carries their failure poison. See the note above it.
-    if: ${{ !cancelled() && needs.prepare.outputs.release_cli == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.upload-cli-release.result == 'success' && needs.promote-release.outputs.promoted == 'true' }}
+    if: ${{ !cancelled() && needs.prepare.outputs.release_cli == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.promote-release.outputs.promoted == 'true' }}
 
     uses: xberg-io/actions/.github/workflows/reusable-binstall-verify.yml@v1
     with:
@@ -2973,6 +3025,8 @@ jobs:
       - prepare
       - validate-versions
       - crates-gate
+      - check-cli
+      - check-c-ffi
       - upload-cli-release
       - upload-c-ffi-release
       # ~keep Ordering only: the draft flips once every per-language asset upload has settled, so
@@ -2984,11 +3038,15 @@ jobs:
       - upload-elixir-release
       - upload-php-pie-release
       - upload-r-release
-    if: ${{ needs.prepare.result == 'success' && (!cancelled() && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.validate-versions.result == 'success' && needs.crates-gate.outputs.ok == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success') }}
+    if: ${{ needs.prepare.result == 'success' && (!cancelled() && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.validate-versions.result == 'success' && needs.crates-gate.outputs.ok == 'true' && (needs.upload-cli-release.result == 'success' || (needs.upload-cli-release.result == 'skipped' && needs.check-cli.outputs.exists == 'true' && needs.prepare.outputs.force_republish != 'true')) && (needs.upload-c-ffi-release.result == 'success' || (needs.upload-c-ffi-release.result == 'skipped' && needs.check-c-ffi.outputs.exists == 'true' && needs.prepare.outputs.force_republish != 'true'))) }}
     runs-on: ubuntu-latest
     outputs:
       promoted: ${{ steps.flip.outputs.promoted }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
       - uses: actions/create-github-app-token@v3
         id: app-token
         with:
@@ -3015,17 +3073,24 @@ jobs:
           jq -e --argjson id "$RELEASE_ID" --arg tag "$TAG" \
             --arg bundle "sha256:$SWIFT_BUNDLE_SHA256" --arg receipt "sha256:$SWIFT_RECEIPT_SHA256" '
             def digests($name): [.assets[] | select(.name == $name and .state == "uploaded") | .digest];
-            .id == $id and .tag_name == $tag and
+            .id == $id and .tag_name == $tag and (.draft | type) == "boolean" and
             digests("HtmlToMarkdown-rs.artifactbundle.zip") == [$bundle] and
             digests("HtmlToMarkdown-rs.artifactbundle.release.json") == [$receipt]
           ' <<<"$live" >/dev/null || { echo "Live release identity or Swift assets changed" >&2; exit 1; }
-          [[ "$(gh api --method PATCH "$endpoint" -F draft=false --jq .draft)" == "false" ]]
+          for kind in cli c-ffi; do
+            complete=$(python3 scripts/ci/release_inventory.py "$kind" --release-id "$RELEASE_ID" --tag "$TAG" <<<"$live")
+            [[ "$complete" == "true" ]] || exit 1
+          done
+          if [[ "$(jq -r .draft <<<"$live")" == "true" ]]; then
+            [[ "$(gh api --method PATCH "$endpoint" -F draft=false --jq .draft)" == "false" ]]
+          fi
           echo "promoted=true" >>"$GITHUB_OUTPUT"
 
   publish-homebrew-formula:
     name: Update Homebrew formulas
-    needs: [prepare, validate-versions, check-homebrew, upload-cli-release, upload-c-ffi-release]
-    if: ${{ needs.prepare.result == 'success' && (needs.prepare.outputs.release_homebrew == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
+    needs:
+      [prepare, validate-versions, check-homebrew, check-cli, check-c-ffi, upload-cli-release, upload-c-ffi-release]
+    if: ${{ !cancelled() && needs.prepare.result == 'success' && needs.validate-versions.result == 'success' && (needs.prepare.outputs.release_homebrew == 'true' && (needs.upload-cli-release.result == 'success' || (needs.upload-cli-release.result == 'skipped' && needs.check-cli.outputs.exists == 'true' && needs.prepare.outputs.force_republish != 'true')) && (needs.upload-c-ffi-release.result == 'success' || (needs.upload-c-ffi-release.result == 'skipped' && needs.check-c-ffi.outputs.exists == 'true' && needs.prepare.outputs.force_republish != 'true')) && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
 
     runs-on: ubuntu-latest
     steps:
@@ -3105,8 +3170,8 @@ jobs:
   # is already a no-op. ~keep
   publish-scoop-manifest:
     name: Update Scoop manifest
-    needs: [prepare, validate-versions, upload-cli-release]
-    if: ${{ needs.prepare.result == 'success' && (needs.prepare.outputs.release_scoop == 'true' && needs.upload-cli-release.result == 'success' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true')) }}
+    needs: [prepare, validate-versions, upload-cli-release, promote-release]
+    if: ${{ !cancelled() && needs.prepare.result == 'success' && needs.validate-versions.result == 'success' && (needs.prepare.outputs.release_scoop == 'true' && ((needs.prepare.outputs.dry_run == 'true' && needs.upload-cli-release.result == 'success') || (needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.promote-release.outputs.promoted == 'true'))) }}
 
     runs-on: ubuntu-latest
     steps:

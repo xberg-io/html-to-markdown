@@ -865,21 +865,41 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
 class SwiftPromotionTests(SwiftReleaseFixture):
     """Verify live release bytes before flipping the verified release object."""
 
-    def promote(self, *, field: str = "") -> subprocess.CompletedProcess[str]:
+    def promote(self, *, field: str = "", draft: bool = True) -> subprocess.CompletedProcess[str]:
         """Run the promotion shell with a recording GitHub API boundary."""
         jobs = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
         step = next(step for step in jobs["promote-release"]["steps"] if step.get("id") == "flip")
         script = step["run"].replace("${{ needs.prepare.outputs.tag }}", TAG)
         checksum = "a" * 64
+        cli = (
+            "cli-SHA256SUMS",
+            "cli-aarch64-apple-darwin.tar.gz",
+            "cli-aarch64-unknown-linux-gnu.tar.gz",
+            "cli-x86_64-pc-windows-msvc.zip",
+            "cli-x86_64-unknown-linux-gnu.tar.gz",
+            "cli-x86_64-unknown-linux-musl.tar.gz",
+        )
+        ffi = tuple(
+            f"html-to-markdown-rs-ffi-{TAG}-{row['target']}.tar.gz"
+            for row in jobs["c-ffi-libraries"]["strategy"]["matrix"]["include"]
+        )
+        tooling = self.work / "scripts/ci/release_inventory.py"
+        shutil.copyfile(ROOT / "scripts/ci/release_inventory.py", tooling)
         release = {
             "id": 42,
             "tag_name": TAG,
+            "draft": draft,
             "assets": [
-                {"name": name, "state": "uploaded", "digest": f"sha256:{checksum}"} for name in (ARCHIVE, RECEIPT)
+                {"name": name, "state": "uploaded", "size": 5, "digest": f"sha256:{checksum}"}
+                for name in (ARCHIVE, RECEIPT, *cli, *ffi)
             ],
         }
         if field == "id":
             release["id"] = 43
+        elif field == "missing-cli":
+            release["assets"] = [asset for asset in release["assets"] if asset["name"] != cli[0]]
+        elif field == "missing-c-ffi":
+            release["assets"] = [asset for asset in release["assets"] if asset["name"] != ffi[0]]
         elif field and field != "tag":
             next(asset for asset in release["assets"] if asset["name"] == field)["digest"] = f"sha256:{'b' * 64}"
         executable = self.directory / "gh"
@@ -922,7 +942,7 @@ class SwiftPromotionTests(SwiftReleaseFixture):
     def test_promotion_checks_live_bundle_receipt_and_release_identity(self) -> None:
         """A replaced release or changed asset cannot reach the publication operation."""
         events = self.directory / "promotion-events"
-        for field in ("id", "tag", ARCHIVE, RECEIPT):
+        for field in ("id", "tag", ARCHIVE, RECEIPT, "missing-cli", "missing-c-ffi"):
             with self.subTest(field=field):
                 rejected = self.promote(field=field)
                 assert rejected.returncode != 0, rejected.stdout
@@ -930,4 +950,11 @@ class SwiftPromotionTests(SwiftReleaseFixture):
         valid = self.promote()
         assert valid.returncode == 0, valid.stderr
         assert events.read_text() == "promoted\n"
+        assert (self.directory / "output").read_text() == "promoted=true\n"
+
+    def test_already_public_complete_release_does_not_patch_the_release(self) -> None:
+        """An exact public recovery permits downstream work without rewriting the release."""
+        result = self.promote(draft=False)
+        assert result.returncode == 0, result.stderr
+        assert not (self.directory / "promotion-events").exists()
         assert (self.directory / "output").read_text() == "promoted=true\n"
