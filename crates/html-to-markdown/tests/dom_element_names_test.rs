@@ -47,4 +47,14 @@ fn should_close_an_element_at_an_end_tag_in_any_letter_case() {
     assert_eq!(top_names("<div>a</DIV><p>b</p>"), ["div", "p"]);
     assert_eq!(top_names("<DIV>a</div><P>b</p>"), ["div", "p"]);
     assert_eq!(top_names("<svg><clipPath></CLIPPATH></svg><p>b</p>"), ["svg", "p"]);
+    assert_eq!(
+        top_names("<svg><foreignObject>x</foreignobject></svg><p>b</p>"),
+        ["svg", "p"]
+    );
+}
+
+#[test]
+fn should_close_an_element_at_an_end_tag_with_white_space_before_its_end() {
+    assert_eq!(top_names("<div>a</div ><p>b</p>"), ["div", "p"]);
+    assert_eq!(top_names("<div>a</DIV\n\t><p>b</p>"), ["div", "p"]);
 }
