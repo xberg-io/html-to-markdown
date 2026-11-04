@@ -55,6 +55,9 @@ concurrency:
     ${{ github.workflow }}-${{ inputs.nuget_runtime_run_id &&
     format('nuget-runtimes-{0}', inputs.nuget_runtime_run_id) ||
     (github.event_name == 'workflow_dispatch' && (github.event.inputs.ref || github.event.inputs.tag)) ||
+    (github.event_name == 'repository_dispatch' && !github.event.client_payload.ref &&
+    github.event.client_payload.dry_run != true && github.event.client_payload.dry_run != 'true' &&
+    github.event.client_payload.tag) ||
     github.ref || github.run_id }}
   cancel-in-progress: false
 

@@ -8,6 +8,21 @@ ROOT = Path(__file__).resolve().parents[2]
 DRY_RUN_EXPRESSION = "${{ needs.prepare.outputs.dry_run }}"
 
 
+def test_publish_recovery_uses_the_tag_concurrency_group() -> None:
+    """A tag-only repository dispatch must queue behind a manual publish of that tag."""
+    workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
+
+    assert workflow["concurrency"] == {
+        "group": "${{ github.workflow }}-${{ inputs.nuget_runtime_run_id && "
+        "format('nuget-runtimes-{0}', inputs.nuget_runtime_run_id) || "
+        "(github.event_name == 'workflow_dispatch' && (github.event.inputs.ref || github.event.inputs.tag)) || "
+        "(github.event_name == 'repository_dispatch' && !github.event.client_payload.ref && "
+        "github.event.client_payload.dry_run != true && github.event.client_payload.dry_run != 'true' && "
+        "github.event.client_payload.tag) || github.ref || github.run_id }}",
+        "cancel-in-progress": False,
+    }
+
+
 def test_publish_rust_setup_omits_coverage_tool() -> None:
     """Publish builders do not need cargo-llvm-cov, which has no locked Windows ARM artifact."""
     workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
