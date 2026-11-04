@@ -287,3 +287,12 @@ mod visitors {
         }
     }
 }
+
+#[test]
+fn should_drop_empty_end_tags_without_splitting_text_in_the_tree_route() {
+    let options = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        ..ConversionOptions::default()
+    };
+    assert_eq!(markdown("<p>before</>after</p>", &options), "beforeafter\n");
+}

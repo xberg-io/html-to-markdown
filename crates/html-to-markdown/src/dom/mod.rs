@@ -239,7 +239,8 @@ impl<'a> HTMLTag<'a> {
         Children(self)
     }
     /// Returns the children of the element, for an edit.
-    pub const fn children_mut(&mut self) -> ChildrenMut<'a, '_> {
+    #[cfg(test)]
+    pub(crate) const fn children_mut(&mut self) -> ChildrenMut<'a, '_> {
         ChildrenMut(self)
     }
     /// Returns the tag name as written in the source.
@@ -297,11 +298,13 @@ impl<'a, 'b> Children<'a, 'b> {
 }
 
 /// The children of an element, for an edit.
-pub struct ChildrenMut<'a, 'b>(&'b mut HTMLTag<'a>);
+#[cfg(test)]
+pub(crate) struct ChildrenMut<'a, 'b>(&'b mut HTMLTag<'a>);
 
+#[cfg(test)]
 impl ChildrenMut<'_, '_> {
     /// Returns the direct children, for an edit.
-    pub const fn top_mut(&mut self) -> &mut RawChildren {
+    pub(crate) const fn top_mut(&mut self) -> &mut RawChildren {
         &mut self.0.children
     }
 }
@@ -640,23 +643,44 @@ impl<'a> Tokens<'a> for astral_html::Tokenizer<'a> {
     }
 }
 
+fn token_start(source: &str, token: &astral_html::Token<'_>, start: usize, end: usize) -> usize {
+    let consumed = &source[start..end];
+    let data = consumed.trim_start_matches("</>");
+    if data.len() == consumed.len() {
+        return start;
+    }
+    // ~keep The tokenizer skips empty end tags in data but emits them literally in raw text.
+    // ~keep Data text may start with the same spelling after entity decoding.
+    if let astral_html::Token::Text(value) = token
+        && value.starts_with("</>")
+        && astral_html::decode(data, false) != *value
+    {
+        return start;
+    }
+    end - data.len()
+}
+
 fn read_region<'a>(parser: &mut Parser<'a>, scopes: &mut Scopes, tokens: &mut impl Tokens<'a>, base: usize) {
     let input = parser.source;
     let mut start = base;
     let mut text: Option<(usize, usize)> = None;
     while let Some(token) = tokens.next_token() {
         let end = base + tokens.offset();
+        let actual_start = token_start(input, &token, start, end);
         if matches!(token, astral_html::Token::Text(_)) {
-            text = Some((text.map_or(start, |(from, _)| from), end));
+            if actual_start != start {
+                flush_text(parser, scopes, &mut text);
+            }
+            text = Some((text.map_or(actual_start, |(from, _)| from), end));
             start = end;
             continue;
         }
         flush_text(parser, scopes, &mut text);
         match token {
-            astral_html::Token::StartTag(tag) => start_tag(parser, scopes, tag, start, end),
+            astral_html::Token::StartTag(tag) => start_tag(parser, scopes, tag, actual_start, end),
             astral_html::Token::EndTag(tag) => end_tag(parser, scopes, &tag.name, end),
-            astral_html::Token::Comment(_) if input.as_bytes()[start..].starts_with(b"<!--") => {
-                let bytes = parser.slice(start, end);
+            astral_html::Token::Comment(_) if input.as_bytes()[actual_start..].starts_with(b"<!--") => {
+                let bytes = parser.slice(actual_start, end);
                 let parent = scopes.open.last().copied();
                 parser.append(Node::Comment(bytes), parent);
             }
