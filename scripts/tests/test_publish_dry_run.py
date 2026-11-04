@@ -8,6 +8,22 @@ ROOT = Path(__file__).resolve().parents[2]
 DRY_RUN_EXPRESSION = "${{ needs.prepare.outputs.dry_run }}"
 
 
+def test_publish_rust_setup_omits_coverage_tool() -> None:
+    """Publish builders do not need cargo-llvm-cov, which has no locked Windows ARM artifact."""
+    workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
+    rust_setup = {
+        job: [step for step in body.get("steps", []) if step.get("uses") == "xberg-io/actions/setup-rust@v1"]
+        for job, body in workflow["jobs"].items()
+    }
+    assert sum(map(len, rust_setup.values())) == 19
+    unexpected = {
+        job
+        for job, steps in rust_setup.items()
+        if any(step.get("with", {}).get("install-llvm-cov") != "false" for step in steps)
+    }
+    assert not unexpected, f"publish jobs install the coverage tool: {sorted(unexpected)}"
+
+
 def test_source_package_builds_receive_dry_run_mode() -> None:
     """Dry runs must not resolve the unpublished workspace crate from crates.io."""
     workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())

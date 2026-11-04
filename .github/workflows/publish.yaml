@@ -847,6 +847,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: ${{ matrix.target }}
           cache-key-prefix: publish-dart-${{ matrix.rid }}
 
@@ -997,6 +998,7 @@ jobs:
         if: runner.os != 'Linux'
         uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           use-sccache: "false"
 
       - name: Build wheels
@@ -1043,6 +1045,8 @@ jobs:
 
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
+        with:
+          install-llvm-cov: "false"
       - uses: xberg-io/actions/setup-mise@v1
         with:
           install-args: python
@@ -1083,6 +1087,8 @@ jobs:
 
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
+        with:
+          install-llvm-cov: "false"
       - uses: xberg-io/actions/setup-node-workspace@v1
 
       - name: Generate TypeScript definitions
@@ -1187,6 +1193,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: ${{ matrix.rust_target || matrix.target }}
           cache-key-prefix: publish-node-${{ matrix.target }}
           # setup-rust otherwise exports CC/CARGO_TARGET_*_LINKER=musl-gcc for musl targets,
@@ -1253,6 +1260,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: wasm32-unknown-unknown
           cache-key-prefix: publish-wasm
 
@@ -1338,6 +1346,7 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         if: runner.os != 'Windows'
         with:
+          install-llvm-cov: "false"
           cache-key-prefix: publish-ruby-${{ matrix.label }}
 
       # ~keep The CI profile locks Ruby 3.3 besides mise.toml's Ruby (mise.ci.toml).
@@ -1477,6 +1486,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           cache-key-prefix: publish-php-${{ matrix.platform.label }}-php${{ matrix.php }}
 
       - uses: xberg-io/actions/install-alef@v1
@@ -1553,6 +1563,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: ${{ matrix.target }}
           cache-key-prefix: publish-go-${{ matrix.platform }}
 
@@ -1615,6 +1626,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: ${{ matrix.target }}
           cache-key-prefix: publish-c-ffi-${{ matrix.platform }}
 
@@ -1700,6 +1712,7 @@ jobs:
       - uses: xberg-io/actions/setup-rust@v1
         if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         with:
+          install-llvm-cov: "false"
           cache-key-prefix: publish-swift-artifactbundle
       - name: Check clean Swift preparation source
         if: ${{ needs.prepare.outputs.dry_run == 'true' }}
@@ -1778,6 +1791,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: ${{ matrix.target }}
           cache-key-prefix: publish-java-${{ matrix.platform }}
 
@@ -1832,6 +1846,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: ${{ matrix.target }}
           cache-key-prefix: publish-csharp-${{ matrix.rid }}
 
@@ -1884,6 +1899,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           target: ${{ matrix.target }}
           cache-key-prefix: publish-elixir-${{ matrix.label }}
 
@@ -1960,6 +1976,8 @@ jobs:
 
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
+        with:
+          install-llvm-cov: "false"
 
       - uses: xberg-io/actions/build-elixir-hex@v1
         with:
@@ -1988,6 +2006,8 @@ jobs:
 
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
+        with:
+          install-llvm-cov: "false"
 
       - name: Package crates
         env:
@@ -2196,6 +2216,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           cache-key-prefix: publish-crates
 
       - uses: xberg-io/actions/publish-crates@v1
@@ -2771,6 +2792,7 @@ jobs:
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
       - uses: xberg-io/actions/setup-rust@v1
         with:
+          install-llvm-cov: "false"
           targets: aarch64-linux-android,x86_64-linux-android,armv7-linux-androideabi,i686-linux-android
 
       # Google removed the legacy `tools` SDK package, but setup-android's `packages` input
