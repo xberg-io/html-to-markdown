@@ -8,7 +8,7 @@ on:
         required: false
         type: string
       ref:
-        description: "Git ref (branch, tag, or commit) to build; defaults to the tag"
+        description: "Git ref for publication; dry runs use the selected workflow ref"
         required: false
         type: string
       targets:
@@ -105,10 +105,14 @@ jobs:
           tag = os.environ['EXPECTED_TAG']
           if not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', tag):
               raise SystemExit('Recovery requires an explicit stable release tag')
-          if (run['path'], run['event'], run['head_branch']) != ('.github/workflows/publish.yaml', 'release', tag):
-              raise SystemExit('Source must be the original Publish Release event for the requested tag')
+          event = run['event']
+          sha = run['head_sha']
+          if (run['path'], run['head_branch']) != ('.github/workflows/publish.yaml', tag):
+              raise SystemExit('Source must be a Publish Release run on the requested tag')
+          if event not in ('release', 'workflow_dispatch') or not re.fullmatch(r'[0-9a-f]{40}', sha):
+              raise SystemExit('Source run must be a release event or tag-scoped manual dispatch')
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-              output.write(f"sha={run['head_sha']}\n")
+              output.write(f"sha={sha}\nevent={event}\n")
           PY
 
       - name: Check out current recovery tooling
@@ -130,11 +134,16 @@ jobs:
         env:
           EXPECTED_TAG: ${{ inputs.tag }}
           EXPECTED_SHA: ${{ steps.source.outputs.sha }}
+          SOURCE_EVENT: ${{ steps.source.outputs.event }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_RUN_ID: ${{ inputs.nuget_runtime_run_id }}
         run: |
           git fetch --no-tags origin "refs/tags/${EXPECTED_TAG}:refs/tags/${EXPECTED_TAG}"
           if [[ "$(git rev-parse "${EXPECTED_TAG}^{commit}")" != "$EXPECTED_SHA" ]]; then
+            if [[ "${SOURCE_EVENT:-}" == "workflow_dispatch" ]]; then
+              echo "Manual publish run must match the immutable tag commit" >&2
+              exit 1
+            fi
             gh run download "$RELEASE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
               --name swift-checksum --dir dist/provenance-swift
           fi
@@ -281,6 +290,9 @@ jobs:
       target_sha: ${{ steps.source.outputs.sha }}
       source_sha: ${{ steps.source.outputs.sha }}
       tag_object: ${{ steps.source.outputs.tag_object }}
+      release_id: ${{ steps.source.outputs.release_id }}
+      swift_bundle_sha256: ${{ steps.source.outputs.swift_bundle_sha256 }}
+      swift_receipt_sha256: ${{ steps.source.outputs.swift_receipt_sha256 }}
       matrix_ref: ${{ steps.meta.outputs.matrix_ref }}
       is_tag: ${{ steps.meta.outputs.is_tag }}
       is_prerelease: ${{ steps.meta.outputs.is_prerelease }}
@@ -412,6 +424,9 @@ jobs:
           TAG_OBJECT=$(git ls-remote origin "refs/tags/$TAG" | cut -f1)
           [[ "$TAG_OBJECT" =~ ^[0-9a-f]{40}$ ]] || { echo "Missing immutable core tag" >&2; exit 1; }
           echo "tag_object=$TAG_OBJECT" >> "$GITHUB_OUTPUT"
+          RELEASE_ID=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json databaseId --jq .databaseId)
+          [[ "$RELEASE_ID" =~ ^[1-9][0-9]*$ ]] || { echo "Missing seeded release identity" >&2; exit 1; }
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
           mkdir -p dist/swift-artifactbundle
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
             --pattern HtmlToMarkdown-rs.artifactbundle.zip \
@@ -420,6 +435,10 @@ jobs:
             --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
             --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
             --version "$VERSION" --source "$SOURCE_SHA" --tag "$TAG" --tag-object "$TAG_OBJECT"
+          {
+            echo "swift_bundle_sha256=$(sha256sum dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip | cut -d ' ' -f 1)"
+            echo "swift_receipt_sha256=$(sha256sum dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json | cut -d ' ' -f 1)"
+          } >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@v7
         if: ${{ steps.meta.outputs.dry_run != 'true' }}
@@ -2921,9 +2940,27 @@ jobs:
         id: flip
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          TAG_OBJECT: ${{ needs.prepare.outputs.tag_object }}
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+          SWIFT_BUNDLE_SHA256: ${{ needs.prepare.outputs.swift_bundle_sha256 }}
+          SWIFT_RECEIPT_SHA256: ${{ needs.prepare.outputs.swift_receipt_sha256 }}
         run: |
-          gh release edit "${{ needs.prepare.outputs.tag }}" --draft=false
+          set -euo pipefail
+          [[ "$RELEASE_ID" =~ ^[1-9][0-9]*$ && "$TAG_OBJECT" =~ ^[0-9a-f]{40}$ &&
+            "$SWIFT_BUNDLE_SHA256" =~ ^[0-9a-f]{64}$ && "$SWIFT_RECEIPT_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          current_tag=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --jq .object.sha)
+          [[ "$current_tag" == "$TAG_OBJECT" ]] || { echo "Release tag object changed before publication" >&2; exit 1; }
+          endpoint="repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID"
+          live=$(gh api "$endpoint")
+          jq -e --argjson id "$RELEASE_ID" --arg tag "$TAG" \
+            --arg bundle "sha256:$SWIFT_BUNDLE_SHA256" --arg receipt "sha256:$SWIFT_RECEIPT_SHA256" '
+            def digests($name): [.assets[] | select(.name == $name and .state == "uploaded") | .digest];
+            .id == $id and .tag_name == $tag and
+            digests("HtmlToMarkdown-rs.artifactbundle.zip") == [$bundle] and
+            digests("HtmlToMarkdown-rs.artifactbundle.release.json") == [$receipt]
+          ' <<<"$live" >/dev/null || { echo "Live release identity or Swift assets changed" >&2; exit 1; }
+          [[ "$(gh api --method PATCH "$endpoint" -F draft=false --jq .draft)" == "false" ]]
           echo "promoted=true" >>"$GITHUB_OUTPUT"
 
   publish-homebrew-formula:

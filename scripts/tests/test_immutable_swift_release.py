@@ -150,6 +150,7 @@ class SwiftReleaseFixture(unittest.TestCase):
             f"#!{sys.executable}\n"
             "import json,os,subprocess,sys\n"
             "if sys.argv[1:3] == ['release','download']: sys.exit(0)\n"
+            "if sys.argv[1:3] == ['release','view']: print(42); sys.exit(0)\n"
             "assert sys.argv[1:4] == ['api','--method','POST']\n"
             "assert sys.argv[4] == 'repos/xberg-io/html-to-markdown/git/refs'\n"
             "body=json.load(sys.stdin)\n"
@@ -213,8 +214,8 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         ]
         assert self.git("ls-remote", "origin", "refs/tags/swift-*") == ""
 
-    def test_preparation_accepts_the_actions_universal_simulator_archive(self) -> None:
-        """Preparation accepts the actions universal simulator archive."""
+    def write_universal_simulator_archive(self, *, duplicate_cpu: bool = False, overlap: bool = False) -> None:
+        """Write the simulator variant in the layout emitted by lipo."""
         with zipfile.ZipFile(self.bundle) as archive:
             members = {name: archive.read(name) for name in archive.namelist()}
         info_name = "HtmlToMarkdown-rs.artifactbundle/info.json"
@@ -226,17 +227,40 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         library = b"!<arch>\nfixture\n"
         header_size = 8 + 2 * 20
         fat = struct.pack(">II", 0xCAFEBABE, 2)
-        for index, cpu in enumerate((0x0100000C, 0x01000007)):
-            fat += struct.pack(">IIIII", cpu, 0, header_size + index * len(library), len(library), 0)
+        arm64 = (0x0100000C, 0)
+        x86_64 = (0x01000007, 3)
+        for index, (cpu, subtype) in enumerate((arm64, arm64 if duplicate_cpu else x86_64)):
+            offset = header_size + (0 if overlap else index * len(library))
+            fat += struct.pack(">IIIII", cpu, subtype, offset, len(library), 0)
         members[f"HtmlToMarkdown-rs.artifactbundle/{variants[3]['path']}"] = fat + library * 2
         members[info_name] = json.dumps(info).encode()
         with zipfile.ZipFile(self.bundle, "w") as archive:
             for name, data in members.items():
                 archive.writestr(name, data)
+
+    def test_preparation_accepts_the_actions_universal_simulator_archive(self) -> None:
+        """Preparation accepts the actions universal simulator archive."""
+        self.write_universal_simulator_archive()
         result = self.helper("prepare")
         assert result.returncode == 0, result.stderr
         receipt = json.loads(self.receipt.read_text())
         assert receipt["triples"] == sorted(TRIPLES)
+
+    def test_preparation_rejects_duplicate_universal_slice_architectures(self) -> None:
+        """Distinct slice ranges cannot advertise the same architecture twice."""
+        self.write_universal_simulator_archive(duplicate_cpu=True)
+        result = self.helper("prepare")
+        assert result.returncode != 0
+        assert "Swift universal archive architecture mismatch" in result.stderr
+        assert not self.receipt.exists()
+
+    def test_preparation_rejects_overlapping_universal_slices(self) -> None:
+        """Distinct architecture labels cannot share archive bytes."""
+        self.write_universal_simulator_archive(overlap=True)
+        result = self.helper("prepare")
+        assert result.returncode != 0
+        assert "invalid native slice bounds" in result.stderr
+        assert not self.receipt.exists()
 
     def test_invalid_receipt_fields_do_not_move_any_ref(self) -> None:
         """Invalid receipt fields do not move any ref."""
@@ -556,7 +580,7 @@ class SwiftWorkflowGuardTests(unittest.TestCase):
                 in {"upload-swift-release", "update-swift-package-manifest", "upload-cli-release", "trigger-pubdev"}
                 or any(
                     re.search(
-                        r"/(?:publish-|upload-release-assets|finalize-release|update-release)|gh (?:release (?:edit|upload|create)|api .*POST)|git push",
+                        r"/(?:publish-|upload-release-assets|finalize-release|update-release)|gh (?:release (?:edit|upload|create)|api .*(?:POST|PATCH))|git push",
                         step.get("uses", "") + "\n" + step.get("run", ""),
                     )
                     for step in job.get("steps", [])
@@ -651,7 +675,9 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
         names = {"Verify immutable release seed", "Verify immutable release seed for recovery"}
         return next(step["run"] for step in jobs[job]["steps"] if step.get("name") in names)
 
-    def run_entrypoint(self, script: str) -> subprocess.CompletedProcess[str]:
+    def run_entrypoint(
+        self, script: str, *, source_event: str = "release", expected_sha: str | None = None
+    ) -> subprocess.CompletedProcess[str]:
         """Expose a publisher sentinel only after the actual verifier succeeds."""
         return subprocess.run(
             ["bash", "-euo", "pipefail", "-c", script + "\necho publisher-sentinel"],
@@ -665,8 +691,9 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
                 "IS_TAG": "true",
                 "GITHUB_REPOSITORY": "xberg-io/html-to-markdown",
                 "GITHUB_WORKSPACE": str(self.work),
-                "EXPECTED_SHA": self.commit,
+                "EXPECTED_SHA": expected_sha or self.commit,
                 "EXPECTED_TAG": TAG,
+                "SOURCE_EVENT": source_event,
                 "RELEASE_RUN_ID": "1",
                 "GITHUB_OUTPUT": str(self.directory / "output"),
             },
@@ -686,6 +713,11 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
                 valid = self.run_entrypoint(script)
                 assert valid.returncode == 0, valid.stderr
                 assert "publisher-sentinel" in valid.stdout
+                if name == "prepare":
+                    outputs = dict(line.split("=", 1) for line in (self.directory / "output").read_text().splitlines())
+                    assert outputs["release_id"] == "42"
+                    assert outputs["swift_bundle_sha256"] == self.digest
+                    assert outputs["swift_receipt_sha256"] == hashlib.sha256(source).hexdigest()
                 self.receipt.unlink()
                 rejected = self.run_entrypoint(script)
                 assert rejected.returncode != 0
@@ -731,7 +763,8 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
         )
         before = {"refs": self.refs(), "shallow": self.git("rev-parse", "--is-shallow-repository").strip()}
         assert before["shallow"] == "false"
-        result = self.run_entrypoint(predecessor + "\n" + self.entrypoint("recover-nuget-runtimes"))
+        script = predecessor + "\n" + self.entrypoint("recover-nuget-runtimes")
+        result = self.run_entrypoint(script, source_event="workflow_dispatch")
         witness = {
             "before": before,
             "after": {"refs": self.refs(), "shallow": self.git("rev-parse", "--is-shallow-repository").strip()},
@@ -749,3 +782,78 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
         assert "publisher-sentinel" in result.stdout
         assert witness["after"] == before
         assert not (self.directory / "events").exists()
+        mismatch = self.run_entrypoint(script, source_event="workflow_dispatch", expected_sha=self.source)
+        assert mismatch.returncode != 0
+        assert "Manual publish run must match the immutable tag commit" in mismatch.stderr
+        assert "publisher-sentinel" not in mismatch.stdout
+
+
+class SwiftPromotionTests(SwiftReleaseFixture):
+    """Verify live release bytes before flipping the verified release object."""
+
+    def promote(self, *, field: str = "") -> subprocess.CompletedProcess[str]:
+        """Run the promotion shell with a recording GitHub API boundary."""
+        jobs = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
+        step = next(step for step in jobs["promote-release"]["steps"] if step.get("id") == "flip")
+        script = step["run"].replace("${{ needs.prepare.outputs.tag }}", TAG)
+        checksum = "a" * 64
+        release = {
+            "id": 42,
+            "tag_name": TAG,
+            "assets": [
+                {"name": name, "state": "uploaded", "digest": f"sha256:{checksum}"} for name in (ARCHIVE, RECEIPT)
+            ],
+        }
+        if field == "id":
+            release["id"] = 43
+        elif field and field != "tag":
+            next(asset for asset in release["assets"] if asset["name"] == field)["digest"] = f"sha256:{'b' * 64}"
+        executable = self.directory / "gh"
+        executable.write_text(
+            f"#!{sys.executable}\n"
+            "import os,sys\n"
+            "if sys.argv[1:4] == ['api','--method','PATCH']:\n"
+            "    assert sys.argv[4] == 'repos/xberg-io/html-to-markdown/releases/42'\n"
+            "    with open(os.environ['PROMOTION_EVENTS'],'a') as output: output.write('promoted\\n')\n"
+            "    print('false')\n"
+            "elif '/git/ref/tags/' in sys.argv[2]:\n"
+            "    print(os.environ['LIVE_TAG_OBJECT'])\n"
+            "else:\n"
+            "    print(os.environ['LIVE_RELEASE'])\n"
+        )
+        executable.chmod(0o755)
+        environment = {
+            **os.environ,
+            "PATH": f"{self.directory}{os.pathsep}{os.environ['PATH']}",
+            "GITHUB_REPOSITORY": "xberg-io/html-to-markdown",
+            "GITHUB_OUTPUT": str(self.directory / "output"),
+            "PROMOTION_EVENTS": str(self.directory / "promotion-events"),
+            "LIVE_RELEASE": json.dumps(release),
+            "LIVE_TAG_OBJECT": "b" * 40 if field == "tag" else "a" * 40,
+            "TAG_OBJECT": "a" * 40,
+            "RELEASE_ID": "42",
+            "SWIFT_BUNDLE_SHA256": checksum,
+            "SWIFT_RECEIPT_SHA256": checksum,
+            "TAG": TAG,
+        }
+        return subprocess.run(
+            ["bash", "-euo", "pipefail", "-c", script],
+            cwd=self.work,
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+    def test_promotion_checks_live_bundle_receipt_and_release_identity(self) -> None:
+        """A replaced release or changed asset cannot reach the publication operation."""
+        events = self.directory / "promotion-events"
+        for field in ("id", "tag", ARCHIVE, RECEIPT):
+            with self.subTest(field=field):
+                rejected = self.promote(field=field)
+                assert rejected.returncode != 0, rejected.stdout
+                assert not events.exists()
+        valid = self.promote()
+        assert valid.returncode == 0, valid.stderr
+        assert events.read_text() == "promoted\n"
+        assert (self.directory / "output").read_text() == "promoted=true\n"

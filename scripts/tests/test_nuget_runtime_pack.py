@@ -78,6 +78,9 @@ def test_pack_failure_stops_before_publishing_partial_runtime_set(tmp_path: Path
     ("run_id", "overrides", "succeeds"),
     [
         ("123", {}, True),
+        ("123", {"event": "workflow_dispatch"}, True),
+        ("123", {"event": "workflow_dispatch", "head_branch": "main"}, False),
+        ("123", {"event": "workflow_dispatch", "head_sha": "not-a-sha"}, False),
         ("123;echo invalid", {}, False),
         ("123", {"path": ".github/workflows/ci.yaml"}, False),
         ("123", {"event": "pull_request"}, False),
@@ -121,6 +124,6 @@ def test_recovery_only_accepts_the_original_requested_release(
     )
     assert (result.returncode == 0) is succeeds, result.stderr
     if succeeds:
-        assert output.read_text() == f"sha={'a' * 40}\n"
+        assert output.read_text() == f"sha={'a' * 40}\nevent={metadata['event']}\n"
     else:
         assert not output.exists()

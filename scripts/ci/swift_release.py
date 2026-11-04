@@ -25,6 +25,9 @@ TRIPLES = {
     "x86_64-unknown-linux-gnu",
     "aarch64-unknown-linux-gnu",
 }
+# Mach-O CPU type and generic subtype for each supported Apple architecture.
+FAT_ARCHITECTURES = {"arm64": (0x0100000C, 0), "x86_64": (0x01000007, 3)}
+CPU_SUBTYPE_MASK = 0x00FFFFFF
 PLACEHOLDER = "__ALEF_SWIFT_CHECKSUM__"
 CHECKSUM = re.compile(r'(checksum\s*:\s*")([^\"]*)(")')
 
@@ -80,11 +83,23 @@ def verify_library(archive: zipfile.ZipFile, member: str, triples: list[str]) ->
         endian, fields = formats[header[:4]]
         count = struct.unpack(f"{endian}I", header[4:])[0]
         require(0 < count == len(triples) <= len(TRIPLES), "Swift universal archive slice count mismatch")
-        rows = [struct.unpack(endian + fields, library.read(struct.calcsize(fields))) for _ in range(count)]
-        for _, _, offset, size, *_ in rows:
-            require(size > 8 and offset + size <= archive.getinfo(member).file_size, "invalid native slice bounds")
+        row_size = struct.calcsize(fields)
+        rows = [struct.unpack(endian + fields, library.read(row_size)) for _ in range(count)]
+        require(
+            all(triple in TRIPLES and "-apple-" in triple for triple in triples),
+            "Swift universal archive requires supported Apple triples",
+        )
+        expected = {FAT_ARCHITECTURES[triple.partition("-")[0]] for triple in triples}
+        actual = {(cpu, subtype & CPU_SUBTYPE_MASK) for cpu, subtype, *_ in rows}
+        require(len(expected) == count and actual == expected, "Swift universal archive architecture mismatch")
+        previous_end = len(header) + row_size * count
+        library_size = archive.getinfo(member).file_size
+        for _, _, offset, size, *_ in sorted(rows, key=lambda row: row[2]):
+            end = offset + size
+            require(previous_end <= offset and size > 8 and end <= library_size, "invalid native slice bounds")
             library.seek(offset)
             require(library.read(8) == b"!<arch>\n", "Swift universal slice is not a native archive")
+            previous_end = end
 
 
 def bundle_metadata(bundle: Path) -> dict[str, object]:
