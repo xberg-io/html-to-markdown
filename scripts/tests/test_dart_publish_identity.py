@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parents[2]
 def configured_alias() -> str:
     """Return the pub.dev name that alef writes into the Dart pubspec."""
     config = tomllib.loads((ROOT / "alef.toml").read_text(encoding="utf-8"))
-    return config["crates"][0]["dart"]["pubspec_name"]
+    (dart,) = [crate["dart"] for crate in config["crates"] if "dart" in crate]
+    return dart["pubspec_name"]
 
 
 def uploaded_pubspec_name() -> str:
