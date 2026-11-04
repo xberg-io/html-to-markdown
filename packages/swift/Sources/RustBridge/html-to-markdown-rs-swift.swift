@@ -2229,6 +2229,10 @@ extension NodeContextRef {
     public func isInline() -> Bool {
         __swift_bridge__$NodeContext$is_inline(ptr)
     }
+
+    public func attributes() -> RustString {
+        RustString(ptr: __swift_bridge__$NodeContext$attributes(ptr))
+    }
 }
 extension NodeContext: Vectorizable {
     public static func vecOfSelfNew() -> UnsafeMutableRawPointer {

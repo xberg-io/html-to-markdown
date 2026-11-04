@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Breaking:** macOS 11 to 25 are no longer supported; macOS 26 is the minimum. Every macOS binary, the CLI included, is built for macOS 26, the minimum the Swift package already declares. Python wheels targeted macOS 10.12 before, and the CLI and the other macOS natives used the Rust default.
-- Regenerate the bindings with Alef 0.124.0. `NodeContext` gains an `attributes` field or property in Node, Go, R,
+- Regenerate the bindings with Alef 0.124.1. `NodeContext` gains an `attributes` field or property in Node, Go, R,
   Dart and PHP (the PHP constructor takes it as an optional trailing parameter).
   **Breaking:** Swift's `attributes()` method becomes an `attributes` property.
 
