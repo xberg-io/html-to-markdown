@@ -3553,8 +3553,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NodeContext dco_decode_node_context(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return NodeContext(
       nodeType: dco_decode_node_type(arr[0]),
       tagName: dco_decode_String(arr[1]),
@@ -3562,6 +3562,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       indexInParent: dco_decode_i_64(arr[3]),
       parentTag: dco_decode_opt_String(arr[4]),
       isInline: dco_decode_bool(arr[5]),
+      attributes: dco_decode_Map_String_String_None(arr[6]),
     );
   }
 
@@ -5066,6 +5067,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_indexInParent = sse_decode_i_64(deserializer);
     var var_parentTag = sse_decode_opt_String(deserializer);
     var var_isInline = sse_decode_bool(deserializer);
+    var var_attributes = sse_decode_Map_String_String_None(deserializer);
     return NodeContext(
       nodeType: var_nodeType,
       tagName: var_tagName,
@@ -5073,6 +5075,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       indexInParent: var_indexInParent,
       parentTag: var_parentTag,
       isInline: var_isInline,
+      attributes: var_attributes,
     );
   }
 
@@ -6801,6 +6804,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_64(self.indexInParent, serializer);
     sse_encode_opt_String(self.parentTag, serializer);
     sse_encode_bool(self.isInline, serializer);
+    sse_encode_Map_String_String_None(self.attributes, serializer);
   }
 
   @protected

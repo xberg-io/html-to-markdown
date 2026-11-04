@@ -1530,6 +1530,7 @@ const _: fn() = || {
         let _: i64 = NodeContext.index_in_parent;
         let _: Option<String> = NodeContext.parent_tag;
         let _: bool = NodeContext.is_inline;
+        let _: std::collections::HashMap<String, String> = NodeContext.attributes;
     }
     {
         let PreprocessingOptions = None::<crate::PreprocessingOptions>.unwrap();
@@ -3131,6 +3132,7 @@ impl SseDecode for crate::NodeContext {
         let mut var_indexInParent = <i64>::sse_decode(deserializer);
         let mut var_parentTag = <Option<String>>::sse_decode(deserializer);
         let mut var_isInline = <bool>::sse_decode(deserializer);
+        let mut var_attributes = <std::collections::HashMap<String, String>>::sse_decode(deserializer);
         return crate::NodeContext {
             node_type: var_nodeType,
             tag_name: var_tagName,
@@ -3138,6 +3140,7 @@ impl SseDecode for crate::NodeContext {
             index_in_parent: var_indexInParent,
             parent_tag: var_parentTag,
             is_inline: var_isInline,
+            attributes: var_attributes,
         };
     }
 }
@@ -4575,6 +4578,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::NodeContext> {
             self.0.index_in_parent.into_into_dart().into_dart(),
             self.0.parent_tag.into_into_dart().into_dart(),
             self.0.is_inline.into_into_dart().into_dart(),
+            self.0.attributes.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5791,6 +5795,7 @@ impl SseEncode for crate::NodeContext {
         <i64>::sse_encode(self.index_in_parent, serializer);
         <Option<String>>::sse_encode(self.parent_tag, serializer);
         <bool>::sse_encode(self.is_inline, serializer);
+        <std::collections::HashMap<String, String>>::sse_encode(self.attributes, serializer);
     }
 }
 

@@ -2089,6 +2089,13 @@ class NodeContext {
   /// Whether this element is treated as inline vs block
   final bool isInline;
 
+  /// Return a reference to the attribute map.
+  ///
+  /// If the context was built with [`NodeContext::with_lazy_attributes`], the
+  /// map is materialized on the first call and cached for subsequent calls.
+  /// If this method is never called, no allocation occurs for attributes.
+  final Map<String, String> attributes;
+
   const NodeContext({
     required this.nodeType,
     required this.tagName,
@@ -2096,6 +2103,7 @@ class NodeContext {
     required this.indexInParent,
     this.parentTag,
     required this.isInline,
+    required this.attributes,
   });
 
   @override
@@ -2105,7 +2113,8 @@ class NodeContext {
       depth.hashCode ^
       indexInParent.hashCode ^
       parentTag.hashCode ^
-      isInline.hashCode;
+      isInline.hashCode ^
+      attributes.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -2117,7 +2126,8 @@ class NodeContext {
           depth == other.depth &&
           indexInParent == other.indexInParent &&
           parentTag == other.parentTag &&
-          isInline == other.isInline;
+          isInline == other.isInline &&
+          attributes == other.attributes;
 }
 
 /// Node type enumeration covering all HTML element types.
