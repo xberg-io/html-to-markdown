@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** macOS 11 to 25 are no longer supported; macOS 26 is the minimum. Every macOS binary is built for macOS 26, the minimum the Swift package already declares. Python wheels targeted macOS 10.12 before, and the other macOS natives used the Rust default.
+
 ### Fixed
 
 - The core `vX.Y.Z` tag of a Swift release holds the final `Package.swift` checksum before anything publishes. The publish workflow checks it with `xberg-io/actions/publish-swift-release` and never moves a tag or the `release/swift/<version>` branch (#963).

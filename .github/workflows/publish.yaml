@@ -46,6 +46,11 @@ on:
   repository_dispatch:
     types: [publish-release]
 
+# ~keep Every macOS binary targets the root Package.swift minimum (.macOS(.v26)); a job without
+# ~keep this falls back to the toolchain default (10.12 or 11.0). scripts/tests/test_macos_deployment_target.py
+env:
+  MACOSX_DEPLOYMENT_TARGET: "26.0"
+
 permissions:
   contents: read
   id-token: write
@@ -1018,8 +1023,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
-    env:
-      MACOSX_DEPLOYMENT_TARGET: "10.12"
     strategy:
       fail-fast: false
       matrix:
