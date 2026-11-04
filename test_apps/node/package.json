@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@xberg-io/html-to-markdown": "^3.19.2",
-    "@types/node": "^26.4.0",
-    "vitest": "^5.0.0"
+    "@types/node": "^26.6.6",
+    "vitest": "^5.0.5"
   }
 }

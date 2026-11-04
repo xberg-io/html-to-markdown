@@ -1968,22 +1968,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2004,22 +2013,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2041,22 +2059,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2079,22 +2106,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2, arg3));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2116,22 +2152,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2154,22 +2199,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2, arg3));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2190,22 +2244,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2227,22 +2290,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2265,22 +2337,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2, arg3));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2304,22 +2385,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2, arg3));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2341,22 +2431,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2377,22 +2476,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2414,22 +2522,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2451,22 +2568,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
       Box<VisitResult>? rawOutput;
       Box<AnyhowException>? rawError;
+      SseSerializer? serializer;
       try {
         rawOutput = Box(await raw(arg0, arg1, arg2));
-      } catch (e, s) {
-        rawError = Box(AnyhowException("$e\n\n$s"));
-      }
-
-      final serializer = SseSerializer(generalizedFrbRustBinding);
-      assert((rawOutput != null) ^ (rawError != null));
-      if (rawOutput != null) {
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(0);
         sse_encode_visit_result(rawOutput.value, serializer);
-      } else {
+      } catch (e, s) {
+        rawOutput = null;
+        rawError = Box(AnyhowException("$e\n\n$s"));
+        if (serializer != null) {
+          final failed = serializer.intoRaw();
+          // The partial success buffer owns a native Vec until explicitly released.
+          if (!const bool.fromEnvironment('dart.library.js_interop')) {
+            (generalizedFrbRustBinding as dynamic).rustVecU8Free(
+              failed.ptr,
+              failed.rustVecLen,
+            );
+          }
+        }
+        serializer = SseSerializer(generalizedFrbRustBinding);
         serializer.buffer.putUint8(1);
-        sse_encode_AnyhowException(rawError!.value, serializer);
+        sse_encode_AnyhowException(rawError.value, serializer);
       }
-      final output = serializer.intoRaw();
+      assert((rawOutput != null) ^ (rawError != null));
+      final output = serializer!.intoRaw();
 
       generalizedFrbRustBinding.dartFnDeliverOutput(
         callId: callId,
@@ -2861,6 +2987,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_u_64(raw);
+  }
+
+  @protected
   UrlEscapeStyle dco_decode_box_autoadd_url_escape_style(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_url_escape_style(raw);
@@ -2898,8 +3030,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return ConversionError_InvalidInput(field0: dco_decode_String(raw[1]));
       case 6:
         return ConversionError_InputTooLarge(
-          observedSize: dco_decode_i_64(raw[1]),
-          maxSize: dco_decode_i_64(raw[2]),
+          observedSize: dco_decode_u_64(raw[1]),
+          maxSize: dco_decode_u_64(raw[2]),
         );
       case 7:
         return ConversionError_Other(field0: dco_decode_String(raw[1]));
@@ -2956,8 +3088,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       outputFormat: dco_decode_output_format(arr[38]),
       includeDocumentStructure: dco_decode_bool(arr[39]),
       extractImages: dco_decode_bool(arr[40]),
-      maxImageSize: dco_decode_i_64(arr[41]),
-      maxInputSize: dco_decode_opt_box_autoadd_i_64(arr[42]),
+      maxImageSize: dco_decode_u_64(arr[41]),
+      maxInputSize: dco_decode_opt_box_autoadd_u_64(arr[42]),
       captureSvg: dco_decode_bool(arr[43]),
       inferDimensions: dco_decode_bool(arr[44]),
       maxDepth: dco_decode_opt_box_autoadd_i_64(arr[45]),
@@ -3021,8 +3153,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       outputFormat: dco_decode_opt_box_autoadd_output_format(arr[38]),
       includeDocumentStructure: dco_decode_opt_box_autoadd_bool(arr[39]),
       extractImages: dco_decode_opt_box_autoadd_bool(arr[40]),
-      maxImageSize: dco_decode_opt_box_autoadd_i_64(arr[41]),
-      maxInputSize: dco_decode_opt_box_autoadd_i_64(arr[42]),
+      maxImageSize: dco_decode_opt_box_autoadd_u_64(arr[41]),
+      maxInputSize: dco_decode_opt_box_autoadd_u_64(arr[42]),
       captureSvg: dco_decode_opt_box_autoadd_bool(arr[43]),
       inferDimensions: dco_decode_opt_box_autoadd_bool(arr[44]),
       maxDepth: dco_decode_opt_box_autoadd_i_64(arr[45]),
@@ -3584,6 +3716,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_64(raw);
+  }
+
+  @protected
   UrlEscapeStyle? dco_decode_opt_box_autoadd_url_escape_style(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_url_escape_style(raw);
@@ -3732,6 +3870,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TierStrategy dco_decode_tier_strategy(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TierStrategy.values[raw as int];
+  }
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
   }
 
   @protected
@@ -4083,6 +4227,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_64(deserializer));
+  }
+
+  @protected
   UrlEscapeStyle sse_decode_box_autoadd_url_escape_style(
     SseDeserializer deserializer,
   ) {
@@ -4130,8 +4280,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         var var_field0 = sse_decode_String(deserializer);
         return ConversionError_InvalidInput(field0: var_field0);
       case 6:
-        var var_observedSize = sse_decode_i_64(deserializer);
-        var var_maxSize = sse_decode_i_64(deserializer);
+        var var_observedSize = sse_decode_u_64(deserializer);
+        var var_maxSize = sse_decode_u_64(deserializer);
         return ConversionError_InputTooLarge(
           observedSize: var_observedSize,
           maxSize: var_maxSize,
@@ -4190,8 +4340,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_outputFormat = sse_decode_output_format(deserializer);
     var var_includeDocumentStructure = sse_decode_bool(deserializer);
     var var_extractImages = sse_decode_bool(deserializer);
-    var var_maxImageSize = sse_decode_i_64(deserializer);
-    var var_maxInputSize = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_maxImageSize = sse_decode_u_64(deserializer);
+    var var_maxInputSize = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_captureSvg = sse_decode_bool(deserializer);
     var var_inferDimensions = sse_decode_bool(deserializer);
     var var_maxDepth = sse_decode_opt_box_autoadd_i_64(deserializer);
@@ -4327,8 +4477,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       deserializer,
     );
     var var_extractImages = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_maxImageSize = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_maxInputSize = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_maxImageSize = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_maxInputSize = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_captureSvg = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_inferDimensions = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_maxDepth = sse_decode_opt_box_autoadd_i_64(deserializer);
@@ -5207,6 +5357,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   UrlEscapeStyle? sse_decode_opt_box_autoadd_url_escape_style(
     SseDeserializer deserializer,
   ) {
@@ -5375,6 +5536,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return TierStrategy.values[inner];
+  }
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
   }
 
   @protected
@@ -5984,6 +6151,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_url_escape_style(
     UrlEscapeStyle self,
     SseSerializer serializer,
@@ -6040,8 +6213,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         maxSize: final maxSize,
       ):
         sse_encode_i_32(6, serializer);
-        sse_encode_i_64(observedSize, serializer);
-        sse_encode_i_64(maxSize, serializer);
+        sse_encode_u_64(observedSize, serializer);
+        sse_encode_u_64(maxSize, serializer);
       case ConversionError_Other(field0: final field0):
         sse_encode_i_32(7, serializer);
         sse_encode_String(field0, serializer);
@@ -6095,8 +6268,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_output_format(self.outputFormat, serializer);
     sse_encode_bool(self.includeDocumentStructure, serializer);
     sse_encode_bool(self.extractImages, serializer);
-    sse_encode_i_64(self.maxImageSize, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.maxInputSize, serializer);
+    sse_encode_u_64(self.maxImageSize, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.maxInputSize, serializer);
     sse_encode_bool(self.captureSvg, serializer);
     sse_encode_bool(self.inferDimensions, serializer);
     sse_encode_opt_box_autoadd_i_64(self.maxDepth, serializer);
@@ -6174,8 +6347,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_output_format(self.outputFormat, serializer);
     sse_encode_opt_box_autoadd_bool(self.includeDocumentStructure, serializer);
     sse_encode_opt_box_autoadd_bool(self.extractImages, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.maxImageSize, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.maxInputSize, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.maxImageSize, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.maxInputSize, serializer);
     sse_encode_opt_box_autoadd_bool(self.captureSvg, serializer);
     sse_encode_opt_box_autoadd_bool(self.inferDimensions, serializer);
     sse_encode_opt_box_autoadd_i_64(self.maxDepth, serializer);
@@ -6908,6 +7081,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_64(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_url_escape_style(
     UrlEscapeStyle? self,
     SseSerializer serializer,
@@ -7064,6 +7247,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(_alefCheckU64BeforeEncode(self));
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
@@ -7086,7 +7275,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putBigUint64(self);
+    serializer.buffer.putBigUint64(_alefCheckU64BeforeEncode(self));
   }
 
   @protected
@@ -7142,4 +7331,13 @@ class VisitorHandleImpl extends RustOpaque implements VisitorHandle {
     rustArcDecrementStrongCountPtr:
         RustLib.instance.api.rust_arc_decrement_strong_count_VisitorHandlePtr,
   );
+}
+
+BigInt _alefCheckU64BeforeEncode(BigInt value) {
+  if (value.isNegative || value.bitLength > 64) {
+    throw RangeError(
+      'u64 unsigned value must be between 0 and 18446744073709551615: $value',
+    );
+  }
+  return value;
 }
