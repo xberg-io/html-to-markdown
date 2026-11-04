@@ -1687,6 +1687,16 @@ jobs:
         if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         with:
           cache-key-prefix: publish-swift-artifactbundle
+      - name: Check clean Swift preparation source
+        if: ${{ needs.prepare.outputs.dry_run == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(git status --porcelain=v1 --untracked-files=all)
+          if [[ -n "$status" ]]; then
+            printf 'Swift release refused: preparation source must be clean before build\n%s\n' "$status" >&2
+            exit 1
+          fi
       - uses: xberg-io/actions/build-swift-artifactbundle@v1
         if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         id: build

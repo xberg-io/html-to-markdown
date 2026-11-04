@@ -192,11 +192,37 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         assert "prepared Cargo version mismatch" in result.stderr
         assert not self.receipt.exists()
         (self.work / "core.txt").write_text("uncommitted native input\n")
+        generated = self.work / "unexpected/generated.txt"
+        generated.parent.mkdir()
+        generated.write_text("generated input\n")
         result = self.helper("prepare")
         assert result.returncode != 0
         assert "preparation source must be clean" in result.stderr
+        assert " M core.txt" in result.stderr.splitlines()
+        assert "?? unexpected/generated.txt" in result.stderr.splitlines()
         assert not self.receipt.exists()
         assert self.git("rev-parse", "HEAD").strip() == self.source
+
+    def test_workflow_refuses_dirty_source_before_building_swift(self) -> None:
+        """The actual workflow checks paths before invoking the artifact builder."""
+        jobs = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
+        steps = jobs["swift-artifactbundle"]["steps"]
+        preflight = next(
+            i for i, step in enumerate(steps) if step.get("name") == "Check clean Swift preparation source"
+        )
+        builder = next(i for i, step in enumerate(steps) if step.get("id") == "build")
+        assert preflight < builder
+        command = ["bash", "-euo", "pipefail", "-c", steps[preflight]["run"]]
+        clean = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
+        assert clean.returncode == 0, clean.stderr
+
+        (self.work / "core.txt").write_text("staged native input\n")
+        self.git("add", "core.txt")
+        (self.work / "unexpected.txt").write_text("untracked build output\n")
+        dirty = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
+        assert dirty.returncode != 0
+        assert "M  core.txt" in dirty.stderr.splitlines()
+        assert "?? unexpected.txt" in dirty.stderr.splitlines()
 
     def test_publication_preserves_tag_object_and_peel_on_first_run_and_retry(self) -> None:
         """Publication preserves tag object and peel on first run and retry."""

@@ -132,7 +132,8 @@ def bundle_metadata(bundle: Path) -> dict[str, object]:
 
 def prepare(arguments: argparse.Namespace) -> None:
     require(git("rev-parse", "HEAD").strip() == arguments.source, "preparation source is not the checked-out commit")
-    require(not git("status", "--porcelain", "--untracked-files=normal"), "preparation source must be clean")
+    status = git("status", "--porcelain=v1", "--untracked-files=all").removesuffix("\n")
+    require(not status, f"preparation source must be clean:\n{status}")
     require(source_version(arguments.source) == arguments.version, "prepared Cargo version mismatch")
     receipt = {
         "schema": 1,
