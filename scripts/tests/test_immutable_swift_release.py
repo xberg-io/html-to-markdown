@@ -676,7 +676,12 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
         return next(step["run"] for step in jobs[job]["steps"] if step.get("name") in names)
 
     def run_entrypoint(
-        self, script: str, *, source_event: str = "release", expected_sha: str | None = None
+        self,
+        script: str,
+        *,
+        source_event: str = "release",
+        expected_sha: str | None = None,
+        workflow_ref: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
         """Expose a publisher sentinel only after the actual verifier succeeds."""
         return subprocess.run(
@@ -690,6 +695,9 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
                 "DRY_RUN": "false",
                 "IS_TAG": "true",
                 "GITHUB_REPOSITORY": "xberg-io/html-to-markdown",
+                "GITHUB_EVENT_NAME": "workflow_dispatch" if workflow_ref else "release",
+                "GITHUB_REF": workflow_ref or f"refs/tags/{TAG}",
+                "GITHUB_SHA": self.commit,
                 "GITHUB_WORKSPACE": str(self.work),
                 "EXPECTED_SHA": expected_sha or self.commit,
                 "EXPECTED_TAG": TAG,
@@ -726,6 +734,18 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
                 self.receipt.write_bytes(source)
                 assert self.refs() == before
                 assert not (self.directory / "events").exists()
+
+    def test_manual_publish_run_requires_its_workflow_ref_to_match_the_seeded_tag(self) -> None:
+        """A manual run may not build a different tag than Actions records in provenance."""
+        self.release()
+        script = self.entrypoint("prepare")
+        rejected = self.run_entrypoint(script, workflow_ref="refs/tags/v9.9.9")
+        assert rejected.returncode != 0, rejected.stdout
+        assert "Manual publish must run on the exact version tag" in rejected.stderr
+        assert "publisher-sentinel" not in rejected.stdout
+        valid = self.run_entrypoint(script, workflow_ref=f"refs/tags/{TAG}")
+        assert valid.returncode == 0, valid.stderr
+        assert "publisher-sentinel" in valid.stdout
 
     def test_both_real_entrypoints_reject_divergent_branch_before_publication(self) -> None:
         """Both real entrypoints reject the divergent branch before publication."""

@@ -421,6 +421,11 @@ jobs:
             exit 0
           fi
           [[ "$IS_TAG" == "true" ]] || { echo "A real release requires a version tag" >&2; exit 1; }
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" &&
+                ( "$GITHUB_REF" != "refs/tags/$TAG" || "$GITHUB_SHA" != "$SOURCE_SHA" ) ]]; then
+            echo "Manual publish must run on the exact version tag and source commit" >&2
+            exit 1
+          fi
           TAG_OBJECT=$(git ls-remote origin "refs/tags/$TAG" | cut -f1)
           [[ "$TAG_OBJECT" =~ ^[0-9a-f]{40}$ ]] || { echo "Missing immutable core tag" >&2; exit 1; }
           echo "tag_object=$TAG_OBJECT" >> "$GITHUB_OUTPUT"
