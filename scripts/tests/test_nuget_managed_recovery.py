@@ -100,7 +100,7 @@ def test_managed_recovery_verifies_before_packing_and_publishes_only_nuget() -> 
     job = workflow["jobs"]["recover-nuget-runtimes"]
     steps = job["steps"]
     names = [step.get("name") for step in steps]
-    assert names.index("Verify release source and checksum-only metadata") < names.index(
+    assert names.index("Verify release source is the immutable tag commit") < names.index(
         "Verify and stage managed ABI repair"
     )
     assert names.index("Verify and stage managed ABI repair") < names.index("Pack verified managed repair")

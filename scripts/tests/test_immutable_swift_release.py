@@ -33,6 +33,20 @@ TRIPLES = (
     "x86_64-unknown-linux-gnu",
     "aarch64-unknown-linux-gnu",
 )
+PUBLISH_ACTION = "xberg-io/actions/publish-swift-release@v1"
+DIST = "dist/swift-artifactbundle"
+TAG_MOVE = re.compile(r"git[ \t]+tag\b[^\n]*?[ \t](?:-f|--force|-d|--delete)\b")
+REF_FORCE_PUSH = re.compile(r"git\s+push\b[^\n]*(?:\s-f\b|--force\b|--force-with-lease\b|--delete\b|\s\+\S|\s:refs/)")
+
+
+def workflow_jobs() -> dict:
+    """Load the real publish workflow."""
+    return yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
+
+
+def run_scripts(jobs: dict) -> list[tuple[str, str]]:
+    """Every inline shell script in the workflow, keyed by job."""
+    return [(name, step["run"]) for name, job in jobs.items() for step in job.get("steps", []) if "run" in step]
 
 
 class SwiftReleaseFixture(unittest.TestCase):
@@ -133,43 +147,55 @@ class SwiftReleaseFixture(unittest.TestCase):
             "--version",
             version,
             "--source",
-            self.source if operation == "prepare" else self.commit,
+            self.source if operation == "check" else self.commit,
         ]
-        if operation != "prepare":
+        if operation != "check":
             arguments.extend(["--tag", TAG, "--tag-object", self.tag_object])
         return subprocess.run(
             arguments, cwd=self.work, env=self.environment(), capture_output=True, text=True, check=False
         )
 
     def environment(self) -> dict[str, str]:
-        """Replace GitHub API writes with create-only local ref operations."""
+        """Serve read-only release lookups and record any other GitHub call as a write."""
         binary = self.directory / "bin"
         binary.mkdir(exist_ok=True)
         gh = binary / "gh"
         gh.write_text(
             f"#!{sys.executable}\n"
-            "import json,os,subprocess,sys\n"
+            "import os,sys\n"
             "if sys.argv[1:3] == ['release','download']: sys.exit(0)\n"
             "if sys.argv[1:3] == ['release','view']: print(42); sys.exit(0)\n"
-            "assert sys.argv[1:4] == ['api','--method','POST']\n"
-            "assert sys.argv[4] == 'repos/xberg-io/html-to-markdown/git/refs'\n"
-            "body=json.load(sys.stdin)\n"
-            "with open(os.environ['SWIFT_TEST_EVENTS'],'a') as events: events.write(body['ref']+'\\n')\n"
-            "result=subprocess.run(['git','--git-dir',os.environ['SWIFT_TEST_REMOTE'],'update-ref',"
-            "body['ref'],body['sha'],'0'*40],capture_output=True,check=False)\n"
-            "sys.exit(result.returncode)\n"
+            "with open(os.environ['SWIFT_TEST_EVENTS'],'a') as events: events.write(' '.join(sys.argv[1:])+'\\n')\n"
+            "sys.exit(1)\n"
         )
         gh.chmod(0o755)
         return {
             **os.environ,
             "PATH": f"{binary}{os.pathsep}{os.environ['PATH']}",
-            "SWIFT_TEST_REMOTE": str(self.remote),
             "SWIFT_TEST_EVENTS": str(self.directory / "events"),
         }
 
+    def write_receipt(self, *, source: str | None = None) -> None:
+        """Write the receipt build-swift-artifactbundle emits for the bundle on disk."""
+        with zipfile.ZipFile(self.bundle) as archive:
+            info = json.loads(archive.read("HtmlToMarkdown-rs.artifactbundle/info.json"))
+        artifact = next(iter(info["artifacts"].values()))
+        receipt = {
+            "schema": 1,
+            "repository": "xberg-io/html-to-markdown",
+            "source": source or self.source,
+            "version": VERSION,
+            "archive": ARCHIVE,
+            "sha256": hashlib.sha256(self.bundle.read_bytes()).hexdigest(),
+            "triples": sorted(triple for variant in artifact["variants"] for triple in variant["supportedTriples"]),
+            "artifact_version": artifact["version"],
+        }
+        self.receipt.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+
     def release(self, *, change_core: bool = False, change_mode: bool = False) -> None:
-        """Prepare source A and tag its checksum-only child B."""
-        prepared = self.helper("prepare")
+        """Check the prepared source A and tag its checksum-only child B."""
+        self.write_receipt()
+        prepared = self.helper("check")
         assert prepared.returncode == 0, prepared.stderr
         manifest = self.work / "Package.swift"
         manifest.write_bytes(self.manifest(self.digest).encode())
@@ -185,88 +211,44 @@ class SwiftReleaseFixture(unittest.TestCase):
 class SwiftReleaseTransactionTests(SwiftReleaseFixture):
     """Reject inconsistent source, artifacts and refs before publishing the branch."""
 
-    def test_preparation_rejects_wrong_source_version_and_dirty_inputs(self) -> None:
-        """Preparation rejects wrong source version and dirty inputs."""
-        result = self.helper("prepare", version="2.4.4")
+    def test_preparation_check_rejects_wrong_source_version_and_dirty_inputs(self) -> None:
+        """The check rejects a wrong source version and dirty inputs without rewriting the receipt."""
+        self.write_receipt()
+        receipt = self.receipt.read_bytes()
+        result = self.helper("check", version="2.4.4")
         assert result.returncode != 0
         assert "prepared Cargo version mismatch" in result.stderr
-        assert not self.receipt.exists()
         (self.work / "core.txt").write_text("uncommitted native input\n")
-        generated = self.work / "unexpected/generated.txt"
-        generated.parent.mkdir()
-        generated.write_text("generated input\n")
-        result = self.helper("prepare")
+        result = self.helper("check")
         assert result.returncode != 0
         assert "preparation source must be clean" in result.stderr
-        assert " M core.txt" in result.stderr.splitlines()
-        assert "?? unexpected/generated.txt" in result.stderr.splitlines()
-        assert not self.receipt.exists()
+        assert self.receipt.read_bytes() == receipt
         assert self.git("rev-parse", "HEAD").strip() == self.source
 
-    def test_workflow_refuses_dirty_source_before_building_swift(self) -> None:
-        """The actual workflow checks paths before invoking the artifact builder."""
-        jobs = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
-        steps = jobs["swift-artifactbundle"]["steps"]
-        preflight = next(
-            i for i, step in enumerate(steps) if step.get("name") == "Check clean Swift preparation source"
-        )
-        initial = next(
-            i for i, step in enumerate(steps) if step.get("name") == "Check Swift checkout before Rust setup"
-        )
-        setup = next(i for i, step in enumerate(steps) if step.get("uses") == "xberg-io/actions/setup-rust@v1")
-        builder = next(i for i, step in enumerate(steps) if step.get("id") == "build")
-        assert initial < setup < preflight < builder
-        shell = ["bash", "-euo", "pipefail", "-c"]
-        command = [*shell, steps[preflight]["run"]]
-        clean = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
-        assert clean.returncode == 0, clean.stderr
+    def test_preparation_check_rejects_a_receipt_for_other_bytes_or_source(self) -> None:
+        """The receipt the action wrote must bind this exact ZIP to the checked-out source."""
+        self.write_receipt()
+        original = json.loads(self.receipt.read_text())
+        for field, value in (("sha256", "0" * 64), ("source", "0" * 40), ("triples", sorted(TRIPLES[:-1]))):
+            with self.subTest(field=field):
+                self.receipt.write_text(json.dumps({**original, field: value}))
+                result = self.helper("check")
+                assert result.returncode != 0, result.stdout
+        self.receipt.unlink()
+        result = self.helper("check")
+        assert result.returncode != 0
+        assert RECEIPT in result.stderr, result.stderr
 
-        probe = self.work / "rust_out"
-        probe.write_bytes(b"synthetic Rust probe")
-        before_setup = subprocess.run(
-            [*shell, steps[initial]["run"]], cwd=self.work, capture_output=True, text=True, check=False
-        )
-        assert before_setup.returncode != 0
-        assert "?? rust_out" in before_setup.stderr.splitlines()
-        assert probe.exists()
-
-        cleaned = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
-        assert cleaned.returncode == 0, cleaned.stderr
-        assert not probe.exists()
-
-        probe.symlink_to("core.txt")
-        symlink = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
-        assert symlink.returncode != 0
-        assert "?? rust_out" in symlink.stderr.splitlines()
-        assert probe.is_symlink()
-        probe.unlink()
-
-        probe.write_bytes(b"synthetic Rust probe")
-        (self.work / "core.txt").write_text("staged native input\n")
-        self.git("add", "core.txt")
-        (self.work / "unexpected.txt").write_text("untracked build output\n")
-        dirty = subprocess.run(command, cwd=self.work, capture_output=True, text=True, check=False)
-        assert dirty.returncode != 0
-        assert "M  core.txt" in dirty.stderr.splitlines()
-        assert "?? unexpected.txt" in dirty.stderr.splitlines()
-        assert "?? rust_out" in dirty.stderr.splitlines()
-        assert probe.read_bytes() == b"synthetic Rust probe"
-
-    def test_publication_preserves_tag_object_and_peel_on_first_run_and_retry(self) -> None:
-        """Publication preserves tag object and peel on first run and retry."""
+    def test_verification_is_read_only_on_first_run_and_retry(self) -> None:
+        """Verification preserves the tag object and peel and creates no ref."""
         self.release()
-        tag_object = self.git("rev-parse", f"refs/tags/{TAG}", cwd=self.remote)
-        tag_commit = self.git("rev-parse", f"refs/tags/{TAG}^{{}}", cwd=self.remote)
+        before = self.refs()
         for _ in range(2):
-            result = self.helper("publish")
+            result = self.helper("verify")
             assert result.returncode == 0, result.stderr
-            assert self.git("rev-parse", f"refs/tags/{TAG}", cwd=self.remote) == tag_object
-            assert self.git("rev-parse", f"refs/tags/{TAG}^{{}}", cwd=self.remote) == tag_commit
-            assert self.git("rev-parse", f"refs/heads/release/swift/{VERSION}", cwd=self.remote) == tag_commit
-        assert (self.directory / "events").read_text().splitlines() == [
-            f"refs/heads/release/swift/{VERSION}",
-        ]
-        assert self.git("ls-remote", "origin", "refs/tags/swift-*") == ""
+            assert self.refs() == before
+        assert not (self.directory / "events").exists()
+        assert self.git("ls-remote", "origin", f"refs/heads/release/swift/{VERSION}") == ""
 
     def write_universal_simulator_archive(self, *, duplicate_cpu: bool = False, overlap: bool = False) -> None:
         """Write the simulator variant in the layout emitted by lipo."""
@@ -295,7 +277,8 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
     def test_preparation_accepts_the_actions_universal_simulator_archive(self) -> None:
         """Preparation accepts the actions universal simulator archive."""
         self.write_universal_simulator_archive()
-        result = self.helper("prepare")
+        self.write_receipt()
+        result = self.helper("check")
         assert result.returncode == 0, result.stderr
         receipt = json.loads(self.receipt.read_text())
         assert receipt["triples"] == sorted(TRIPLES)
@@ -303,18 +286,18 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
     def test_preparation_rejects_duplicate_universal_slice_architectures(self) -> None:
         """Distinct slice ranges cannot advertise the same architecture twice."""
         self.write_universal_simulator_archive(duplicate_cpu=True)
-        result = self.helper("prepare")
+        self.write_receipt()
+        result = self.helper("check")
         assert result.returncode != 0
         assert "Swift universal archive architecture mismatch" in result.stderr
-        assert not self.receipt.exists()
 
     def test_preparation_rejects_overlapping_universal_slices(self) -> None:
         """Distinct architecture labels cannot share archive bytes."""
         self.write_universal_simulator_archive(overlap=True)
-        result = self.helper("prepare")
+        self.write_receipt()
+        result = self.helper("check")
         assert result.returncode != 0
         assert "invalid native slice bounds" in result.stderr
-        assert not self.receipt.exists()
 
     def test_invalid_receipt_fields_do_not_move_any_ref(self) -> None:
         """Invalid receipt fields do not move any ref."""
@@ -332,7 +315,7 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         for field, value in cases.items():
             with self.subTest(field=field):
                 self.receipt.write_text(json.dumps({**original, field: value}))
-                result = self.helper("publish")
+                result = self.helper("verify")
                 assert result.returncode != 0
                 assert self.refs() == before
                 assert not (self.directory / "events").exists()
@@ -348,7 +331,7 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
                     self.bundle.unlink()
                 if data is not None:
                     self.bundle.write_bytes(data)
-                result = self.helper("publish")
+                result = self.helper("verify")
                 assert result.returncode != 0
                 assert self.refs() == before
                 assert not (self.directory / "events").exists()
@@ -358,18 +341,17 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         self.release()
         self.git("push", "origin", f"{self.source}:refs/heads/release/swift/{VERSION}")
         before = self.refs()
-        for operation in ("verify", "publish"):
-            result = self.helper(operation)
-            assert result.returncode != 0
-            assert "Swift release ref already points elsewhere" in result.stderr
-            assert self.refs() == before
-            assert not (self.directory / "events").exists()
+        result = self.helper("verify")
+        assert result.returncode != 0
+        assert "Swift release ref already points elsewhere" in result.stderr
+        assert self.refs() == before
+        assert not (self.directory / "events").exists()
 
     def test_native_source_changes_after_preparation_prevent_publication(self) -> None:
         """Native source changes after preparation prevent publication."""
         self.release(change_core=True)
         before = self.refs()
-        result = self.helper("publish")
+        result = self.helper("verify")
         assert result.returncode != 0
         assert "only Package.swift may change after preparation" in result.stderr
         assert self.refs() == before
@@ -378,7 +360,7 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         """Manifest mode changes after preparation prevent publication."""
         self.release(change_mode=True)
         before = self.refs()
-        result = self.helper("publish")
+        result = self.helper("verify")
         assert result.returncode != 0
         assert "Package.swift mode changed" in result.stderr
         assert self.refs() == before
@@ -395,7 +377,7 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         for expected_object, expected_commit, message in cases:
             with self.subTest(message=message):
                 self.tag_object, self.commit = expected_object, expected_commit
-                result = self.helper("publish")
+                result = self.helper("verify")
                 assert result.returncode != 0
                 assert message in result.stderr
                 assert self.refs() == before
@@ -406,34 +388,36 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         self.release()
         before = self.refs()
         self.receipt.unlink()
-        result = self.helper("publish")
+        result = self.helper("verify")
         assert result.returncode != 0
         assert self.refs() == before
         assert not (self.directory / "events").exists()
 
     def test_manifest_edits_beyond_checksum_fail_before_publishing(self) -> None:
         """Manifest edits beyond checksum fail before publishing."""
-        assert self.helper("prepare").returncode == 0
+        self.write_receipt()
+        assert self.helper("check").returncode == 0
         (self.work / "Package.swift").write_text(self.manifest(self.digest) + "// unrelated change\n")
         self.git("add", "--", "Package.swift")
         self.git("commit", "-m", "fixture: change manifest beyond checksum")
         self.tag_current()
         before = self.refs()
-        result = self.helper("publish")
+        result = self.helper("verify")
         assert result.returncode != 0
         assert "Package.swift changed beyond its checksum" in result.stderr
         assert self.refs() == before
         assert not (self.directory / "events").exists()
 
-    def test_preparation_rejects_missing_platforms_and_records_independent_metadata_version(self) -> None:
-        """Preparation rejects missing platforms and records independent metadata version."""
+    def test_preparation_rejects_missing_platforms_and_accepts_independent_metadata_version(self) -> None:
+        """Preparation rejects missing platforms and accepts an independent metadata version."""
         self.write_bundle(triples=TRIPLES[:-1])
-        result = self.helper("prepare")
+        self.write_receipt()
+        result = self.helper("check")
         assert result.returncode != 0
         assert "Swift platform census mismatch" in result.stderr
-        assert not self.receipt.exists()
         self.write_bundle()
-        result = self.helper("prepare")
+        self.write_receipt()
+        result = self.helper("check")
         assert result.returncode == 0, result.stderr
         receipt = json.loads(self.receipt.read_text())
         assert receipt["artifact_version"] == "1.0.0"
@@ -441,110 +425,105 @@ class SwiftReleaseTransactionTests(SwiftReleaseFixture):
         assert receipt["triples"] == sorted(TRIPLES)
 
 
-class OriginalWorkflowTests(SwiftReleaseFixture):
-    """Prevent the original checksum writer from moving immutable release refs."""
+class SwiftPublishWorkflowTests(unittest.TestCase):
+    """The tag is final before publication starts; the Swift job only verifies it and adds a branch."""
 
-    def _prepare_workflow_source(self, literal: bool, divergent: bool) -> None:
-        """Construct canonical source, assets and legacy workflow inputs."""
-        metadata = {
-            "schema": 1,
-            "repository": "xberg-io/html-to-markdown",
-            "source": self.source,
-            "version": VERSION,
-            "archive": ARCHIVE,
-            "sha256": self.digest,
-            "triples": sorted(TRIPLES),
-            "artifact_version": "1.0.0",
-        }
-        self.receipt.write_text(json.dumps(metadata, indent=2) + "\n")
-        if literal:
-            (self.work / "Package.swift").write_bytes(self.manifest(self.digest).encode())
-            self.git("add", "Package.swift")
-            self.git("commit", "-m", "fixture: finalize checksum before tagging")
-        self.tag_current()
-        if divergent:
-            self.git("push", "origin", f"{self.source}:refs/heads/release/swift/{VERSION}")
-        checksum = self.work / "swift-checksums"
-        checksum.mkdir()
-        (checksum / "bundle.checksum").write_text(self.digest)
-        tooling = self.work / ".release-tooling/scripts/ci/swift"
-        tooling.mkdir(parents=True)
-        shutil.copyfile(
-            ROOT / "scripts/ci/swift/finalize_release_manifest.py", tooling / "finalize_release_manifest.py"
+    def test_ref_rewrite_patterns_fire_on_the_old_force_moving_job(self) -> None:
+        """Negative control: the patterns below match the commands the old job ran."""
+        old = (
+            'git tag -f "v3.19.2" && git push origin -f refs/tags/v3.19.2\n'
+            "git push --force origin HEAD:refs/heads/release/swift/3.19.2\n"
+            "git push origin +HEAD:refs/tags/v3.19.2\n"
         )
+        assert TAG_MOVE.search(old)
+        assert len(REF_FORCE_PUSH.findall(old)) == 3
 
-    def _record_workflow_witness(self, script: str, result: subprocess.CompletedProcess[str]) -> None:
-        """Preserve exact before and after source/ref evidence outside the disposable repository."""
-        witness = {
-            "test": self._testMethodName,
-            "script_sha256": hashlib.sha256(script.encode()).hexdigest(),
-            "before": {**self.before, "manifest": hashlib.sha256(self.before["manifest"]).hexdigest()},
-            "after": {
-                "head": self.git("rev-parse", "HEAD"),
-                "refs": self.refs(),
-                "manifest": hashlib.sha256((self.work / "Package.swift").read_bytes()).hexdigest(),
-            },
-            "exit": result.returncode,
-            "stdout": result.stdout,
-            "stderr": result.stderr,
+    def test_publish_workflow_never_moves_rewrites_or_deletes_release_refs(self) -> None:
+        """No step re-tags, force-pushes, deletes refs or substitutes the checksum placeholder."""
+        scripts = run_scripts(workflow_jobs())
+        assert len(scripts) > 50
+        for name, script in scripts:
+            with self.subTest(job=name):
+                assert not TAG_MOVE.search(script), script
+                assert not REF_FORCE_PUSH.search(script), script
+                assert "__ALEF_SWIFT_CHECKSUM__" not in script
+                assert "finalize_release_manifest" not in script
+
+    def test_swift_publication_uses_the_shared_immutable_action(self) -> None:
+        """The prepared ZIP and receipt go to publish-swift-release on the tagged source."""
+        steps = workflow_jobs()["update-swift-package-manifest"]["steps"]
+        uses = [step.get("uses", "") for step in steps]
+        publish = steps[uses.index(PUBLISH_ACTION)]
+        assert uses.count(PUBLISH_ACTION) == 1
+        assert publish["if"] == "${{ needs.prepare.outputs.dry_run != 'true' }}"
+        assert publish["with"] == {
+            "tag": "${{ needs.prepare.outputs.tag }}",
+            "bundle-zip": f"{DIST}/{ARCHIVE}",
+            "receipt": f"{DIST}/{RECEIPT}",
+            "token": "${{ steps.app-token.outputs.token }}",
         }
-        (self.directory.parent / f"{self._testMethodName}-witness.json").write_text(
-            json.dumps(witness, indent=2) + "\n"
+        checkout = steps[uses.index("actions/checkout@v7")]
+        assert checkout["with"]["ref"] == "${{ needs.prepare.outputs.source_sha }}"
+        assert checkout["with"]["fetch-depth"] == 0
+        assert checkout["with"]["token"] == "${{ steps.app-token.outputs.token }}"
+        assert checkout["with"].get("persist-credentials", True) is not False
+        download = steps[uses.index("actions/download-artifact@v8")]
+        assert download["with"] == {"name": "swift-artifactbundle", "path": DIST}
+        guard = next(index for index, step in enumerate(steps) if step.get("id") == "prepared-tag")
+        assert uses.index("actions/checkout@v7") < guard < uses.index(PUBLISH_ACTION)
+        assert not any("swift_release.py publish" in step.get("run", "") for step in steps)
+
+    def test_swift_bundle_job_writes_the_actions_receipt_and_checks_it(self) -> None:
+        """The build action writes the receipt; the repo check validates it instead of writing its own."""
+        steps = workflow_jobs()["swift-artifactbundle"]["steps"]
+        build = next(step for step in steps if step.get("uses") == "xberg-io/actions/build-swift-artifactbundle@v1")
+        assert build["with"]["receipt-version"] == "${{ steps.swift-version.outputs.version }}"
+        assert build["with"]["output-dir"] == DIST
+        scripts = [step.get("run", "") for step in steps]
+        assert not any("swift_release.py prepare" in script for script in scripts)
+        check = next(index for index, script in enumerate(scripts) if "swift_release.py check" in script)
+        upload = next(index for index, step in enumerate(steps) if step.get("uses") == "actions/upload-artifact@v7")
+        assert steps.index(build) < check < upload
+
+    def test_downstream_jobs_still_wait_for_swift_publication(self) -> None:
+        """The needs graph around the Swift job is unchanged."""
+        jobs = workflow_jobs()
+        assert jobs["update-swift-package-manifest"]["needs"] == ["prepare", "upload-swift-release", "publish-zig"]
+        for name in ("release-finalize", "release-report"):
+            assert "update-swift-package-manifest" in jobs[name]["needs"], name
+        report = next(
+            step for step in jobs["release-report"]["steps"] if "RESULT_SWIFT_MANIFEST" in step.get("env", {})
         )
+        assert report["env"]["RESULT_SWIFT_MANIFEST"] == "${{ needs.update-swift-package-manifest.result }}"
 
-    def workflow(self, *, literal: bool, divergent: bool = False) -> subprocess.CompletedProcess[str]:
-        """Execute the actual publication step against the isolated Git remote."""
-        self._prepare_workflow_source(literal, divergent)
-        jobs = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())["jobs"]
-        steps = jobs["update-swift-package-manifest"]["steps"]
-        names = {"Update Package.swift with version and checksum", "Publish immutable Swift references"}
-        script = next(step["run"] for step in steps if step.get("name") in names)
-        script = script.replace("${{ needs.prepare.outputs.version }}", VERSION)
-        self.before = {
-            "head": self.git("rev-parse", "HEAD"),
-            "refs": self.refs(),
-            "manifest": (self.work / "Package.swift").read_bytes(),
-        }
-        environment = {
-            **self.environment(),
-            "VERSION": VERSION,
-            "SOURCE_SHA": self.commit,
-            "TAG": TAG,
-            "TAG_OBJECT": self.tag_object,
-        }
-        result = subprocess.run(
-            ["bash", "-euo", "pipefail", "-c", script],
+
+class SwiftPreparedTagGuardTests(SwiftReleaseFixture):
+    """Run the real pre-publication tag guard against a disposable remote."""
+
+    def guard(self, tag_object: str, source: str) -> subprocess.CompletedProcess[str]:
+        """Execute the guard step with the identities prepare recorded."""
+        steps = workflow_jobs()["update-swift-package-manifest"]["steps"]
+        step = next(step for step in steps if step.get("id") == "prepared-tag")
+        return subprocess.run(
+            ["bash", "-euo", "pipefail", "-c", step["run"]],
             cwd=self.work,
-            env=environment,
+            env={**os.environ, "TAG": TAG, "TAG_OBJECT": tag_object, "SOURCE_SHA": source},
             capture_output=True,
             text=True,
             check=False,
         )
-        self._record_workflow_witness(script, result)
-        return result
 
-    def test_original_workflow_refuses_checksum_child_before_any_ref_move(self) -> None:
-        """Original workflow refuses checksum child before any ref move."""
-        result = self.workflow(literal=False)
-        assert result.returncode != 0, "post-tag checksum finalization must be refused"
-        assert "checksum" in result.stderr.lower(), result.stderr
-        assert self.git("rev-parse", "HEAD") == self.before["head"]
-        assert self.refs() == self.before["refs"]
-        assert (self.work / "Package.swift").read_bytes() == self.before["manifest"]
-
-    def test_original_workflow_preserves_annotated_core_tag(self) -> None:
-        """Original workflow preserves annotated core tag."""
-        result = self.workflow(literal=True)
-        assert result.returncode == 0, result.stderr
-        assert self.git("rev-parse", f"refs/tags/{TAG}", cwd=self.remote).strip() == self.tag_object
-        assert self.git("rev-parse", f"refs/tags/{TAG}^{{commit}}", cwd=self.remote).strip() == self.commit
-
-    def test_original_workflow_rejects_divergent_alias_without_overwriting_it(self) -> None:
-        """Original workflow rejects divergent alias without overwriting it."""
-        result = self.workflow(literal=True, divergent=True)
-        assert result.returncode != 0, "a divergent legacy branch must reject publication"
-        assert "already points elsewhere" in result.stderr, result.stderr
-        assert self.refs() == self.before["refs"]
+    def test_guard_admits_only_the_tag_prepare_verified(self) -> None:
+        """A replaced tag object or a different peeled commit stops publication."""
+        self.release()
+        before = self.refs()
+        assert self.guard(self.tag_object, self.commit).returncode == 0
+        for tag_object, source in (("0" * 40, self.commit), (self.tag_object, self.source), ("", "")):
+            with self.subTest(tag_object=tag_object, source=source):
+                result = self.guard(tag_object, source)
+                assert result.returncode != 0, result.stdout
+                assert "changed since prepare verified it" in result.stderr
+        assert self.refs() == before
 
 
 class SwiftByteClosureTests(SwiftReleaseFixture):
@@ -556,7 +535,8 @@ class SwiftByteClosureTests(SwiftReleaseFixture):
         assert self.git("config", "--get", "core.autocrlf").strip() == "false"
         assert original == self.manifest("__ALEF_SWIFT_CHECKSUM__").encode()
         assert b"\r\n" not in original and original.endswith(b"\n")
-        prepared = self.helper("prepare")
+        self.write_receipt()
+        prepared = self.helper("check")
         assert prepared.returncode == 0, prepared.stderr
         (self.work / "Package.swift").write_bytes(self.manifest(self.digest).encode().replace(b"\n", b"\r\n"))
         self.git("add", "Package.swift")
@@ -566,7 +546,7 @@ class SwiftByteClosureTests(SwiftReleaseFixture):
         assert changed == original.replace(b"__ALEF_SWIFT_CHECKSUM__", self.digest.encode()).replace(b"\n", b"\r\n")
         assert b"\r\n" in changed and b"\n" not in changed.replace(b"\r\n", b"")
         before = self.refs()
-        result = self.helper("publish")
+        result = self.helper("verify")
         assert result.returncode != 0, "checksum-only closure must preserve CRLF bytes"
         assert "changed beyond its checksum" in result.stderr, result.stderr
         assert self.refs() == before
@@ -582,7 +562,8 @@ class SwiftByteClosureTests(SwiftReleaseFixture):
         original = self.committed_manifest(self.source)
         assert original == self.manifest("__ALEF_SWIFT_CHECKSUM__").encode().replace(b"\n", b"\r\n")
         assert b"\r\n" in original and b"\n" not in original.replace(b"\r\n", b"")
-        assert self.helper("prepare").returncode == 0
+        self.write_receipt()
+        assert self.helper("check").returncode == 0
         manifest.write_bytes(manifest.read_bytes().replace(b"__ALEF_SWIFT_CHECKSUM__", self.digest.encode()))
         self.git("add", "Package.swift")
         self.git("commit", "-m", "fixture: preserve source newline bytes")
@@ -590,7 +571,7 @@ class SwiftByteClosureTests(SwiftReleaseFixture):
         committed = self.committed_manifest(self.commit)
         assert committed == original.replace(b"__ALEF_SWIFT_CHECKSUM__", self.digest.encode())
         assert b"\r\n" in committed and b"\n" not in committed.replace(b"\r\n", b"")
-        result = self.helper("publish")
+        result = self.helper("verify")
         assert result.returncode == 0, result.stderr
         assert b"\r\n" in manifest.read_bytes()
         assert self.git("rev-parse", f"refs/tags/{TAG}", cwd=self.remote).strip() == self.tag_object
@@ -614,7 +595,8 @@ class SwiftByteClosureTests(SwiftReleaseFixture):
         with zipfile.ZipFile(self.bundle, "w") as archive:
             for name, data in members.items():
                 archive.writestr(name, data)
-        prepared = self.helper("prepare")
+        self.write_receipt()
+        prepared = self.helper("check")
         assert prepared.returncode == 0, prepared.stderr
         assert re.findall(r'\.binaryTarget\(\s*name:\s*"([^"]+)"', (ROOT / "Package.swift").read_text()) == [identity]
 
@@ -858,7 +840,7 @@ class SwiftSeedEntrypointTests(SwiftReleaseFixture):
         assert not (self.directory / "events").exists()
         mismatch = self.run_entrypoint(script, source_event="workflow_dispatch", expected_sha=self.source)
         assert mismatch.returncode != 0
-        assert "Manual publish run must match the immutable tag commit" in mismatch.stderr
+        assert "is not the commit the immutable tag" in mismatch.stderr
         assert "publisher-sentinel" not in mismatch.stdout
 
 

@@ -70,16 +70,16 @@ def test_node_release_builds_allow_napi_platform_regeneration() -> None:
     assert workflow["jobs"]["node-bindings"]["env"] == {"PNPM_CONFIG_FROZEN_LOCKFILE": "false"}
 
 
-def test_swift_release_finalizer_only_verifies_prepared_source_and_assets() -> None:
-    """Recovery uses exact tagged source and cannot finalize a checksum child."""
+def test_swift_release_job_only_verifies_the_tag_and_adds_the_branch() -> None:
+    """Publication checks out the tagged source and hands it to the shared immutable action."""
     workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
     steps = workflow["jobs"]["update-swift-package-manifest"]["steps"]
     checkout = next(step for step in steps if step.get("uses") == "actions/checkout@v7")
-    update = next(step for step in steps if step.get("name") == "Publish immutable Swift references")
     assert checkout["with"]["ref"] == "${{ needs.prepare.outputs.source_sha }}"
-    assert "scripts/ci/swift_release.py publish" in update["run"]
-    assert "finalize_release_manifest.py" not in update["run"]
-    assert "git tag" not in update["run"]
+    assert [step for step in steps if step.get("uses") == "xberg-io/actions/publish-swift-release@v1"]
+    for step in steps:
+        assert "git tag" not in step.get("run", "")
+        assert "swift_release.py publish" not in step.get("run", "")
 
 
 def test_release_report_accepts_already_finalized_release_and_scoop_manifest() -> None:

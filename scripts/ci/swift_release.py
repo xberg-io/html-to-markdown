@@ -1,4 +1,4 @@
-"""Prepare and verify exact Swift release bytes without rewriting release tags."""
+"""Check and verify exact Swift release bytes without rewriting release tags."""
 
 from __future__ import annotations
 
@@ -130,12 +130,14 @@ def bundle_metadata(bundle: Path) -> dict[str, object]:
         return {"triples": sorted(observed), "artifact_version": artifact["version"]}
 
 
-def prepare(arguments: argparse.Namespace) -> None:
+def check(arguments: argparse.Namespace) -> None:
+    """Validate the receipt build-swift-artifactbundle wrote for the checked-out source."""
     require(git("rev-parse", "HEAD").strip() == arguments.source, "preparation source is not the checked-out commit")
     status = git("status", "--porcelain=v1", "--untracked-files=all").removesuffix("\n")
     require(not status, f"preparation source must be clean:\n{status}")
     require(source_version(arguments.source) == arguments.version, "prepared Cargo version mismatch")
-    receipt = {
+    require(arguments.receipt.is_file(), f"missing Swift preparation receipt {arguments.receipt.name}")
+    expected = {
         "schema": 1,
         "repository": REPOSITORY,
         "source": arguments.source,
@@ -144,8 +146,9 @@ def prepare(arguments: argparse.Namespace) -> None:
         "sha256": digest(arguments.bundle),
         **bundle_metadata(arguments.bundle),
     }
-    arguments.receipt.write_text(json.dumps(receipt, indent=2) + "\n")
-    print(f"Prepared {ARCHIVE}: {receipt['sha256']} ({len(TRIPLES)} platform triples)")
+    receipt = json.loads(arguments.receipt.read_text())
+    require(receipt == expected, "Swift preparation receipt does not describe this bundle and source")
+    print(f"Checked {ARCHIVE}: {expected['sha256']} ({len(TRIPLES)} platform triples)")
 
 
 def remote_refs(*references: str) -> dict[str, str]:
@@ -220,39 +223,9 @@ def verify(arguments: argparse.Namespace) -> None:
     print(f"Verified immutable {arguments.tag}: {checksum}")
 
 
-def create_reference(reference: str, source: str) -> None:
-    refs = remote_refs(reference)
-    existing = refs.get(reference)
-    require(existing in (None, source), f"Swift release ref already points elsewhere: {reference}")
-    if existing is None:
-        result = subprocess.run(
-            ["gh", "api", "--method", "POST", f"repos/{REPOSITORY}/git/refs", "--input", "-"],
-            input=json.dumps({"ref": reference, "sha": source}),
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        refs = remote_refs(reference)
-        require(
-            result.returncode == 0 or refs.get(reference) == source,
-            f"could not create immutable Swift release ref: {reference}",
-        )
-    refs = remote_refs(reference)
-    require(refs.get(reference) == source, f"Swift release ref commit mismatch: {reference}")
-
-
-def publish(arguments: argparse.Namespace) -> None:
-    verify(arguments)
-    for reference in legacy_references(arguments.version):
-        create_reference(reference, arguments.source)
-    verify_legacy_refs(arguments)
-    verify_tag(arguments)
-    print(f"Verified Swift branch at {arguments.source}; core tag preserved")
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("prepare", "verify", "publish"))
+    parser.add_argument("operation", choices=("check", "verify"))
     parser.add_argument("--bundle", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     parser.add_argument("--version", required=True)
@@ -261,10 +234,10 @@ def main() -> None:
     parser.add_argument("--tag-object")
     arguments = parser.parse_args()
     require(re.fullmatch(r"[0-9a-f]{40}", arguments.source) is not None, "expected a full source commit SHA")
-    if arguments.operation != "prepare":
+    if arguments.operation != "check":
         require(arguments.tag == f"v{arguments.version}", "release tag/version mismatch")
         require(arguments.tag_object is not None, "missing original release tag object")
-    {"prepare": prepare, "verify": verify, "publish": publish}[arguments.operation](arguments)
+    {"check": check, "verify": verify}[arguments.operation](arguments)
 
 
 if __name__ == "__main__":

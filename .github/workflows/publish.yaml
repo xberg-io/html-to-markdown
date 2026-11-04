@@ -130,28 +130,16 @@ jobs:
           fetch-depth: 0
           path: release-source
 
-      - name: Verify release source and checksum-only metadata
+      - name: Verify release source is the immutable tag commit
         id: version
         shell: bash
         working-directory: release-source
         env:
           EXPECTED_TAG: ${{ inputs.tag }}
           EXPECTED_SHA: ${{ steps.source.outputs.sha }}
-          SOURCE_EVENT: ${{ steps.source.outputs.event }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_RUN_ID: ${{ inputs.nuget_runtime_run_id }}
         run: |
           git fetch --no-tags origin "refs/tags/${EXPECTED_TAG}:refs/tags/${EXPECTED_TAG}"
-          if [[ "$(git rev-parse "${EXPECTED_TAG}^{commit}")" != "$EXPECTED_SHA" ]]; then
-            if [[ "${SOURCE_EVENT:-}" == "workflow_dispatch" ]]; then
-              echo "Manual publish run must match the immutable tag commit" >&2
-              exit 1
-            fi
-            gh run download "$RELEASE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-              --name swift-checksum --dir dist/provenance-swift
-          fi
-          python3 "$GITHUB_WORKSPACE/scripts/ci/csharp/verify_recovery_source.py" \
-            "$EXPECTED_SHA" "$EXPECTED_TAG" dist/provenance-swift
+          python3 "$GITHUB_WORKSPACE/scripts/ci/csharp/verify_recovery_source.py" "$EXPECTED_SHA" "$EXPECTED_TAG"
           python3 - <<'PY'
           import os
           import tomllib
@@ -1794,13 +1782,14 @@ jobs:
           output-dir: dist/swift-artifactbundle
           build-profile: release
           package-version: ${{ steps.swift-version.outputs.version }}
-      - name: Record exact prepared Swift bytes
+          receipt-version: ${{ steps.swift-version.outputs.version }}
+      - name: Check the prepared Swift bytes and receipt
         if: ${{ needs.prepare.outputs.dry_run == 'true' }}
         env:
           VERSION: ${{ steps.swift-version.outputs.version }}
           SOURCE_SHA: ${{ needs.prepare.outputs.source_sha }}
         run: |
-          python3 scripts/ci/swift_release.py prepare \
+          python3 scripts/ci/swift_release.py check \
             --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
             --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
             --version "$VERSION" --source "$SOURCE_SHA"
@@ -3450,28 +3439,40 @@ jobs:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           owner: xberg-io
+      # ~keep The action pushes the legacy branch with the checkout's credentials, so they persist.
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.source_sha }}
           fetch-depth: 0
-          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token }}
       - uses: actions/download-artifact@v8
         with:
           name: swift-artifactbundle
           path: dist/swift-artifactbundle
-      - name: Publish immutable Swift references
+      # ~keep The action checks the tag it reads now; this binds that tag to the one prepare verified.
+      - name: Require the tag prepare verified
+        id: prepared-tag
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          VERSION: ${{ needs.prepare.outputs.version }}
-          SOURCE_SHA: ${{ needs.prepare.outputs.source_sha }}
           TAG: ${{ needs.prepare.outputs.tag }}
           TAG_OBJECT: ${{ needs.prepare.outputs.tag_object }}
+          SOURCE_SHA: ${{ needs.prepare.outputs.source_sha }}
         run: |
-          python3 scripts/ci/swift_release.py publish \
-            --bundle dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip \
-            --receipt dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json \
-            --version "$VERSION" --source "$SOURCE_SHA" --tag "$TAG" --tag-object "$TAG_OBJECT"
+          set -euo pipefail
+          refs=$(git ls-remote origin "refs/tags/$TAG" "refs/tags/$TAG^{}")
+          object=$(awk -v ref="refs/tags/$TAG" '$2 == ref { print $1 }' <<<"$refs")
+          commit=$(awk -v ref="refs/tags/$TAG^{}" '$2 == ref { print $1 }' <<<"$refs")
+          if [[ -z "$TAG_OBJECT" || "$object" != "$TAG_OBJECT" || "${commit:-$object}" != "$SOURCE_SHA" ]]; then
+            echo "Release tag $TAG changed since prepare verified it" >&2
+            exit 1
+          fi
+      - uses: xberg-io/actions/publish-swift-release@v1
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          bundle-zip: dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.zip
+          receipt: dist/swift-artifactbundle/HtmlToMarkdown-rs.artifactbundle.release.json
+          token: ${{ steps.app-token.outputs.token }}
       - name: Update release notes with artifact URL
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         env:
