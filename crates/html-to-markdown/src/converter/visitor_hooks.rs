@@ -89,7 +89,7 @@ pub fn handle_visitor_element_start(
         visitor.visit_element_start(&node_ctx)
     };
 
-    match visitor_start_result {
+    match resolve_media_source_preservation(visitor_start_result, tag_name, tag, state) {
         crate::visitor::VisitResult::Continue => VisitAction::Continue,
         crate::visitor::VisitResult::Skip => VisitAction::Skip,
         crate::visitor::VisitResult::Custom(custom_output) => {
@@ -130,8 +130,11 @@ pub fn handle_visitor_element_end(
     let safe_start = crate::converter::utility::content::floor_char_boundary(end.output, safe_start);
     let element_content = &end.output[safe_start..];
 
-    let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
-    match visitor.visit_element_end(&node_ctx, element_content) {
+    let result = visitor_handle
+        .lock()
+        .expect("visitor mutex poisoned")
+        .visit_element_end(&node_ctx, element_content);
+    match resolve_media_source_preservation(result, tag_name, tag, state) {
         VisitResult::Continue | VisitResult::PreserveHtml => VisitAction::Continue,
         VisitResult::Custom(custom) => {
             end.output.truncate(safe_start);
@@ -148,6 +151,24 @@ pub fn handle_visitor_element_end(
             }
             VisitAction::Error
         }
+    }
+}
+
+fn resolve_media_source_preservation(
+    result: VisitResult,
+    name: &str,
+    tag: &crate::dom::HTMLTag<'_>,
+    state: &VisitorElementState<'_>,
+) -> VisitResult {
+    if matches!(result, VisitResult::PreserveHtml)
+        && name == "source"
+        && matches!(state.parent_tag, Some("audio" | "video"))
+    {
+        let mut html = String::new();
+        crate::converter::utility::serialization::serialize_open_tag(tag, name, &mut html);
+        VisitResult::Custom(html)
+    } else {
+        result
     }
 }
 

@@ -34,6 +34,14 @@ fn serialize_attributes(tag: &crate::dom::HTMLTag<'_>, tag_name: &str, output: &
     }
 }
 
+/// Write an opening tag with source attributes.
+pub fn serialize_open_tag(tag: &crate::dom::HTMLTag<'_>, name: &str, output: &mut String) {
+    output.push('<');
+    output.push_str(name);
+    serialize_attributes(tag, name, output);
+    output.push('>');
+}
+
 fn write_attributes<'a>(attributes: impl Iterator<Item = (Cow<'a, str>, Option<Cow<'a, str>>)>, output: &mut String) {
     for (key, value) in attributes {
         output.push(' ');
@@ -162,12 +170,7 @@ fn serialize_node_to_html_at_depth(
         Some(crate::dom::Node::Tag(tag)) => {
             let tag_name = normalized_tag_name(tag.name().as_utf8_str());
 
-            output.push('<');
-            output.push_str(&tag_name);
-
-            serialize_attributes(tag, &tag_name, output);
-
-            output.push('>');
+            serialize_open_tag(tag, &tag_name, output);
 
             if depth >= NATIVE_STACK_SAFE_DEPTH {
                 tracing::warn!(

@@ -13,6 +13,7 @@ struct Recorder {
     video_src: Option<String>,
     media_action: Option<VisitResult>,
     source_end: Option<VisitResult>,
+    source_start: Option<VisitResult>,
 }
 
 impl HtmlVisitor for Recorder {
@@ -20,6 +21,9 @@ impl HtmlVisitor for Recorder {
         self.starts
             .insert(context.tag_name.to_string(), context.attributes().clone());
         self.events.push(format!("+{}", context.tag_name));
+        if context.tag_name == "source" {
+            return self.source_start.take().unwrap_or_default();
+        }
         VisitResult::Continue
     }
 
@@ -153,4 +157,55 @@ fn preserving_media_html_keeps_literal_source_spelling_and_skips_child_callbacks
     let markdown = result.content.expect("Markdown");
     assert!(markdown.contains(r#"src="/clip.mp4?a=1&amp;b=2""#));
     assert!(markdown.contains(r#"data-nested="&amp;lt;""#));
+}
+
+#[test]
+fn preserve_tags_ignores_direct_media_sources_without_hiding_callbacks() {
+    let html = r#"<video><source src="/media.mp4"></video><source src="/outside.mp4">"#;
+    let options = ConversionOptions {
+        preserve_tags: vec!["source".into()],
+        ..ConversionOptions::default()
+    };
+    let baseline = convert(html, Some(options.clone())).expect("no visitor");
+    let recorder = Arc::new(Mutex::new(Recorder::default()));
+    let visitor: VisitorHandle = recorder.clone();
+    let observed = convert(
+        html,
+        Some(ConversionOptions {
+            visitor: Some(visitor),
+            ..options
+        }),
+    )
+    .expect("visitor");
+
+    assert_eq!(observed.content, baseline.content);
+    let content = observed.content.expect("Markdown");
+    assert!(!content.contains(r#"<source src="/media.mp4">"#));
+    assert!(content.contains(r#"<source src="/outside.mp4">"#));
+    assert_eq!(
+        &recorder.lock().expect("recorder").events[..4],
+        ["+video", "+source", "-source", "-video"]
+    );
+}
+
+#[test]
+fn explicit_source_preserve_html_emits_the_raw_declaration_and_calls_end() {
+    let html = r#"<video><source src="/media.mp4?a=1&amp;b=2"></video>"#;
+    let raw_source = r#"<source src="/media.mp4?a=1&amp;b=2">"#;
+    let choices = [
+        (Some(VisitResult::PreserveHtml), None),
+        (None, Some(VisitResult::PreserveHtml)),
+    ];
+    for (source_start, source_end) in choices {
+        let (recorder, result) = record_with(
+            html,
+            Recorder {
+                source_end,
+                source_start,
+                ..Recorder::default()
+            },
+        );
+        assert_eq!(recorder.events, ["+video", "+source", "-source", "-video"]);
+        assert_eq!(result.content.expect("Markdown").matches(raw_source).count(), 1);
+    }
 }

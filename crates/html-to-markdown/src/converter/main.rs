@@ -601,9 +601,7 @@ fn begin_tag<'a>(
     handler: HandlerContext<'_>,
     dom_ctx: &'a DomContext,
 ) -> Begun<'a> {
-    let options = handler.options;
-    let depth = handler.depth;
-    let ctx = handler.ctx;
+    let (options, ctx, depth) = (handler.options, handler.ctx, handler.depth);
     let tag_name = normalized_node_tag_name(node_handle, tag, parser, dom_ctx);
     let tag_name = tag_name.as_ref();
     #[cfg(feature = "visitor")]
@@ -618,14 +616,7 @@ fn begin_tag<'a>(
         Some(state)
     };
 
-    match skip_or_render_tag(
-        tag_name,
-        node_handle,
-        tag,
-        parser,
-        output,
-        HandlerContext::new(options, ctx, depth, dom_ctx),
-    ) {
+    match skip_or_render_tag(tag_name, node_handle, tag, parser, output, handler) {
         TagRoute::Handler => {}
         TagRoute::Written => return Begun::Complete,
         TagRoute::Children => return Begun::Children,
@@ -835,6 +826,15 @@ fn skip_or_render_tag(
     output: &mut String,
     handler: HandlerContext<'_>,
 ) -> TagRoute {
+    // ~keep A media source declares its parent's address and has no default output of its own.
+    if tag_name == "source"
+        && matches!(
+            handler.dom_ctx.parent_tag_name(node_handle.get_inner(), parser),
+            Some("audio" | "video")
+        )
+    {
+        return TagRoute::Handler;
+    }
     if should_skip_tag(tag_name, node_handle, tag, parser, handler) {
         if handler.options.whitespace_mode == crate::options::WhitespaceMode::Strict
             && handler.ctx.excluded_node_ids.contains(&node_handle.get_inner())

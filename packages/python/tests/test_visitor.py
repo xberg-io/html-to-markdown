@@ -1,6 +1,6 @@
 from typing import cast
 
-from html_to_markdown import NodeContext, convert
+from html_to_markdown import ConversionOptions, NodeContext, convert
 from html_to_markdown.api import HtmlVisitor
 
 
@@ -113,3 +113,17 @@ def test_visitor_observes_lazy_media_source_and_track() -> None:
     assert visitor.attributes["track"] == {"src": "/captions.vtt"}
     assert visitor.ends == ["source", "track", "video", "div"]
     assert result.content == convert(html).content
+
+
+def test_preserve_tags_keeps_media_source_visitor_output_equal_to_default() -> None:
+    html = '<video><source src="/media.mp4"></video><source src="/outside.mp4">'
+    options = ConversionOptions(preserve_tags=["source"])
+    visitor = MediaChildVisitor()
+
+    observed = convert(html, options, visitor=cast("HtmlVisitor", visitor))
+
+    assert observed.content == convert(html, options).content
+    assert observed.content is not None
+    assert '<source src="/media.mp4">' not in observed.content
+    assert '<source src="/outside.mp4">' in observed.content
+    assert visitor.ends == ["source", "video"]
