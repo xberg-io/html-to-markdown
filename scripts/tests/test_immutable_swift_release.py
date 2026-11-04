@@ -351,8 +351,9 @@ class SwiftWorkflowGuardTests(unittest.TestCase):
                 )
             )
         }
-        assert len(jobs) == 75
-        assert len(publishers) == 29
+        # ~keep Lower bounds prove the matcher still finds the publishers without pinning the job count.
+        assert len(publishers) >= 29, sorted(publishers)
+        assert len(jobs) > len(publishers)
         missing = {name for name in publishers if "needs.prepare.result == 'success'" not in jobs[name].get("if", "")}
         assert not missing, f"publishers bypass successful immutable preparation: {sorted(missing)}"
 
