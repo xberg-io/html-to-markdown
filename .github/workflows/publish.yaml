@@ -1994,6 +1994,7 @@ jobs:
       build-musl: true
       checksums: true
       undraft-release: false
+      macos-deployment-target: "26.0"
 
   verify-binstall:
     # ~keep Must wait for promote-release, not just upload-cli-release. binstall resolves

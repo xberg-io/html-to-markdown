@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** macOS 11 to 25 are no longer supported; macOS 26 is the minimum. Every macOS binary is built for macOS 26, the minimum the Swift package already declares. Python wheels targeted macOS 10.12 before, and the other macOS natives used the Rust default.
+- **Breaking:** macOS 11 to 25 are no longer supported; macOS 26 is the minimum. Every macOS binary, the CLI included, is built for macOS 26, the minimum the Swift package already declares. Python wheels targeted macOS 10.12 before, and the CLI and the other macOS natives used the Rust default.
 
 ### Fixed
 

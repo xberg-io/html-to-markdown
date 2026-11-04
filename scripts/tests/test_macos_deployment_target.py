@@ -80,3 +80,43 @@ def test_every_macos_publish_job_builds_with_the_package_minimum() -> None:
         name for name, job in macos_jobs.items() if (job.get("env") or {}).get(VARIABLE, inherited) != minimum
     )
     assert not missing, f"macOS publish jobs without MACOSX_DEPLOYMENT_TARGET={minimum}: {missing}"
+
+
+# ~keep A called workflow does not inherit the caller's `env:`, so each one that builds a macOS binary must be
+# ~keep handed the target as an input. Every remote reusable workflow a shipping workflow calls is classified here;
+# ~keep a new one fails the test until someone decides which kind it is.
+SHIPPING_WORKFLOWS = ("publish.yaml", "prepare-swift-release.yaml")
+MACOS_BUILDERS = {
+    "xberg-io/actions/.github/workflows/reusable-cli-release.yml@v1": "required",
+    # Empty derives the target from Package.swift's .macOS minimum, and a set value must equal it.
+    "xberg-io/actions/.github/workflows/reusable-swift-release-prepare.yml@v1": "derived",
+}
+NOT_MACOS_BUILDERS = {"xberg-io/actions/.github/workflows/reusable-binstall-verify.yml@v1"}
+
+
+def reusable_jobs() -> list[tuple[str, str, dict]]:
+    """(workflow job, called workflow, job) for every remote reusable call in a shipping workflow."""
+    found = []
+    for name in SHIPPING_WORKFLOWS:
+        workflow = yaml.safe_load((ROOT / ".github/workflows" / name).read_text())
+        for job_name, job in workflow["jobs"].items():
+            uses = job.get("uses", "")
+            if uses and not uses.startswith("./"):
+                found.append((f"{name} {job_name}", uses, job))
+    return found
+
+
+def test_every_reusable_macos_build_receives_the_package_minimum() -> None:
+    """A reusable job that builds on macOS gets macos-deployment-target equal to Package.swift's minimum."""
+    minimum = package_minimum()
+    calls = reusable_jobs()
+    assert {uses for _, uses, _ in calls} >= set(MACOS_BUILDERS), calls
+    unclassified = [(job, uses) for job, uses, _ in calls if uses not in MACOS_BUILDERS.keys() | NOT_MACOS_BUILDERS]
+    assert not unclassified, f"classify these reusable workflows as macOS builders or not: {unclassified}"
+    wrong = []
+    for location, uses, job in calls:
+        mode = MACOS_BUILDERS.get(uses)
+        value = str((job.get("with") or {}).get("macos-deployment-target", ""))
+        if (mode == "required" and value != minimum) or (mode == "derived" and value not in ("", minimum)):
+            wrong.append((location, value or "<unset>"))
+    assert not wrong, f"reusable macOS builds without macos-deployment-target={minimum}: {wrong}"
