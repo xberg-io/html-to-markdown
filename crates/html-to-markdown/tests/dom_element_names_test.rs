@@ -43,6 +43,8 @@ fn should_close_an_element_at_an_end_tag_in_the_spelling_of_its_start_tag() {
 }
 
 #[test]
-fn should_keep_an_element_open_at_an_end_tag_in_another_spelling() {
-    assert_eq!(top_names("<div>a</DIV><p>b</p>"), ["div"]);
+fn should_close_an_element_at_an_end_tag_in_any_letter_case() {
+    assert_eq!(top_names("<div>a</DIV><p>b</p>"), ["div", "p"]);
+    assert_eq!(top_names("<DIV>a</div><P>b</p>"), ["div", "p"]);
+    assert_eq!(top_names("<svg><clipPath></CLIPPATH></svg><p>b</p>"), ["svg", "p"]);
 }

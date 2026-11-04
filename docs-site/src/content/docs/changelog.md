@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Self-closing markup in text the author wrote, such as `<br/>` in a `textarea`, an `xmp` or escaped markup, keeps its bytes and gains no space before `/>` (#965).
 - Tag names are read in lower case, so the `exclude_selectors` type selector `div` also removes `<DIV>`. SVG element names such as `clipPath` keep their mixed case inside `svg` (#965).
 - `exclude_selectors` attribute, id and class selectors match the decoded value, so `[title=Abc]` removes an element with `title="&#65;bc"` (#965).
+- An end tag closes its element in any letter case, as HTML reads it, so `<div>a</DIV>` no longer leaves the `div` open and the page no longer needs the repair parse (#968).
 
 ## [3.19.2] - 2026-10-31
 

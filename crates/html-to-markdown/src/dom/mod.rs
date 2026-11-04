@@ -580,21 +580,10 @@ fn start_tag<'a>(parser: &mut Parser<'a>, scopes: &mut Scopes, tag: astral_html:
     }
 }
 
-/// ~keep The name as the start tag spells it. An end tag closes the element only in this spelling,
-/// ~keep as in astral-tl, so `<div>a</DIV>` stays open and the page keeps its repair route.
-fn start_tag_spelling<'t>(tag: &'t HTMLTag<'_>) -> &'t [u8] {
-    let name = tag.name.as_bytes();
-    match tag.raw.as_bytes().get(1..=name.len()) {
-        Some(spelled) if spelled.eq_ignore_ascii_case(name) => spelled,
-        _ => name,
-    }
-}
-
-fn end_tag(parser: &mut Parser<'_>, scopes: &mut Scopes, start: usize, end: usize) {
-    let source = parser.source.as_bytes();
-    let spelled = source.get(start + 2..end.saturating_sub(1)).unwrap_or_default();
+/// An end tag closes the element on top when it names that element in any letter case, as HTML reads it.
+fn end_tag(parser: &mut Parser<'_>, scopes: &mut Scopes, name: &str, end: usize) {
     let closes = scopes.open.last().is_some_and(|id| match &parser.tags[*id as usize] {
-        Node::Tag(tag) => start_tag_spelling(tag) == spelled,
+        Node::Tag(tag) => tag.name.as_bytes().eq_ignore_ascii_case(name.as_bytes()),
         _ => false,
     });
     if !closes {
@@ -665,7 +654,7 @@ fn read_region<'a>(parser: &mut Parser<'a>, scopes: &mut Scopes, tokens: &mut im
         flush_text(parser, scopes, &mut text);
         match token {
             astral_html::Token::StartTag(tag) => start_tag(parser, scopes, tag, start, end),
-            astral_html::Token::EndTag(_) => end_tag(parser, scopes, start, end),
+            astral_html::Token::EndTag(tag) => end_tag(parser, scopes, &tag.name, end),
             astral_html::Token::Comment(_) if input.as_bytes()[start..].starts_with(b"<!--") => {
                 let bytes = parser.slice(start, end);
                 let parent = scopes.open.last().copied();

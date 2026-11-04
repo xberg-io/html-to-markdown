@@ -449,7 +449,8 @@ fn should_write_a_title_under_a_wider_choice_where_a_narrower_choice_writes_it()
         assert_eq!(all, "T1\n\nW4\n\nEnd\n", "{html}");
     }
     // ~keep Where `drop` takes the tree builder, each choice takes it: no choice writes the title.
-    let html = r#"<head><title>T1</title><p>W4</p></head><div><TEMPLATE shadowrootmode="open"><div><p>End</p></template></div>"#;
+    // ~keep The template has no end tag, so the page asks for the tree builder.
+    let html = r#"<head><title>T1</title><p>W4</p></head><div><template shadowrootmode="open"><div><p>End</p></div>"#;
     let [drop, reachable, all] = without_front_matter(html);
     assert_eq!(drop, "W4\n", "{html}");
     assert_eq!(reachable, "W4\n\nEnd\n", "{html}");
