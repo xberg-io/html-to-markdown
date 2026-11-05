@@ -6,7 +6,7 @@ name: html-to-markdown-metadata
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:c03c898fc94f2cd7d1fdaaba584d8973cf9f7e1ea1ce731d7a5943979f033b26
-Source-Hash: blake3:c9a47eeba8370e9be2e04b73b3e29c5d1c79284183f355f4e221e0cd45770389
+Source-Hash: blake3:704535e60aeb7476a467c23200ae2f60cf84f37c2f2477cfaba32f2aeb9ad414
 Schema-Version: v1
 -->
 
