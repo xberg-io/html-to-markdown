@@ -318,3 +318,6 @@ plugin/.ai-rulez/.generated-manifest.json
 .codex/plugins.json
 .cursor/
 .github/commands/
+
+# Output of the rustc stdin lint probes xberg-io/actions/setup-rust runs in the checkout
+/rust_out

@@ -288,6 +288,13 @@ class SwiftPrepareCallerTests(unittest.TestCase):
         assert re.findall(r'\.binaryTarget\(\s*name:\s*"([^"]+)"', manifest) == ["RustBridgeBinary"]
         assert f"/{ARCHIVE}" in manifest
 
+    def test_rust_lint_probe_output_does_not_dirty_the_preparation_tree(self) -> None:
+        """setup-rust's stdin rustc probes write rust_out; the shared pin step refuses any non-ignored path."""
+        for path, ignored in (("rust_out", True), ("crates/rust_out", False), ("rust_out_other", False)):
+            with self.subTest(path=path):
+                result = subprocess.run(["git", "check-ignore", "--no-index", "--quiet", path], cwd=ROOT, check=False)
+                assert (result.returncode == 0) is ignored, result.returncode
+
     def test_downstream_jobs_still_wait_for_swift_publication(self) -> None:
         """The needs graph around the Swift job is unchanged."""
         jobs = workflow_jobs()
