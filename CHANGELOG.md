@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The macOS floor no longer follows the build runners to macOS 26, because nothing in html-to-markdown needs macOS 26. The CLI, the language extensions, the FFI libraries and the Python wheels target macOS 10.13 on x86_64 and macOS 11.0 on Apple Silicon, so the wheels are tagged `macosx_10_13_x86_64` and `macosx_11_0_arm64`. The Swift package requires macOS 13 and uses `swift-tools-version: 6.0`.
+- The macOS floor no longer follows the build runners to macOS 26, because nothing in html-to-markdown needs macOS 26. The CLI, the language extensions, the FFI libraries and the Python wheels target macOS 10.13 on x86_64 and macOS 11.0 on Apple Silicon, so the wheels are tagged `macosx_10_13_x86_64` and `macosx_11_0_arm64`. The Swift package requires macOS 13 and uses `swift-tools-version: 6.2`.
 
 ## [3.21.0] - 2026-11-05
 
