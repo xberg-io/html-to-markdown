@@ -3211,7 +3211,7 @@ int32_t htm_node_context_is_inline(HTMAlefHandle handle);
 
 #if defined(HTM_FEATURE_VISITOR)
 /**
- * Return a reference to the attribute map.
+ * Return a reference to the attribute map. Parsed HTML values use HTML attribute reference rules.
  *
  * If the context was built with `NodeContext.with_lazy_attributes`, the
  * map is materialized on the first call and cached for subsequent calls.
