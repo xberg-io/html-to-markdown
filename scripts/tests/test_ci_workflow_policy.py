@@ -41,3 +41,18 @@ def test_lint_runs_the_quality_warning_gate_through_mise() -> None:
     job = workflow["jobs"]["quality-warnings"]
 
     assert [step["run"] for step in job["steps"] if "run" in step] == ["mise run check:quality-warnings"]
+
+
+def test_ffi_build_skips_the_coverage_tool() -> None:
+    workflow = _workflow("ci-e2e-delegated.yaml")
+    jobs = workflow["jobs"]
+    assert isinstance(jobs, dict)
+    setup_steps = [
+        step
+        for job in jobs.values()
+        for step in job.get("steps", [])
+        if step.get("uses") == "xberg-io/actions/setup-rust@v1"
+        and str(step.get("with", {}).get("cache-key-prefix", "")).startswith("ffi-")
+    ]
+    assert len(setup_steps) == 1
+    assert setup_steps[0]["with"]["install-llvm-cov"] == "false"

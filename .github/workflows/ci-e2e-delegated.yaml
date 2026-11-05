@@ -46,11 +46,18 @@ jobs:
           "uses": "xberg-io/actions/free-disk-space-linux@v1",
           "with": { "show-initial": "false", "show-final": "true" },
         }
-      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
+      # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it. The FFI build
+      # ~keep collects no coverage, and mise.lock has no windows-arm64 cargo-llvm-cov entry, so the default
+      # ~keep install failed every windows-11-arm leg under MISE_LOCKED.
       - {
           "name": "Setup Rust",
           "uses": "xberg-io/actions/setup-rust@v1",
-          "with": { "cache-key-prefix": "ffi-${{ inputs.runner }}", "use-sccache": false },
+          "with":
+            {
+              "cache-key-prefix": "ffi-${{ inputs.runner }}",
+              "use-sccache": false,
+              "install-llvm-cov": "false",
+            },
         }
       - {
           "name": "Build html-to-markdown-ffi (release, Unix)",
