@@ -1,4 +1,7 @@
-"""Every shipped macOS binary targets the macOS minimum the root Package.swift declares."""
+"""Every shipped macOS binary targets the workflow's deployment target; the Swift package keeps its own minimum.
+
+The binary target lives in publish.yaml's workflow `env:`. The Swift minimum lives in the root Package.swift.
+"""
 
 import re
 from pathlib import Path
@@ -6,9 +9,15 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+PUBLISH = ROOT / ".github/workflows/publish.yaml"
 WORKFLOWS = sorted((ROOT / ".github/workflows").glob("*.y*ml"))
 VARIABLE = "MACOSX_DEPLOYMENT_TARGET"
 ASSIGNMENT = re.compile(rf"{VARIABLE}\s*[=:]\s*[\"']?([0-9][0-9.]*)")
+
+
+def binary_target() -> str:
+    """Read the workflow-level MACOSX_DEPLOYMENT_TARGET every macOS publish job inherits."""
+    return str(yaml.safe_load(PUBLISH.read_text())["env"][VARIABLE])
 
 
 def package_minimum() -> str:
@@ -51,24 +60,29 @@ def declared_targets() -> list[tuple[str, str]]:
     return found
 
 
-def test_package_minimum_is_macos_15() -> None:
-    """The equality rule below is anchored on the manifest: macOS 15, the oldest macOS Apple supports."""
-    assert package_minimum() == "15.0"
+def test_binary_target_is_macos_10_13() -> None:
+    """Binaries target macOS 10.13 on x86_64; rustc and maturin raise arm64 to 11.0, its first macOS."""
+    assert binary_target() == "10.13"
 
 
-def test_every_declared_macos_deployment_target_equals_the_package_minimum() -> None:
-    """No workflow or script builds a macOS binary for an older system than SwiftPM allows."""
-    minimum = package_minimum()
+def test_package_minimum_is_macos_13() -> None:
+    """The Swift package declares macOS 13 until the alef release with xberg-io/alef#893 allows 10.15."""
+    assert package_minimum() == "13.0"
+
+
+def test_every_declared_macos_deployment_target_equals_the_binary_target() -> None:
+    """No workflow or script builds a macOS binary for a different system than the publish workflow."""
+    minimum = binary_target()
     targets = declared_targets()
     assert targets, "no deployment target declared anywhere"
     wrong = [(location, value) for location, value in targets if value != minimum]
-    assert not wrong, f"deployment targets differ from Package.swift's macOS {minimum}: {wrong}"
+    assert not wrong, f"deployment targets differ from publish.yaml's macOS {minimum}: {wrong}"
 
 
-def test_every_macos_publish_job_builds_with_the_package_minimum() -> None:
-    """A macOS job without the variable falls back to the toolchain default (10.12 or 11.0)."""
-    minimum = package_minimum()
-    workflow = yaml.safe_load((ROOT / ".github/workflows/publish.yaml").read_text())
+def test_every_macos_publish_job_builds_with_the_binary_target() -> None:
+    """A macOS job without the variable falls back to the toolchain default."""
+    minimum = binary_target()
+    workflow = yaml.safe_load(PUBLISH.read_text())
     inherited = (workflow.get("env") or {}).get(VARIABLE)
     macos_jobs = {
         name: job
@@ -88,7 +102,7 @@ def test_every_macos_publish_job_builds_with_the_package_minimum() -> None:
 SHIPPING_WORKFLOWS = ("publish.yaml", "prepare-swift-release.yaml")
 MACOS_BUILDERS = {
     "xberg-io/actions/.github/workflows/reusable-cli-release.yml@v1": "required",
-    # Empty derives the target from Package.swift's .macOS minimum, and a set value must equal it.
+    # Empty derives the target from Package.swift's .macOS minimum, and a set value must equal that minimum.
     "xberg-io/actions/.github/workflows/reusable-swift-release-prepare.yml@v1": "derived",
 }
 NOT_MACOS_BUILDERS = {"xberg-io/actions/.github/workflows/reusable-binstall-verify.yml@v1"}
@@ -106,9 +120,9 @@ def reusable_jobs() -> list[tuple[str, str, dict]]:
     return found
 
 
-def test_every_reusable_macos_build_receives_the_package_minimum() -> None:
-    """A reusable job that builds on macOS gets macos-deployment-target equal to Package.swift's minimum."""
-    minimum = package_minimum()
+def test_every_reusable_macos_build_receives_its_target() -> None:
+    """A required builder gets the binary target; a derived builder gets nothing or Package.swift's minimum."""
+    binary, package = binary_target(), package_minimum()
     calls = reusable_jobs()
     assert {uses for _, uses, _ in calls} >= set(MACOS_BUILDERS), calls
     unclassified = [(job, uses) for job, uses, _ in calls if uses not in MACOS_BUILDERS.keys() | NOT_MACOS_BUILDERS]
@@ -117,6 +131,6 @@ def test_every_reusable_macos_build_receives_the_package_minimum() -> None:
     for location, uses, job in calls:
         mode = MACOS_BUILDERS.get(uses)
         value = str((job.get("with") or {}).get("macos-deployment-target", ""))
-        if (mode == "required" and value != minimum) or (mode == "derived" and value not in ("", minimum)):
+        if (mode == "required" and value != binary) or (mode == "derived" and value not in ("", package)):
             wrong.append((location, value or "<unset>"))
-    assert not wrong, f"reusable macOS builds without macos-deployment-target={minimum}: {wrong}"
+    assert not wrong, f"reusable macOS builds with the wrong macos-deployment-target: {wrong}"

@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
   name: "E2eSwift",
   platforms: [
-    .macOS(.v15),
+    .macOS(.v13),
     .iOS(.v16),
   ],
   dependencies: [

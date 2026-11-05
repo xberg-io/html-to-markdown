@@ -822,8 +822,8 @@ exclude_functions = ["visitor"]
 [crates.swift]
 module_name = "HtmlToMarkdown"
 package_name = "HtmlToMarkdown"
-# The oldest macOS that Apple still supports (alef ADR 0021).
-min_macos_version = "15.0"
+# alef 0.124.1 cannot write a 10.x floor; xberg-io/alef#893 lowers it to 10.15 (async/await).
+min_macos_version = "13.0"
 features = ["full", "testkit"]
 
 [crates.dart]
@@ -2214,7 +2214,7 @@ cd html-to-markdown
 cargo build -p html-to-markdown-rs-swift --release
 swift build --package-path packages/swift"""
 description = """
-High-performance HTML to Markdown converter for Swift via `swift-bridge`. Distributed through the Swift Package Manager; targets macOS 15+ and iOS 16+.
+High-performance HTML to Markdown converter for Swift via `swift-bridge`. Distributed through the Swift Package Manager; targets macOS 13+ and iOS 16+.
 Ship identical Markdown across every runtime while keeping idiomatic Swift APIs and Codable-friendly result types.
 """
 migration_version = ""
