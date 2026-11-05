@@ -45,6 +45,8 @@ to outlive the callback should call \code{\link[NodeContext:into_owned]{NodeCont
 \item{\code{parent_tag}}{Parent element's tag name (None if root)}
 
 \item{\code{is_inline}}{Whether this element is treated as inline vs block}
+
+\item{\code{attributes}}{Return a reference to the attribute map. Parsed HTML values use HTML attribute reference rules.}
 }}
 
 \keyword{datasets}
