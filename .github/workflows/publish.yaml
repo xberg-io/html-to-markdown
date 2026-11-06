@@ -46,10 +46,11 @@ on:
   repository_dispatch:
     types: [publish-release]
 
-# ~keep Every macOS binary targets the root Package.swift minimum (.macOS(.v26)); a job without
-# ~keep this falls back to the toolchain default (10.12 or 11.0). scripts/tests/test_macos_deployment_target.py
+# ~keep Every macOS binary targets the oldest macOS Apple still supports (15), the root Package.swift minimum
+# ~keep (.macOS(.v15)); a job without this falls back to the toolchain default (10.12 or 11.0).
+# ~keep scripts/tests/test_macos_deployment_target.py
 env:
-  MACOSX_DEPLOYMENT_TARGET: "26.0"
+  MACOSX_DEPLOYMENT_TARGET: "15.0"
 
 permissions:
   contents: read
@@ -1994,7 +1995,7 @@ jobs:
       build-musl: true
       checksums: true
       undraft-release: false
-      macos-deployment-target: "26.0"
+      macos-deployment-target: "15.0"
 
   verify-binstall:
     # ~keep Must wait for promote-release, not just upload-cli-release. binstall resolves

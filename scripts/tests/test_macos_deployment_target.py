@@ -51,9 +51,9 @@ def declared_targets() -> list[tuple[str, str]]:
     return found
 
 
-def test_package_minimum_is_macos_26() -> None:
-    """The equality rule below is anchored on the manifest, which declares macOS 26."""
-    assert package_minimum() == "26.0"
+def test_package_minimum_is_macos_15() -> None:
+    """The equality rule below is anchored on the manifest, which declares macOS 15, the oldest Apple supports."""
+    assert package_minimum() == "15.0"
 
 
 def test_every_declared_macos_deployment_target_equals_the_package_minimum() -> None:
