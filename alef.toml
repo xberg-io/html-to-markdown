@@ -1566,6 +1566,7 @@ version = "^3.21.1"
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
 version = "3.21.1"
+hash = "html_to_markdown_rs-3.21.1-QtXyWz55AQLjyAn0le-tKLjazMtZOY3Shv0_99dCmfdf"
 
 [crates.e2e.registry.packages.php_ext]
 name = "xberg-io/html-to-markdown"
