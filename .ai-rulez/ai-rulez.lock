@@ -4,7 +4,7 @@
 version = 1
 ai_rulez_version = '5.10.0'
 scope = 'all'
-tree = 'sha256:a0d1204239a27b19fb795712cd38b1fe8c504236cd7746351d9030fd9828d741'
+tree = 'sha256:cc6d620b2721c8788b902457af03a07f4711a9c6a02cd3864f3ac68c502aa864'
 
 [[include]]
 name = 'xberg-bindings'
@@ -489,7 +489,7 @@ digest = 'sha256:deb7822f8a52d91ab333af68f97e4d6b236325583b1f9419a6e5b44efe73e59
 kind = 'rule'
 id = 'output-escaping'
 path = 'rules/output-escaping.md'
-digest = 'sha256:334237285c01050fa31b2e26357d3e73b5604b59aa48e6a40ce6fc115094e8a6'
+digest = 'sha256:e8ae4846e767978c914fcda5ab58e401df03cfec2394c4e8177a109adbbf7976'
 
 [[item]]
 kind = 'rule'
