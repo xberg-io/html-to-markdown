@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.21.2] - 2026-11-07
+
 ### Fixed
 
 - Python's `convert` and `convert_with_accessible_names` release the GIL while converting again, so other Python
