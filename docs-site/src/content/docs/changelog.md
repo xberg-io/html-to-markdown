@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Python's `convert` and `convert_with_accessible_names` release the GIL while converting again, so other Python
+  threads keep running during a large conversion; a visitor reacquires the GIL only for its callbacks. The GIL had
+  been held for the whole call since 3.2.0. Regenerated with Alef 0.127.3 (#974).
+
 ## [3.21.1] - 2026-11-06
 
 ### Changed
