@@ -29,6 +29,10 @@ bin-dir = "cli-{ target }/{ bin }{ binary-ext }"
 name = "html-to-markdown"
 path = "src/main.rs"
 
+[[bin]]
+name = "h2m"
+path = "src/h2m.rs"
+
 [features]
 # ~keep mcp-http opens an unauthenticated HTTP listener; a CLI installed via
 # ~keep brew/cargo/npm/pip must not start a network service by default, so it

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The CLI also installs as `h2m`, a short alias of `html-to-markdown`; shell completions generated through `h2m`
+  complete `h2m`. Every channel ships it: `cargo install`, cargo-binstall archives, the Homebrew tap and Scoop.
+
 ## [3.21.2] - 2026-11-07
 
 ### Fixed

@@ -4,7 +4,7 @@
 // ~keep would require breaking the flat Cli struct into nested groups, which complicates clap
 #![allow(clippy::struct_excessive_bools)]
 
-use crate::validators::{
+use super::validators::{
     CliCodeBlockStyle, CliHeadingStyle, CliHiddenContent, CliHighlightStyle, CliInlineDataMedia, CliLinkStyle,
     CliListIndentType, CliNewlineStyle, CliOutputFormat, CliPreprocessingPreset, CliTierStrategy, CliUrlEscapeStyle,
     CliWhitespaceMode, validate_bullets, validate_strong_em_symbol,

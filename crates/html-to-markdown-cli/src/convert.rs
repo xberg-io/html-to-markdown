@@ -1,7 +1,7 @@
 // ~keep reason: CLI application modules do not expose docs to users; doc coverage not required
 #![allow(missing_docs)]
 
-use crate::args::Cli;
+use super::args::Cli;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use html_to_markdown_rs::{ConversionOptions, OutputFormat, PreprocessingOptions, convert};
 use serde_json::json;

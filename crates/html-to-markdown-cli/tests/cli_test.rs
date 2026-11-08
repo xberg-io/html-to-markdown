@@ -972,3 +972,24 @@ fn test_mcp_help_lists_transport_host_port() {
         .stdout(predicates::str::contains("host"))
         .stdout(predicates::str::contains("port"));
 }
+
+#[test]
+fn test_h2m_alias_converts_stdin() {
+    Command::new(env!("CARGO_BIN_EXE_h2m"))
+        .write_stdin("<h1>Title</h1><p>Content</p>")
+        .assert()
+        .success()
+        .stdout("# Title\n\nContent\n");
+}
+
+#[test]
+fn test_h2m_alias_completion_completes_h2m() {
+    Command::new(env!("CARGO_BIN_EXE_h2m"))
+        .arg("--generate-completion")
+        .arg("bash")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "complete -F _h2m -o bashdefault -o default h2m",
+        ));
+}

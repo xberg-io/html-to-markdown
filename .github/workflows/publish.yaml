@@ -1988,6 +1988,7 @@ jobs:
     with:
       package-name: html-to-markdown-cli
       binary-name: html-to-markdown
+      binary-aliases: h2m
       tag: ${{ needs.prepare.outputs.tag }}
       asset-prefix: cli-
       checkout-ref: ${{ needs.prepare.outputs.checkout_ref }}
@@ -2019,6 +2020,7 @@ jobs:
       smoke-command: |
         html-to-markdown --version
         test "$(printf '<h1>Hello</h1>' | html-to-markdown)" = "# Hello"
+        test "$(printf '<h1>Hello</h1>' | h2m)" = "# Hello"
 
   upload-go-release:
     name: Upload Go FFI archives to GitHub Release

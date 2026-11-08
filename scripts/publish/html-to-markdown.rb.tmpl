@@ -35,6 +35,7 @@ class HtmlToMarkdown < Formula
 
   def install
     bin.install "html-to-markdown"
+    bin.install_symlink "html-to-markdown" => "h2m"
   end
 
   test do
@@ -46,5 +47,6 @@ class HtmlToMarkdown < Formula
     output = shell_output("#{bin}/html-to-markdown test.html")
     assert_match "Hello World", output
     assert_match "**bold**", output
+    assert_equal output, shell_output("#{bin}/h2m test.html")
   end
 end

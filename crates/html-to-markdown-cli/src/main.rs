@@ -98,7 +98,21 @@ fn generate_completions(shell: Shell) {
         Shell::Elvish => ClapShell::Elvish,
     };
 
-    generate(shell, &mut cmd, "html-to-markdown", &mut io::stdout());
+    generate(shell, &mut cmd, invoked_name(), &mut io::stdout());
+}
+
+/// The name this binary was invoked as (`html-to-markdown` or its `h2m` alias), so generated
+/// completions bind to the command the user actually types.
+fn invoked_name() -> String {
+    std::env::args_os()
+        .next()
+        .as_deref()
+        .map(std::path::Path::new)
+        .and_then(std::path::Path::file_stem)
+        .and_then(|stem| stem.to_str())
+        .filter(|stem| *stem == "h2m")
+        .unwrap_or("html-to-markdown")
+        .to_owned()
 }
 
 fn generate_man_page() -> Result<(), String> {
@@ -149,7 +163,12 @@ fn read_input(cli: &Cli) -> Result<String, Box<dyn std::error::Error>> {
     Ok(html)
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// Entry point shared by the `html-to-markdown` and `h2m` binaries.
+///
+/// # Errors
+///
+/// Returns an error when input cannot be read, conversion fails or output cannot be written.
+pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     init_tracing(cli.debug);
 
