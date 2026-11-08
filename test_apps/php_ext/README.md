@@ -1,6 +1,6 @@
 # php-ext test_app
 
-Exercises the configured PHP native extension (`xberg-io/html-to-markdown` v`3.21.2`)
+Exercises the configured PHP native extension (`xberg-io/html-to-markdown` v`3.22.0`)
 installed via [PIE](https://github.com/php/pie).
 
 ## Running

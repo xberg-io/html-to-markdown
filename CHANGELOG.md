@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.22.0] - 2026-11-08
+
 ### Added
 
 - The CLI also installs as `h2m`, a short alias of `html-to-markdown`; shell completions generated through `h2m`
