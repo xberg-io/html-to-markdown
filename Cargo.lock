@@ -37,7 +37,6 @@ checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
 dependencies = [
  "cfg-if",
  "const-random",
- "getrandom 0.3.4",
  "once_cell",
  "version_check",
  "zerocopy",
@@ -1456,7 +1455,6 @@ dependencies = [
 name = "html-to-markdown-ffi"
 version = "3.22.1"
 dependencies = [
- "ahash",
  "cbindgen",
  "html-to-markdown-rs",
  "serde",
@@ -1561,7 +1559,6 @@ dependencies = [
 name = "html-to-markdown-rs-swift"
 version = "3.22.1"
 dependencies = [
- "ahash",
  "async-trait",
  "html-to-markdown-ffi",
  "html-to-markdown-rs",
@@ -1577,7 +1574,6 @@ dependencies = [
 name = "html-to-markdown-wasm"
 version = "3.22.1"
 dependencies = [
- "futures",
  "futures-util",
  "getrandom 0.2.17",
  "getrandom 0.3.4",
