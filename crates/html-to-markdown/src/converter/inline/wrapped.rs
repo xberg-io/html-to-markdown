@@ -442,6 +442,52 @@ fn inline_edges<'a>(content: &'a str, options: &crate::options::ConversionOption
     (prefix, suffix, trimmed)
 }
 
+fn emit_blank_wrapper(output: &mut String, content: &str, prefix: &str, suffix: &str, site: InlineSite<'_>) -> bool {
+    let InlineSite {
+        node_handle,
+        parser,
+        dom_ctx,
+        ctx,
+        options,
+    } = site;
+    // ~keep A noncollapsible blank body after an existing space keeps its character (#843).
+    // ~keep Leading whitespace or a leading break still follows the existing blank-wrapper rule.
+    let marker = crate::converter::main_helpers::hard_break_marker(options);
+    let blank_body = content.trim_end_matches(marker);
+    if output.ends_with([' ', '\t'])
+        && !content.starts_with(crate::converter::utility::white_space::is_collapsible)
+        && blank_body.chars().all(char::is_whitespace)
+        && !blank_body
+            .chars()
+            .all(crate::converter::utility::white_space::is_collapsible)
+    {
+        let body = blank_body.trim_matches(crate::converter::utility::white_space::is_collapsible);
+        output.push_str(body);
+        let breaks = &content[blank_body.len()..];
+        if breaks.is_empty() {
+            crate::converter::append_inline_suffix(output, suffix, !body.is_empty(), node_handle, parser, dom_ctx);
+        } else {
+            output.push_str(breaks);
+        }
+        return true;
+    }
+    // ~keep A backslash hard-break suffix must not turn a blank body into literal empty marks.
+    if blank_body.trim().is_empty() {
+        if content.is_empty() {
+            return true;
+        }
+        // ~keep issue #481: a whitespace-only body (e.g. `<i> </i>`) is one space at most, and
+        // ~keep none where the rule of running text owes none (after a space, at a line start).
+        if crate::converter::utility::white_space::space_is_owed_in(output, ctx) {
+            output.push_str(prefix);
+        }
+        crate::converter::append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);
+        return true;
+    }
+
+    false
+}
+
 /// Emit `content` wrapped in `delimiters`, handling delimiter-run adjacency with a preceding
 /// sibling and a body that is non-empty but entirely whitespace.
 pub fn emit_wrapped_inline(
@@ -479,38 +525,7 @@ pub fn emit_wrapped_inline(
     if emit_break_sentinel(output, content, ctx, options) {
         return;
     }
-    // ~keep A noncollapsible blank body after an existing space keeps its character (#843).
-    // ~keep Leading whitespace or a leading break still follows the existing blank-wrapper rule.
-    let marker = crate::converter::main_helpers::hard_break_marker(options);
-    let blank_body = content.trim_end_matches(marker);
-    if output.ends_with([' ', '\t'])
-        && !content.starts_with(crate::converter::utility::white_space::is_collapsible)
-        && blank_body.chars().all(char::is_whitespace)
-        && !blank_body
-            .chars()
-            .all(crate::converter::utility::white_space::is_collapsible)
-    {
-        let body = blank_body.trim_matches(crate::converter::utility::white_space::is_collapsible);
-        output.push_str(body);
-        let breaks = &content[blank_body.len()..];
-        if breaks.is_empty() {
-            append_inline_suffix(output, suffix, !body.is_empty(), node_handle, parser, dom_ctx);
-        } else {
-            output.push_str(breaks);
-        }
-        return;
-    }
-    // ~keep A backslash hard-break suffix must not turn a blank body into literal empty marks.
-    if blank_body.trim().is_empty() {
-        if content.is_empty() {
-            return;
-        }
-        // ~keep issue #481: a whitespace-only body (e.g. `<i> </i>`) is one space at most, and
-        // ~keep none where the rule of running text owes none (after a space, at a line start).
-        if crate::converter::utility::white_space::space_is_owed_in(output, ctx) {
-            output.push_str(prefix);
-        }
-        append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);
+    if emit_blank_wrapper(output, content, prefix, suffix, site) {
         return;
     }
 
