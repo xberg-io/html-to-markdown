@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.22.1] - 2026-11-13
+
+### Fixed
+
+- Run Python visitor callbacks supplied through conversion options (#976).
+- Render nested tables in layout cells as separate Markdown blocks (#975).
+
+### Changed
+
+- Build with Rust 1.100.0 and update Cargo dependencies.
+
 ## [3.22.0] - 2026-11-08
 
 ### Added
