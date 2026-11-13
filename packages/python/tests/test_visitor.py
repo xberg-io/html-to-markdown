@@ -1,6 +1,6 @@
 from typing import cast
 
-from html_to_markdown import ConversionOptions, NodeContext, convert
+from html_to_markdown import ConversionOptions, NodeContext, convert, convert_with_accessible_names
 from html_to_markdown.api import HtmlVisitor
 
 
@@ -27,6 +27,17 @@ def test_visitor_honors_tagged_link_and_image_actions() -> None:
     result = convert(html, visitor=cast("HtmlVisitor", LinkAndImageVisitor()))
 
     assert result.content == "[Download](https://new-cdn.example/file.pdf) ![Photo](https://assets.example/photo.jpg)\n"
+
+
+def test_visitor_from_options_is_used_by_both_conversion_entry_points() -> None:
+    html = '<a href="https://old-cdn.example/file.pdf">Download</a>'
+    options = ConversionOptions(visitor=LinkAndImageVisitor())
+
+    assert convert(html, options=options).content == "[Download](https://new-cdn.example/file.pdf)\n"
+    assert (
+        convert_with_accessible_names(html, False, options=options).content
+        == "[Download](https://new-cdn.example/file.pdf)\n"
+    )
 
 
 class AttributeVisitor:
