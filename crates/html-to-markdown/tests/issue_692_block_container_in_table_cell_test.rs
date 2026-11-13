@@ -386,11 +386,11 @@ fn should_break_before_a_block_in_a_summary_or_figcaption_the_same_in_both_tiers
     for (html, want) in [
         (
             "<summary><h3>for T<div>where</div></h3></summary>",
-            "**### for T where**\n",
+            "### **for T where**\n",
         ),
         (
             "<figure><figcaption><h3>for T<div>where</div></h3></figcaption></figure>",
-            "*### for T where*\n",
+            "### *for T where*\n",
         ),
     ] {
         let tier2_out = tier2(html, false);
