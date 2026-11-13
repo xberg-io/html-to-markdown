@@ -1494,7 +1494,6 @@ dependencies = [
  "async-trait",
  "html-to-markdown-rs",
  "pyo3",
- "pyo3-async-runtimes",
  "serde",
  "serde_json",
  "tokio",
@@ -1590,7 +1589,6 @@ dependencies = [
  "serde_json",
  "tracing",
  "wasm-bindgen",
- "wasm-bindgen-futures",
 ]
 
 [[package]]
@@ -2685,20 +2683,6 @@ dependencies = [
  "pyo3-build-config",
  "pyo3-ffi",
  "pyo3-macros",
-]
-
-[[package]]
-name = "pyo3-async-runtimes"
-version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b877331c7817ccb6379e9d19a06993160141f1d0a386e55276128717df85e3fc"
-dependencies = [
- "futures-channel",
- "futures-util",
- "once_cell",
- "pin-project-lite",
- "pyo3",
- "tokio",
 ]
 
 [[package]]
