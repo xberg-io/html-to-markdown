@@ -926,9 +926,7 @@ fn serve_once_bytes(
             let _ = stream.read(&mut buffer);
             let _ = tx.send(String::from_utf8_lossy(&buffer).to_string());
 
-            let ct_header = content_type
-                .map(|ct| format!("Content-Type: {ct}\r\n"))
-                .unwrap_or_default();
+            let ct_header = content_type.map_or_else(String::new, |ct| format!("Content-Type: {ct}\r\n"));
             let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n{ct_header}\r\n", body.len());
             let _ = stream.write_all(response.as_bytes());
             let _ = stream.write_all(&body);

@@ -42,7 +42,7 @@ astral-html.workspace = true
 axum = { version = "0.8", optional = true }
 base64.workspace = true
 bitflags = "2"
-html-escape = "0.3.0"
+html-escape = "0.3.1"
 html5ever.workspace = true
 image = { version = "0.25", default-features = false, features = [
     "gif",
@@ -55,7 +55,7 @@ memchr = "2"
 once_cell.workspace = true
 phf = { version = "0.14", features = ["macros"] }
 regex.workspace = true
-rmcp = { version = "3.8.0", features = [
+rmcp = { version = "3.10.0", features = [
     "server",
     "macros",
     "transport-io",

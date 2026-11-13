@@ -281,7 +281,7 @@ fn should_start_an_empty_item_that_completes_a_thematic_break_on_the_next_line()
         // ~keep The moved marker keeps the column it has on the line of markers.
         let width = ConversionOptions {
             list_indent_width: 4,
-            ..options.clone()
+            ..options
         };
         assert_items(
             "<ul><li><ul><li><ul><li></li></ul></li></ul></li></ul>",

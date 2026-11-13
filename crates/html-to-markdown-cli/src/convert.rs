@@ -29,7 +29,7 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
 
     let preprocessing = PreprocessingOptions {
         enabled: cli.preprocess,
-        preset: cli.preset.map(Into::into).unwrap_or_default(),
+        preset: cli.preset.map_or_else(Default::default, Into::into),
         remove_navigation: !cli.keep_navigation,
         remove_forms: !cli.keep_forms,
     };

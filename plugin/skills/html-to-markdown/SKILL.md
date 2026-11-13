@@ -11,7 +11,7 @@ name: html-to-markdown
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:5abd004690ce3046e7a1c602d30fe8a23b961e3b6767988ebf6cc144c55d4a45
-Source-Hash: blake3:89dec5c993f905659e940f245ca0f0d32e1a4fcb2b1f223ad805c7a92627a840
+Source-Hash: blake3:9069769ceb066b2af95a2f0cf9395a9073ad129cb1a3358b2fb42760712319a0
 Schema-Version: v1
 -->
 

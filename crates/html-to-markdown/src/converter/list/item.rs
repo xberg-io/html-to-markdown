@@ -613,10 +613,13 @@ fn render_regular_item(
         strip_trailing_backslash_breaks(output, item_start);
     }
     #[cfg(feature = "visitor")]
-    if visit_regular_item(node_handle, tag, parser, output, render) {
-        return true;
+    {
+        visit_regular_item(node_handle, tag, parser, output, render)
     }
-    false
+    #[cfg(not(feature = "visitor"))]
+    {
+        false
+    }
 }
 
 fn finish_list_item(output: &mut String, ctx: &Context, has_block_children: bool) {

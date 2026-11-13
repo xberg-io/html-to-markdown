@@ -175,7 +175,9 @@ const TWO_NESTED_TABLES: &str = concat!(
 
 #[test]
 fn should_match_tier2_output_when_auto_routing_a_table_containing_two_nested_tables() {
-    assert_auto_matches_tier2_layout_output(TWO_NESTED_TABLES, "two nested tables");
+    let expected = "| x |\n| --- |\n\n| y |\n| --- |\n";
+    assert_eq!(convert_with(TWO_NESTED_TABLES, TierStrategy::Tier2), expected);
+    assert_eq!(convert_with(TWO_NESTED_TABLES, TierStrategy::Auto), expected);
 }
 
 #[test]

@@ -142,3 +142,18 @@ fn deeply_nested_wrappers_preserve_surrounding_content_and_depth_warning() {
     );
     assert!(!result.tables.is_empty());
 }
+
+#[test]
+fn sibling_tables_in_layout_row_render_as_separate_blocks() {
+    let html = concat!(
+        "<table><tr><td>1)</td><td>2)</td></tr><tr>",
+        "<td><table><tr><td>A</td><td>B</td></tr></table></td>",
+        "<td><table><tr><td>C</td><td>D</td></tr></table></td>",
+        "</tr></table>",
+    );
+    let output = convert(html, None).unwrap().content.unwrap();
+    assert_eq!(
+        output,
+        "- 1) 2)\n\n| A | B |\n| --- | --- |\n\n| C | D |\n| --- | --- |\n"
+    );
+}

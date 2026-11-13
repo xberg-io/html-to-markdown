@@ -610,18 +610,7 @@ impl TableWalk {
                     .join(" "),
                 site.options.br_in_tables,
             ),
-            Mode::Layout => cells::append_layout_text(
-                &mut self.text,
-                &self
-                    .row_texts
-                    .iter()
-                    .filter(|text| !text.is_empty())
-                    .cloned()
-                    .collect::<Vec<_>>()
-                    .join(" "),
-                site.options,
-                site.context,
-            ),
+            Mode::Layout => self.append_layout_row(site),
             Mode::Wrapper => {}
         }
     }
@@ -650,6 +639,16 @@ const fn row_env<'a>(site: &'a HookSite<'a>) -> cells::RowEnv<'a> {
 }
 
 impl TableWalk {
+    fn append_layout_row(&mut self, site: &HookSite<'_>) {
+        let row = self
+            .row_texts
+            .drain(..)
+            .filter(|text| !text.is_empty())
+            .collect::<Vec<_>>()
+            .join(" ");
+        cells::append_layout_text(&mut self.text, &row, site.options, site.context);
+    }
+
     #[cfg(feature = "visitor")]
     fn start_inert(&mut self, node: crate::dom::NodeHandle, depth: usize, end: usize, site: &HookSite<'_>) {
         let data = match &self.mode {
@@ -848,6 +847,8 @@ impl ChildHook for TableWalk {
                 }
                 let nested = matches!(active.spec.kind, CellKind::Render)
                     && utils::is_or_contains_table(&node, site.parser, site.dom_context);
+                let layout_table = matches!(active.spec.kind, CellKind::Layout)
+                    && utils::is_tag_name(&node, site.parser, site.dom_context, "table");
                 let scope = if nested {
                     Rc::new(Context {
                         allow_nested_table_markup: active.spec.defer,
@@ -856,7 +857,7 @@ impl ChildHook for TableWalk {
                 } else {
                     Rc::clone(&active.scope)
                 };
-                let buffer = if nested {
+                let buffer = if nested || layout_table {
                     String::new()
                 } else {
                     std::mem::take(&mut active.text)
@@ -881,6 +882,25 @@ impl ChildHook for TableWalk {
         let Step::Content { node, .. } = self.steps[index] else {
             return;
         };
+        if matches!(active.spec.kind, CellKind::Layout)
+            && utils::is_tag_name(&node, site.parser, site.dom_context, "table")
+        {
+            let table = text.trim();
+            if !table.is_empty() {
+                self.row_texts.push(
+                    crate::text::normalize_whitespace_cow(&std::mem::take(&mut active.text))
+                        .trim()
+                        .to_string(),
+                );
+                self.append_layout_row(site);
+                if !self.text.is_empty() && !self.text.ends_with("\n\n") {
+                    self.text.push('\n');
+                }
+                self.text.push_str(table);
+                self.text.push('\n');
+            }
+            return;
+        }
         if !matches!(active.spec.kind, CellKind::Render)
             || !utils::is_or_contains_table(&node, site.parser, site.dom_context)
         {
