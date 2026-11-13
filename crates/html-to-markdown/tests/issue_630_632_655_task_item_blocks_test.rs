@@ -122,7 +122,7 @@ fn should_keep_a_block_inside_an_inline_marker_on_the_checkbox_line() {
     for (html, expected) in [
         (
             r#"<ul><li><input type="checkbox"><b><h2>h</h2></b></li></ul>"#,
-            "- [ ] **## h**\n",
+            "- [ ] ## **h**\n",
         ),
         (
             r#"<ul><li><input type="checkbox"><a href="u"><h2>h</h2></a></li></ul>"#,

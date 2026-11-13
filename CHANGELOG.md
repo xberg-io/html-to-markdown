@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Run Python visitor callbacks supplied through conversion options (#976).
 - Render nested tables in layout cells as separate Markdown blocks (#975).
+- Preserve Markdown heading syntax inside inline formatting and fix Node visitor preprocessing and navigation (#977).
 
 ### Changed
 
