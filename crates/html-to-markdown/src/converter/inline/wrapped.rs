@@ -111,12 +111,14 @@ pub fn needs_block_wrapping(content: &str) -> bool {
         let block = block.trim_start_matches([' ', '\t']);
         block.starts_with('#') && markdown_block_prefix_len(block) > 0
     };
-    block_runs_are_single_line(content)
-        && (content.contains("\n\n") || is_heading(content.trim()))
-        && content.split("\n\n").all(|block| {
-            let indentation = block.bytes().take_while(|byte| matches!(byte, b' ' | b'\t')).count();
-            is_heading(block) || markdown_block_prefix_len(block) == indentation
-        })
+    let trimmed = content.trim();
+    (is_heading(trimmed) && !trimmed.contains('\n'))
+        || (block_runs_are_single_line(content)
+            && content.contains("\n\n")
+            && content.split("\n\n").all(|block| {
+                let indentation = block.bytes().take_while(|byte| matches!(byte, b' ' | b'\t')).count();
+                is_heading(block) || markdown_block_prefix_len(block) == indentation
+            }))
 }
 
 /// ~keep Multi-line structured blocks need tree-aware delimiter placement; the shared wrapper
