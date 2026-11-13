@@ -11,10 +11,6 @@ description = "Benchmark harness and golden oracle for html-to-markdown-rs"
 publish = false
 build = "build.rs"
 
-[package.metadata.cargo-machete]
-# Kept available for golden-oracle diff assertions; not currently referenced.
-ignored = ["pretty_assertions"]
-
 [lib]
 name = "html_to_markdown_bench"
 path = "src/lib.rs"
@@ -39,7 +35,6 @@ clap = { version = "4.6", features = ["derive"] }
 # keeping the compiled dependency and recorded provenance in lockstep.
 html-to-markdown-rs = { path = "../../crates/html-to-markdown", default-features = false }
 humantime = "2"
-pretty_assertions = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "1.2"
