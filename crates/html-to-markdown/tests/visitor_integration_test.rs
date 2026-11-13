@@ -646,3 +646,19 @@ fn test_visitor_table_callbacks() {
 }
 
 include!("support/visitor_integration_extended.rs");
+
+#[test]
+fn should_keep_navigation_preprocessing_enabled_with_a_visitor() {
+    #[derive(Debug)]
+    struct EmptyVisitor;
+    impl HtmlVisitor for EmptyVisitor {}
+
+    let html = "<html><body><nav><a href='/'>Home</a></nav><main><p>Content</p></main></body></html>";
+    let visitor: VisitorHandle = Arc::new(Mutex::new(EmptyVisitor));
+    let options = ConversionOptions::default();
+    assert!(options.preprocessing.enabled && options.preprocessing.remove_navigation);
+    assert_eq!(
+        convert(html, Some(options), Some(visitor)).unwrap().content.as_deref(),
+        Some("Content\n"),
+    );
+}

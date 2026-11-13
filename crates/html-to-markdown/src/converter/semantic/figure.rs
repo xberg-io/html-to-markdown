@@ -333,9 +333,16 @@ pub fn close_figcaption(
         return;
     }
     separate_caption(output);
-    output.push(handler.options.strong_em_symbol);
-    output.push_str(text);
-    output.push(handler.options.strong_em_symbol);
+    use crate::converter::inline::wrapped::{needs_block_wrapping, wrap_block_runs};
+    let symbol = handler.options.strong_em_symbol;
+    if needs_block_wrapping(text) {
+        let marker = symbol.to_string();
+        output.push_str(&wrap_block_runs(text, &marker, &marker));
+    } else {
+        output.push(symbol);
+        output.push_str(text);
+        output.push(symbol);
+    }
     output.push_str("\n\n");
 }
 

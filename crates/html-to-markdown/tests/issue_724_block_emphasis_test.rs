@@ -52,3 +52,19 @@ fn should_split_strong_and_emphasis_markers_around_block_children() {
     assert_all_tiers("<strong>a<div>b</div>c</strong>", "**a**\n\n**b**\n\n**c**\n");
     assert_all_tiers("<em>a<div>b</div>c</em>", "*a*\n\n*b*\n\n*c*\n");
 }
+
+#[test]
+fn should_place_emphasis_inside_headings() {
+    assert_all_tiers(
+        "<details><summary><h3>Question</h3><p>Subtitle</p></summary><p>Answer</p></details>",
+        "### **Question**\n\n**Subtitle**\n\nAnswer\n",
+    );
+    assert_all_tiers("<strong><h3>Title</h3></strong>", "### **Title**\n");
+    assert_all_tiers("<em><h3>Title</h3></em>", "### *Title*\n");
+    assert_all_tiers(
+        "<figcaption><h3>Title</h3><p>Description</p></figcaption>",
+        "### *Title*\n\n*Description*\n",
+    );
+    assert_all_tiers("<del><h3>Title</h3></del>", "### ~~Title~~\n");
+    assert_all_tiers("<mark><h3>Title</h3></mark>", "### ==Title==\n");
+}

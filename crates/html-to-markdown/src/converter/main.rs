@@ -891,7 +891,7 @@ pub(super) fn should_skip_tag(
     let visitor_is_active = handler.ctx.visitor.is_some() && !handler.ctx.skip_visitor_hooks;
     #[cfg(not(feature = "visitor"))]
     let visitor_is_active = false;
-    (!visitor_is_active
+    (!(visitor_is_active && tag_name == "form")
         && should_drop_for_preprocessing(
             tag_name,
             tag,

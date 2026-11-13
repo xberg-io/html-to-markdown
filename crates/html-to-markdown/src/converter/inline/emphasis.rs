@@ -17,8 +17,8 @@ use std::rc::Rc;
 type Context = crate::converter::Context;
 
 use crate::converter::inline::wrapped::{
-    EMPHASIS_SIBLING_TAGS, InlineDelimiters, InlineSite, STRONG_SIBLING_TAGS, block_runs_are_plain,
-    block_runs_are_single_line, emit_first_block_wrapped, emit_wrapped_inline, wrap_block_runs,
+    EMPHASIS_SIBLING_TAGS, InlineDelimiters, InlineSite, STRONG_SIBLING_TAGS, block_runs_are_single_line,
+    emit_first_block_wrapped, emit_wrapped_inline, needs_block_wrapping, wrap_block_runs,
 };
 
 /// Resolve `<strong>`/`<b>`'s wrapping delimiters for the current context and options, then
@@ -36,7 +36,7 @@ pub fn emit_strong_wrapped(output: &mut String, content: &str, site: InlineSite<
     if emit_first_block_wrapped(output, content, &marker, &marker, ctx, site.parser) {
         return;
     }
-    if !marker.is_empty() && content.contains("\n\n") && block_runs_are_plain(content) {
+    if !marker.is_empty() && needs_block_wrapping(content) {
         output.push_str(&wrap_block_runs(content, &marker, &marker));
         return;
     }
@@ -130,7 +130,7 @@ fn emit_emphasis_wrapped(output: &mut String, content: &str, site: InlineSite<'_
     if emit_first_block_wrapped(output, content, &marker, &marker, site.ctx, site.parser) {
         return;
     }
-    if content.contains("\n\n") && block_runs_are_plain(content) {
+    if needs_block_wrapping(content) {
         output.push_str(&wrap_block_runs(content, &marker, &marker));
         return;
     }

@@ -740,7 +740,7 @@ fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
             dest.push_str("\n\n");
         }
     }
-    if trimmed.contains("\n\n") && crate::converter::inline::wrapped::block_runs_are_plain(trimmed) {
+    if crate::converter::inline::wrapped::needs_block_wrapping(trimmed) {
         dest.push_str(&crate::converter::inline::wrapped::wrap_block_runs(trimmed, "**", "**"));
     } else {
         dest.push_str("**");
@@ -794,9 +794,15 @@ fn close_figcaption(state: &mut Tier1State, _frame: &OpenTag) {
             dest.push_str("\n\n");
         }
     }
-    dest.push('*');
-    dest.push_str(trimmed);
-    dest.push_str("*\n\n");
+    use crate::converter::inline::wrapped::{needs_block_wrapping, wrap_block_runs};
+    if needs_block_wrapping(trimmed) {
+        dest.push_str(&wrap_block_runs(trimmed, "*", "*"));
+    } else {
+        dest.push('*');
+        dest.push_str(trimmed);
+        dest.push('*');
+    }
+    dest.push_str("\n\n");
 }
 
 /// Close a `<progress>`, `<meter>` or `<output>` (Phase T).  When the control produced visible
@@ -938,7 +944,7 @@ fn handle_empty_inline_body(
 
 fn wrap_inline_block_runs(buf: &mut String, content_start: usize, marker: &str) -> bool {
     let content = &buf[content_start..];
-    if !content.contains("\n\n") || !crate::converter::inline::wrapped::block_runs_are_plain(content) {
+    if !crate::converter::inline::wrapped::needs_block_wrapping(content) {
         return false;
     }
     let content = content.to_owned();

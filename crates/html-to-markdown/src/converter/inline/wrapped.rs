@@ -105,14 +105,18 @@ pub fn wrap_block_runs(content: &str, open: &str, close: &str) -> String {
     wrapped
 }
 
-/// ~keep General inline handlers split only plain paragraph-like runs. Structured Markdown
-/// remains on its established path because moving a delimiter across nested list/quote syntax
-/// changes the block tree; legend opts into that explicitly for its pinned list behavior.
-pub fn block_runs_are_plain(content: &str) -> bool {
+/// Whether a wrapper can format separate paragraph and ATX heading runs.
+pub fn needs_block_wrapping(content: &str) -> bool {
+    let content = content.trim();
+    let is_heading = |block: &str| {
+        let block = block.trim_start_matches([' ', '\t']);
+        block.starts_with('#') && markdown_block_prefix_len(block) > 0
+    };
     block_runs_are_single_line(content)
+        && (content.contains("\n\n") || is_heading(content))
         && content.split("\n\n").all(|block| {
-            let indentation = block.bytes().take_while(|byte| matches!(byte, b' ' | b'\t')).count();
-            markdown_block_prefix_len(block) == indentation
+            let block = block.trim_start_matches([' ', '\t']);
+            is_heading(block) || markdown_block_prefix_len(block) == 0
         })
 }
 
@@ -460,6 +464,11 @@ pub fn emit_wrapped_inline(
     } = *delimiters;
     use crate::converter::utility::siblings::get_previous_sibling_tag;
     use crate::converter::{append_inline_suffix, merge_adjacent_emphasis};
+
+    if !open.is_empty() && needs_block_wrapping(content) {
+        output.push_str(&wrap_block_runs(content, open, close));
+        return;
+    }
 
     let moved = move_leading_hard_breaks(output, strict_blank_separator(content, site), ctx, options);
     // ~keep A blank wrapper after real strong markup remains a separator (#502/#504).
