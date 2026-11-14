@@ -126,6 +126,7 @@ jobs:
   validate:
     uses: xberg-io/actions/.github/workflows/reusable-validate.yml@v1
     with:
+      runner: ubuntu-24.04
       setup-rust: true
       setup-python: true
       # poly's checkstyle whole-project check runs `mvn checkstyle:check`;
