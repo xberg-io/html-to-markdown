@@ -1559,7 +1559,6 @@ dependencies = [
 name = "html-to-markdown-rs-swift"
 version = "3.22.1"
 dependencies = [
- "async-trait",
  "html-to-markdown-ffi",
  "html-to-markdown-rs",
  "libc",
