@@ -2,9 +2,9 @@
 # Refresh it with `ai-rulez lock`; `ai-rulez generate --locked` fails when it is stale.
 
 version = 1
-ai_rulez_version = '5.12.0'
+ai_rulez_version = '5.12.1'
 scope = 'all'
-tree = 'sha256:a74f9d2a21f5ddc053240d9cd9450dcab6afc6941c9e85b4370550eecb30cbcd'
+tree = 'sha256:478fa73da4c45def4856609c703c3a6b7bd71497cd15bd1e5bb18b6705b3e571'
 
 [[include]]
 name = 'xberg-bindings'
@@ -87,7 +87,7 @@ digest = 'sha256:eb41348cdeb82cef385f3230b33bb436011ef32813fd0876ea80c5e7c0449dc
 name = 'api'
 source = '.agents/skills/api'
 commit = ''
-digest = 'sha256:c43ee95ed871149a4eb9de91a6fe6164bcf0ccd6700ad7ea3a5ae2c475a853f9'
+digest = 'sha256:e32d926b6f0a4abb615fc50032f3c754cd6e6269a86fb72f97a6fc32eb3bfea8'
 
 [[served]]
 name = 'basemind-tools'
@@ -111,7 +111,7 @@ digest = 'sha256:ab529dd0b7133c43697f12c9285b314f7098ec1f9f9db4c8ef1d9c86b272955
 name = 'claude.skills.api'
 source = '.claude/skills/api'
 commit = ''
-digest = 'sha256:405171b0faa3076280960f2ee86304e70b2af2f9318cdef310950736fa89bca1'
+digest = 'sha256:e8ed5346f55fe17b5c043742712cb5256242553a3cca85202ddb21b4032a82bc'
 
 [[served]]
 name = 'claude.skills.cli'
