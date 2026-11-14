@@ -252,7 +252,7 @@ checksum = "d45ed4d99334da2a2f221504e8ffc8ad09baf2a452b154465a976bfde697b004"
 
 [[package]]
 name = "html-to-markdown-rb"
-version = "3.22.1"
+version = "3.22.2"
 dependencies = [
  "async-trait",
  "html-to-markdown-rs",
@@ -266,7 +266,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.22.1"
+version = "3.22.2"
 dependencies = [
  "ahash",
  "astral-html",

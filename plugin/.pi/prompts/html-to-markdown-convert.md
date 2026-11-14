@@ -5,7 +5,7 @@ description: Convert HTML to Markdown
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:0901ea656b7d1f2388c4cef72949263a07c7e3ad049756e3fdaca2211fe6a160
-Source-Hash: blake3:4b8ba5033e49c69ed09bbaaceb7ef28a76b6ac18a031a3761951628b493e0c93
+Source-Hash: blake3:1ed3f3e4e0fbffe751f33048eb28aec65244e2b0f41355b1a7d5ea13ba281e20
 Schema-Version: v1
 -->
 
