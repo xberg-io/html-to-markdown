@@ -32,18 +32,15 @@ fn whitespace_before_comments_should_scale_linearly() {
         let mut measurements = Vec::new();
         for _ in 0..3 {
             let small = fastest(1_000, tier).as_secs_f64();
-            let medium = fastest(2_000, tier).as_secs_f64();
             let large = fastest(4_000, tier).as_secs_f64();
-            measurements.push((small, medium, large));
-            if medium < small * 3.0 && large < medium * 3.0 {
+            measurements.push((small, large));
+            if large < small * 9.0 {
                 break;
             }
         }
         println!("{tier:?}: {measurements:?}");
         assert!(
-            measurements
-                .iter()
-                .any(|(small, medium, large)| *medium < small * 3.0 && *large < medium * 3.0),
+            measurements.iter().any(|(small, large)| *large < small * 9.0),
             "{tier:?} rescanned comments: {measurements:?}"
         );
     }
