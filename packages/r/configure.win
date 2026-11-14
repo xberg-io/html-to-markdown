@@ -10,7 +10,8 @@
 #      This is the path taken by r-universe and anyone installing from a
 #      source tarball built outside the monorepo.
 
-if [ ! -f "src/rust/vendor/html-to-markdown-rs/Cargo.toml" ]; then
+if [ ! -f "../../crates/html-to-markdown/Cargo.toml" ] &&
+   [ ! -f "src/rust/vendor/html-to-markdown-rs/Cargo.toml" ]; then
   # Strategy 1: monorepo
   REPO_ROOT="$(cd ../.. 2>/dev/null && pwd)"
   VENDOR_SCRIPT="${REPO_ROOT}/scripts/ci/r/vendor-core-crate.py"
