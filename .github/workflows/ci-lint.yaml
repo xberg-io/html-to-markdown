@@ -142,6 +142,8 @@ jobs:
       # the git hooks and CI never saw them. ~keep
       setup-go: true
       setup-ruby: true
+      setup-php: true
+      php-version: "8.4"
       setup-dart: true
       setup-elixir: true
       # zig and R snippets validated as `Unavailable` -- "toolchain not found" -- because
