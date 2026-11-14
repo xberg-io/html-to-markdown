@@ -1,37 +1,37 @@
 {
   "schema": 2,
-  "campaign_id": "695ce726d09f253565b6c16e58a953c701dec60e:2026-10-03T17:03:15.089559869Z",
+  "campaign_id": "0b134cf7394cb26d1d0c9ce7f8c2aa31093d43ff:2026-11-14T13:53:00.192653021Z",
   "thresholds": {
+    "clean_medium": {
+      "max_regression_pct": 8.0
+    },
+    "fallthrough_bare_lt": {
+      "max_regression_pct": 10.0
+    },
     "spec_rules": {
       "max_regression_pct": 10.0
     },
-    "fallthrough_bare_lt": {
+    "clean_small": {
+      "max_regression_pct": 10.0
+    },
+    "fallthrough_custom_elements": {
       "max_regression_pct": 10.0
     },
     "adversarial": {
       "max_regression_pct": 30.0
     },
-    "clean_medium": {
-      "max_regression_pct": 8.0
-    },
     "clean_large": {
       "max_regression_pct": 5.0
-    },
-    "fallthrough_custom_elements": {
-      "max_regression_pct": 10.0
-    },
-    "clean_small": {
-      "max_regression_pct": 10.0
     }
   },
   "calibration_provenance": {
     "os": "linux",
     "arch": "x86_64",
-    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "cpu_model": "Intel(R) Xeon(R) 6975P-C",
     "cpu_count": 4,
-    "rustc_verbose": "rustc 1.95.0 (59807616e 2026-04-14)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.95.0\nLLVM version: 22.1.2",
+    "rustc_verbose": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
     "rustc_host": "x86_64-unknown-linux-gnu",
-    "cargo_version": "cargo 1.95.0 (f2d3ce0bd 2026-03-21)",
+    "cargo_version": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
     "profile": "release",
     "build_flags": "-D warnings -A unpredictable-function-pointer-comparisons -A mismatched-lifetime-syntaxes",
     "measurement_mode": "nine-batch-median-mad-v2",
@@ -51,179 +51,179 @@
     "runner_class": "github-hosted"
   },
   "fixture_floors": {
-    "real-world/issues/gh-127-issue.html": {
+    "real-world/issues/gh-190/ozonekorea.html": {
       "sample_count": 40,
-      "median_ms": 16.594149708333333,
-      "mad_ms": 0.0897917916666664,
-      "floor_ms": 0.31553891666666445
-    },
-    "real-world/issues/gh-121-hacker-news.html": {
-      "sample_count": 40,
-      "median_ms": 1.69421685,
-      "mad_ms": 0.004569750000000039,
-      "floor_ms": 0.026906538932147006
-    },
-    "mdream/wikipedia-small.html": {
-      "sample_count": 40,
-      "median_ms": 4.2013817499999995,
-      "mad_ms": 0.007192083333332988,
-      "floor_ms": 0.03154116666666695
-    },
-    "real-world/issues/gh-190/sjsu.html": {
-      "sample_count": 40,
-      "median_ms": 0.9403611851851852,
-      "mad_ms": 0.005821030808080774,
-      "floor_ms": 0.02558303039832277
-    },
-    "real-world/issues/gh-190/insight.html": {
-      "sample_count": 40,
-      "median_ms": 0.19728255016618199,
-      "mad_ms": 0.0013426417001747154,
-      "floor_ms": 0.004008791546618318
-    },
-    "real-world/wikipedia/medium_python.html": {
-      "sample_count": 40,
-      "median_ms": 55.250820000000004,
-      "mad_ms": 0.37981900000000124,
-      "floor_ms": 0.8521399999999986
-    },
-    "mdream/vuejs-docs.html": {
-      "sample_count": 40,
-      "median_ms": 5.4856486,
-      "mad_ms": 0.009397044444444447,
-      "floor_ms": 0.03442029999999985
-    },
-    "mdream/nuxt-example.html": {
-      "sample_count": 40,
-      "median_ms": 0.05126404967699168,
-      "mad_ms": 0.00012517083901570844,
-      "floor_ms": 0.0006744486341288131
-    },
-    "real-world/issues/gh-190/mitrade.html": {
-      "sample_count": 40,
-      "median_ms": 0.07985528150130478,
-      "mad_ms": 0.0005552898082771332,
-      "floor_ms": 0.0019376266090967431
-    },
-    "mdream/mdn-array.html": {
-      "sample_count": 40,
-      "median_ms": 9.792242166666666,
-      "mad_ms": 0.03259875000000001,
-      "floor_ms": 0.140327166666669
-    },
-    "real-world/issues/gh-190/plusblog.html": {
-      "sample_count": 40,
-      "median_ms": 2.000125285384615,
-      "mad_ms": 0.0032923492307692648,
-      "floor_ms": 0.02223486000000019
-    },
-    "synthetic/table_no_tbody.html": {
-      "sample_count": 40,
-      "median_ms": 0.01879446936753886,
-      "mad_ms": 0.00012002427731944154,
-      "floor_ms": 0.0003691916802033082
-    },
-    "real-world/issues/gh-190/kimbrain.html": {
-      "sample_count": 40,
-      "median_ms": 2.805736277777778,
-      "mad_ms": 0.0058021111111108414,
-      "floor_ms": 0.026348444444444397
+      "median_ms": 2.4980692160714284,
+      "mad_ms": 0.007100727976190324,
+      "floor_ms": 0.018382476190476282
     },
     "mdream/github-markdown-complete.html": {
       "sample_count": 40,
-      "median_ms": 10.0925849,
-      "mad_ms": 0.039093000000000266,
-      "floor_ms": 0.13180119999999995
-    },
-    "synthetic/cdata_in_svg.html": {
-      "sample_count": 40,
-      "median_ms": 0.012293813057529517,
-      "mad_ms": 0.00009349611330956766,
-      "floor_ms": 0.0005207720065559928
-    },
-    "real-world/wikipedia/small_html.html": {
-      "sample_count": 40,
-      "median_ms": 20.702064166666666,
-      "mad_ms": 0.23588433333333114,
-      "floor_ms": 3.355968333333333
-    },
-    "real-world/issues/gh-190/ozonekorea.html": {
-      "sample_count": 40,
-      "median_ms": 2.6348023749999996,
-      "mad_ms": 0.008418386842105052,
-      "floor_ms": 0.022315600000000213
-    },
-    "real-world/wikipedia/lists_timeline.html": {
-      "sample_count": 40,
-      "median_ms": 9.131580333333334,
-      "mad_ms": 0.026678916666666552,
-      "floor_ms": 0.07545783333333134
-    },
-    "real-world/wikipedia/tables_countries.html": {
-      "sample_count": 40,
-      "median_ms": 13.523123875,
-      "mad_ms": 0.10901675000000033,
-      "floor_ms": 0.25011274999999955
-    },
-    "synthetic/bare_fragment.html": {
-      "sample_count": 40,
-      "median_ms": 0.0003792224960837401,
-      "mad_ms": 4.509169490597047e-6,
-      "floor_ms": 0.000020331666081803434
-    },
-    "synthetic/optional_li.html": {
-      "sample_count": 40,
-      "median_ms": 0.0053530523687138525,
-      "mad_ms": 0.00004397717285162077,
-      "floor_ms": 0.00023933319250804726
-    },
-    "mdream/react-learn.html": {
-      "sample_count": 40,
-      "median_ms": 11.2530497,
-      "mad_ms": 0.059547700000000425,
-      "floor_ms": 0.17984300000000175
-    },
-    "synthetic/unclosed_p.html": {
-      "sample_count": 40,
-      "median_ms": 0.0040182091712213375,
-      "mad_ms": 0.00004425190851896658,
-      "floor_ms": 0.00013110670657854283
-    },
-    "real-world/issues/gh-190/rbloggers.html": {
-      "sample_count": 40,
-      "median_ms": 1.326241592105263,
-      "mad_ms": 0.0045290684885290755,
-      "floor_ms": 0.0168967631578949
-    },
-    "synthetic/unclosed_at_eof.html": {
-      "sample_count": 40,
-      "median_ms": 0.0034694473849136423,
-      "mad_ms": 0.00003053078317114379,
-      "floor_ms": 0.0001253933403509819
-    },
-    "synthetic/unescaped_lt.html": {
-      "sample_count": 40,
-      "median_ms": 0.003039970529253206,
-      "mad_ms": 0.000031540926813443306,
-      "floor_ms": 0.00008223979096439382
-    },
-    "real-world/wikipedia/large_rust.html": {
-      "sample_count": 40,
-      "median_ms": 21.6927905,
-      "mad_ms": 0.15314100000000153,
-      "floor_ms": 0.5324626666666639
-    },
-    "real-world/issues/gh-190/firsteigen.html": {
-      "sample_count": 40,
-      "median_ms": 2.02843646,
-      "mad_ms": 0.005187359999999863,
-      "floor_ms": 0.018882322500000104
+      "median_ms": 9.826443833333332,
+      "mad_ms": 0.03482166666666675,
+      "floor_ms": 0.5198900000000002
     },
     "real-world/issues/gh-190/flex2025.html": {
       "sample_count": 40,
-      "median_ms": 0.13152905637121565,
-      "mad_ms": 0.0007944478686403994,
-      "floor_ms": 0.002157752604166674
+      "median_ms": 0.17145596510092437,
+      "mad_ms": 0.0005278889604550807,
+      "floor_ms": 0.0027084215156794322
+    },
+    "synthetic/unclosed_at_eof.html": {
+      "sample_count": 40,
+      "median_ms": 0.0076396756689718825,
+      "mad_ms": 0.00003662258296942538,
+      "floor_ms": 0.00028065498832082793
+    },
+    "real-world/wikipedia/tables_countries.html": {
+      "sample_count": 40,
+      "median_ms": 17.992938000000002,
+      "mad_ms": 0.054884999999996964,
+      "floor_ms": 0.2565436666666656
+    },
+    "real-world/wikipedia/medium_python.html": {
+      "sample_count": 40,
+      "median_ms": 60.6439885,
+      "mad_ms": 0.5639494999999997,
+      "floor_ms": 1.865429000000006
+    },
+    "real-world/issues/gh-190/plusblog.html": {
+      "sample_count": 40,
+      "median_ms": 2.03644152,
+      "mad_ms": 0.005786059999999926,
+      "floor_ms": 0.017927439999999795
+    },
+    "real-world/issues/gh-190/sjsu.html": {
+      "sample_count": 40,
+      "median_ms": 0.6787752,
+      "mad_ms": 0.00228102416666659,
+      "floor_ms": 0.006870958333333399
+    },
+    "real-world/issues/gh-121-hacker-news.html": {
+      "sample_count": 40,
+      "median_ms": 2.176602458333333,
+      "mad_ms": 0.006534645833333741,
+      "floor_ms": 0.02349156521739104
+    },
+    "real-world/issues/gh-127-issue.html": {
+      "sample_count": 40,
+      "median_ms": 16.27841425,
+      "mad_ms": 0.056001625000002164,
+      "floor_ms": 0.17857725000000002
+    },
+    "mdream/vuejs-docs.html": {
+      "sample_count": 40,
+      "median_ms": 4.901790272727272,
+      "mad_ms": 0.010831818181818331,
+      "floor_ms": 0.04893990909090906
+    },
+    "real-world/issues/gh-190/insight.html": {
+      "sample_count": 40,
+      "median_ms": 0.3191814838709678,
+      "mad_ms": 0.0015399783238884135,
+      "floor_ms": 0.0055272109417301984
+    },
+    "real-world/issues/gh-190/rbloggers.html": {
+      "sample_count": 40,
+      "median_ms": 1.7387084166666664,
+      "mad_ms": 0.004312917241379388,
+      "floor_ms": 0.01789389655172413
+    },
+    "real-world/wikipedia/small_html.html": {
+      "sample_count": 40,
+      "median_ms": 29.639249749999998,
+      "mad_ms": 0.16081849999999953,
+      "floor_ms": 0.5891395000000017
+    },
+    "synthetic/unclosed_p.html": {
+      "sample_count": 40,
+      "median_ms": 0.008926430270896252,
+      "mad_ms": 0.000038647838413973824,
+      "floor_ms": 0.0002285294471880816
+    },
+    "synthetic/unescaped_lt.html": {
+      "sample_count": 40,
+      "median_ms": 0.0036288691152872197,
+      "mad_ms": 0.000034729516629075944,
+      "floor_ms": 0.00014123339693867913
+    },
+    "mdream/nuxt-example.html": {
+      "sample_count": 40,
+      "median_ms": 0.05160854729705403,
+      "mad_ms": 0.00026221170625512213,
+      "floor_ms": 0.0009426300941297108
+    },
+    "synthetic/table_no_tbody.html": {
+      "sample_count": 40,
+      "median_ms": 0.017287993857801644,
+      "mad_ms": 0.00015609872061257864,
+      "floor_ms": 0.0005341974827676316
+    },
+    "real-world/wikipedia/lists_timeline.html": {
+      "sample_count": 40,
+      "median_ms": 9.110254083333334,
+      "mad_ms": 0.022242583333333954,
+      "floor_ms": 0.08496383333332957
+    },
+    "real-world/wikipedia/large_rust.html": {
+      "sample_count": 40,
+      "median_ms": 31.44646025,
+      "mad_ms": 0.15901525000000127,
+      "floor_ms": 0.5967800000000025
+    },
+    "mdream/react-learn.html": {
+      "sample_count": 40,
+      "median_ms": 10.1605717,
+      "mad_ms": 0.05759670000000039,
+      "floor_ms": 0.2662873999999995
+    },
+    "mdream/wikipedia-small.html": {
+      "sample_count": 40,
+      "median_ms": 5.892265833333333,
+      "mad_ms": 0.03604283333333358,
+      "floor_ms": 0.15821922222222184
+    },
+    "real-world/issues/gh-190/kimbrain.html": {
+      "sample_count": 40,
+      "median_ms": 3.4475203666666667,
+      "mad_ms": 0.008489533333333243,
+      "floor_ms": 0.038111600000000134
+    },
+    "real-world/issues/gh-190/mitrade.html": {
+      "sample_count": 40,
+      "median_ms": 0.04825861851823712,
+      "mad_ms": 0.00018855339573705526,
+      "floor_ms": 0.0009187366811277131
+    },
+    "synthetic/cdata_in_svg.html": {
+      "sample_count": 40,
+      "median_ms": 0.010449104382254576,
+      "mad_ms": 0.00005102062874641662,
+      "floor_ms": 0.0003317618961993698
+    },
+    "synthetic/bare_fragment.html": {
+      "sample_count": 40,
+      "median_ms": 0.00027166122140891206,
+      "mad_ms": 8.68832576724583e-7,
+      "floor_ms": 4.031978280736464e-6
+    },
+    "synthetic/optional_li.html": {
+      "sample_count": 40,
+      "median_ms": 0.008324819247418406,
+      "mad_ms": 0.000043494417086935126,
+      "floor_ms": 0.00022233840431972775
+    },
+    "mdream/mdn-array.html": {
+      "sample_count": 40,
+      "median_ms": 9.502940916666667,
+      "mad_ms": 0.07090516666666602,
+      "floor_ms": 0.25296866666666773
+    },
+    "real-world/issues/gh-190/firsteigen.html": {
+      "sample_count": 40,
+      "median_ms": 4.775334454545455,
+      "mad_ms": 0.013419909090909066,
+      "floor_ms": 0.04413072727272738
     }
   }
 }
