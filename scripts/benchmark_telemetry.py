@@ -246,7 +246,8 @@ def check_background_cpu(samples: list[dict], header: dict) -> None:
                 continue
             background_ticks += delta
         limit = elapsed * ticks_per_second * header["identity"]["cpu_count"] * BACKGROUND_CPU_FRACTION
-        if background_ticks > limit:
+        # Capture boundaries can be closer together than a meaningful CPU sampling window. ~keep
+        if background_ticks > max(1, limit):
             raise ValueError("competing background CPU workload")
 
 

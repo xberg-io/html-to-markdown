@@ -236,6 +236,15 @@ def test_malformed_five_minute_load_is_rejected(tmp_path: Path, value) -> None:
         telemetry.validate(evidence, tmp_path / "runs", 1)
 
 
+def test_single_background_tick_between_capture_boundaries_is_quantization_noise() -> None:
+    runner = {"pid": 23, "start": 4, "exe": "/bin/Runner.Worker", "ticks": 10}
+    samples = [
+        {"monotonic": 100.0, "processes": [runner]},
+        {"monotonic": 100.016, "processes": [{**runner, "ticks": 11}]},
+    ]
+    telemetry.check_background_cpu(samples, {"identity": {"cpu_count": 4}, "clock_ticks": 100})
+
+
 def test_unknown_cpu_workload_cannot_hide_behind_quiet_load(tmp_path: Path) -> None:
     evidence = campaign(tmp_path)
     rows = [json.loads(line) for line in evidence.read_text().splitlines()]
