@@ -55,17 +55,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-trait"
-version = "0.1.92"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82f6aeea286b8eb4dd3431a1be1b59d290ace00f5bfd8e2a159bc2a05e2c1667"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 3.0.9",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -271,7 +260,6 @@ version = "3.22.1"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
- "async-trait",
  "brotli-decompressor",
  "html-to-markdown-rs",
  "rustler",

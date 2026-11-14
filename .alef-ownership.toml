@@ -1312,6 +1312,7 @@ owned_paths = [
   "packages/dart/README.md",
   "packages/elixir/LICENSE",
   "packages/elixir/README.md",
+  "packages/go/.lib/.gitkeep",
   "packages/go/LICENSE",
   "packages/go/v3/README.md",
   "packages/java/LICENSE",
