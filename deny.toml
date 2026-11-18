@@ -8,7 +8,10 @@ exclude = ["html-to-markdown-wasm-wasmtime-tests"]
 feature-depth = 1
 
 [advisories]
-ignore = []
+ignore = [
+  { id = "RUSTSEC-2026-0543", reason = "unmaintained notice only, no fixed release; chrono arrives transitively" },
+  { id = "RUSTSEC-2026-0542", reason = "unmaintained notice only, no fixed release; used only by the benchmark harness" },
+]
 
 [licenses]
 allow = [
