@@ -94,6 +94,8 @@ jobs:
     name: "Validate: binding freshness"
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
+    env:
+      POLY_TRUST: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -108,9 +110,9 @@ jobs:
       # ~keep `alef verify` compares formatter-owned generated files after a real Poly pass.
       # Without Poly it cannot validate those bytes and can report formatted Markdown as raw drift.
       - name: Install poly
-        uses: Goldziher/poly@v0
+        uses: polylint/polylint@v0
         with:
-          version: "0.32.1"
+          version: "0.36.0"
 
       - name: Setup mise for module freshness
         uses: xberg-io/actions/setup-mise@v1

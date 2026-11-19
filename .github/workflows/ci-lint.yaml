@@ -109,6 +109,8 @@ jobs:
   quality-warnings:
     name: Reject quality warning regressions
     runs-on: ubuntu-latest
+    env:
+      POLY_TRUST: "1"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -116,9 +118,9 @@ jobs:
       - uses: xberg-io/actions/setup-mise@v1
         with:
           install-args: python
-      - uses: Goldziher/poly@v0
+      - uses: polylint/polylint@v0
         with:
-          version: "0.32.1"
+          version: "0.36.0"
       - run: mise run check:quality-warnings
         env:
           QUALITY_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}

@@ -232,6 +232,8 @@ jobs:
     if: inputs.task == 'e2e-freshness'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 30
+    env:
+      POLY_TRUST: "1"
     steps:
       - { "name": "Checkout", "uses": "actions/checkout@v7" }
       # ~keep rust is a mise lock gap (rustup script install); rust-toolchain.toml pins it.
@@ -266,7 +268,7 @@ jobs:
       # ~keep `alef e2e generate` formats every suite it emits by shelling out to poly. With
       # poly absent this job failed all 16 languages with "poly not found on PATH" before the
       # drift check below ever ran, so the gate could not report on the drift it exists to catch.
-      - { "name": "Install poly", "uses": "Goldziher/poly@v0", "with": { "version": "0.32.1" } }
+      - { "name": "Install poly", "uses": "polylint/polylint@v0", "with": { "version": "0.36.0" } }
       # ~keep Alef runs `dart format` on the generated suite; omitting Dart makes freshness
       # compare unformatted output with committed formatted files.
       - { "name": "Setup Dart", "uses": "dart-lang/setup-dart@v1" }

@@ -1,7 +1,0 @@
-version = 1
-
-[[sources]]
-git = "https://github.com/xberg-io/alef.git"
-file = "poly-base.toml"
-revision = "main"
-locked = "82f9ab5c45b78be56ae8c716c23f25f396e94a9b"
