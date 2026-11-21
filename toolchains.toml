@@ -16,3 +16,7 @@ task_sets = [
   "plugin-runtime",
   "rust",
 ]
+
+[overrides."github:xberg-io/alef"]
+version = "0.129.6"
+reason = "alef.toml pins alef_version 0.129.6 and the committed bindings are generated with it; the baseline's newer alef lands with a regeneration"
