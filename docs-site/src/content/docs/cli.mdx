@@ -153,6 +153,7 @@ html-to-markdown --url https://example.com > output.md
 | `--strip-tags TAGS`    | Comma-separated tags to strip (text content preserved, no Markdown conversion).     |
 | `--preserve-tags TAGS` | Comma-separated tags to emit verbatim as raw HTML instead of converting.            |
 | `--exclude-selectors SELECTORS` | Comma-separated CSS selectors. Matching elements and their descendants are removed before conversion (e.g. `.ad,#sidebar`). A selector with a combinator (`.menu a`, `div > p`) or a pseudo-class matches nothing. |
+| `--data-as-elements ELEMENTS` | Comma-separated tag names (default `span,div`). An element in the list with `data-as="p"` (or `h1`-`h6`, `li`, `ul`, `ol`, `blockquote`, `pre`, `div`) is converted as that element, as in Mintlify's `<span data-as="p">` paragraphs. An empty value turns it off. |
 | `--max-depth N`        | Silently truncate subtrees beyond this DOM nesting depth. Omit for unlimited depth. |
 
 ## Metadata
@@ -275,6 +276,7 @@ Each CLI flag has a corresponding `ConversionOptions` field. Library users can c
 | `--strip-tags TAGS`             | `strip_tags`                 | comma-separated tag list                                   |
 | `--preserve-tags TAGS`          | `preserve_tags`              | comma-separated tag list                                   |
 | `--exclude-selectors SELECTORS` | `exclude_selectors`          | comma-separated CSS selector list                          |
+| `--data-as-elements ELEMENTS` | `data_as_elements`        | comma-separated tag name list                              |
 | `--max-depth N`                 | `max_depth`                  | integer                                                    |
 | `--extract-metadata`            | `extract_metadata`           | boolean flag                                               |
 | `--include-structure`           | `include_document_structure` | boolean flag; `--json` only                                |

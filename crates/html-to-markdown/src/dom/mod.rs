@@ -431,6 +431,10 @@ impl<'a> VDom<'a> {
     pub const fn parser_mut(&mut self) -> &mut Parser<'a> {
         &mut self.parser
     }
+    /// Renames the `elements` that carry a `data-as` attribute to the element it names.
+    pub(crate) fn apply_data_as(&mut self, elements: &[String]) {
+        apply_data_as(&mut self.parser, elements);
+    }
     /// Returns every node, in document order.
     #[must_use]
     pub fn nodes(&self) -> &[Node<'a>] {
@@ -706,4 +710,52 @@ pub fn parse(input: &str, _options: ParserOptions) -> Result<VDom<'_>, ParseErro
     let subtree_end = parser.tags.len() as u32;
     while scopes.close_top(subtree_end, &mut parser).is_some() {}
     Ok(VDom { parser })
+}
+
+/// The element a `data-as` value asks a `span` to stand for, if it names one the converter treats as a block.
+fn data_as_element(value: &[u8]) -> Option<&'static str> {
+    const ELEMENTS: [&str; 13] = [
+        "p",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "li",
+        "ul",
+        "ol",
+        "blockquote",
+        "pre",
+        "div",
+    ];
+    let value = value.trim_ascii();
+    ELEMENTS
+        .into_iter()
+        .find(|name| value.eq_ignore_ascii_case(name.as_bytes()))
+}
+
+/// Renames each element of `elements` that has a `data-as` attribute to the element the attribute names,
+/// so the converter handles it exactly as it handles that element (Mintlify writes a paragraph as
+/// `<span data-as="p">`).
+fn apply_data_as(parser: &mut Parser<'_>, elements: &[String]) {
+    if elements.is_empty() {
+        return;
+    }
+    for node in &mut parser.tags {
+        let Node::Tag(tag) = node else { continue };
+        let name = tag.name.as_bytes();
+        if !elements
+            .iter()
+            .any(|element| name.eq_ignore_ascii_case(element.as_bytes()))
+        {
+            continue;
+        }
+        let Some(Some(value)) = tag.attributes.get("data-as") else {
+            continue;
+        };
+        if let Some(element) = data_as_element(value.as_bytes()) {
+            tag.name = Bytes::from(element);
+        }
+    }
 }

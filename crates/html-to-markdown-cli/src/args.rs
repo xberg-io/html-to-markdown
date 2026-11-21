@@ -495,6 +495,15 @@ pub struct ExtendedConversionArgs {
     #[arg(help_heading = "Element Handling")]
     pub exclude_selectors: Option<Vec<String>>,
 
+    /// Elements whose data-as attribute names the element they stand for
+    ///
+    /// Comma-separated list of tag names (default: span,div). An element in the
+    /// list with data-as="p" (or h1-h6, li, ul, ol, blockquote, pre, div) is
+    /// converted as that element. Pass an empty value to turn the feature off.
+    #[arg(long, value_name = "ELEMENTS", value_delimiter = ',')]
+    #[arg(help_heading = "Element Handling")]
+    pub data_as_elements: Option<Vec<String>>,
+
     /// Maximum DOM traversal depth
     ///
     /// Truncate subtrees beyond this nesting depth. Records a processing warning;

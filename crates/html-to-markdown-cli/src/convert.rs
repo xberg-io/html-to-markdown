@@ -85,6 +85,12 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
         infer_dimensions: !cli.no_infer_dimensions,
         max_depth: cli.max_depth,
         exclude_selectors: cli.exclude_selectors.clone().unwrap_or(defaults.exclude_selectors),
+        data_as_elements: cli
+            .data_as_elements
+            .clone()
+            .map_or(defaults.data_as_elements, |elements| {
+                elements.into_iter().filter(|element| !element.is_empty()).collect()
+            }),
         tier_strategy: cli.tier_strategy.map_or(defaults.tier_strategy, Into::into),
         base_url: defaults.base_url,
         visitor: None,
