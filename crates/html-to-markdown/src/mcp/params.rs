@@ -128,6 +128,8 @@ pub struct ConvertConfig {
     pub max_depth: Option<u64>,
     /// CSS selectors for elements to exclude entirely (element + descendants).
     pub exclude_selectors: Option<Vec<String>>,
+    /// Elements whose `data-as` attribute names the element they stand for (default `["span", "div"]`; empty disables).
+    pub data_as_elements: Option<Vec<String>>,
     /// Conversion tier: `"auto"` (default) or `"tier2"`.
     pub tier_strategy: Option<String>,
     /// Base URL to resolve relative `href`/`src` destinations against. Omitted (default):
@@ -386,6 +388,7 @@ impl ConvertConfig {
         update.infer_dimensions = self.infer_dimensions.take();
         update.max_depth = self.max_depth.take().map(|requested| Some(clamp_max_depth(requested)));
         update.exclude_selectors = self.exclude_selectors.take();
+        update.data_as_elements = self.data_as_elements.take();
         update.tier_strategy = validated_enum(
             "tier_strategy",
             self.tier_strategy.take(),

@@ -57,6 +57,7 @@ fn should_accept_the_exhaustive_conversion_options_literal_from_3_18_6() {
         infer_dimensions: defaults.infer_dimensions,
         max_depth: defaults.max_depth,
         exclude_selectors: defaults.exclude_selectors,
+        data_as_elements: defaults.data_as_elements,
         tier_strategy: defaults.tier_strategy,
         base_url: defaults.base_url,
         #[cfg(feature = "visitor")]

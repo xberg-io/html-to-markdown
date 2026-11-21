@@ -6,6 +6,7 @@
     .dependencies = .{
         .html_to_markdown = .{
             .url = "https://github.com/xberg-io/html-to-markdown/releases/download/v3.22.2/html-to-markdown-rs-zig-v3.22.2.tar.gz",
+            .hash = "html_to_markdown_rs-3.22.2-QtXyWz7yAQIXyuvyIx8xcxmrq4Ty9gCkcV4FzTyKjeR9",
         },
     },
     .paths = .{

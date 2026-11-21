@@ -241,6 +241,21 @@ pub struct ConversionOptions {
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default))]
     pub exclude_selectors: Vec<String>,
 
+    /// Elements whose `data-as` attribute names the element they stand for.
+    ///
+    /// Mintlify writes a paragraph as `<span data-as="p">`. An element in this list that has a
+    /// `data-as` attribute is converted as the element the attribute names, so adjacent
+    /// `<span data-as="p">` elements become separate paragraphs. The attribute can name `p`,
+    /// `h1` to `h6`, `li`, `ul`, `ol`, `blockquote`, `pre` or `div`; any other value leaves the
+    /// element as it is. Tag names are matched without regard to case.
+    ///
+    /// `None` (the default) uses `["span", "div"]`. `Some` of an empty list turns the feature off.
+    #[cfg_attr(
+        any(feature = "serde", feature = "metadata"),
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub data_as_elements: Option<Vec<String>>,
+
     /// Which conversion tier to use.
     ///
     /// - [`TierStrategy::Auto`] (default) — automatically choose the best path.
@@ -337,6 +352,7 @@ impl Default for ConversionOptions {
             infer_dimensions: true,
             max_depth: None,
             exclude_selectors: Vec::new(),
+            data_as_elements: None,
             tier_strategy: TierStrategy::Auto,
             base_url: None,
             #[cfg(feature = "visitor")]
@@ -478,6 +494,13 @@ impl ConversionOptionsBuilder {
     #[must_use]
     pub fn exclude_selectors(mut self, selectors: Vec<String>) -> Self {
         self.0.exclude_selectors = selectors;
+        self
+    }
+
+    /// Set the elements whose `data-as` attribute names the element they stand for; an empty list turns the feature off.
+    #[must_use]
+    pub fn data_as_elements(mut self, elements: Vec<String>) -> Self {
+        self.0.data_as_elements = Some(elements);
         self
     }
 
@@ -623,6 +646,8 @@ pub struct ConversionOptionsUpdate {
     pub max_depth: Option<Option<usize>>,
     /// Optional override for [`ConversionOptions::exclude_selectors`].
     pub exclude_selectors: Option<Vec<String>>,
+    /// Optional override for [`ConversionOptions::data_as_elements`].
+    pub data_as_elements: Option<Vec<String>>,
     /// Optional override for [`ConversionOptions::tier_strategy`].
     pub tier_strategy: Option<TierStrategy>,
     /// Optional override for [`ConversionOptions::base_url`].
@@ -690,6 +715,9 @@ impl ConversionOptions {
         apply!(infer_dimensions);
         apply!(max_depth);
         apply!(exclude_selectors);
+        if let Some(elements) = update.data_as_elements {
+            self.data_as_elements = Some(elements);
+        }
         apply!(tier_strategy);
         apply!(base_url);
         #[cfg(feature = "visitor")]

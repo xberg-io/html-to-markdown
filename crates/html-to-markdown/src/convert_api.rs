@@ -370,6 +370,10 @@ fn try_tier1(
     if prepared.head_repair_limit.is_some() {
         return None;
     }
+    // ~keep Only the full converter reads `data-as` (Mintlify's `<span data-as="p">`), so a page naming it goes there.
+    if mentions_data_as(prepared.html.as_ref()) {
+        return None;
+    }
     let report = crate::converter::prescan::PrescanReport::default();
     match options.tier_strategy {
         crate::options::TierStrategy::Tier2 => None,
@@ -385,6 +389,12 @@ fn try_tier1(
         #[cfg(any(test, feature = "testkit"))]
         crate::options::TierStrategy::Tier1 => run_tier1(prepared, options, &report, policy),
     }
+}
+
+fn mentions_data_as(html: &str) -> bool {
+    let bytes = html.as_bytes();
+    memchr::memmem::find(bytes, b"data-as").is_some()
+        || bytes.windows(7).any(|window| window.eq_ignore_ascii_case(b"data-as"))
 }
 
 fn run_tier1(
