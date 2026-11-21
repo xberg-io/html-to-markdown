@@ -101,3 +101,47 @@ fn should_match_element_names_and_values_without_regard_to_case() {
     let html = r#"<div><span data-as="p">A</span><span data-as="p">B</span></div>"#;
     assert_eq!(markdown_with(html, &["SPAN"]), "A\n\nB\n");
 }
+
+#[test]
+fn should_use_the_default_elements_when_data_as_elements_is_unset() {
+    let html = r#"<div><span data-as="p">A</span><span data-as="p">B</span></div>"#;
+    let options = ConversionOptions::default();
+    assert_eq!(options.data_as_elements, None);
+    assert_eq!(
+        convert(html, Some(options)).unwrap().content.unwrap_or_default(),
+        "A\n\nB\n"
+    );
+}
+
+#[test]
+fn should_disable_data_as_only_for_some_empty_list_not_for_none() {
+    let html = r#"<div><span data-as="p">A</span><span data-as="p">B</span></div>"#;
+    let off = ConversionOptions::builder().data_as_elements(Vec::new()).build();
+    assert_eq!(off.data_as_elements, Some(Vec::new()));
+    assert_eq!(convert(html, Some(off)).unwrap().content.unwrap_or_default(), "AB\n");
+}
+
+#[test]
+fn should_use_a_custom_list_as_given() {
+    let html = r#"<div><b data-as="p">A</b><b data-as="p">B</b></div>"#;
+    assert_eq!(markdown_with(html, &["b"]), "A\n\nB\n");
+}
+
+#[test]
+fn should_decode_character_references_in_the_data_as_value() {
+    let encoded = r#"<div><span data-as="&#112;">A</span><span data-as="&#x70;">B</span></div>"#;
+    let plain = r#"<div><span data-as="p">A</span><span data-as="p">B</span></div>"#;
+    assert_eq!(markdown(encoded), markdown(plain));
+    assert_eq!(markdown(encoded), "A\n\nB\n");
+    let unsupported = r#"<div><span data-as="&#115;trong">A</span><span>B</span></div>"#;
+    assert_eq!(markdown(unsupported), "AB\n");
+}
+
+#[test]
+fn should_not_repair_a_correctly_closed_data_as_span_on_the_final_open_chain() {
+    let html = r#"<div><span data-as="p">A</span></div><span data-as="p">B <em>x</em></span>"#;
+    assert_eq!(markdown(html), markdown("<div><p>A</p></div><p>B <em>x</em></p>"));
+    let result = convert(html, None).unwrap();
+    assert!(result.warnings.is_empty(), "{:?}", result.warnings);
+    assert_eq!(result.content.unwrap_or_default(), "A\n\nB *x*\n");
+}

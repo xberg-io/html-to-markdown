@@ -81,7 +81,7 @@ pub(super) fn parse_for_conversion<'a>(
 ) -> Result<ParsedPage<'a>> {
     let (preserve_menu, hidden_content) = (preserves_menu(options), options.hidden_content);
     let mut dom = parse_html(input)?;
-    dom.apply_data_as(&options.data_as_elements);
+    dom.apply_data_as(options.data_as_elements.as_deref());
     let parser = dom.parser();
     let len = input.len();
     let asked = Asked::of(&dom, parser, input, options);
@@ -121,7 +121,7 @@ pub(super) fn parse_for_conversion<'a>(
     }
     let page = repaired_page.get_or_init(|| preprocess_repaired_html(&repaired, preserve_menu, hidden_content));
     let mut second = parse_html(page)?;
-    second.apply_data_as(&options.data_as_elements);
+    second.apply_data_as(options.data_as_elements.as_deref());
     // ~keep The text rule is for the second parse that an omitted end tag asks for. The first
     // ~keep parse of a misnest can hide content, so its count is not a measure.
     let loses_text = omitted_end_tag

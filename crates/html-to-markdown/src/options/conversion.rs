@@ -249,8 +249,12 @@ pub struct ConversionOptions {
     /// `h1` to `h6`, `li`, `ul`, `ol`, `blockquote`, `pre` or `div`; any other value leaves the
     /// element as it is. Tag names are matched without regard to case.
     ///
-    /// Defaults to `["span", "div"]`. An empty list turns the feature off.
-    pub data_as_elements: Vec<String>,
+    /// `None` (the default) uses `["span", "div"]`. `Some` of an empty list turns the feature off.
+    #[cfg_attr(
+        any(feature = "serde", feature = "metadata"),
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub data_as_elements: Option<Vec<String>>,
 
     /// Which conversion tier to use.
     ///
@@ -348,7 +352,7 @@ impl Default for ConversionOptions {
             infer_dimensions: true,
             max_depth: None,
             exclude_selectors: Vec::new(),
-            data_as_elements: vec!["span".to_owned(), "div".to_owned()],
+            data_as_elements: None,
             tier_strategy: TierStrategy::Auto,
             base_url: None,
             #[cfg(feature = "visitor")]
@@ -493,10 +497,10 @@ impl ConversionOptionsBuilder {
         self
     }
 
-    /// Set the elements whose `data-as` attribute names the element they stand for.
+    /// Set the elements whose `data-as` attribute names the element they stand for; an empty list turns the feature off.
     #[must_use]
     pub fn data_as_elements(mut self, elements: Vec<String>) -> Self {
-        self.0.data_as_elements = elements;
+        self.0.data_as_elements = Some(elements);
         self
     }
 
@@ -711,7 +715,9 @@ impl ConversionOptions {
         apply!(infer_dimensions);
         apply!(max_depth);
         apply!(exclude_selectors);
-        apply!(data_as_elements);
+        if let Some(elements) = update.data_as_elements {
+            self.data_as_elements = Some(elements);
+        }
         apply!(tier_strategy);
         apply!(base_url);
         #[cfg(feature = "visitor")]

@@ -153,7 +153,7 @@ html-to-markdown --url https://example.com > output.md
 | `--strip-tags TAGS`    | Comma-separated tags to strip (text content preserved, no Markdown conversion).     |
 | `--preserve-tags TAGS` | Comma-separated tags to emit verbatim as raw HTML instead of converting.            |
 | `--exclude-selectors SELECTORS` | Comma-separated CSS selectors. Matching elements and their descendants are removed before conversion (e.g. `.ad,#sidebar`). A selector with a combinator (`.menu a`, `div > p`) or a pseudo-class matches nothing. |
-| `--data-as-elements ELEMENTS` | Comma-separated tag names (default `span,div`). An element in the list with `data-as="p"` (or `h1`-`h6`, `li`, `ul`, `ol`, `blockquote`, `pre`, `div`) is converted as that element, as in Mintlify's `<span data-as="p">` paragraphs. An empty value turns it off. |
+| `--data-as-elements ELEMENTS` | Comma-separated tag names (default `span,div` when the flag is not given). An element in the list with `data-as="p"` (or `h1`-`h6`, `li`, `ul`, `ol`, `blockquote`, `pre`, `div`) is converted as that element, as in Mintlify's `<span data-as="p">` paragraphs. An empty value turns it off. |
 | `--max-depth N`        | Silently truncate subtrees beyond this DOM nesting depth. Omit for unlimited depth. |
 
 ## Metadata

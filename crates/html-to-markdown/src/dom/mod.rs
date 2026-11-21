@@ -432,8 +432,13 @@ impl<'a> VDom<'a> {
         &mut self.parser
     }
     /// Renames the `elements` that carry a `data-as` attribute to the element it names.
-    pub(crate) fn apply_data_as(&mut self, elements: &[String]) {
-        apply_data_as(&mut self.parser, elements);
+    ///
+    /// `None` uses [`DEFAULT_DATA_AS_ELEMENTS`]; `Some` of an empty slice renames nothing.
+    pub(crate) fn apply_data_as(&mut self, elements: Option<&[String]>) {
+        match elements {
+            Some(elements) => apply_data_as(&mut self.parser, elements),
+            None => apply_data_as(&mut self.parser, &DEFAULT_DATA_AS_ELEMENTS),
+        }
     }
     /// Returns every node, in document order.
     #[must_use]
@@ -712,8 +717,11 @@ pub fn parse(input: &str, _options: ParserOptions) -> Result<VDom<'_>, ParseErro
     Ok(VDom { parser })
 }
 
+/// The elements whose `data-as` attribute is honored when `ConversionOptions::data_as_elements` is unset.
+const DEFAULT_DATA_AS_ELEMENTS: [&str; 2] = ["span", "div"];
+
 /// The element a `data-as` value asks a `span` to stand for, if it names one the converter treats as a block.
-fn data_as_element(value: &[u8]) -> Option<&'static str> {
+fn data_as_element(value: &str) -> Option<&'static str> {
     const ELEMENTS: [&str; 13] = [
         "p",
         "h1",
@@ -729,16 +737,15 @@ fn data_as_element(value: &[u8]) -> Option<&'static str> {
         "pre",
         "div",
     ];
+    let value = crate::text::decode_attribute_value_cow(value);
     let value = value.trim_ascii();
-    ELEMENTS
-        .into_iter()
-        .find(|name| value.eq_ignore_ascii_case(name.as_bytes()))
+    ELEMENTS.into_iter().find(|name| value.eq_ignore_ascii_case(name))
 }
 
 /// Renames each element of `elements` that has a `data-as` attribute to the element the attribute names,
 /// so the converter handles it exactly as it handles that element (Mintlify writes a paragraph as
 /// `<span data-as="p">`).
-fn apply_data_as(parser: &mut Parser<'_>, elements: &[String]) {
+fn apply_data_as<S: AsRef<str>>(parser: &mut Parser<'_>, elements: &[S]) {
     if elements.is_empty() {
         return;
     }
@@ -747,14 +754,14 @@ fn apply_data_as(parser: &mut Parser<'_>, elements: &[String]) {
         let name = tag.name.as_bytes();
         if !elements
             .iter()
-            .any(|element| name.eq_ignore_ascii_case(element.as_bytes()))
+            .any(|element| name.eq_ignore_ascii_case(element.as_ref().as_bytes()))
         {
             continue;
         }
         let Some(Some(value)) = tag.attributes.get("data-as") else {
             continue;
         };
-        if let Some(element) = data_as_element(value.as_bytes()) {
+        if let Some(element) = data_as_element(&value.as_utf8_str()) {
             tag.name = Bytes::from(element);
         }
     }
