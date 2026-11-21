@@ -3094,7 +3094,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       inferDimensions: dco_decode_bool(arr[44]),
       maxDepth: dco_decode_opt_box_autoadd_i_64(arr[45]),
       excludeSelectors: dco_decode_list_String(arr[46]),
-      dataAsElements: dco_decode_list_String(arr[47]),
+      dataAsElements: dco_decode_opt_list_String(arr[47]),
       tierStrategy: dco_decode_tier_strategy(arr[48]),
       baseUrl: dco_decode_opt_String(arr[49]),
       visitor:
@@ -4349,7 +4349,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_inferDimensions = sse_decode_bool(deserializer);
     var var_maxDepth = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_excludeSelectors = sse_decode_list_String(deserializer);
-    var var_dataAsElements = sse_decode_list_String(deserializer);
+    var var_dataAsElements = sse_decode_opt_list_String(deserializer);
     var var_tierStrategy = sse_decode_tier_strategy(deserializer);
     var var_baseUrl = sse_decode_opt_String(deserializer);
     var var_visitor =
@@ -6283,7 +6283,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.inferDimensions, serializer);
     sse_encode_opt_box_autoadd_i_64(self.maxDepth, serializer);
     sse_encode_list_String(self.excludeSelectors, serializer);
-    sse_encode_list_String(self.dataAsElements, serializer);
+    sse_encode_opt_list_String(self.dataAsElements, serializer);
     sse_encode_tier_strategy(self.tierStrategy, serializer);
     sse_encode_opt_String(self.baseUrl, serializer);
     sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(

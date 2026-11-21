@@ -635,8 +635,8 @@ class ConversionOptions {
   /// `h1` to `h6`, `li`, `ul`, `ol`, `blockquote`, `pre` or `div`; any other value leaves the
   /// element as it is. Tag names are matched without regard to case.
   ///
-  /// Defaults to `["span", "div"]`. An empty list turns the feature off.
-  final List<String> dataAsElements;
+  /// `None` (the default) uses `["span", "div"]`. `Some` of an empty list turns the feature off.
+  final List<String>? dataAsElements;
 
   /// Which conversion tier to use.
   ///
@@ -722,7 +722,7 @@ class ConversionOptions {
     required this.inferDimensions,
     this.maxDepth,
     required this.excludeSelectors,
-    required this.dataAsElements,
+    this.dataAsElements,
     required this.tierStrategy,
     this.baseUrl,
     this.visitor,
