@@ -6,7 +6,7 @@ name: html-to-markdown-convert
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:e1ad5bd3c412dfc05b3862f3d5edf1699b4d658af3037df1367f01a94999aa3d
-Source-Hash: blake3:78cab030311b980879d3d1a74dba84eabbe414713b15d31028940cb54ee40d52
+Source-Hash: blake3:77bfd6b7dcd16725b4358624f286a34e44770a459bd2bd28ff1b850e013f464b
 Schema-Version: v1
 -->
 

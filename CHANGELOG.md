@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.1] - 2026-11-22
+
+### Added
+
+- Publish the `html-to-markdown-cli` launcher packages to npm and PyPI in lockstep with each release, and list the MCP server in the MCP Registry.
+
+### Changed
+
+- Pin the plugin MCP launcher to the release it ships with.
+- Update Cargo dependencies and regenerate the bindings with Alef 0.132.2.
+
 ## [3.23.0] - 2026-11-22
 
 ### Added
