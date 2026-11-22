@@ -35,17 +35,20 @@ BIN="$BIN_DIR/$BINARY_NAME"
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-# True when $1 runs and reports a version at or above PINNED_VERSION. ~keep
+# True when $1 runs and reports a version at or above PINNED_VERSION. A prerelease of a version
+# sorts below that version (SemVer), so 3.23.0-rc.1 does not satisfy a 3.23.0 pin. ~keep
 runnable() {
-  local out found
+  local out found base
   [ -x "$1" ] || return 1
   out="$("$1" --version 2>/dev/null)" || return 1
-  found="$(printf '%s\n' "$out" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)"
+  found="$(printf '%s\n' "$out" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?' | head -n 1)"
   [ -n "$found" ] || return 1
-  [ "$(printf '%s\n%s\n' "$PINNED_VERSION" "$found" | sort -V | head -n 1)" = "$PINNED_VERSION" ] || {
+  base="${found%%-*}"
+  if [ "$(printf '%s\n%s\n' "$PINNED_VERSION" "$base" | sort -V | head -n 1)" != "$PINNED_VERSION" ] ||
+    { [ "$base" = "$PINNED_VERSION" ] && [ "$found" != "$base" ]; }; then
     log "ignoring $1: version $found is older than the pinned $PINNED_VERSION"
     return 1
-  }
+  fi
 }
 
 if runnable "$BIN"; then

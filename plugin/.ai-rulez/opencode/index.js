@@ -56,7 +56,7 @@ function runCli(args, context, directory, stdin) {
       if (error.code === "ENOENT") {
         resolve({
           content:
-            "Install the html-to-markdown CLI with `brew install xberg-io/tap/html-to-markdown`, or run it via `npx -y @xberg-io/html-to-markdown-cli` / `uvx --from html-to-markdown-cli html-to-markdown`.",
+            "Install the html-to-markdown CLI with `brew install xberg-io/tap/html-to-markdown`, or `cargo install html-to-markdown-cli`.",
           metadata: { exitCode: 127, command: "html-to-markdown" },
         });
         return;
