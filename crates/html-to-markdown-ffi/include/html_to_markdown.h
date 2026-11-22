@@ -1484,6 +1484,15 @@ int32_t htm_conversion_options_has_max_depth(HTMAlefHandle handle);
 char *htm_conversion_options_exclude_selectors(HTMAlefHandle handle);
 
 /**
+ * Get the `data_as_elements` field from a `ConversionOptions`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `htm_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *htm_conversion_options_data_as_elements(HTMAlefHandle handle);
+
+/**
  * Get the `tier_strategy` field from a `ConversionOptions`.
  * A non-null returned handle is owned by the caller.
  * It must be freed with `htm_tier_strategy_free`.
@@ -2228,6 +2237,15 @@ int32_t htm_conversion_options_update_has_max_depth(HTMAlefHandle handle);
  * Pointer must be a valid handle returned by this library.
  */
 char *htm_conversion_options_update_exclude_selectors(HTMAlefHandle handle);
+
+/**
+ * Get the `data_as_elements` field from a `ConversionOptionsUpdate`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `htm_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *htm_conversion_options_update_data_as_elements(HTMAlefHandle handle);
 
 /**
  * Get the `tier_strategy` field from a `ConversionOptionsUpdate`.

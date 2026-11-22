@@ -1323,6 +1323,7 @@ const _: fn() = || {
         let _: bool = ConversionOptions.infer_dimensions;
         let _: Option<i64> = ConversionOptions.max_depth;
         let _: Vec<String> = ConversionOptions.exclude_selectors;
+        let _: Option<Vec<String>> = ConversionOptions.data_as_elements;
         let _: crate::TierStrategy = ConversionOptions.tier_strategy;
         let _: Option<String> = ConversionOptions.base_url;
         let _: Option<VisitorHandle> = ConversionOptions.visitor;
@@ -1376,6 +1377,7 @@ const _: fn() = || {
         let _: Option<bool> = ConversionOptionsUpdate.infer_dimensions;
         let _: Option<i64> = ConversionOptionsUpdate.max_depth;
         let _: Option<Vec<String>> = ConversionOptionsUpdate.exclude_selectors;
+        let _: Option<Vec<String>> = ConversionOptionsUpdate.data_as_elements;
         let _: Option<crate::TierStrategy> = ConversionOptionsUpdate.tier_strategy;
         let _: Option<String> = ConversionOptionsUpdate.base_url;
         let _: Option<VisitorHandle> = ConversionOptionsUpdate.visitor;
@@ -2359,6 +2361,7 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_inferDimensions = <bool>::sse_decode(deserializer);
         let mut var_maxDepth = <Option<i64>>::sse_decode(deserializer);
         let mut var_excludeSelectors = <Vec<String>>::sse_decode(deserializer);
+        let mut var_dataAsElements = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_tierStrategy = <crate::TierStrategy>::sse_decode(deserializer);
         let mut var_baseUrl = <Option<String>>::sse_decode(deserializer);
         let mut var_visitor = <Option<VisitorHandle>>::sse_decode(deserializer);
@@ -2410,6 +2413,7 @@ impl SseDecode for crate::ConversionOptions {
             infer_dimensions: var_inferDimensions,
             max_depth: var_maxDepth,
             exclude_selectors: var_excludeSelectors,
+            data_as_elements: var_dataAsElements,
             tier_strategy: var_tierStrategy,
             base_url: var_baseUrl,
             visitor: var_visitor,
@@ -2467,6 +2471,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_inferDimensions = <Option<bool>>::sse_decode(deserializer);
         let mut var_maxDepth = <Option<i64>>::sse_decode(deserializer);
         let mut var_excludeSelectors = <Option<Vec<String>>>::sse_decode(deserializer);
+        let mut var_dataAsElements = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_tierStrategy = <Option<crate::TierStrategy>>::sse_decode(deserializer);
         let mut var_baseUrl = <Option<String>>::sse_decode(deserializer);
         let mut var_visitor = <Option<VisitorHandle>>::sse_decode(deserializer);
@@ -2518,6 +2523,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
             infer_dimensions: var_inferDimensions,
             max_depth: var_maxDepth,
             exclude_selectors: var_excludeSelectors,
+            data_as_elements: var_dataAsElements,
             tier_strategy: var_tierStrategy,
             base_url: var_baseUrl,
             visitor: var_visitor,
@@ -4055,6 +4061,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptions> {
             self.0.infer_dimensions.into_into_dart().into_dart(),
             self.0.max_depth.into_into_dart().into_dart(),
             self.0.exclude_selectors.into_into_dart().into_dart(),
+            self.0.data_as_elements.into_into_dart().into_dart(),
             self.0.tier_strategy.into_into_dart().into_dart(),
             self.0.base_url.into_into_dart().into_dart(),
             self.0.visitor.into_into_dart().into_dart(),
@@ -4119,6 +4126,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptionsUpdate
             self.0.infer_dimensions.into_into_dart().into_dart(),
             self.0.max_depth.into_into_dart().into_dart(),
             self.0.exclude_selectors.into_into_dart().into_dart(),
+            self.0.data_as_elements.into_into_dart().into_dart(),
             self.0.tier_strategy.into_into_dart().into_dart(),
             self.0.base_url.into_into_dart().into_dart(),
             self.0.visitor.into_into_dart().into_dart(),
@@ -5209,6 +5217,7 @@ impl SseEncode for crate::ConversionOptions {
         <bool>::sse_encode(self.infer_dimensions, serializer);
         <Option<i64>>::sse_encode(self.max_depth, serializer);
         <Vec<String>>::sse_encode(self.exclude_selectors, serializer);
+        <Option<Vec<String>>>::sse_encode(self.data_as_elements, serializer);
         <crate::TierStrategy>::sse_encode(self.tier_strategy, serializer);
         <Option<String>>::sse_encode(self.base_url, serializer);
         <Option<VisitorHandle>>::sse_encode(self.visitor, serializer);
@@ -5265,6 +5274,7 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<bool>>::sse_encode(self.infer_dimensions, serializer);
         <Option<i64>>::sse_encode(self.max_depth, serializer);
         <Option<Vec<String>>>::sse_encode(self.exclude_selectors, serializer);
+        <Option<Vec<String>>>::sse_encode(self.data_as_elements, serializer);
         <Option<crate::TierStrategy>>::sse_encode(self.tier_strategy, serializer);
         <Option<String>>::sse_encode(self.base_url, serializer);
         <Option<VisitorHandle>>::sse_encode(self.visitor, serializer);

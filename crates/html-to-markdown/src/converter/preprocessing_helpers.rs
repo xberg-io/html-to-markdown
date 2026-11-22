@@ -282,11 +282,22 @@ fn end_tag_offset(tag: &crate::dom::HTMLTag<'_>) -> Option<usize> {
     let body = raw.strip_suffix(b">")?;
     let at = memchr::memmem::rfind(body, b"</")?;
     let rest = &body[at + 2..];
-    let name = tag.name().as_bytes();
+    let name = source_name(raw);
     let spelled = rest.get(..name.len())?;
     let tail = &rest[name.len()..];
     (spelled.eq_ignore_ascii_case(name) && tail.iter().all(|byte| byte.is_ascii_whitespace() || *byte == b'/'))
         .then_some(at)
+}
+
+/// The tag name as written in the source range `raw`, which is the name before `apply_data_as` renamed a
+/// `<span data-as="p">`: the end tag of the element names the source name.
+fn source_name(raw: &[u8]) -> &[u8] {
+    let after_bracket = raw.strip_prefix(b"<").unwrap_or(raw);
+    let len = after_bracket
+        .iter()
+        .position(|byte| byte.is_ascii_whitespace() || matches!(byte, b'/' | b'>'))
+        .unwrap_or(after_bracket.len());
+    &after_bracket[..len]
 }
 
 /// The position in one element (or the page) in the walk of [`has_discarded_end_tag`].

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "options_data_as_elements_default",
+    "description": "Unset data_as_elements uses span and div for data-as",
+    "input": {
+      "html": "<div><span data-as=\"p\">First</span><span data-as=\"p\">Second</span></div>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "First\n\nSecond\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_data_as_elements_default",
+      "title": "Unset data_as_elements uses span and div for data-as"
+    }
+  },
+  {
+    "id": "options_data_as_elements_custom",
+    "description": "A custom data_as_elements list names the elements to convert",
+    "input": {
+      "html": "<div><section data-as=\"p\">First</section><section data-as=\"p\">Second</section></div>",
+      "options": {
+        "data_as_elements": [
+          "section"
+        ]
+      }
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "First\n\nSecond\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_data_as_elements_custom",
+      "title": "A custom data_as_elements list names the elements to convert"
+    }
+  },
+  {
+    "id": "options_data_as_elements_empty",
+    "description": "An empty data_as_elements list turns data-as off",
+    "input": {
+      "html": "<div><span data-as=\"p\">First</span><span data-as=\"p\">Second</span></div>",
+      "options": {
+        "data_as_elements": []
+      }
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "FirstSecond\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_data_as_elements_empty",
+      "title": "An empty data_as_elements list turns data-as off"
+    }
+  }
+]

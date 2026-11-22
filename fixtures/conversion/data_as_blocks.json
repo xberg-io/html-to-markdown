@@ -1,0 +1,21 @@
+[
+  {
+    "id": "data_as_paragraph_spans",
+    "description": "Adjacent span[data-as=p] elements convert like paragraphs",
+    "input": {
+      "html": "<div><span data-as=\"p\">First paragraph.</span><span data-as=\"p\">Second paragraph.</span></div>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "First paragraph.\n\nSecond paragraph.\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "data_as_paragraph_spans",
+      "title": "data-as paragraph spans"
+    }
+  }
+]

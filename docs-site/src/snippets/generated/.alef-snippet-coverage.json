@@ -30,6 +30,7 @@
     "c/conversion/conversion_autolink_mailto.md",
     "c/conversion/conversion_autolink_mixed_filename_and_url.md",
     "c/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "c/conversion/data_as_paragraph_spans.md",
     "c/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "c/conversion/emphasis_mark_highlight.md",
     "c/conversion/emphasis_strikethrough_del.md",
@@ -215,6 +216,9 @@
     "c/options/options_compact_tables_true.md",
     "c/options/options_convert_as_inline.md",
     "c/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "c/options/options_data_as_elements_custom.md",
+    "c/options/options_data_as_elements_default.md",
+    "c/options/options_data_as_elements_empty.md",
     "c/options/options_debug_true.md",
     "c/options/options_default_title_true.md",
     "c/options/options_encoding_utf8.md",
@@ -388,6 +392,7 @@
     "csharp/conversion/conversion_autolink_mailto.md",
     "csharp/conversion/conversion_autolink_mixed_filename_and_url.md",
     "csharp/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "csharp/conversion/data_as_paragraph_spans.md",
     "csharp/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "csharp/conversion/emphasis_mark_highlight.md",
     "csharp/conversion/emphasis_strikethrough_del.md",
@@ -573,6 +578,9 @@
     "csharp/options/options_compact_tables_true.md",
     "csharp/options/options_convert_as_inline.md",
     "csharp/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "csharp/options/options_data_as_elements_custom.md",
+    "csharp/options/options_data_as_elements_default.md",
+    "csharp/options/options_data_as_elements_empty.md",
     "csharp/options/options_debug_true.md",
     "csharp/options/options_default_title_true.md",
     "csharp/options/options_encoding_utf8.md",
@@ -746,6 +754,7 @@
     "dart/conversion/conversion_autolink_mailto.md",
     "dart/conversion/conversion_autolink_mixed_filename_and_url.md",
     "dart/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "dart/conversion/data_as_paragraph_spans.md",
     "dart/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "dart/conversion/emphasis_mark_highlight.md",
     "dart/conversion/emphasis_strikethrough_del.md",
@@ -931,6 +940,9 @@
     "dart/options/options_compact_tables_true.md",
     "dart/options/options_convert_as_inline.md",
     "dart/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "dart/options/options_data_as_elements_custom.md",
+    "dart/options/options_data_as_elements_default.md",
+    "dart/options/options_data_as_elements_empty.md",
     "dart/options/options_debug_true.md",
     "dart/options/options_default_title_true.md",
     "dart/options/options_encoding_utf8.md",
@@ -1104,6 +1116,7 @@
     "elixir/conversion/conversion_autolink_mailto.md",
     "elixir/conversion/conversion_autolink_mixed_filename_and_url.md",
     "elixir/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "elixir/conversion/data_as_paragraph_spans.md",
     "elixir/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "elixir/conversion/emphasis_mark_highlight.md",
     "elixir/conversion/emphasis_strikethrough_del.md",
@@ -1289,6 +1302,9 @@
     "elixir/options/options_compact_tables_true.md",
     "elixir/options/options_convert_as_inline.md",
     "elixir/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "elixir/options/options_data_as_elements_custom.md",
+    "elixir/options/options_data_as_elements_default.md",
+    "elixir/options/options_data_as_elements_empty.md",
     "elixir/options/options_debug_true.md",
     "elixir/options/options_default_title_true.md",
     "elixir/options/options_encoding_utf8.md",
@@ -1462,6 +1478,7 @@
     "go/conversion/conversion_autolink_mailto.md",
     "go/conversion/conversion_autolink_mixed_filename_and_url.md",
     "go/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "go/conversion/data_as_paragraph_spans.md",
     "go/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "go/conversion/emphasis_mark_highlight.md",
     "go/conversion/emphasis_strikethrough_del.md",
@@ -1647,6 +1664,9 @@
     "go/options/options_compact_tables_true.md",
     "go/options/options_convert_as_inline.md",
     "go/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "go/options/options_data_as_elements_custom.md",
+    "go/options/options_data_as_elements_default.md",
+    "go/options/options_data_as_elements_empty.md",
     "go/options/options_debug_true.md",
     "go/options/options_default_title_true.md",
     "go/options/options_encoding_utf8.md",
@@ -1820,6 +1840,7 @@
     "java/conversion/conversion_autolink_mailto.md",
     "java/conversion/conversion_autolink_mixed_filename_and_url.md",
     "java/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "java/conversion/data_as_paragraph_spans.md",
     "java/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "java/conversion/emphasis_mark_highlight.md",
     "java/conversion/emphasis_strikethrough_del.md",
@@ -2005,6 +2026,9 @@
     "java/options/options_compact_tables_true.md",
     "java/options/options_convert_as_inline.md",
     "java/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "java/options/options_data_as_elements_custom.md",
+    "java/options/options_data_as_elements_default.md",
+    "java/options/options_data_as_elements_empty.md",
     "java/options/options_debug_true.md",
     "java/options/options_default_title_true.md",
     "java/options/options_encoding_utf8.md",
@@ -2178,6 +2202,7 @@
     "kotlin-android/conversion/conversion_autolink_mailto.md",
     "kotlin-android/conversion/conversion_autolink_mixed_filename_and_url.md",
     "kotlin-android/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "kotlin-android/conversion/data_as_paragraph_spans.md",
     "kotlin-android/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "kotlin-android/conversion/emphasis_mark_highlight.md",
     "kotlin-android/conversion/emphasis_strikethrough_del.md",
@@ -2358,6 +2383,9 @@
     "kotlin-android/options/options_compact_tables_true.md",
     "kotlin-android/options/options_convert_as_inline.md",
     "kotlin-android/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "kotlin-android/options/options_data_as_elements_custom.md",
+    "kotlin-android/options/options_data_as_elements_default.md",
+    "kotlin-android/options/options_data_as_elements_empty.md",
     "kotlin-android/options/options_debug_true.md",
     "kotlin-android/options/options_default_title_true.md",
     "kotlin-android/options/options_encoding_utf8.md",
@@ -2482,6 +2510,7 @@
     "php/conversion/conversion_autolink_mailto.md",
     "php/conversion/conversion_autolink_mixed_filename_and_url.md",
     "php/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "php/conversion/data_as_paragraph_spans.md",
     "php/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "php/conversion/emphasis_mark_highlight.md",
     "php/conversion/emphasis_strikethrough_del.md",
@@ -2662,6 +2691,9 @@
     "php/options/options_compact_tables_true.md",
     "php/options/options_convert_as_inline.md",
     "php/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "php/options/options_data_as_elements_custom.md",
+    "php/options/options_data_as_elements_default.md",
+    "php/options/options_data_as_elements_empty.md",
     "php/options/options_debug_true.md",
     "php/options/options_default_title_true.md",
     "php/options/options_encoding_utf8.md",
@@ -2786,6 +2818,7 @@
     "python/conversion/conversion_autolink_mailto.md",
     "python/conversion/conversion_autolink_mixed_filename_and_url.md",
     "python/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "python/conversion/data_as_paragraph_spans.md",
     "python/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "python/conversion/emphasis_mark_highlight.md",
     "python/conversion/emphasis_strikethrough_del.md",
@@ -2971,6 +3004,9 @@
     "python/options/options_compact_tables_true.md",
     "python/options/options_convert_as_inline.md",
     "python/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "python/options/options_data_as_elements_custom.md",
+    "python/options/options_data_as_elements_default.md",
+    "python/options/options_data_as_elements_empty.md",
     "python/options/options_debug_true.md",
     "python/options/options_default_title_true.md",
     "python/options/options_encoding_utf8.md",
@@ -3144,6 +3180,7 @@
     "r/conversion/conversion_autolink_mailto.md",
     "r/conversion/conversion_autolink_mixed_filename_and_url.md",
     "r/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "r/conversion/data_as_paragraph_spans.md",
     "r/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "r/conversion/emphasis_mark_highlight.md",
     "r/conversion/emphasis_strikethrough_del.md",
@@ -3329,6 +3366,9 @@
     "r/options/options_compact_tables_true.md",
     "r/options/options_convert_as_inline.md",
     "r/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "r/options/options_data_as_elements_custom.md",
+    "r/options/options_data_as_elements_default.md",
+    "r/options/options_data_as_elements_empty.md",
     "r/options/options_debug_true.md",
     "r/options/options_default_title_true.md",
     "r/options/options_encoding_utf8.md",
@@ -3502,6 +3542,7 @@
     "ruby/conversion/conversion_autolink_mailto.md",
     "ruby/conversion/conversion_autolink_mixed_filename_and_url.md",
     "ruby/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "ruby/conversion/data_as_paragraph_spans.md",
     "ruby/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "ruby/conversion/emphasis_mark_highlight.md",
     "ruby/conversion/emphasis_strikethrough_del.md",
@@ -3687,6 +3728,9 @@
     "ruby/options/options_compact_tables_true.md",
     "ruby/options/options_convert_as_inline.md",
     "ruby/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "ruby/options/options_data_as_elements_custom.md",
+    "ruby/options/options_data_as_elements_default.md",
+    "ruby/options/options_data_as_elements_empty.md",
     "ruby/options/options_debug_true.md",
     "ruby/options/options_default_title_true.md",
     "ruby/options/options_encoding_utf8.md",
@@ -3860,6 +3904,7 @@
     "rust/conversion/conversion_autolink_mailto.md",
     "rust/conversion/conversion_autolink_mixed_filename_and_url.md",
     "rust/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "rust/conversion/data_as_paragraph_spans.md",
     "rust/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "rust/conversion/emphasis_mark_highlight.md",
     "rust/conversion/emphasis_strikethrough_del.md",
@@ -4045,6 +4090,9 @@
     "rust/options/options_compact_tables_true.md",
     "rust/options/options_convert_as_inline.md",
     "rust/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "rust/options/options_data_as_elements_custom.md",
+    "rust/options/options_data_as_elements_default.md",
+    "rust/options/options_data_as_elements_empty.md",
     "rust/options/options_debug_true.md",
     "rust/options/options_default_title_true.md",
     "rust/options/options_encoding_utf8.md",
@@ -4218,6 +4266,7 @@
     "swift/conversion/conversion_autolink_mailto.md",
     "swift/conversion/conversion_autolink_mixed_filename_and_url.md",
     "swift/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "swift/conversion/data_as_paragraph_spans.md",
     "swift/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "swift/conversion/emphasis_mark_highlight.md",
     "swift/conversion/emphasis_strikethrough_del.md",
@@ -4403,6 +4452,9 @@
     "swift/options/options_compact_tables_true.md",
     "swift/options/options_convert_as_inline.md",
     "swift/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "swift/options/options_data_as_elements_custom.md",
+    "swift/options/options_data_as_elements_default.md",
+    "swift/options/options_data_as_elements_empty.md",
     "swift/options/options_debug_true.md",
     "swift/options/options_default_title_true.md",
     "swift/options/options_encoding_utf8.md",
@@ -4576,6 +4628,7 @@
     "typescript/conversion/conversion_autolink_mailto.md",
     "typescript/conversion/conversion_autolink_mixed_filename_and_url.md",
     "typescript/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "typescript/conversion/data_as_paragraph_spans.md",
     "typescript/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "typescript/conversion/emphasis_mark_highlight.md",
     "typescript/conversion/emphasis_strikethrough_del.md",
@@ -4761,6 +4814,9 @@
     "typescript/options/options_compact_tables_true.md",
     "typescript/options/options_convert_as_inline.md",
     "typescript/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "typescript/options/options_data_as_elements_custom.md",
+    "typescript/options/options_data_as_elements_default.md",
+    "typescript/options/options_data_as_elements_empty.md",
     "typescript/options/options_debug_true.md",
     "typescript/options/options_default_title_true.md",
     "typescript/options/options_encoding_utf8.md",
@@ -4934,6 +4990,7 @@
     "wasm/conversion/conversion_autolink_mailto.md",
     "wasm/conversion/conversion_autolink_mixed_filename_and_url.md",
     "wasm/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "wasm/conversion/data_as_paragraph_spans.md",
     "wasm/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "wasm/conversion/emphasis_mark_highlight.md",
     "wasm/conversion/emphasis_strikethrough_del.md",
@@ -5119,6 +5176,9 @@
     "wasm/options/options_compact_tables_true.md",
     "wasm/options/options_convert_as_inline.md",
     "wasm/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "wasm/options/options_data_as_elements_custom.md",
+    "wasm/options/options_data_as_elements_default.md",
+    "wasm/options/options_data_as_elements_empty.md",
     "wasm/options/options_debug_true.md",
     "wasm/options/options_default_title_true.md",
     "wasm/options/options_encoding_utf8.md",
@@ -5292,6 +5352,7 @@
     "zig/conversion/conversion_autolink_mailto.md",
     "zig/conversion/conversion_autolink_mixed_filename_and_url.md",
     "zig/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "zig/conversion/data_as_paragraph_spans.md",
     "zig/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "zig/conversion/emphasis_mark_highlight.md",
     "zig/conversion/emphasis_strikethrough_del.md",
@@ -5477,6 +5538,9 @@
     "zig/options/options_compact_tables_true.md",
     "zig/options/options_convert_as_inline.md",
     "zig/options/options_custom_bullets_apply_to_layout_table_rows.md",
+    "zig/options/options_data_as_elements_custom.md",
+    "zig/options/options_data_as_elements_default.md",
+    "zig/options/options_data_as_elements_empty.md",
     "zig/options/options_debug_true.md",
     "zig/options/options_default_title_true.md",
     "zig/options/options_encoding_utf8.md",
@@ -5965,6 +6029,18 @@
         "language": "c"
       },
       "path": "c/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "c"
+      },
+      "path": "c/conversion/data_as_paragraph_spans.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -8193,6 +8269,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "c"
+      },
+      "path": "c/options/options_data_as_elements_custom.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "c"
+      },
+      "path": "c/options/options_data_as_elements_default.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "c"
+      },
+      "path": "c/options/options_data_as_elements_empty.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "c"
       },
@@ -10261,6 +10373,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/data_as_paragraph_spans.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -12489,6 +12613,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_data_as_elements_custom.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_data_as_elements_default.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_data_as_elements_empty.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "csharp"
       },
@@ -14557,6 +14717,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "dart"
+      },
+      "path": "dart/conversion/data_as_paragraph_spans.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -16785,6 +16957,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "dart"
+      },
+      "path": "dart/options/options_data_as_elements_custom.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "dart"
+      },
+      "path": "dart/options/options_data_as_elements_default.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "dart"
+      },
+      "path": "dart/options/options_data_as_elements_empty.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "dart"
       },
@@ -18853,6 +19061,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/data_as_paragraph_spans.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -21081,6 +21301,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_data_as_elements_custom.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_data_as_elements_default.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_data_as_elements_empty.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "elixir"
       },
@@ -23149,6 +23405,18 @@
         "language": "go"
       },
       "path": "go/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "go"
+      },
+      "path": "go/conversion/data_as_paragraph_spans.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -25377,6 +25645,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "go"
+      },
+      "path": "go/options/options_data_as_elements_custom.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "go"
+      },
+      "path": "go/options/options_data_as_elements_default.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "go"
+      },
+      "path": "go/options/options_data_as_elements_empty.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "go"
       },
@@ -27445,6 +27749,18 @@
         "language": "java"
       },
       "path": "java/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "java"
+      },
+      "path": "java/conversion/data_as_paragraph_spans.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -29673,6 +29989,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "java"
+      },
+      "path": "java/options/options_data_as_elements_custom.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "java"
+      },
+      "path": "java/options/options_data_as_elements_default.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "java"
+      },
+      "path": "java/options/options_data_as_elements_empty.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "java"
       },
@@ -31741,6 +32093,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/data_as_paragraph_spans.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -33909,6 +34273,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_data_as_elements_custom.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_data_as_elements_default.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_data_as_elements_empty.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "kotlin_android"
       },
@@ -35389,6 +35789,18 @@
         "language": "php"
       },
       "path": "php/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "php"
+      },
+      "path": "php/conversion/data_as_paragraph_spans.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -37557,6 +37969,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "php"
+      },
+      "path": "php/options/options_data_as_elements_custom.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "php"
+      },
+      "path": "php/options/options_data_as_elements_default.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "php"
+      },
+      "path": "php/options/options_data_as_elements_empty.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "php"
       },
@@ -39037,6 +39485,18 @@
         "language": "python"
       },
       "path": "python/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "python"
+      },
+      "path": "python/conversion/data_as_paragraph_spans.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -41265,6 +41725,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "python"
+      },
+      "path": "python/options/options_data_as_elements_custom.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "python"
+      },
+      "path": "python/options/options_data_as_elements_default.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "python"
+      },
+      "path": "python/options/options_data_as_elements_empty.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "python"
       },
@@ -43333,6 +43829,18 @@
         "language": "r"
       },
       "path": "r/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "r"
+      },
+      "path": "r/conversion/data_as_paragraph_spans.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -45561,6 +46069,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "r"
+      },
+      "path": "r/options/options_data_as_elements_custom.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "r"
+      },
+      "path": "r/options/options_data_as_elements_default.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "r"
+      },
+      "path": "r/options/options_data_as_elements_empty.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "r"
       },
@@ -47629,6 +48173,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/data_as_paragraph_spans.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -49857,6 +50413,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_data_as_elements_custom.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_data_as_elements_default.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_data_as_elements_empty.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "ruby"
       },
@@ -51925,6 +52517,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "rust"
+      },
+      "path": "rust/conversion/data_as_paragraph_spans.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -54277,6 +54881,46 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "rust"
+      },
+      "path": "rust/options/options_data_as_elements_custom.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "rust"
+      },
+      "path": "rust/options/options_data_as_elements_default.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "rust"
+      },
+      "path": "rust/options/options_data_as_elements_empty.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "rust"
       },
@@ -56619,6 +57263,18 @@
     },
     {
       "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "swift"
+      },
+      "path": "swift/conversion/data_as_paragraph_spans.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "div_whitespace_only_span_does_not_indent_image",
         "language": "swift"
       },
@@ -58839,6 +59495,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "swift"
+      },
+      "path": "swift/options/options_data_as_elements_custom.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "swift"
+      },
+      "path": "swift/options/options_data_as_elements_default.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "swift"
+      },
+      "path": "swift/options/options_data_as_elements_empty.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "swift"
       },
@@ -60907,6 +61599,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "node"
+      },
+      "path": "typescript/conversion/data_as_paragraph_spans.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -63135,6 +63839,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "node"
+      },
+      "path": "typescript/options/options_data_as_elements_custom.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "node"
+      },
+      "path": "typescript/options/options_data_as_elements_default.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "node"
+      },
+      "path": "typescript/options/options_data_as_elements_empty.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "node"
       },
@@ -65203,6 +65943,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/data_as_paragraph_spans.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -67431,6 +68183,42 @@
     },
     {
       "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_data_as_elements_custom.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_data_as_elements_default.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_data_as_elements_empty.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_debug_true",
         "language": "wasm"
       },
@@ -69499,6 +70287,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "data_as_paragraph_spans",
+        "language": "zig"
+      },
+      "path": "zig/conversion/data_as_paragraph_spans.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -71719,6 +72519,42 @@
         "language": "zig"
       },
       "path": "zig/options/options_custom_bullets_apply_to_layout_table_rows.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_custom",
+        "language": "zig"
+      },
+      "path": "zig/options/options_data_as_elements_custom.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_default",
+        "language": "zig"
+      },
+      "path": "zig/options/options_data_as_elements_default.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_data_as_elements_empty",
+        "language": "zig"
+      },
+      "path": "zig/options/options_data_as_elements_empty.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -75312,6 +76148,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "c"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "go"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "java"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "node"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "php"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "python"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "r"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "zig"
+    },
+    {
       "fixture_id": "div_whitespace_only_span_does_not_indent_image",
       "language": "c"
     },
@@ -83757,6 +84657,198 @@
     },
     {
       "fixture_id": "options_custom_bullets_apply_to_layout_table_rows",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
       "language": "zig"
     },
     {
@@ -97794,6 +98886,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "c"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "go"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "java"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "node"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "php"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "python"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "r"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "data_as_paragraph_spans",
+      "language": "zig"
+    },
+    {
       "fixture_id": "div_whitespace_only_span_does_not_indent_image",
       "language": "c"
     },
@@ -106239,6 +107395,198 @@
     },
     {
       "fixture_id": "options_custom_bullets_apply_to_layout_table_rows",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_data_as_elements_custom",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_data_as_elements_default",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_data_as_elements_empty",
       "language": "zig"
     },
     {
