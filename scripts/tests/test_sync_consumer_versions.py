@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from sync_consumer_versions import synchronize
+from sync_consumer_versions import pep440, synchronize
 
 
 @pytest.fixture
@@ -27,10 +27,16 @@ def consumer_files(tmp_path: Path) -> dict[str, str]:
             'val aarCoord = "io.xberg:html-to-markdown-android:3.12.2"\n'
             'tasks.register("buildHostJni") { custom() }\n'
         ),
+        "cli-proxy/npm/package.json": '{\n  "name": "x",\n  "version": "3.12.2",\n  "engines": {"node": ">=22"}\n}\n',
+        "cli-proxy/pypi/pyproject.toml": '[project]\nname = "x"\nversion = "3.12.2"\nrequires-python = ">=3.11"\n',
+        "server.json": (
+            '{\n  "name": "io.github.x/y",\n  "version": "3.12.2",\n  "packages": [\n    {\n'
+            '      "identifier": "@x/y",\n      "version": "3.12.2"\n    }\n  ]\n}\n'
+        ),
     }
     for relative_path, text in files.items():
         path = tmp_path / relative_path
-        path.parent.mkdir(parents=True)
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
     return files
 
@@ -51,7 +57,9 @@ def test_check_detects_drift_without_modifying_manifests(tmp_path: Path, consume
         assert (tmp_path / relative_path).read_text() == text
 
 
-@pytest.mark.parametrize("relative_path", ["test_apps/elixir/mix.exs", "e2e/go/go.mod"])
+@pytest.mark.parametrize(
+    "relative_path", ["test_apps/elixir/mix.exs", "e2e/go/go.mod", "server.json", "cli-proxy/pypi/pyproject.toml"]
+)
 def test_missing_pin_fails_before_any_manifest_is_written(
     tmp_path: Path, consumer_files: dict[str, str], relative_path: str
 ) -> None:
@@ -73,3 +81,36 @@ def test_duplicate_go_release_pins_fail_before_any_manifest_is_written(
     with pytest.raises(ValueError, match="expected 1 release pins, found 2"):
         synchronize(tmp_path)
     assert (tmp_path / "test_apps/dart/pubspec.yaml").read_text() == consumer_files["test_apps/dart/pubspec.yaml"]
+
+
+def test_server_json_pins_both_the_server_and_the_package_version(
+    tmp_path: Path, consumer_files: dict[str, str]
+) -> None:
+    """The registry entry's server version and its npm package version move together."""
+    synchronize(tmp_path)
+    text = (tmp_path / "server.json").read_text()
+    assert text.count('"version": "3.12.3"') == 2
+    assert "3.12.2" not in text
+
+
+def test_deliberate_proxy_drift_fails_the_check(tmp_path: Path, consumer_files: dict[str, str]) -> None:
+    """A proxy package left behind the product version is reported, not ignored."""
+    synchronize(tmp_path)
+    assert synchronize(tmp_path, check=True) is True
+    path = tmp_path / "cli-proxy/npm/package.json"
+    path.write_text(path.read_text().replace("3.12.3", "3.12.2"))
+    assert synchronize(tmp_path, check=True) is False
+
+
+def test_pypi_proxy_uses_the_pep440_spelling_of_a_prerelease(tmp_path: Path, consumer_files: dict[str, str]) -> None:
+    """PyPI rejects 3.13.0-rc.1, so the proxy wheel version is respelled while npm keeps semver."""
+    (tmp_path / "Cargo.toml").write_text('[workspace.package]\nversion = "3.13.0-rc.1"\n')
+    synchronize(tmp_path)
+    assert 'version = "3.13.0rc1"' in (tmp_path / "cli-proxy/pypi/pyproject.toml").read_text()
+    assert '"version": "3.13.0-rc.1"' in (tmp_path / "cli-proxy/npm/package.json").read_text()
+    assert synchronize(tmp_path, check=True) is True
+
+
+def test_pep440_leaves_a_final_version_alone() -> None:
+    assert pep440("3.13.0") == "3.13.0"
+    assert pep440("3.13.0-beta.2") == "3.13.0b2"
