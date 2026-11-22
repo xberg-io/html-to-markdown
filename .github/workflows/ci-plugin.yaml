@@ -25,6 +25,9 @@ on:
       - ".agents/plugins/**"
       - ".ai-rulez/config*.toml"
       - "scripts/sync_plugin_version.py"
+      - "scripts/sync_consumer_versions.py"
+      - "cli-proxy/**"
+      - "server.json"
       - "mise.toml"
       - "mise-tasks/**"
       - "scripts/tests/**"
@@ -59,6 +62,9 @@ jobs:
       # Plugin version must track the core crate version (mise run version:sync keeps it pinned).
       - name: Verify plugin version tracks core
         run: python3 scripts/sync_plugin_version.py --check
+      # The CLI proxy packages and the MCP registry entry ship in lockstep with core.
+      - name: Verify CLI proxy and MCP registry versions track core
+        run: python3 scripts/sync_consumer_versions.py --check
       # Byte-verify the ai-rulez-generated bundles under plugin/ match plugin/.ai-rulez.
       # ai-rulez is the latest release; a release that changes bundle bytes turns this red
       # until `mise run plugin:generate` is rerun. ~keep

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.xberg-io/html-to-markdown",
+  "title": "HTML to Markdown",
+  "description": "Convert HTML to clean Markdown with a fast Rust engine, over a local stdio MCP server.",
+  "repository": {
+    "url": "https://github.com/xberg-io/html-to-markdown",
+    "source": "github"
+  },
+  "version": "3.23.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@xberg-io/html-to-markdown-cli",
+      "version": "3.23.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ]
+    }
+  ]
+}

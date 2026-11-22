@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { isNonCliArtifact, selectArchiveName } from "./install.js";
+import crypto from "node:crypto";
+import fs from "node:fs";
+
+import { isNonCliArtifact, pinnedTag, selectArchiveName, verifyChecksum } from "./install.js";
 
 const TRIPLE = "aarch64-apple-darwin";
 
@@ -50,4 +53,33 @@ test("selectArchiveName prefers a bin-name/cli archive among survivors", () => {
 test("selectArchiveName returns null when only non-CLI artifacts exist", () => {
   const names = ["crawlberg-ffi-v0.3.0-aarch64-apple-darwin.tar.gz", "libfoo-nif-2.17-aarch64-apple-darwin.so.tar.gz"];
   assert.equal(selectArchiveName(names, TRIPLE), null);
+});
+
+test("pinnedTag is the package version, never latest", () => {
+  const { version } = JSON.parse(fs.readFileSync(new URL("./package.json", import.meta.url), "utf8"));
+  assert.equal(pinnedTag({}), `v${version}`);
+});
+
+test("pinnedTag honours an explicit HTML_TO_MARKDOWN_CLI_VERSION override", () => {
+  assert.equal(pinnedTag({ HTML_TO_MARKDOWN_CLI_VERSION: "v9.9.9" }), "v9.9.9");
+});
+
+test("verifyChecksum accepts the matching digest", () => {
+  const body = Buffer.from("archive-bytes");
+  const digest = crypto.createHash("sha256").update(body).digest("hex");
+  const sums = `${"0".repeat(64)}  cli-other.tar.gz\n${digest}  cli-aarch64-apple-darwin.tar.gz\n`;
+  verifyChecksum(body, "cli-aarch64-apple-darwin.tar.gz", sums);
+});
+
+test("verifyChecksum rejects a digest mismatch", () => {
+  const sums = `${"0".repeat(64)}  cli-aarch64-apple-darwin.tar.gz\n`;
+  assert.throws(
+    () => verifyChecksum(Buffer.from("tampered"), "cli-aarch64-apple-darwin.tar.gz", sums),
+    /checksum mismatch/,
+  );
+});
+
+test("verifyChecksum rejects an archive with no entry in cli-SHA256SUMS", () => {
+  const sums = `${"0".repeat(64)}  cli-other.tar.gz\n`;
+  assert.throws(() => verifyChecksum(Buffer.from("x"), "cli-aarch64-apple-darwin.tar.gz", sums), /no checksum entry/);
 });

@@ -101,6 +101,8 @@ run = [
   "python3 scripts/sync_plugin_version.py",
   "npx -y ai-rulez@latest generate --plugin",
   "python3 scripts/sync_public_skills.py",
+  # The CLI proxy packages and server.json must land on the product version in the same sync. ~keep
+  "python3 scripts/sync_consumer_versions.py --check",
   { task = "alef:verify:strict" },
 ]
 
