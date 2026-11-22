@@ -28,9 +28,10 @@ the runtime supports MCP.
 The plugin auto-registers the server through its bundled MCP launcher, which execs
 `html-to-markdown mcp`. On first run the
 launcher resolves an `html-to-markdown` binary: it reuses one already on `PATH`
-or cached in the plugin's `bin/`, then tries `npx`/`uvx`, then Homebrew, then
-downloads a prebuilt from the tool's latest GitHub release. Override the channel
-with `HTML_TO_MARKDOWN_LAUNCHER=auto|npx|uvx|brew|download`.
+or cached in the plugin's `bin/`, provided it is at least the release this plugin
+ships with, then tries Homebrew, then downloads that exact release from GitHub
+and verifies its checksum. Override the channel with
+`HTML_TO_MARKDOWN_LAUNCHER=auto|brew|download`.
 
 The `mcp` subcommand ships in a recent release of the tool. If an older
 `html-to-markdown` is already on `PATH`, it may not expose `mcp` yet — upgrade

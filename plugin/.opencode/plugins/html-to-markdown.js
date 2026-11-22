@@ -1,6 +1,6 @@
 // AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-// Content-Hash: blake3:2e612761528e736297ad6fea35c069568eb341e0d28abd11dec8115b1d83d010
-// Source-Hash: blake3:e7a43593e105601e55df1c85f519d9d0078b2168048b9fe48d10e949829df93c
+// Content-Hash: blake3:8e1d89e2e2174c41c042b742d1ddcc750966de06c1c59d08395ec35e7654fbe7
+// Source-Hash: blake3:78cab030311b980879d3d1a74dba84eabbe414713b15d31028940cb54ee40d52
 // Schema-Version: v1
 
 import { registerBundledContent } from "../ai-rulez-content.js";
@@ -61,7 +61,7 @@ function runCli(args, context, directory, stdin) {
       if (error.code === "ENOENT") {
         resolve({
           content:
-            "Install the html-to-markdown CLI with `brew install xberg-io/tap/html-to-markdown`, or run it via `npx -y @xberg-io/html-to-markdown-cli` / `uvx --from html-to-markdown-cli html-to-markdown`.",
+            "Install the html-to-markdown CLI with `brew install xberg-io/tap/html-to-markdown`, or `cargo install html-to-markdown-cli`.",
           metadata: { exitCode: 127, command: "html-to-markdown" },
         });
         return;
