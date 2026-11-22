@@ -1,13 +1,13 @@
 {
   "schema_version": "v1",
-  "source_hash": "blake3:de6ae056e22a8c2f20286b578b846613c692a655e1ab843bb4d9e42221abd85b",
+  "source_hash": "blake3:e7a43593e105601e55df1c85f519d9d0078b2168048b9fe48d10e949829df93c",
   "outputs": {
     ".claude-plugin/plugin.json": {
-      "content_hash": "blake3:b77bf6eab2ba060867cf8fd29ee975adf5adcc09e34fd0047ba12b39dca73446",
+      "content_hash": "blake3:012703d61db853b336e6fe8a753dc9874a723cab72ef20a33474c6f87e5d4233",
       "mode": "0644"
     },
     ".codex-plugin/plugin.json": {
-      "content_hash": "blake3:66bfcb8957a84278f697ccdcc093379e7c031331a47a98c95b69db8aef694e31",
+      "content_hash": "blake3:df8524fe187999dfa9dacfc2cbc6202d14761bb9a6488b2ae8b6967d443850ff",
       "mode": "0644"
     },
     ".cursor-plugin/commands/html-to-markdown-convert.md": {
@@ -19,7 +19,7 @@
       "mode": "0644"
     },
     ".cursor-plugin/plugin.json": {
-      "content_hash": "blake3:17b7d3f65db18a8ffe83356dde01526930a4df48f13dff315ddc921beea29d89",
+      "content_hash": "blake3:cd8d13923a9370d512ebdb03a3be60db17fc5e63531842671b6800c1474fb508",
       "mode": "0644"
     },
     ".cursor-plugin/skills/html-to-markdown-converting-html/SKILL.md": {
@@ -215,15 +215,15 @@
       "mode": "0644"
     },
     ".factory-plugin/plugin.json": {
-      "content_hash": "blake3:0e1120e15be59c82edc2fa8b55b97663bc620e156f6cde90d36d04a6525b3658",
+      "content_hash": "blake3:df599cdc5ae014f53b869366d5b7c709f26e734f6c407d22790bb9c0cfde192b",
       "mode": "0644"
     },
     ".hermes/package/pyproject.toml": {
-      "content_hash": "blake3:2b705e2aa8ac3b44e6da8ea71266c5a69aced8b31f6eb4285d0f0d4edf055b81",
+      "content_hash": "blake3:034648299f135a7a601166252b072111243ff0aa166da6ccbd1450be07822ab0",
       "mode": "0644"
     },
     ".hermes/package/src/html_to_markdown_hermes_plugin/__init__.py": {
-      "content_hash": "blake3:2f9bd979a6fde09d0f6f2811022e45d4f311762c85428331afe63307925aef18",
+      "content_hash": "blake3:545acdc3b2c6bbe8e0d4dc3fcc8f835f3899435711ae3a731abeaa91f38c9dbd",
       "mode": "0644"
     },
     ".hermes/package/src/html_to_markdown_hermes_plugin/commands/html-to-markdown-convert.md": {
@@ -239,7 +239,7 @@
       "mode": "0644"
     },
     ".hermes/package/src/html_to_markdown_hermes_plugin/plugin.yaml": {
-      "content_hash": "blake3:1c28e9ff9ca82e67c931efb54319358a8c7682709c96084bbca6e2701fe6a1fc",
+      "content_hash": "blake3:5e4e3d26bbf86bcb0f703045c844a068a64ab37c0e47af230b0ab6465d93bf25",
       "mode": "0644"
     },
     ".hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-converting-html/SKILL.md": {
@@ -435,7 +435,7 @@
       "mode": "0644"
     },
     ".hermes/plugins/html-to-markdown/__init__.py": {
-      "content_hash": "blake3:2f9bd979a6fde09d0f6f2811022e45d4f311762c85428331afe63307925aef18",
+      "content_hash": "blake3:545acdc3b2c6bbe8e0d4dc3fcc8f835f3899435711ae3a731abeaa91f38c9dbd",
       "mode": "0644"
     },
     ".hermes/plugins/html-to-markdown/commands/html-to-markdown-convert.md": {
@@ -451,7 +451,7 @@
       "mode": "0644"
     },
     ".hermes/plugins/html-to-markdown/plugin.yaml": {
-      "content_hash": "blake3:1c28e9ff9ca82e67c931efb54319358a8c7682709c96084bbca6e2701fe6a1fc",
+      "content_hash": "blake3:5e4e3d26bbf86bcb0f703045c844a068a64ab37c0e47af230b0ab6465d93bf25",
       "mode": "0644"
     },
     ".hermes/plugins/html-to-markdown/skills/html-to-markdown-converting-html/SKILL.md": {
@@ -1087,11 +1087,11 @@
       "mode": "0644"
     },
     "gemini-extension.json": {
-      "content_hash": "blake3:4f31763fd5c499b0b8d463f7eb346cbc2ebbf2fa7450b4bf8c076368a240b36f",
+      "content_hash": "blake3:4d696abd33a6e5cdca8278ef58067824748baa4018e7626ff406d958636c6964",
       "mode": "0644"
     },
     "kimi.plugin.json": {
-      "content_hash": "blake3:aa90dde7719471883315e29160b866394c3eaac168b7d9d62cd18787dc9d3daa",
+      "content_hash": "blake3:b4e174bb61748fe482db80fca110819e920065b16a0f7e6c17612881abbf8497",
       "mode": "0644"
     },
     "mcp.json": {
@@ -1099,11 +1099,11 @@
       "mode": "0644"
     },
     "package.json": {
-      "content_hash": "blake3:e1c56e3c47f2a97b6168efd01505d8a7afe934343dc89db2f52c038f3d33b713",
+      "content_hash": "blake3:896c270a7479a57da4e6f739191be9d8e504b87f71fb7dd7f1972cb8918cab01",
       "mode": "0644"
     },
     "plugin.json": {
-      "content_hash": "blake3:342e411537e7924b45d8c0a2315369f7d76e293b7471319dedae133274c6e022",
+      "content_hash": "blake3:55b39edaa85b84595b14d3a64f9860e8e3b4a9d470e7b830665b63cc31a11913",
       "mode": "0644"
     },
     "scripts/mcp-launch.sh": {
