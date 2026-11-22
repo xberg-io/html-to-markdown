@@ -2,8 +2,10 @@
 set -euo pipefail
 
 REPO="xberg-io/html-to-markdown"
-NPM_PKG="@xberg-io/html-to-markdown-cli"
-PYPI_PKG="html-to-markdown-cli"
+# ~keep Rewritten by scripts/sync_plugin_version.py on every release. The plugin only accepts a
+# ~keep binary at or above this version, and downloads exactly this release, so a plugin update
+# ~keep cannot keep running an older html-to-markdown that happens to be installed.
+PINNED_VERSION="3.23.0"
 
 log() { printf 'html-to-markdown-launch: %s\n' "$*" >&2; }
 die() {
@@ -13,8 +15,8 @@ die() {
 
 LAUNCHER="${HTML_TO_MARKDOWN_LAUNCHER:-auto}"
 case "$LAUNCHER" in
-auto | npx | uvx | brew | download) ;;
-*) die "invalid HTML_TO_MARKDOWN_LAUNCHER='$LAUNCHER' (expected auto|npx|uvx|brew|download)" ;;
+auto | brew | download) ;;
+*) die "invalid HTML_TO_MARKDOWN_LAUNCHER='$LAUNCHER' (expected auto|brew|download)" ;;
 esac
 
 want() { [ "$LAUNCHER" = "auto" ] || [ "$LAUNCHER" = "$1" ]; }
@@ -33,7 +35,18 @@ BIN="$BIN_DIR/$BINARY_NAME"
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-runnable() { [ -x "$1" ] && "$1" --version >/dev/null 2>&1; }
+# True when $1 runs and reports a version at or above PINNED_VERSION. ~keep
+runnable() {
+  local out found
+  [ -x "$1" ] || return 1
+  out="$("$1" --version 2>/dev/null)" || return 1
+  found="$(printf '%s\n' "$out" | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)"
+  [ -n "$found" ] || return 1
+  [ "$(printf '%s\n%s\n' "$PINNED_VERSION" "$found" | sort -V | head -n 1)" = "$PINNED_VERSION" ] || {
+    log "ignoring $1: version $found is older than the pinned $PINNED_VERSION"
+    return 1
+  }
+}
 
 if runnable "$BIN"; then
   log "using cached html-to-markdown at $BIN"
@@ -45,28 +58,6 @@ if have "$BINARY_NAME"; then
     log "using html-to-markdown on PATH ($PATH_BIN)"
     exec "$PATH_BIN" "$@"
   fi
-fi
-
-if want npx && have npx; then
-  log "resolving npx $NPM_PKG@latest ..."
-  scratch="$(mktemp -d)"
-  # Resolve in an empty project, then execute the selected binary in the caller's cwd. ~keep
-  if npm_bin="$(cd "$scratch" && npx -y --package "$NPM_PKG@latest" --call "command -v ${BINARY_NAME%.exe}" 2>/dev/null)" && runnable "$npm_bin"; then
-    rm -rf "$scratch"
-    log "launching npm package binary $npm_bin"
-    exec "$npm_bin" "$@"
-  fi
-  rm -rf "$scratch"
-  log "npx $NPM_PKG not available (no CLI bin yet); falling through"
-fi
-
-if want uvx && have uvx; then
-  log "probing uvx --from $PYPI_PKG $BINARY_NAME ..."
-  if uvx --from "$PYPI_PKG" "$BINARY_NAME" --version >/dev/null 2>&1; then
-    log "launching via uvx --from $PYPI_PKG $BINARY_NAME"
-    exec uvx --from "$PYPI_PKG" "$BINARY_NAME" "$@"
-  fi
-  log "uvx $PYPI_PKG not available (no CLI entry point yet); falling through"
 fi
 
 if want brew && have brew; then
@@ -117,7 +108,7 @@ try_download() {
   *) ext="tar.gz" ;;
   esac
 
-  base_url="https://github.com/${REPO}/releases/latest/download"
+  base_url="https://github.com/${REPO}/releases/download/v${PINNED_VERSION}"
   asset="cli-${triple}.${ext}"
   asset_url="${base_url}/${asset}"
   sums_asset="cli-SHA256SUMS"
@@ -136,7 +127,7 @@ try_download() {
   # shellcheck disable=SC2064  # expand $tmp now so the trap removes this exact dir
   trap "rm -rf '$tmp'" RETURN
 
-  log "downloading $asset from latest release ..."
+  log "downloading $asset from release v$PINNED_VERSION ..."
   if ! fetch "$asset_url" "$tmp/$asset"; then
     log "download failed or asset not found: $asset_url; falling through"
     return 1
@@ -221,5 +212,5 @@ fi
 die "could not locate or install html-to-markdown. Install it manually with one of:
   brew install xberg-io/tap/html-to-markdown
   cargo install html-to-markdown-cli
-  or download a prebuilt archive from https://github.com/${REPO}/releases/latest
+  or download a prebuilt archive from https://github.com/${REPO}/releases/tag/v${PINNED_VERSION}
 then ensure 'html-to-markdown' is on PATH and retry."

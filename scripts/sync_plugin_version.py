@@ -33,6 +33,10 @@ if not PLUGIN_CONFIG.exists():
 # ~keep Matches the `version` key of the `[plugin]` table only. The file also has a
 # top-level ai-rulez schema `version = "4.0"` that must never be rewritten.
 PLUGIN_VERSION_RE = re.compile(r'(\[plugin\][^\[]*?\nversion = ")([^"]*)(")', re.DOTALL)
+LAUNCHER = ROOT / "plugin" / ".ai-rulez" / "scripts" / "mcp-launch.sh"
+# ~keep The launcher pins the exact release it downloads and the minimum binary version it accepts,
+# so it has to move with every release exactly like the plugin manifest does.
+LAUNCHER_PIN_RE = re.compile(r'(?m)^(PINNED_VERSION=")([^"]*)(")')
 SYNC_HINT = "run `mise run version:sync` to re-pin the plugin and regenerate its bundles"
 
 
@@ -51,6 +55,22 @@ def plugin_version() -> str:
     if not match:
         sys.exit(f"could not read [plugin].version from {PLUGIN_CONFIG.relative_to(ROOT)}")
     return match.group(2)
+
+
+def launcher_pin() -> str:
+    """Read ``PINNED_VERSION`` from the MCP launcher."""
+    match = LAUNCHER_PIN_RE.search(LAUNCHER.read_text(encoding="utf-8"))
+    if not match:
+        sys.exit(f"could not read PINNED_VERSION from {LAUNCHER.relative_to(ROOT)}")
+    return match.group(2)
+
+
+def transform_launcher(version: str) -> tuple[str, str]:
+    """Rewrite ``PINNED_VERSION`` in the launcher, failing when the line is absent."""
+    original = LAUNCHER.read_text(encoding="utf-8")
+    if not LAUNCHER_PIN_RE.search(original):
+        sys.exit(f"could not read PINNED_VERSION from {LAUNCHER.relative_to(ROOT)}")
+    return original, LAUNCHER_PIN_RE.sub(rf"\g<1>{version}\g<3>", original, count=1)
 
 
 def transform(version: str) -> tuple[str, str]:
@@ -82,13 +102,15 @@ def parse_expect(argv: list[str]) -> str | None:
     return None
 
 
-def report_drift(expected: str, core: str, plugin: str) -> int:
+def report_drift(expected: str, core: str, plugin: str, pin: str) -> int:
     """Print every version that disagrees with ``expected`` and fail."""
     print(f"plugin/core version drift — expected {expected}")
     if core != expected:
         print(f"  Cargo.toml [workspace.package].version -> {core}")
     if plugin != expected:
         print(f"  {PLUGIN_CONFIG.relative_to(ROOT)} [plugin].version -> {plugin}")
+    if pin != expected:
+        print(f"  {LAUNCHER.relative_to(ROOT)} PINNED_VERSION -> {pin}")
     print(SYNC_HINT)
     return 1
 
@@ -100,18 +122,21 @@ def main() -> int:
 
     if expect is not None:
         plugin = plugin_version()
-        if core == expect and plugin == expect:
-            print(f"plugin and core both at {expect}")
+        pin = launcher_pin()
+        if core == expect and plugin == expect and pin == expect:
+            print(f"plugin, launcher pin and core all at {expect}")
             return 0
-        return report_drift(expect, core, plugin)
+        return report_drift(expect, core, plugin, pin)
 
     original, updated = transform(core)
-    if original == updated:
+    launcher_original, launcher_updated = transform_launcher(core)
+    if original == updated and launcher_original == launcher_updated:
         return 0
     if "--check" in argv:
-        return report_drift(core, core, plugin_version())
+        return report_drift(core, core, plugin_version(), launcher_pin())
     PLUGIN_CONFIG.write_text(updated, encoding="utf-8")
-    print(f"synced plugin version -> {core}")
+    LAUNCHER.write_text(launcher_updated, encoding="utf-8")
+    print(f"synced plugin version and launcher pin -> {core}")
     return 0
 
 
