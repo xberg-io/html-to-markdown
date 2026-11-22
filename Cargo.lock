@@ -1413,7 +1413,7 @@ checksum = "d45ed4d99334da2a2f221504e8ffc8ad09baf2a452b154465a976bfde697b004"
 
 [[package]]
 name = "html-to-markdown-bench"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -1431,7 +1431,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-cli"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "assert_cmd",
  "base64",
@@ -1453,7 +1453,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-ffi"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "cbindgen",
  "html-to-markdown-rs",
@@ -1465,7 +1465,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-node"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "html-to-markdown-rs",
  "napi",
@@ -1477,7 +1477,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-php"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "ext-php-rs",
  "html-to-markdown-rs",
@@ -1487,7 +1487,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-py"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "async-trait",
  "html-to-markdown-rs",
@@ -1500,7 +1500,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "ahash",
  "astral-html",
@@ -1531,7 +1531,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-dart"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "async-trait",
  "flutter_rust_bridge",
@@ -1543,7 +1543,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-jni"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "async-trait",
  "base64",
@@ -1557,7 +1557,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-swift"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "html-to-markdown-ffi",
  "html-to-markdown-rs",
@@ -1571,7 +1571,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-wasm"
-version = "3.22.2"
+version = "3.23.0"
 dependencies = [
  "futures-util",
  "getrandom 0.2.17",

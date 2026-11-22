@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.0] - 2026-11-22
+
 ### Added
 
 - Treat an element with a `data-as` attribute as the element the attribute names (`p`, `h1`-`h6`, `li`, `ul`, `ol`, `blockquote`, `pre`, `div`), so Mintlify's `<span data-as="p">` paragraphs no longer run together (#978). The new `data_as_elements` option (CLI `--data-as-elements`) lists the elements it applies to; it defaults to `span` and `div`, and an empty list turns it off.
