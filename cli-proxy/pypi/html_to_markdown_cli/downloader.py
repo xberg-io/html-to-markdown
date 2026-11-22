@@ -1,9 +1,9 @@
 """Resolve, download, verify, and run the native html-to-markdown binary.
 
-Self-healing asset discovery: query the GitHub releases API and pick the asset
-whose name contains the platform target triple, instead of hardcoding one exact
-asset name. This keeps working as release asset naming standardizes over time.
-All diagnostics go to stderr.
+Fallback for installs that ship no bundled binary (the sdist). Queries the GitHub
+release tagged with this package's own version, picks the asset whose name
+contains the platform target triple, and refuses to install it unless it matches
+``cli-SHA256SUMS``. All diagnostics go to stderr.
 """
 
 from __future__ import annotations
@@ -12,12 +12,14 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
 import tarfile
 import tempfile
 import zipfile
+from importlib import metadata
 from pathlib import Path, PurePosixPath
 from typing import IO, TYPE_CHECKING, Any
 from urllib.error import URLError
@@ -32,6 +34,27 @@ BIN_NAME = "html-to-markdown"
 PKG_NAME = "html-to-markdown-cli"
 VERSION_ENV = "HTML_TO_MARKDOWN_CLI_VERSION"
 _USER_AGENT = "html-to-markdown-cli-python-proxy"
+SUMS_NAME = "cli-SHA256SUMS"
+_PEP440_PRERELEASE = re.compile(r"^(?P<base>\d+\.\d+\.\d+)(?:(?P<kind>a|b|rc)(?P<num>\d+))?$")
+_PRERELEASE_LABEL = {"a": "alpha", "b": "beta", "rc": "rc"}
+
+
+def release_tag(version: str | None = None) -> str:
+    """Return the release tag matching this package's version.
+
+    The package version is the product version, kept in lockstep by
+    scripts/sync_consumer_versions.py, so the tag is derived from it rather
+    than resolved as "latest". PEP 440 prereleases (``3.24.0rc1``) map back to the
+    semver spelling the release tags use (``v3.24.0-rc.1``).
+    """
+    if version is None:
+        version = metadata.version(PKG_NAME)
+    match = _PEP440_PRERELEASE.match(version)
+    if not match:
+        raise RuntimeError(f"cannot derive a release tag from package version {version!r}")
+    if match["kind"] is None:
+        return f"v{match['base']}"
+    return f"v{match['base']}-{_PRERELEASE_LABEL[match['kind']]}.{match['num']}"
 
 
 def _target_triple() -> str:
@@ -111,15 +134,12 @@ def _asset_score(name: str) -> int:
 def _resolve_release() -> tuple[str, dict[str, Any], dict[str, Any] | None]:
     """Return (tag, archive_asset, checksums_asset_or_none) for this platform."""
     triple = _target_triple()
-    pinned = os.getenv(VERSION_ENV)
-    if pinned:
-        api_url = f"https://api.github.com/repos/{REPO}/releases/tags/{quote(pinned, safe='')}"
-    else:
-        api_url = f"https://api.github.com/repos/{REPO}/releases/latest"
+    pinned = os.getenv(VERSION_ENV) or release_tag()
+    api_url = f"https://api.github.com/repos/{REPO}/releases/tags/{quote(pinned, safe='')}"
 
     release = json.loads(_http_get(api_url, accept="application/vnd.github+json"))
     assets = release.get("assets") or []
-    tag = release.get("tag_name") or pinned or "latest"
+    tag = release.get("tag_name") or pinned
 
     archives = [
         a
@@ -132,7 +152,7 @@ def _resolve_release() -> tuple[str, dict[str, Any], dict[str, Any] | None]:
     archives.sort(key=lambda a: _asset_score(a.get("name") or ""), reverse=True)
     archive = archives[0]
 
-    checksums = next((a for a in assets if "SHA256SUMS" in (a.get("name") or "").upper()), None)
+    checksums = next((a for a in assets if a.get("name") == SUMS_NAME), None)
     return tag, archive, checksums
 
 
@@ -150,23 +170,20 @@ def _expected_digest(text: str, asset_name: str) -> str | None:
     return None
 
 
-def _verify_or_warn(archive_path: Path, asset_name: str, checksums: dict[str, Any] | None) -> None:
-    if not checksums:
-        print(  # noqa: T201 (diagnostic to stderr)
-            f"WARNING: no SHA256SUMS asset found for {asset_name}; "
-            "installing over HTTPS without checksum verification.",
-            file=sys.stderr,
-        )
-        return
-    sums_text = _http_get(checksums["browser_download_url"]).decode("utf-8")
+def _verify_checksum(archive_path: Path, asset_name: str, sums_text: str) -> None:
     expected = _expected_digest(sums_text, asset_name)
     if not expected:
-        raise RuntimeError(
-            f"no checksum entry for {asset_name} in {checksums['name']} — refusing to install unverified binary"
-        )
+        raise RuntimeError(f"no checksum entry for {asset_name} in {SUMS_NAME} — refusing to install unverified binary")
     digest = hashlib.sha256(archive_path.read_bytes()).hexdigest().lower()
     if digest != expected:
         raise RuntimeError(f"checksum mismatch for {asset_name} (expected {expected}, got {digest})")
+
+
+def _verify_download(archive_path: Path, asset_name: str, checksums: dict[str, Any] | None) -> None:
+    if not checksums:
+        raise RuntimeError(f"release has no {SUMS_NAME} asset for {asset_name} — refusing to install unverified binary")
+    sums_text = _http_get(checksums["browser_download_url"]).decode("utf-8")
+    _verify_checksum(archive_path, asset_name, sums_text)
     print(f"Checksum verified for {asset_name}.", file=sys.stderr)  # noqa: T201 (diagnostic to stderr)
 
 
@@ -253,7 +270,7 @@ def ensure_binary() -> str:
         tmp = Path(tmpdir)
         archive_path = tmp / Path(archive["name"]).name
         archive_path.write_bytes(_http_get(archive["browser_download_url"]))
-        _verify_or_warn(archive_path, archive["name"], checksums)
+        _verify_download(archive_path, archive["name"], checksums)
         extract_dir = tmp / "extract"
         extract_dir.mkdir()
         _safe_extract(archive_path, archive["name"], extract_dir)

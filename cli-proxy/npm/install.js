@@ -12,6 +12,19 @@ const PKG_NAME = "html-to-markdown-cli";
 const VERSION_ENV = "HTML_TO_MARKDOWN_CLI_VERSION";
 const USER_AGENT = "html-to-markdown-cli-npm-proxy";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const BIN_DIR = path.join(__dirname, "bin");
+const SUMS_NAME = "cli-SHA256SUMS";
+
+// ~keep The package version is the product version (kept in lockstep by scripts/sync_consumer_versions.py),
+// ~keep so the release tag is derived from it instead of asking GitHub for "latest".
+export function pinnedTag(env = process.env) {
+  const override = env[VERSION_ENV];
+  if (override) return override;
+  const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
+  return `v${version}`;
+}
+
 function targetTriple() {
   const type = os.type();
   const arch = os.arch();
@@ -129,22 +142,20 @@ export function selectArchiveName(names, triple) {
 
 async function resolveRelease() {
   const triple = targetTriple();
-  const pinned = process.env[VERSION_ENV];
-  const apiUrl = pinned
-    ? `https://api.github.com/repos/${REPO}/releases/tags/${encodeURIComponent(pinned)}`
-    : `https://api.github.com/repos/${REPO}/releases/latest`;
+  const pinned = pinnedTag();
+  const apiUrl = `https://api.github.com/repos/${REPO}/releases/tags/${encodeURIComponent(pinned)}`;
 
   let release;
   try {
     release = await httpGetJson(apiUrl);
   } catch (err) {
-    if (pinned && /HTTP 404/.test(err.message)) {
+    if (/HTTP 404/.test(err.message)) {
       throw new Error(`release tag '${pinned}' not found`, { cause: err });
     }
     throw err;
   }
   const assets = Array.isArray(release.assets) ? release.assets : [];
-  const tag = release.tag_name || pinned || "latest";
+  const tag = release.tag_name || pinned;
 
   const chosenName = selectArchiveName(
     assets.map((a) => a.name),
@@ -154,15 +165,12 @@ async function resolveRelease() {
     throw new CliUnavailableError(`no standalone CLI asset for target triple "${triple}" in ${REPO} release ${tag}`);
   }
   const archive = assets.find((a) => a.name === chosenName);
-  const checksums = assets.find((a) => (a.name || "").toUpperCase().includes("SHA256SUMS"));
+  const checksums = assets.find((a) => a.name === SUMS_NAME);
 
   return { tag, triple, archive, checksums };
 }
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BIN_DIR = path.join(__dirname, "bin");
-
-function expectedDigest(text, assetName) {
+export function expectedDigest(text, assetName) {
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.trim();
     if (!line) continue;
@@ -174,25 +182,23 @@ function expectedDigest(text, assetName) {
   return null;
 }
 
-async function verifyOrWarn(archiveBuf, archiveName, checksums) {
-  if (!checksums) {
-    process.stderr.write(
-      `WARNING: no SHA256SUMS asset found for ${archiveName}; ` +
-        `installing over HTTPS without checksum verification.\n`,
-    );
-    return;
-  }
-  const sumsText = (await httpGetBuffer(checksums.browser_download_url)).toString("utf8");
+export function verifyChecksum(archiveBuf, archiveName, sumsText) {
   const expected = expectedDigest(sumsText, archiveName);
   if (!expected) {
-    throw new Error(
-      `no checksum entry for ${archiveName} in ${checksums.name} — refusing to install unverified binary`,
-    );
+    throw new Error(`no checksum entry for ${archiveName} in ${SUMS_NAME} — refusing to install unverified binary`);
   }
   const actual = crypto.createHash("sha256").update(archiveBuf).digest("hex").toLowerCase();
   if (actual !== expected) {
     throw new Error(`checksum mismatch for ${archiveName} (expected ${expected}, got ${actual})`);
   }
+}
+
+async function verifyDownload(archiveBuf, archiveName, checksums) {
+  if (!checksums) {
+    throw new Error(`release has no ${SUMS_NAME} asset for ${archiveName} — refusing to install unverified binary`);
+  }
+  const sumsText = (await httpGetBuffer(checksums.browser_download_url)).toString("utf8");
+  verifyChecksum(archiveBuf, archiveName, sumsText);
   process.stderr.write(`Checksum verified for ${archiveName}.\n`);
 }
 
@@ -355,7 +361,7 @@ export async function main() {
   process.stderr.write(`Downloading ${BIN_NAME} ${tag} asset ${archive.name}...\n`);
 
   const archiveBuf = await httpGetBuffer(archive.browser_download_url);
-  await verifyOrWarn(archiveBuf, archive.name, checksums);
+  await verifyDownload(archiveBuf, archive.name, checksums);
 
   const stageDir = fs.mkdtempSync(path.join(os.tmpdir(), `${PKG_NAME}-dl-`));
   try {
