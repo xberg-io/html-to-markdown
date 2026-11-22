@@ -345,10 +345,16 @@ class SwiftWorkflowGuardTests(unittest.TestCase):
         publishers = {
             name
             for name, job in jobs.items()
-            if name not in {"prepare", "recover-nuget-runtimes", "cli-proxy"}
+            if name not in {"prepare", "recover-nuget-runtimes"}
             and (
                 name
-                in {"upload-swift-release", "update-swift-package-manifest", "upload-cli-release", "trigger-pubdev"}
+                in {
+                    "upload-swift-release",
+                    "update-swift-package-manifest",
+                    "upload-cli-release",
+                    "trigger-pubdev",
+                    "publish-mcp-registry",
+                }
                 or any(
                     re.search(
                         r"/(?:publish-|upload-release-assets|finalize-release|update-release)|gh (?:release (?:edit|upload|create)|api .*(?:POST|PATCH))|git push",

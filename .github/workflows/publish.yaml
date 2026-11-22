@@ -549,6 +549,13 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: python3 scripts/sync_plugin_version.py --expect "${VERSION%%-dryrun-*}"
 
+      # The CLI proxy packages and server.json are published at the release version and the
+      # proxy downloads the release asset of exactly that version; a drifted manifest would
+      # publish a package that cannot find its binary, and a registry version is immutable.
+      # Cargo.toml is the version validate-versions just matched to the tag. ~keep
+      - name: Validate CLI proxy and MCP registry versions match the release
+        run: python3 scripts/sync_consumer_versions.py --check
+
   check-pypi:
     name: Check PyPI for existing version
     needs: prepare
@@ -3554,26 +3561,356 @@ jobs:
           project-name: html-to-markdown
           token: ${{ steps.app-token.outputs.token }}
 
-  # ~keep Deliberately off-cycle and therefore deliberately without `needs:`. The proxy has
-  # its own version lineage (cli-proxy/npm/package.json 0.0.1, cli-proxy/pypi/pyproject.toml
-  # 0.1.0) and its own `cli-proxy-v*` tag lineage, independent of the core crate version. It
-  # is gated on that tag prefix alone; a core release never runs it, and validate-versions —
-  # which asserts the language manifests against the *core* version — would be meaningless
-  # here and would fail every proxy release. Do not add it to `needs:`.
-  cli-proxy:
-    name: Publish CLI proxy package (npm)
-    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'cli-proxy-v') }}
+  # --- CLI proxy packages and MCP Registry entry (lockstep with core) ---
+  # `@xberg-io/html-to-markdown-cli` (npm) and `html-to-markdown-cli` (PyPI) carry the product
+  # version (scripts/sync_consumer_versions.py keeps them there; validate-versions asserts it)
+  # and download the release asset of exactly that version. The wheels embed the binary, the
+  # npm package and the sdist fetch it from the public release, so the two that fetch wait for
+  # `promote-release` to flip the draft. The npm package is what the MCP Registry entry
+  # (server.json) points at, so the registry publishes after it. Additive like the plugin jobs:
+  # not part of finalize or announce. ~keep
+
+  check-cli-proxy:
+    name: Check npm and PyPI for existing CLI proxy versions
+    needs: prepare
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_cli == 'true' }}
+
+    runs-on: ubuntu-latest
+    outputs:
+      npm_exists: ${{ steps.npm.outputs.exists }}
+      pypi_exists: ${{ steps.pypi.outputs.exists }}
+    steps:
+      - id: npm
+        uses: xberg-io/actions/check-registry@v1
+        with:
+          registry: npm
+          package: "@xberg-io/html-to-markdown-cli"
+          version: ${{ needs.prepare.outputs.version }}
+      - id: pypi
+        uses: xberg-io/actions/check-registry@v1
+        with:
+          registry: pypi
+          package: html-to-markdown-cli
+          version: ${{ needs.prepare.outputs.pypi_version }}
+
+  cli-proxy-wheels:
+    name: Build CLI proxy wheel (${{ matrix.target }})
+    needs: [prepare, validate-versions, check-cli, check-cli-proxy, upload-cli-release]
+    # ~keep Runs on dry runs too: the wheel smoke test below is the only check that the packaged
+    # binary starts, and the job ends at upload-artifact with no token or secret. A skipped
+    # `upload-cli-release` is accepted only when check-cli found the assets already on the
+    # release; the archive is then downloaded from it instead of from this run's artifacts.
+    if: ${{ needs.prepare.result == 'success' && (!cancelled() && needs.prepare.outputs.release_cli == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.validate-versions.result == 'success' && (needs.upload-cli-release.result == 'success' || (needs.upload-cli-release.result == 'skipped' && needs.check-cli.outputs.exists == 'true' && needs.prepare.outputs.force_republish != 'true')) && (needs.check-cli-proxy.outputs.pypi_exists != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: aarch64-apple-darwin }
+          - { target: aarch64-unknown-linux-gnu }
+          - { target: x86_64-unknown-linux-gnu }
+          - { target: x86_64-unknown-linux-musl }
+          - { target: x86_64-pc-windows-msvc }
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
+      - uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: python
+          config-ref: ${{ github.sha }}
+
+      - name: Download CLI archive from this run
+        id: artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: cli-${{ matrix.target }}
+          path: .
+
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        if: ${{ steps.artifact.outcome != 'success' }}
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: xberg-io
+
+      # The archive already on the release is checked against cli-SHA256SUMS, the file the
+      # proxy itself verifies at install time.
+      - name: Download CLI archive from the release
+        if: ${{ steps.artifact.outcome != 'success' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern "cli-${TARGET}.tar.gz" --pattern "cli-${TARGET}.zip" --pattern cli-SHA256SUMS --dir .
+          grep -E " \*?cli-${TARGET}\.(tar\.gz|zip)\$" cli-SHA256SUMS | sha256sum -c -
+          rm -f cli-SHA256SUMS
+
+      - name: Build wheel with bundled binary
+        shell: bash
+        working-directory: cli-proxy/pypi
+        env:
+          HTML_TO_MARKDOWN_CLI_TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          ls -la "../../cli-${HTML_TO_MARKDOWN_CLI_TARGET}".*
+          pip install hatchling build
+          python -m build --wheel
+
+      # A build-time file check cannot prove the packaged binary starts, so run the one this
+      # runner can execute: the gnu wheel is installed and driven through its console script,
+      # the musl wheel (its tag does not install on a glibc host) is unpacked and run directly.
+      # Both must report the release version, which also proves the wheel is not an
+      # empty launcher. Other targets get a notice, so the gap is visible in the run.
+      - name: Smoke-test wheel payload
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          expected="${VERSION%%-dryrun-*}"
+          shopt -s nullglob
+          wheels=(cli-proxy/pypi/dist/*.whl)
+          if [ "${#wheels[@]}" -ne 1 ]; then
+            echo "::error::expected exactly one wheel in cli-proxy/pypi/dist, found ${#wheels[@]}"
+            exit 1
+          fi
+          case "$TARGET" in
+            x86_64-unknown-linux-gnu)
+              python -m venv "${RUNNER_TEMP}/smoke"
+              "${RUNNER_TEMP}/smoke/bin/pip" install --no-index "${wheels[0]}"
+              out="$("${RUNNER_TEMP}/smoke/bin/html-to-markdown" --version)"
+              ;;
+            x86_64-unknown-linux-musl)
+              unpack="${RUNNER_TEMP}/wheel-smoke"
+              rm -rf "$unpack"
+              mkdir -p "$unpack"
+              unzip -q "${wheels[0]}" -d "$unpack"
+              stage="${unpack}/html_to_markdown_cli/bin/${TARGET}"
+              [ -d "$stage" ] || { echo "::error::wheel ships no payload directory html_to_markdown_cli/bin/${TARGET}"; exit 1; }
+              chmod u+rx "$stage/html-to-markdown"
+              out="$("$stage/html-to-markdown" --version)"
+              ;;
+            *)
+              echo "::notice title=Wheel smoke test not run::${TARGET} binaries cannot execute on this x86_64 linux runner"
+              exit 0
+              ;;
+          esac
+          echo "$out"
+          grep -qF "$expected" <<<"$out" || { echo "::error::wheel binary reported '${out}', expected ${expected}"; exit 1; }
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: proxy-wheel-${{ matrix.target }}
+          path: cli-proxy/pypi/dist/*.whl
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-cli-proxy-pypi:
+    name: Publish CLI proxy to PyPI (wheels + sdist)
+    needs: [prepare, validate-versions, check-cli-proxy, cli-proxy-wheels, promote-release]
+    # ~keep `promote-release` is ordering plus a runtime check, not a result gate: on a
+    # partial-target dispatch it is skipped, and a skipped `needs` entry would otherwise skip
+    # this job too (the propagation `!cancelled()` opts out of). The release being public is
+    # asserted in the first step instead, so a draft fails loudly rather than skipping.
+    if: ${{ needs.prepare.result == 'success' && (!cancelled() && needs.prepare.outputs.release_cli == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.validate-versions.result == 'success' && needs.cli-proxy-wheels.result == 'success' && (needs.prepare.outputs.dry_run == 'true' || needs.promote-release.result != 'failure') && (needs.check-cli-proxy.outputs.pypi_exists != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Require the jobs this channel publishes from
+        uses: xberg-io/actions/require-job-results@v1
+        with:
+          channel: PyPI (html-to-markdown-cli)
+          needs: ${{ toJSON(needs) }}
+          succeeded: |
+            cli-proxy-wheels
+
+      # The sdist is a downloader: installing it resolves the release by tag through the public
+      # API, which cannot see a draft, and a PyPI version cannot be replaced. ~keep
+      - name: Require a published GitHub release
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          set -euo pipefail
+          draft="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft 2>/dev/null || echo unknown)"
+          [ "$draft" = "false" ] || { echo "::error::${TAG} is not a published release (isDraft=${draft}); refusing to publish a CLI proxy that cannot download its binary"; exit 1; }
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
+      - uses: xberg-io/actions/setup-mise@v1
+        with:
+          install-args: python
+          config-ref: ${{ github.sha }}
+
+      - name: Download CLI proxy wheels
+        uses: actions/download-artifact@v8
+        with:
+          pattern: proxy-wheel-*
+          path: dist
+          merge-multiple: true
+
+      - name: Build CLI proxy sdist (fallback with downloader)
+        shell: bash
+        run: |
+          set -euo pipefail
+          pip install hatchling build
+          (cd cli-proxy/pypi && python -m build --sdist)
+          cp cli-proxy/pypi/dist/*.tar.gz dist/
+          shopt -s nullglob
+          wheels=(dist/*.whl)
+          printf '%s\n' "${wheels[@]}"
+          [ "${#wheels[@]}" -eq 5 ] || { echo "::error::expected 5 platform wheels in dist, found ${#wheels[@]}"; exit 1; }
+
+      - uses: xberg-io/actions/publish-pypi@v1
+        with:
+          packages-dir: dist
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          expected-version: ${{ needs.prepare.outputs.pypi_version }}
+
+      - name: Verify PyPI indexing
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: xberg-io/actions/wait-for-package@v1
+        with:
+          registry: pypi
+          package: html-to-markdown-cli
+          version: ${{ needs.prepare.outputs.pypi_version }}
+          max-attempts: "60"
+
+  publish-cli-proxy-npm:
+    name: Publish CLI proxy to npm
+    needs: [prepare, validate-versions, check-cli, check-cli-proxy, upload-cli-release, promote-release]
+    # ~keep See `publish-cli-proxy-pypi` for why `promote-release` is checked at run time. The
+    # package resolves the release by tag at install time through the public API, which cannot
+    # see a draft, and an npm version cannot be replaced.
+    if: ${{ needs.prepare.result == 'success' && (!cancelled() && needs.prepare.outputs.release_cli == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.validate-versions.result == 'success' && (needs.upload-cli-release.result == 'success' || (needs.upload-cli-release.result == 'skipped' && needs.check-cli.outputs.exists == 'true' && needs.prepare.outputs.force_republish != 'true')) && (needs.prepare.outputs.dry_run == 'true' || needs.promote-release.result != 'failure') && (needs.check-cli-proxy.outputs.npm_exists != 'true' || needs.prepare.outputs.force_republish == 'true')) }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
     steps:
+      - name: Require a published GitHub release
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          set -euo pipefail
+          draft="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft 2>/dev/null || echo unknown)"
+          [ "$draft" = "false" ] || { echo "::error::${TAG} is not a published release (isDraft=${draft}); refusing to publish a CLI proxy that cannot download its binary"; exit 1; }
+
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
       - uses: xberg-io/actions/publish-npm@v1
         with:
           package-dir: cli-proxy/npm
+          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           access: public
           provenance: "true"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          expected-version: ${{ needs.prepare.outputs.version }}
+
+      - name: Wait for npm indexing
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: xberg-io/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@xberg-io/html-to-markdown-cli"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "60"
+
+  publish-mcp-registry:
+    name: Publish MCP Registry entry
+    needs: [prepare, validate-versions, check-cli-proxy, publish-cli-proxy-npm]
+    # ~keep The registry verifies the npm package (version and `mcpName`) at publish time, so
+    # this runs only once that package exists: published by this run, or already there.
+    if: ${{ needs.prepare.result == 'success' && (!cancelled() && needs.prepare.outputs.release_cli == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.validate-versions.result == 'success' && (needs.publish-cli-proxy-npm.result == 'success' || (needs.publish-cli-proxy-npm.result == 'skipped' && needs.check-cli-proxy.outputs.npm_exists == 'true'))) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      # ~keep Pinned with the digest of the linux_amd64 archive: `releases/latest` would land an
+      # upstream release in a publish job unreviewed. Bump both together, deliberately.
+      MCP_PUBLISHER_VERSION: v1.8.13
+      MCP_PUBLISHER_SHA256: 7a708f418788d962a1ca3d6744d4cf86ed95f790d33c7abf562916ff83be61d2
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
+      - name: Install mcp-publisher
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="mcp-publisher_linux_amd64.tar.gz"
+          curl --fail --location --silent --show-error --output "$archive" \
+            "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/${archive}"
+          echo "${MCP_PUBLISHER_SHA256}  ${archive}" | sha256sum -c -
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive"
+
+      # Registry versions are immutable, and the name and version in server.json are what it
+      # keys on, so a manifest that lags the release would publish the wrong entry for good. ~keep
+      - name: Assert server.json matches the release
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          expected="${VERSION%%-dryrun-*}"
+          jq -e --arg v "$expected" \
+            '.version == $v and (.packages | length == 1) and .packages[0].version == $v and .packages[0].identifier == "@xberg-io/html-to-markdown-cli" and .packages[0].registryType == "npm"' \
+            server.json >/dev/null \
+            || { echo "::error::server.json does not describe the npm package at ${expected}"; jq . server.json; exit 1; }
+          jq -e '.mcpName == "io.github.xberg-io/html-to-markdown"' cli-proxy/npm/package.json >/dev/null \
+            || { echo "::error::cli-proxy/npm/package.json mcpName does not match the server name"; exit 1; }
+
+      - name: Validate server.json
+        run: ./mcp-publisher validate server.json
+
+      - name: Skip when this version is already in the registry
+        id: registry
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          name="$(jq -r .name server.json | jq -sRr @uri | tr -d '\n')"
+          status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            "https://registry.modelcontextprotocol.io/v0.1/servers/${name}/versions/${VERSION}")"
+          case "$status" in
+            200) echo "exists=true" >>"$GITHUB_OUTPUT"; echo "${VERSION} is already in the MCP Registry" ;;
+            404) echo "exists=false" >>"$GITHUB_OUTPUT" ;;
+            *) echo "::error::unexpected HTTP ${status} from the MCP Registry"; exit 1 ;;
+          esac
+
+      - name: Authenticate to MCP Registry
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.registry.outputs.exists == 'false' }}
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish server to MCP Registry
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.registry.outputs.exists == 'false' }}
+        run: ./mcp-publisher publish server.json
 
   # --- Coding-agent plugin (lives in plugin/, generated by ai-rulez; see plugin/README.md) ---
   # Additive best-effort like the language jobs above: intentionally NOT part of
@@ -3774,6 +4111,7 @@ jobs:
       - check-hex
       - check-homebrew
       - check-cli
+      - check-cli-proxy
       - check-go
       - check-c-ffi
       - check-elixir-release
@@ -3806,6 +4144,9 @@ jobs:
       - update-swift-package-manifest
       - publish-plugin-opencode
       - publish-plugin-hermes
+      - publish-cli-proxy-pypi
+      - publish-cli-proxy-npm
+      - publish-mcp-registry
     if: ${{ always() && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' }}
     runs-on: ubuntu-latest
     permissions:
@@ -3898,6 +4239,9 @@ jobs:
           RESULT_PUBLISH_HOMEBREW: ${{ needs.publish-homebrew-bottles.result }}
           RESULT_PUBLISH_SCOOP: ${{ needs.publish-scoop-manifest.result }}
           RESULT_UPLOAD_CLI: ${{ needs.upload-cli-release.result }}
+          RESULT_PROXY_PYPI: ${{ needs.publish-cli-proxy-pypi.result }}
+          RESULT_PROXY_NPM: ${{ needs.publish-cli-proxy-npm.result }}
+          RESULT_MCP_REGISTRY: ${{ needs.publish-mcp-registry.result }}
           RESULT_VERIFY_BINSTALL: ${{ needs.verify-binstall.result }}
           RESULT_UPLOAD_GO: ${{ needs.upload-go-release.result }}
           RESULT_UPLOAD_C_FFI: ${{ needs.upload-c-ffi-release.result }}
@@ -3935,6 +4279,8 @@ jobs:
           EXISTS_ZIG: ${{ needs.check-zig.outputs.exists }}
           EXISTS_HOMEBREW: ${{ needs.check-homebrew.outputs.exists }}
           EXISTS_CLI: ${{ needs.check-cli.outputs.exists }}
+          EXISTS_PROXY_PYPI: ${{ needs.check-cli-proxy.outputs.pypi_exists }}
+          EXISTS_PROXY_NPM: ${{ needs.check-cli-proxy.outputs.npm_exists }}
           EXISTS_GO: ${{ needs.check-go.outputs.exists }}
           EXISTS_C_FFI: ${{ needs.check-c-ffi.outputs.exists }}
           EXISTS_ELIXIR: ${{ needs.check-elixir-release.outputs.exists }}
@@ -4022,6 +4368,9 @@ jobs:
 
           # Release assets consumers resolve at install time.
           require_publish "cli-binaries" "${RESULT_UPLOAD_CLI}" "${RELEASE_CLI}" "${EXISTS_CLI}"
+          require_publish "cli-proxy-pypi" "${RESULT_PROXY_PYPI}" "${RELEASE_CLI}" "${EXISTS_PROXY_PYPI}"
+          require_publish "cli-proxy-npm" "${RESULT_PROXY_NPM}" "${RELEASE_CLI}" "${EXISTS_PROXY_NPM}"
+          require_publish "mcp-registry" "${RESULT_MCP_REGISTRY}" "${RELEASE_CLI}"
           require_publish "binstall-verify" "${RESULT_VERIFY_BINSTALL}" "${RELEASE_CLI}" "${EXISTS_CLI}"
           require_publish "go-ffi-assets" "${RESULT_UPLOAD_GO}" "${RELEASE_GO}" "${EXISTS_GO}"
           require_publish "c-ffi-assets" "${RESULT_UPLOAD_C_FFI}" "${RELEASE_C_FFI}" "${EXISTS_C_FFI}"
