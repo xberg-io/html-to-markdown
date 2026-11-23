@@ -99,6 +99,49 @@ fn graphic_metadata(tag: &crate::dom::HTMLTag<'_>) -> GraphicMetadataPayload {
     (attributes, width, height)
 }
 
+#[cfg(feature = "visitor")]
+fn visit_graphic(
+    visitor_handle: &crate::visitor::VisitorHandle,
+    tag: &crate::dom::HTMLTag<'_>,
+    data: &GraphicData<'_>,
+    handler: &HandlerContext<'_>,
+    render: impl FnOnce() -> Option<String>,
+) -> Option<String> {
+    use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+    let context = handler.context;
+    let node_id = handler.node_handle.get_inner();
+    let parent_tag = handler.dom_context.parent_tag_name(node_id, handler.parser);
+    let index_in_parent = handler.dom_context.get_sibling_index(node_id).unwrap_or(0);
+
+    let node_ctx = NodeContext::with_lazy_attributes(
+        NodeType::Image,
+        Cow::Borrowed("graphic"),
+        tag,
+        handler.depth,
+        index_in_parent,
+        parent_tag.map(Cow::Borrowed),
+        true,
+    );
+
+    let visit_result = {
+        let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
+        visitor.visit_image(&node_ctx, &data.src, &data.alt, data.title.as_deref())
+    };
+    match visit_result {
+        VisitResult::Continue => render(),
+        VisitResult::Custom(custom) => Some(custom),
+        VisitResult::Skip => None,
+        VisitResult::Error(err) => {
+            if context.visitor_error.borrow().is_none() {
+                *context.visitor_error.borrow_mut() = Some(err);
+            }
+            None
+        }
+        VisitResult::PreserveHtml => Some(serialize_node(handler.node_handle, handler.parser)),
+    }
+}
+
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 fn render_graphic(
     tag: &crate::dom::HTMLTag<'_>,
@@ -142,38 +185,7 @@ fn render_graphic(
 
     #[cfg(feature = "visitor")]
     let graphic_output = if let Some(ref visitor_handle) = context.visitor {
-        use crate::visitor::{NodeContext, NodeType, VisitResult};
-
-        let node_id = handler.node_handle.get_inner();
-        let parent_tag = handler.dom_context.parent_tag_name(node_id, handler.parser);
-        let index_in_parent = handler.dom_context.get_sibling_index(node_id).unwrap_or(0);
-
-        let node_ctx = NodeContext::with_lazy_attributes(
-            NodeType::Image,
-            Cow::Borrowed("graphic"),
-            tag,
-            handler.depth,
-            index_in_parent,
-            parent_tag.map(Cow::Borrowed),
-            true,
-        );
-
-        let visit_result = {
-            let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
-            visitor.visit_image(&node_ctx, &data.src, &data.alt, data.title.as_deref())
-        };
-        match visit_result {
-            VisitResult::Continue => render(),
-            VisitResult::Custom(custom) => Some(custom),
-            VisitResult::Skip => None,
-            VisitResult::Error(err) => {
-                if context.visitor_error.borrow().is_none() {
-                    *context.visitor_error.borrow_mut() = Some(err);
-                }
-                None
-            }
-            VisitResult::PreserveHtml => Some(serialize_node(handler.node_handle, handler.parser)),
-        }
+        visit_graphic(visitor_handle, tag, data, handler, render)
     } else {
         render()
     };

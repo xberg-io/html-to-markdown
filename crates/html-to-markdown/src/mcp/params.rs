@@ -487,14 +487,18 @@ mod tests {
 
     /// Drift guard: every settable `ConversionOptions` field must be mirrored by
     /// `ConvertConfig`. `ConversionOptions` serialises every field except the
-    /// serde-skipped `visitor`, and `ConvertConfig` serialises every field as
+    /// serde-skipped `visitor` (`data_as_elements` is set so its `None` skip does not hide it), and `ConvertConfig` serialises every field as
     /// `null` (no `skip_serializing_if`). The wire-only accessible-name policy is the
     /// sole extra key; all remaining keys must match exactly.
     /// Fails loudly, naming the offending field, if a core option is added
     /// without being mirrored here.
     #[test]
     fn mirror_covers_all_core_fields() {
-        let core = serde_json::to_value(ConversionOptions::default()).unwrap();
+        let core = serde_json::to_value(ConversionOptions {
+            data_as_elements: Some(Vec::new()),
+            ..ConversionOptions::default()
+        })
+        .unwrap();
         let mirror = serde_json::to_value(ConvertConfig::default()).unwrap();
         let mut mirror_keys = json_keys(&mirror);
         assert!(mirror_keys.remove("use_accessible_names"));

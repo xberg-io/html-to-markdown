@@ -222,7 +222,7 @@ checksum = "d45ed4d99334da2a2f221504e8ffc8ad09baf2a452b154465a976bfde697b004"
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.23.1"
+version = "3.23.2"
 dependencies = [
  "ahash",
  "astral-html",
@@ -256,7 +256,7 @@ dependencies = [
 
 [[package]]
 name = "html_to_markdown_nif"
-version = "3.23.1"
+version = "3.23.2"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",

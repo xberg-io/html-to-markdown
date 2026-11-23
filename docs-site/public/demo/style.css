@@ -76,6 +76,7 @@ header h1 {
   border-radius: 0.5rem;
   font-weight: 500;
   transition: all 0.2s;
+  /* biome-ignore lint/suspicious/useBaseline: progressive enhancement, the layout works without it */
   backdrop-filter: blur(10px);
 }
 
@@ -134,6 +135,7 @@ textarea,
   font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", monospace;
   font-size: 0.875rem;
   line-height: 1.6;
+  /* biome-ignore lint/suspicious/useBaseline: progressive enhancement, the layout works without it */
   resize: vertical;
   background: var(--background);
   color: var(--text-primary);
@@ -190,6 +192,7 @@ textarea:focus {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 .btn-icon {
@@ -343,10 +346,6 @@ footer a:hover {
   50% {
     opacity: 0.5;
   }
-}
-
-.primary-btn:disabled {
-  animation: pulse 1.5s ease-in-out infinite;
 }
 
 textarea::-webkit-scrollbar,

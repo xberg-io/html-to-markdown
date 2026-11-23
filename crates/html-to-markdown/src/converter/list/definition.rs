@@ -75,6 +75,25 @@ pub fn handle_dl(
     }
 }
 
+fn render_term_text(tag: &crate::dom::HTMLTag<'_>, parser: &crate::dom::Parser, context: ListContext<'_>) -> String {
+    let ListContext {
+        options,
+        ctx,
+        depth,
+        dom_ctx,
+    } = context;
+    let mut rendered = String::with_capacity(64);
+    let child_ctx = ctx.with_inline_break_owner(&rendered);
+    let child_context =
+        crate::converter::block::container::HandlerContext::new(options, &child_ctx, depth + 1, dom_ctx);
+    let children = tag.children();
+    for child_handle in children.top() {
+        crate::converter::walk_node(child_handle, parser, &mut rendered, child_context);
+    }
+    strip_trailing_backslash_breaks_from_fresh_buffer(&mut rendered, options.newline_style);
+    rendered.trim().to_owned()
+}
+
 /// Handle definition term element (<dt>).
 ///
 /// Outputs the term text as a separate paragraph.
@@ -86,26 +105,14 @@ pub fn handle_dt(
     context: ListContext<'_>,
 ) {
     let ListContext {
-        options,
-        ctx,
-        depth,
-        dom_ctx,
+        ctx, depth, dom_ctx, ..
     } = context;
     let tag = match node_handle.get(parser) {
         Some(crate::dom::Node::Tag(t)) => t,
         _ => return,
     };
 
-    let mut rendered = String::with_capacity(64);
-    let child_ctx = ctx.with_inline_break_owner(&rendered);
-    let child_context =
-        crate::converter::block::container::HandlerContext::new(options, &child_ctx, depth + 1, dom_ctx);
-    let children = tag.children();
-    for child_handle in children.top() {
-        crate::converter::walk_node(child_handle, parser, &mut rendered, child_context);
-    }
-    strip_trailing_backslash_breaks_from_fresh_buffer(&mut rendered, options.newline_style);
-    let trimmed = rendered.trim().to_owned();
+    let trimmed = render_term_text(tag, parser, context);
     if trimmed.is_empty() {
         return;
     }

@@ -298,7 +298,7 @@ class Recorder:
         self.last_sample = None
         self.last_row = None
 
-    def write(self, kind: str, **values) -> None:
+    def write(self, kind: str, **values: object) -> None:
         """Retain one raw campaign event immediately."""
         self.output.write(json.dumps({"kind": kind, "monotonic": time.monotonic(), **values}) + "\n")
         self.output.flush()

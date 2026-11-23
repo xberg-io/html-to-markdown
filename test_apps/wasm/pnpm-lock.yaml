@@ -167,8 +167,8 @@ importers:
   .:
     devDependencies:
       '@xberg-io/html-to-markdown-wasm':
-        specifier: ^3.22.2
-        version: 3.22.2
+        specifier: ^3.23.1
+        version: 3.23.1
       rollup:
         specifier: ^4.67.2
         version: 4.67.4
@@ -466,8 +466,8 @@ packages:
   '@vitest/spy@5.1.0':
     resolution: {integrity: sha512-2DPO5OMHWKrBngC+fCmTQqemNF0gidRhp3lxbBmRhW+M1XJrfgPpqNqWVevXtn2f2ufD5ZaR1B6B641aAlcX5A==}
 
-  '@xberg-io/html-to-markdown-wasm@3.22.2':
-    resolution: {integrity: sha512-1wOj5Lt9c4CWzJdovEH7K7BnVK6SKEr8EBs2ag01SWeC1VK/PZXWUFXzKMU5B3fe1TCuIWNF/4p2b4vi0ySFdA==}
+  '@xberg-io/html-to-markdown-wasm@3.23.1':
+    resolution: {integrity: sha512-VffP1w7n5P1jV0MoS30hE3AtLfk6eamgT3m/Zb0TrdVUIm0Q5oyRMyrx5+OCH1sHX3hw2BWm1yn0cqnyF6O5iA==}
     engines: {node: '>= 22'}
 
   assertion-error@2.0.1:
@@ -884,7 +884,7 @@ snapshots:
 
   '@vitest/spy@5.1.0': {}
 
-  '@xberg-io/html-to-markdown-wasm@3.22.2': {}
+  '@xberg-io/html-to-markdown-wasm@3.23.1': {}
 
   assertion-error@2.0.1: {}
 
