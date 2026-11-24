@@ -6,7 +6,7 @@ name: html-to-markdown-extracting-tables
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:d581ed76f6325d95c7906b89a227dabe3598860edfd1a5b4a22e4fbbb085f140
-Source-Hash: blake3:5493fbb1d6a28bdc124ec05d7bb10087e904e9cdc0938bb9a4f9fea07319842e
+Source-Hash: blake3:ea1e81cf8eb2fe0e86715a8c0bab86f7f13a775af8417d71141090d6ca90f246
 Schema-Version: v1
 -->
 

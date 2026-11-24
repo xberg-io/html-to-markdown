@@ -7,13 +7,13 @@
     "url": "https://github.com/xberg-io/html-to-markdown",
     "source": "github"
   },
-  "version": "3.23.2",
+  "version": "3.23.3",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@xberg-io/html-to-markdown-cli",
-      "version": "3.23.2",
+      "version": "3.23.3",
       "transport": {
         "type": "stdio"
       },

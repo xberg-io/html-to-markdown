@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.3] - 2026-11-24
+
+### Fixed
+
+- Refresh the plugin `ai-rulez.lock` so the plugin runtime packaging check passes with ai-rulez 5.14.1.
+
 ## [3.23.2] - 2026-11-23
 
 ### Changed

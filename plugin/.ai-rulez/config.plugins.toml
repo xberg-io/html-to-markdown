@@ -1,6 +1,6 @@
 [plugin]
 name = "html-to-markdown"
-version = "3.23.2"
+version = "3.23.3"
 runtimes = [
   "claude",
   "cursor",
