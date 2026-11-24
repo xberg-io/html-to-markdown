@@ -2001,6 +2001,13 @@ jobs:
       checkout-ref: ${{ needs.prepare.outputs.checkout_ref }}
       dry-run: ${{ needs.prepare.outputs.dry_run }}
       build-musl: true
+      # ~keep Best-effort: the scarce macOS x64 and Windows arm64 runners must not block a release.
+      # The npm CLI proxy bundles whichever of these archives exist and downloads the rest.
+      extra-targets: >-
+        [
+          {"os": "macos-26-intel", "target": "x86_64-apple-darwin"},
+          {"os": "windows-11-arm", "target": "aarch64-pc-windows-msvc"}
+        ]
       checksums: true
       undraft-release: false
       macos-deployment-target: "15.0"
@@ -3818,6 +3825,80 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
+
+      # ~keep The binary ships inside per-platform npm packages (optionalDependencies of the root
+      # package) so `npx` works with no network access. A dry run has no release to download from,
+      # so it only exercises the root package.
+      - name: Setup pnpm
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: xberg-io/actions/setup-mise@v1
+        with:
+          tools: pnpm
+          config-ref: ${{ github.sha }}
+
+      - name: Configure npm registry authentication
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: actions/setup-node@v7
+        with:
+          registry-url: "https://registry.npmjs.org"
+
+      # ~keep The platform packages wrap the release archives; every archive is checked against
+      # cli-SHA256SUMS before it is packaged. Targets the release does not build are skipped.
+      - name: Build the platform packages
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p cli-archives
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir cli-archives \
+            --pattern 'cli-*.tar.gz' --pattern 'cli-*.zip' --pattern cli-SHA256SUMS
+          python3 -I scripts/release/package_cli_npm.py --archives cli-archives --version "$VERSION" --out cli-npm-packages
+
+      # ~keep Platform packages first and the root last: a partial failure never leaves a root whose
+      # optionalDependencies are unpublished, and a rerun skips what is already on npm.
+      - name: Publish the platform packages
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ""
+          NPM_TAG: ${{ needs.prepare.outputs.npm_tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          unset NODE_AUTH_TOKEN
+          count=0
+          for dir in cli-npm-packages/*-*; do
+            name="$(node -p "require('./$dir/package.json').name")"
+            count=$((count + 1))
+            if [ -n "$(pnpm view "$name@$VERSION" version 2>/dev/null)" ]; then
+              echo "$name@$VERSION is already published"
+              continue
+            fi
+            (cd "$dir" && pnpm publish --provenance --access public --tag "$NPM_TAG" --no-git-checks)
+          done
+          [ "$count" -gt 0 ] || { echo "::error::no platform packages were built"; exit 1; }
+          cp cli-npm-packages/root/package.json cli-proxy/npm/package.json
+
+      - name: Wait for the platform packages
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        shell: bash
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          for dir in cli-npm-packages/*-*; do
+            name="$(node -p "require('./$dir/package.json').name")"
+            for _ in $(seq 1 60); do
+              [ -n "$(pnpm view "$name@$VERSION" version 2>/dev/null)" ] && continue 2
+              sleep 5
+            done
+            echo "::error::$name@$VERSION is not visible on npm"
+            exit 1
+          done
 
       - uses: xberg-io/actions/publish-npm@v1
         with:
