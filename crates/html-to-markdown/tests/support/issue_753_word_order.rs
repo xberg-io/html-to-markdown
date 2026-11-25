@@ -286,7 +286,8 @@ fn should_take_the_tree_builder_under_a_wider_choice_when_a_narrower_choice_take
 #[test]
 fn should_start_the_body_where_a_narrower_choice_starts_it() {
     // ~keep The tree builder puts a `<title>` that precedes the body in the head, and a title in
-    // ~keep the body is text. A kept element can be what starts the body: a `<noscript>` after the
+    // ~keep the body stays in the body. No choice writes either one as text: a browser does not
+    // ~keep render a `title` element. A kept element can be what starts the body: a `<noscript>` after the
     // ~keep end tag of the head, the first `<template>` of a fragment, a hidden element. A wider
     // ~keep choice removes the tags of that element, and the body still starts there.
     //
@@ -295,10 +296,9 @@ fn should_start_the_body_where_a_narrower_choice_starts_it() {
     // ~keep holds each title in another element, so the head repair leaves the page.
     // ~keep The outputs have no front matter: a title of the head is then written nowhere.
     //
-    // ~keep Each row names the narrowest choice that writes the title. The inert-body pass reads
-    // ~keep `<template/>` and `<noscript/>` as start tags, so the first three pages are the
-    // ~keep content of one such element: `drop` and `reachable` write nothing, and `all` writes
-    // ~keep the title.
+    // ~keep Each row names the narrowest choice that starts the body at the title. The inert-body
+    // ~keep pass reads `<template/>` and `<noscript/>` as start tags, so the first three pages are
+    // ~keep the content of one such element: `drop` and `reachable` write nothing.
     let (reachable, all) = (1, 2);
     let pages = [
         // ~keep Three of the generated documents.
@@ -360,11 +360,8 @@ fn should_start_the_body_where_a_narrower_choice_starts_it() {
                 .content
                 .unwrap_or_default()
         });
-        check(&mut failures, outputs[narrowest].contains(title), || {
-            format!(
-                "{html}: {:?} does not write {title}: {:?}",
-                CHOICES[narrowest], outputs[narrowest]
-            )
+        check(&mut failures, outputs.iter().all(|output| !output.contains(title)), || {
+            format!("{html}: a choice writes {title}: {outputs:?}")
         });
         check(
             &mut failures,
@@ -453,8 +450,9 @@ fn without_front_matter(html: &str) -> [String; 3] {
 }
 
 #[test]
-fn should_write_a_title_under_a_wider_choice_where_a_narrower_choice_writes_it() {
-    // ~keep The walk writes the title of a `<head>` that holds a paragraph as text. The kept
+fn should_write_no_title_under_a_wider_choice() {
+    // ~keep The walk writes the paragraph of a `<head>` that holds one, and no choice writes the
+    // ~keep title, which a browser does not render. The kept
     // ~keep content has an element with no end tag, which asks for the tree builder, and the
     // ~keep tree builder puts the title in the head. No narrower choice takes the tree builder
     // ~keep here, so the wider choice keeps its first parse. The first page of each group is a
@@ -466,9 +464,9 @@ fn should_write_a_title_under_a_wider_choice_where_a_narrower_choice_writes_it()
     ] {
         assert_ne!(drop_takes_the_tree_builder(html), Some(true), "{html}");
         let [drop, reachable, all] = without_front_matter(html);
-        assert_eq!(drop, "T1\n\nW4\n", "{html}");
+        assert_eq!(drop, "W4\n", "{html}");
         assert_eq!(reachable, drop, "{html}");
-        assert_eq!(all, "T1\n\nW4\n\nEnd\n", "{html}");
+        assert_eq!(all, "W4\n\nEnd\n", "{html}");
     }
     // ~keep An end tag closes its element in any letter case, so a shadow root that closes in
     // ~keep another case asks for no tree builder under `drop`, as its lower-case twin does.
@@ -478,11 +476,11 @@ fn should_write_a_title_under_a_wider_choice_where_a_narrower_choice_writes_it()
     ] {
         assert_ne!(drop_takes_the_tree_builder(html), Some(true), "{html}");
         let [drop, reachable, all] = without_front_matter(html);
-        assert_eq!(drop, "T1\n\nW4\n", "{html}");
-        assert_eq!(reachable, "T1\n\nW4\n\nEnd\n", "{html}");
+        assert_eq!(drop, "W4\n", "{html}");
+        assert_eq!(reachable, "W4\n\nEnd\n", "{html}");
         assert_eq!(all, reachable, "{html}");
     }
-    // ~keep Where `drop` takes the tree builder, each choice takes it: no choice writes the title.
+    // ~keep Where `drop` takes the tree builder, each choice takes it.
     // ~keep The template has no end tag, so the page asks for the tree builder.
     let html = r#"<head><title>T1</title><p>W4</p></head><div><template shadowrootmode="open"><div><p>End</p></div>"#;
     assert_ne!(drop_takes_the_tree_builder(html), Some(false), "{html}");
@@ -502,8 +500,8 @@ fn should_write_a_title_under_a_wider_choice_where_a_narrower_choice_writes_it()
         r#"<template/><head><head></template><TEMPLATE shadowrootmode="open"><title>T5</title><noscript/><p>End</p>"#;
     let [drop, reachable, all] = without_front_matter(html);
     assert_eq!(drop, "", "{html}");
-    assert_eq!(reachable, "T5\n", "{html}");
-    assert_eq!(all, "T5\n\nEnd\n", "{html}");
+    assert_eq!(reachable, "", "{html}");
+    assert_eq!(all, "End\n", "{html}");
 }
 
 /// The pieces of the generated documents. `{}` takes a word that no other piece of the document has.
