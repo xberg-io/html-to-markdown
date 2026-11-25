@@ -1,6 +1,6 @@
 {
   "name": "@xberg-io/html-to-markdown-cli",
-  "version": "3.23.3",
+  "version": "3.23.4",
   "mcpName": "io.github.xberg-io/html-to-markdown",
   "description": "CLI proxy for html-to-markdown — runs the native html-to-markdown binary shipped in a per-platform package, downloading it from GitHub releases only as a fallback.",
   "license": "MIT",

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.4] - 2026-11-25
+
+### Added
+
+- Ship the CLI binary inside per-platform npm packages (`@xberg-io/html-to-markdown-cli-<os>-<cpu>[-<libc>]`) that the `@xberg-io/html-to-markdown-cli` launcher resolves first, so `npx` works in sandboxes without network access. The GitHub download remains the last-resort fallback. macOS x64 and Windows arm64 builds are best-effort.
+
+### Changed
+
+- Upgrade dependencies, including `comrak` 1.2 and `mdream` 2.2.1.
+
+### Fixed
+
+- Refresh the `.ai-rulez` lock for ai-rulez 5.15.0 so the plugin runtime packaging check passes.
+
 ## [3.23.3] - 2026-11-24
 
 ### Fixed

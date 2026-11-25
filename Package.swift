@@ -33,7 +33,7 @@ let package = Package(
     // sibling RustBridge target below and link against this binary.
     .binaryTarget(
       name: "RustBridgeBinary",
-      url: "https://github.com/xberg-io/html-to-markdown/releases/download/v3.23.3/HtmlToMarkdown-rs.artifactbundle.zip",
+      url: "https://github.com/xberg-io/html-to-markdown/releases/download/v3.23.4/HtmlToMarkdown-rs.artifactbundle.zip",
       checksum: "c983c0869ac196e6681c5667d7bafcced53dc0721ce68551cf2b51a9a31d3079"
     ),
     // RustBridge: Swift wrapper module owning the swift-bridge generated
