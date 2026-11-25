@@ -291,7 +291,8 @@ fn head_element_metadata(
 /// The first `title` element of the body below `roots` in tree order. A browser's
 /// `document.title` reads this element when the head has no title, as on pages that stream their
 /// metadata after the body has started. The search skips the `title` of a drawing or a formula,
-/// the inert content of a template or a `noscript` element, and a `head` element in the body,
+/// the inert content of a template or a `noscript` element, the raw text of a `noembed` or
+/// `noframes` element, and a `head` element in the body,
 /// whose content the head metadata ignores.
 fn first_document_title(
     roots: &[crate::dom::NodeHandle],
@@ -306,9 +307,17 @@ fn first_document_title(
         if name.eq_ignore_ascii_case(b"title") {
             return Some(handle);
         }
-        if [b"head".as_slice(), b"svg", b"math", b"template", b"noscript"]
-            .iter()
-            .any(|skipped| name.eq_ignore_ascii_case(skipped))
+        if [
+            b"head".as_slice(),
+            b"svg",
+            b"math",
+            b"template",
+            b"noscript",
+            b"noembed",
+            b"noframes",
+        ]
+        .iter()
+        .any(|skipped| name.eq_ignore_ascii_case(skipped))
         {
             continue;
         }

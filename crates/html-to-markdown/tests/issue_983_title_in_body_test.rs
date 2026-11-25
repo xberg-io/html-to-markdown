@@ -110,6 +110,16 @@ fn a_title_in_a_drawing_or_template_in_the_body_is_not_the_document_title() {
 }
 
 #[test]
+fn a_title_in_raw_text_content_in_the_body_is_not_the_document_title() {
+    for element in ["noembed", "noframes"] {
+        let html = format!(
+            "<html><head></head><body><p>one</p><{element}><title>Fallback</title></{element}><title>Page</title></body></html>"
+        );
+        assert_eq!(document_title(&html), Some("Page".to_string()), "{element}");
+    }
+}
+
+#[test]
 fn a_title_in_the_body_is_not_plain_text() {
     let options = ConversionOptions {
         output_format: OutputFormat::Plain,
