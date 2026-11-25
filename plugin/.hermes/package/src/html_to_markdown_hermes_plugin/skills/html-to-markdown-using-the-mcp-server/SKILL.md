@@ -5,8 +5,8 @@ name: html-to-markdown-using-the-mcp-server
 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:1ce57a9c9cdf2f0ee0853d42c96a71ed07640f86051d06457fae3839161f0e0f
-Source-Hash: blake3:b0f5bc06d0b06415e0736f9d216c9cc22b5642cff7d85c21c7cc388041a66dc5
+Content-Hash: blake3:ce9bbad8159322ce30c501edc9bdbbfee64ecc30a33d70ddf557d4a81f95ee57
+Source-Hash: blake3:032a3d2a6faa3fb8b3f9a2952397c2c6590105b689c54fb064e07ca4334e2019
 Schema-Version: v1
 -->
 
@@ -30,9 +30,10 @@ The plugin auto-registers the server through its bundled MCP launcher, which exe
 `html-to-markdown mcp`. On first run the
 launcher resolves an `html-to-markdown` binary: it reuses one already on `PATH`
 or cached in the plugin's `bin/`, provided it is at least the release this plugin
-ships with, then tries Homebrew, then downloads that exact release from GitHub
-and verifies its checksum. Override the channel with
-`HTML_TO_MARKDOWN_LAUNCHER=auto|brew|download`.
+ships with, then runs the exact pinned `@xberg-io/html-to-markdown-cli` npm package
+through `npx` (when `node` and `npx` exist), then downloads that exact release from
+GitHub and verifies its checksum. Homebrew is used only when requested. Override the
+channel with `HTML_TO_MARKDOWN_LAUNCHER=auto|npx|brew|download`.
 
 The `mcp` subcommand ships in a recent release of the tool. If an older
 `html-to-markdown` is already on `PATH`, it may not expose `mcp` yet — upgrade

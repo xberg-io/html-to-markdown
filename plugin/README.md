@@ -21,8 +21,10 @@ Self-host:
 
 The bundled MCP launcher (`scripts/mcp-launch.sh`) resolves an
 `html-to-markdown` binary automatically on first run: it reuses one already on
-`PATH`, then tries `npx`/`uvx`, then Homebrew, then a prebuilt download from the
-tool's latest GitHub release. No manual install is required to use the MCP
+`PATH` (at the plugin's pinned version or newer), then runs the pinned
+`@xberg-io/html-to-markdown-cli` npm package through `npx`, then falls back to a
+checksum-verified download of the pinned GitHub release. Homebrew is used only
+with `HTML_TO_MARKDOWN_LAUNCHER=brew`. No manual install is required to use the MCP
 server.
 
 To install the CLI yourself:
@@ -110,7 +112,7 @@ tools — `convert_html` (HTML string → Markdown/Djot/plain text, or the full
 metadata from an HTML string) — so the agent can convert HTML directly without
 shelling out to the CLI. The launcher auto-installs a
 binary on first run (override with
-`HTML_TO_MARKDOWN_LAUNCHER=auto|npx|uvx|brew|download`). The `mcp` subcommand
+`HTML_TO_MARKDOWN_LAUNCHER=auto|npx|brew|download`). The `mcp` subcommand
 ships in a recent release of the tool; an older binary on `PATH` may need an
 upgrade to expose it. See the **html-to-markdown-using-the-mcp-server** skill for details.
 

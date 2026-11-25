@@ -29,9 +29,10 @@ The plugin auto-registers the server through its bundled MCP launcher, which exe
 `html-to-markdown mcp`. On first run the
 launcher resolves an `html-to-markdown` binary: it reuses one already on `PATH`
 or cached in the plugin's `bin/`, provided it is at least the release this plugin
-ships with, then tries Homebrew, then downloads that exact release from GitHub
-and verifies its checksum. Override the channel with
-`HTML_TO_MARKDOWN_LAUNCHER=auto|brew|download`.
+ships with, then runs the exact pinned `@xberg-io/html-to-markdown-cli` npm package
+through `npx` (when `node` and `npx` exist), then downloads that exact release from
+GitHub and verifies its checksum. Homebrew is used only when requested. Override the
+channel with `HTML_TO_MARKDOWN_LAUNCHER=auto|npx|brew|download`.
 
 The `mcp` subcommand ships in a recent release of the tool. If an older
 `html-to-markdown` is already on `PATH`, it may not expose `mcp` yet — upgrade

@@ -2,8 +2,9 @@
 set -euo pipefail
 
 REPO="xberg-io/html-to-markdown"
+NPM_PACKAGE="@xberg-io/html-to-markdown-cli"
 # ~keep Rewritten by scripts/sync_plugin_version.py on every release. The plugin only accepts a
-# ~keep binary at or above this version, and downloads exactly this release, so a plugin update
+# ~keep binary at or above this version, and fetches exactly this release, so a plugin update
 # ~keep cannot keep running an older html-to-markdown that happens to be installed.
 PINNED_VERSION="3.23.4"
 
@@ -15,11 +16,13 @@ die() {
 
 LAUNCHER="${HTML_TO_MARKDOWN_LAUNCHER:-auto}"
 case "$LAUNCHER" in
-auto | brew | download) ;;
-*) die "invalid HTML_TO_MARKDOWN_LAUNCHER='$LAUNCHER' (expected auto|brew|download)" ;;
+auto | npx | brew | download) ;;
+*) die "invalid HTML_TO_MARKDOWN_LAUNCHER='$LAUNCHER' (expected auto|npx|brew|download)" ;;
 esac
 
 want() { [ "$LAUNCHER" = "auto" ] || [ "$LAUNCHER" = "$1" ]; }
+# brew is never part of auto: it needs network and a writable prefix, which sandboxes lack. ~keep
+want_explicit() { [ "$LAUNCHER" = "$1" ]; }
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 if [ -z "$PLUGIN_ROOT" ]; then
@@ -51,11 +54,11 @@ runnable() {
   fi
 }
 
-if runnable "$BIN"; then
+if [ "$LAUNCHER" != "npx" ] && runnable "$BIN"; then
   log "using cached html-to-markdown at $BIN"
   exec "$BIN" "$@"
 fi
-if have "$BINARY_NAME"; then
+if [ "$LAUNCHER" != "npx" ] && have "$BINARY_NAME"; then
   PATH_BIN="$(command -v "$BINARY_NAME")"
   if runnable "$PATH_BIN"; then
     log "using html-to-markdown on PATH ($PATH_BIN)"
@@ -63,7 +66,14 @@ if have "$BINARY_NAME"; then
   fi
 fi
 
-if want brew && have brew; then
+if want npx && have node && have npx; then
+  log "running $NPM_PACKAGE@$PINNED_VERSION via npx ..."
+  # The npm config env vars and --loglevel keep npm's own output off stdout, which carries the MCP stdio protocol. ~keep
+  export NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false NPM_CONFIG_UPDATE_NOTIFIER=false
+  exec npx --yes --loglevel=error "$NPM_PACKAGE@$PINNED_VERSION" "$@"
+fi
+
+if want_explicit brew && have brew; then
   log "installing via 'brew install xberg-io/tap/html-to-markdown' ..."
   if brew install xberg-io/tap/html-to-markdown >&2; then
     if have "$BINARY_NAME"; then
@@ -213,6 +223,7 @@ if want download; then
 fi
 
 die "could not locate or install html-to-markdown. Install it manually with one of:
+  npm install -g $NPM_PACKAGE@$PINNED_VERSION
   brew install xberg-io/tap/html-to-markdown
   cargo install html-to-markdown-cli
   or download a prebuilt archive from https://github.com/${REPO}/releases/tag/v${PINNED_VERSION}

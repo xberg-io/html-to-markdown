@@ -1,6 +1,6 @@
 {
   "schema_version": "v1",
-  "source_hash": "blake3:b0f5bc06d0b06415e0736f9d216c9cc22b5642cff7d85c21c7cc388041a66dc5",
+  "source_hash": "blake3:032a3d2a6faa3fb8b3f9a2952397c2c6590105b689c54fb064e07ca4334e2019",
   "outputs": {
     ".claude-plugin/plugin.json": {
       "content_hash": "blake3:85131438a94859cb8e1e98ac7e5310a413083737a666b487e2c9d3186165c6f5",
@@ -151,7 +151,7 @@
       "mode": "0644"
     },
     ".cursor-plugin/skills/html-to-markdown-using-the-mcp-server/SKILL.md": {
-      "content_hash": "blake3:1ce57a9c9cdf2f0ee0853d42c96a71ed07640f86051d06457fae3839161f0e0f",
+      "content_hash": "blake3:ce9bbad8159322ce30c501edc9bdbbfee64ecc30a33d70ddf557d4a81f95ee57",
       "mode": "0644"
     },
     ".cursor-plugin/skills/html-to-markdown-using-the-mcp-server/index.md": {
@@ -371,7 +371,7 @@
       "mode": "0644"
     },
     ".hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-using-the-mcp-server/SKILL.md": {
-      "content_hash": "blake3:1ce57a9c9cdf2f0ee0853d42c96a71ed07640f86051d06457fae3839161f0e0f",
+      "content_hash": "blake3:ce9bbad8159322ce30c501edc9bdbbfee64ecc30a33d70ddf557d4a81f95ee57",
       "mode": "0644"
     },
     ".hermes/package/src/html_to_markdown_hermes_plugin/skills/html-to-markdown-using-the-mcp-server/index.md": {
@@ -583,7 +583,7 @@
       "mode": "0644"
     },
     ".hermes/plugins/html-to-markdown/skills/html-to-markdown-using-the-mcp-server/SKILL.md": {
-      "content_hash": "blake3:1ce57a9c9cdf2f0ee0853d42c96a71ed07640f86051d06457fae3839161f0e0f",
+      "content_hash": "blake3:ce9bbad8159322ce30c501edc9bdbbfee64ecc30a33d70ddf557d4a81f95ee57",
       "mode": "0644"
     },
     ".hermes/plugins/html-to-markdown/skills/html-to-markdown-using-the-mcp-server/index.md": {
@@ -799,7 +799,7 @@
       "mode": "0644"
     },
     ".opencode/skills/html-to-markdown-using-the-mcp-server/SKILL.md": {
-      "content_hash": "blake3:1ce57a9c9cdf2f0ee0853d42c96a71ed07640f86051d06457fae3839161f0e0f",
+      "content_hash": "blake3:ce9bbad8159322ce30c501edc9bdbbfee64ecc30a33d70ddf557d4a81f95ee57",
       "mode": "0644"
     },
     ".opencode/skills/html-to-markdown-using-the-mcp-server/index.md": {
@@ -999,7 +999,7 @@
       "mode": "0644"
     },
     ".pi/skills/html-to-markdown-using-the-mcp-server/SKILL.md": {
-      "content_hash": "blake3:1ce57a9c9cdf2f0ee0853d42c96a71ed07640f86051d06457fae3839161f0e0f",
+      "content_hash": "blake3:ce9bbad8159322ce30c501edc9bdbbfee64ecc30a33d70ddf557d4a81f95ee57",
       "mode": "0644"
     },
     ".pi/skills/html-to-markdown-using-the-mcp-server/index.md": {
@@ -1107,7 +1107,7 @@
       "mode": "0644"
     },
     "scripts/mcp-launch.sh": {
-      "content_hash": "blake3:f847bbc03674a22a37b8e8d5d4a7f601796a2da933ff57df82607f3d1edc6110",
+      "content_hash": "blake3:c0e7ff1b7c67a9a560f7b12f581711f4ff64baace6df1fefce5e85c16da9ad0d",
       "mode": "0755"
     },
     "skills/html-to-markdown-converting-html/SKILL.md": {
@@ -1239,7 +1239,7 @@
       "mode": "0644"
     },
     "skills/html-to-markdown-using-the-mcp-server/SKILL.md": {
-      "content_hash": "blake3:1ce57a9c9cdf2f0ee0853d42c96a71ed07640f86051d06457fae3839161f0e0f",
+      "content_hash": "blake3:ce9bbad8159322ce30c501edc9bdbbfee64ecc30a33d70ddf557d4a81f95ee57",
       "mode": "0644"
     },
     "skills/html-to-markdown-using-the-mcp-server/index.md": {

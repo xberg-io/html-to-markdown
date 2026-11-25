@@ -54,6 +54,57 @@ class LauncherDirectoryTests(unittest.TestCase):
             assert payload["config"] == "provider-model-route"
             assert payload["args"] == arguments
 
+    def test_should_run_the_exact_pinned_npm_package_through_npx_with_arguments(self) -> None:
+        """Forcing the npx tier must exec npx with the pinned package spec and the caller's argv."""
+        root = Path(__file__).resolve().parents[2]
+        source = (root / "plugin/scripts/mcp-launch.sh").read_text()
+        mode = re.search(r'LAUNCHER="\$\{([A-Z_]+):-auto\}"', source)
+        pin = re.search(r'(?m)^PINNED_VERSION="([^"]+)"', source)
+        assert mode is not None and pin is not None
+        with tempfile.TemporaryDirectory(prefix="mcp-launch-npx-") as temporary:
+            directory = Path(temporary)
+            stubs = directory / "stubs"
+            stubs.mkdir()
+            (stubs / "node").write_text("#!/bin/sh\nexit 0\n")
+            (stubs / "npx").write_text(f"#!{sys.executable}\nimport json, sys\nprint(json.dumps(sys.argv[1:]))\n")
+            for stub in stubs.iterdir():
+                stub.chmod(0o755)
+            environment = os.environ | {
+                mode[1]: "npx",
+                "CLAUDE_PLUGIN_ROOT": str(directory / "plugin"),
+                "PATH": f"{stubs}{os.pathsep}{os.environ['PATH']}",
+            }
+            arguments = ["mcp", "relative file.txt"]
+            result = subprocess.run(
+                ["bash", str(root / "plugin/scripts/mcp-launch.sh"), *arguments],
+                env=environment,
+                capture_output=True,
+                text=True,
+                timeout=60,
+                check=False,
+            )
+            assert result.returncode == 0, result.stderr
+            received = json.loads(result.stdout)
+            assert "@xberg-io/html-to-markdown-cli@" + pin[1] in received
+            assert received[received.index("@xberg-io/html-to-markdown-cli@" + pin[1]) + 1 :] == arguments
+
+    def test_should_reject_an_unknown_launcher_mode(self) -> None:
+        """An unrecognised mode fails fast and names every accepted value."""
+        root = Path(__file__).resolve().parents[2]
+        source = (root / "plugin/scripts/mcp-launch.sh").read_text()
+        mode = re.search(r'LAUNCHER="\$\{([A-Z_]+):-auto\}"', source)
+        assert mode is not None
+        result = subprocess.run(
+            ["bash", str(root / "plugin/scripts/mcp-launch.sh")],
+            env=os.environ | {mode[1]: "uvx"},
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        assert result.returncode == 1
+        assert "auto|npx|brew|download" in result.stderr
+
 
 if __name__ == "__main__":
     unittest.main()
