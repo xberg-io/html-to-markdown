@@ -1339,12 +1339,8 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: wasm-bundle
-          path: |
-            crates/html-to-markdown-wasm/dist/**
-            crates/html-to-markdown-wasm/dist-node/**
-            crates/html-to-markdown-wasm/dist-web/**
-            crates/html-to-markdown-wasm/pkg/**
-            crates/html-to-markdown-wasm/package.json
+          path: crates/html-to-markdown-wasm/pkg/**
+          if-no-files-found: error
           retention-days: 14
 
   ruby-gem:
@@ -2471,14 +2467,7 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: wasm-bundle
-          path: crates/html-to-markdown-wasm
-
-      - name: Drop dist .gitignore files
-        shell: bash
-        run: |
-          rm -f crates/html-to-markdown-wasm/dist/.gitignore
-          rm -f crates/html-to-markdown-wasm/dist-node/.gitignore
-          rm -f crates/html-to-markdown-wasm/dist-web/.gitignore
+          path: crates/html-to-markdown-wasm/pkg
 
       - uses: xberg-io/actions/setup-node-workspace@v1
         with:
