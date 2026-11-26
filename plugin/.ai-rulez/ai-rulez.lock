@@ -2,10 +2,10 @@
 # Refresh it with `ai-rulez lock`; `ai-rulez generate --locked` fails when it is stale.
 
 version = 1
-ai_rulez_version = '5.14.1'
+ai_rulez_version = '5.15.0'
 scope = 'all'
 outputs_pinned = true
-tree = 'sha256:d8395b4d0c28116c0aad00eabb9b2cc55f8c1e49aa5b1b7c9134a815c017f738'
+tree = 'sha256:d61f8d469d89d58bfd5fd68bd78e65bc0e16190d735c728edaa543e6fc5a0cc8'
 
 [[item]]
 kind = 'command'
@@ -53,4 +53,4 @@ digest = 'sha256:a771752cd3deba4085cca0c19de3d54605eb8fd50a86a724143b55706f31087
 kind = 'skill'
 id = 'html-to-markdown-using-the-mcp-server'
 path = 'skills/html-to-markdown-using-the-mcp-server'
-digest = 'sha256:82cd76209174d974b9eda58131c4f0498bb47d8622a9aded0feeb4ca42b339ff'
+digest = 'sha256:f8d528b301db6ba28ad992876edd5f84f6ae752743a2b7e68100da022995bfd4'
