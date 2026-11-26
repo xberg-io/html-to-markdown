@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.5] - 2026-11-26
+
+### Changed
+
+- Refresh dependencies within their current major versions (Rust, Node, Python, Ruby, PHP, Elixir and Java lockfiles).
+
 ### Fixed
 
 - A `<title>` in the body is the document title when no title comes before it, as `document.title`

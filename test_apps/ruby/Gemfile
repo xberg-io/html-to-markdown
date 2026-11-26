@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "html-to-markdown", "~> 3.23.4"
+gem "html-to-markdown", "~> 3.23.5"
 gem "rspec", "~> 3.13"
 gem "rubocop", "~> 1.86"
 gem "rubocop-rspec", "~> 3.9"

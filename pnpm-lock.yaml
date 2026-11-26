@@ -238,28 +238,28 @@ importers:
         version: 3.11.1(@emnapi/core@2.0.0-beta.3)(@emnapi/runtime@2.0.0-beta.3)(@types/node@26.6.11)
     optionalDependencies:
       '@xberg-io/html-to-markdown-darwin-arm64':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/darwin-arm64
       '@xberg-io/html-to-markdown-darwin-x64':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/darwin-x64
       '@xberg-io/html-to-markdown-linux-arm64-gnu':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/linux-arm64-gnu
       '@xberg-io/html-to-markdown-linux-arm64-musl':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/linux-arm64-musl
       '@xberg-io/html-to-markdown-linux-x64-gnu':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/linux-x64-gnu
       '@xberg-io/html-to-markdown-linux-x64-musl':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/linux-x64-musl
       '@xberg-io/html-to-markdown-win32-arm64-msvc':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/win32-arm64-msvc
       '@xberg-io/html-to-markdown-win32-x64-msvc':
-        specifier: 3.23.4
+        specifier: 3.23.5
         version: link:npm/win32-x64-msvc
 
   crates/html-to-markdown-node/npm/darwin-arm64: {}
@@ -290,13 +290,13 @@ importers:
   e2e/node:
     devDependencies:
       '@types/node':
-        specifier: ^26.6.11
+        specifier: ^26.6.6
         version: 26.6.11
       '@xberg-io/html-to-markdown':
         specifier: workspace:*
         version: link:../../crates/html-to-markdown-node
       vitest:
-        specifier: ^5.1.2
+        specifier: ^5.0.5
         version: 5.1.2(@types/node@26.6.11)(@vitest/coverage-v8@5.1.2)(vite@8.4.0(@types/node@26.6.11))
 
   e2e/wasm:
@@ -305,10 +305,10 @@ importers:
         specifier: file:../../crates/html-to-markdown-wasm
         version: link:../../crates/html-to-markdown-wasm
       rollup:
-        specifier: ^4.68.8
+        specifier: ^4.67.2
         version: 4.68.8
       vitest:
-        specifier: ^5.1.2
+        specifier: ^5.0.5
         version: 5.1.2(@types/node@26.6.11)(@vitest/coverage-v8@5.1.2)(vite@8.4.0(@types/node@26.6.11))
 
 packages:

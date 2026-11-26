@@ -6,7 +6,7 @@ NPM_PACKAGE="@xberg-io/html-to-markdown-cli"
 # ~keep Rewritten by scripts/sync_plugin_version.py on every release. The plugin only accepts a
 # ~keep binary at or above this version, and fetches exactly this release, so a plugin update
 # ~keep cannot keep running an older html-to-markdown that happens to be installed.
-PINNED_VERSION="3.23.4"
+PINNED_VERSION="3.23.5"
 
 log() { printf 'html-to-markdown-launch: %s\n' "$*" >&2; }
 die() {

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.5] - 2026-11-26
+
+### Changed
+
+- Refresh dependencies within their current major versions (Rust, Node, Python, Ruby, PHP, Elixir and Java lockfiles).
+
 ### Fixed
 
 - A `<title>` in the body is the document title when no title comes before it, as `document.title`
@@ -19,6 +25,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   written into the body, with `extract_metadata` off and in plain text too. A title in the head
   still wins over one in the body, and a title in an inline SVG, a template or a `noscript`
   element is not the document title. (#983)
+- Removing the first item of a nested list with `exclude_selectors` no longer panics. The removal
+  trimmed the space after the bare list marker that the list had measured, and the list then read
+  past the end of the output. `<ul><li><ul><li class="nav">Home</li><li>Step one</li></ul></li></ul>`
+  with `exclude_selectors: [".nav"]` panicked, and now converts as if the excluded item were absent:
+  `- * Step one`. (#985)
+- An ordered list item that `exclude_selectors` removes no longer advances the numbering of the items
+  after it. `<ol><li class="nav">Home</li><li>Step one</li></ol>` with `exclude_selectors: [".nav"]`
+  gave `2. Step one`, and now gives `1. Step one`. (#985)
+
+### Removed
+
+- Remove the unused WASM `patch-bundler-entry.js` and `cleanup-gitignore.js` build scripts. No build step runs
+  them any more, and the bundler wrapper passed a stale positional option list (#980).
+
+## [3.23.4] - 2026-11-25
+
+### Added
+
+- Ship the CLI binary inside per-platform npm packages (`@xberg-io/html-to-markdown-cli-<os>-<cpu>[-<libc>]`) that the `@xberg-io/html-to-markdown-cli` launcher resolves first, so `npx` works in sandboxes without network access. The GitHub download remains the last-resort fallback. macOS x64 and Windows arm64 builds are best-effort.
+
+### Changed
+
+- Upgrade dependencies, including `comrak` 1.2 and `mdream` 2.2.1.
+
+### Fixed
+
+- Refresh the `.ai-rulez` lock for ai-rulez 5.15.0 so the plugin runtime packaging check passes.
+
+## [3.23.3] - 2026-11-24
+
+### Fixed
+
+- Refresh the plugin `ai-rulez.lock` so the plugin runtime packaging check passes with ai-rulez 5.14.1.
+
+## [3.23.2] - 2026-11-23
+
+### Changed
+
+- Regenerate the bindings with Alef 0.132.5: generated Node, WASM, Python, PHP, Java and Elixir output is lint-clean.
+- Split `visit_graphic` and `render_term_text` out of oversized converter functions.
+
+## [3.23.1] - 2026-11-22
+
+### Added
+
+- Publish the `html-to-markdown-cli` launcher packages to npm and PyPI in lockstep with each release, and list the MCP server in the MCP Registry.
+
+### Changed
+
+- Pin the plugin MCP launcher to the release it ships with.
+- Update Cargo dependencies and regenerate the bindings with Alef 0.132.2.
+
+## [3.23.0] - 2026-11-22
+
+### Added
+
+- Treat an element with a `data-as` attribute as the element the attribute names (`p`, `h1`-`h6`, `li`, `ul`, `ol`, `blockquote`, `pre`, `div`), so Mintlify's `<span data-as="p">` paragraphs no longer run together (#978). The new `data_as_elements` option (CLI `--data-as-elements`) lists the elements it applies to; it defaults to `span` and `div`, and an empty list turns it off.
 
 ## [3.22.1] - 2026-11-13
 

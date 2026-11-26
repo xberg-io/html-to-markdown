@@ -360,9 +360,11 @@ fn should_start_the_body_where_a_narrower_choice_starts_it() {
                 .content
                 .unwrap_or_default()
         });
-        check(&mut failures, outputs.iter().all(|output| !output.contains(title)), || {
-            format!("{html}: a choice writes {title}: {outputs:?}")
-        });
+        check(
+            &mut failures,
+            outputs.iter().all(|output| !output.contains(title)),
+            || format!("{html}: a choice writes {title}: {outputs:?}"),
+        );
         check(
             &mut failures,
             narrowest == reachable || outputs[reachable].is_empty(),
