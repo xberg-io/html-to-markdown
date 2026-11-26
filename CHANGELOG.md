@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   still wins over one in the body, and a title in an inline SVG, a template or a `noscript`
   element is not the document title. (#983)
 
+### Removed
+
+- Remove the unused WASM `patch-bundler-entry.js` and `cleanup-gitignore.js` build scripts. No build step runs
+  them any more, and the bundler wrapper passed a stale positional option list (#980).
+
 ## [3.23.4] - 2026-11-25
 
 ### Added

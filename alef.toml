@@ -710,9 +710,9 @@ traineddata = "traineddata"
 "e2e/**/*.py" = ["Q000"]
 "**/skills/**/SKILL.md" = ["MD032"]
 # Node build-time scripts whose console output IS their product: the two `verify-*` guards
-# report the check they ran, and fail the build via `console.error` + `process.exit(1)`;
-# `patch-bundler-entry.js` reports the wasm entry it rewrote. These are standalone scripts run
-# by npm or mise with no subscriber or logger to route through. ~keep
+# report the check they ran, and fail the build via `console.error` + `process.exit(1)`.
+# These are standalone scripts run by npm or mise with no subscriber or logger to route
+# through. ~keep
 "crates/html-to-markdown-node/scripts/**" = ["no-console"]
 "crates/html-to-markdown-wasm/scripts/**" = ["no-console"]
 # Standalone browser demo asset, loaded straight into a `<script type="module">` on the docs
