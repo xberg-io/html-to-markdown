@@ -870,7 +870,15 @@ impl<'a> ListChildProcessor<'a> {
         output: &mut String,
     ) -> MarkerPosition {
         let context = self.config.list.ctx;
-        if !self.first_item || !is_list_item(child_handle, parser, self.config.list.dom_ctx) {
+        if !self.first_item
+            || !is_list_item(child_handle, parser, self.config.list.dom_ctx)
+            || self
+                .config
+                .list
+                .ctx
+                .excluded_node_ids
+                .contains(&child_handle.get_inner())
+        {
             return MarkerPosition::default();
         }
         self.first_item = false;

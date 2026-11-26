@@ -289,6 +289,14 @@ fn should_convert_a_nested_list_whose_first_item_is_excluded_as_if_the_item_were
             r#"<p>Intro.</p><ul><li>a</li><li><ul><li class="nav">Home</li><li>b</li></ul></li></ul>"#,
             "<p>Intro.</p><ul><li>a</li><li><ul><li>b</li></ul></li></ul>",
         ),
+        (
+            r#"<ul><li><ul><li><ul><li class="nav">Home</li><li></li></ul></li></ul></li></ul>"#,
+            "<ul><li><ul><li><ul><li></li></ul></li></ul></li></ul>",
+        ),
+        (
+            r#"<ul><li><ul><li class="nav">Home</li><li></li><li>x</li></ul></li></ul>"#,
+            "<ul><li><ul><li></li><li>x</li></ul></li></ul>",
+        ),
     ] {
         assert_eq!(
             convert(html, Some(options.clone())).expect("conversion succeeds"),
