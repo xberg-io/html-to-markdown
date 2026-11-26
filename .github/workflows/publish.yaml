@@ -3965,7 +3965,7 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
-          name="$(jq -r .name server.json | jq -sRr @uri | tr -d '\n')"
+          name="$(jq -r '.name | @uri' server.json)"
           status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
             "https://registry.modelcontextprotocol.io/v0.1/servers/${name}/versions/${VERSION}")"
           case "$status" in
