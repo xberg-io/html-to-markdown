@@ -265,3 +265,35 @@ fn should_match_attribute_id_and_class_selectors_on_the_decoded_value() {
     };
     assert_eq!(convert(html, Some(options)).expect("conversion succeeds"), "Kept.\n");
 }
+
+#[test]
+fn should_convert_a_nested_list_whose_first_item_is_excluded_as_if_the_item_were_absent() {
+    let options = ConversionOptions {
+        exclude_selectors: vec![".nav".to_owned()],
+        ..Default::default()
+    };
+    for (html, without_item) in [
+        (
+            r#"<ul><li><ul><li class="nav">Home</li></ul></li></ul>"#,
+            "<ul><li><ul></ul></li></ul>",
+        ),
+        (
+            r#"<ul><li><ul><li class="nav">Home</li><li>Step one</li></ul></li></ul>"#,
+            "<ul><li><ul><li>Step one</li></ul></li></ul>",
+        ),
+        (
+            r#"<ol><li><ul><li class="nav">Home</li><li>Step one</li></ul></li></ol>"#,
+            "<ol><li><ul><li>Step one</li></ul></li></ol>",
+        ),
+        (
+            r#"<p>Intro.</p><ul><li>a</li><li><ul><li class="nav">Home</li><li>b</li></ul></li></ul>"#,
+            "<p>Intro.</p><ul><li>a</li><li><ul><li>b</li></ul></li></ul>",
+        ),
+    ] {
+        assert_eq!(
+            convert(html, Some(options.clone())).expect("conversion succeeds"),
+            convert(without_item, None).expect("conversion succeeds"),
+            "{html}"
+        );
+    }
+}

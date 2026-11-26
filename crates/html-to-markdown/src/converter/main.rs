@@ -841,7 +841,9 @@ fn skip_or_render_tag(
         {
             handler.dom_ctx.record_absent_breaks(node_handle.get_inner(), true);
         }
-        if handler.ctx.inline_code_links.is_none() {
+        // ~keep The space after a bare list marker belongs to the marker: the list stored the end of
+        // ~keep that line before it rendered this element (#985).
+        if handler.ctx.inline_code_links.is_none() && !crate::converter::list::utils::line_is_bare_list_marker(output) {
             let before = output.len();
             trim_trailing_whitespace(output);
             if output.len() < before {
