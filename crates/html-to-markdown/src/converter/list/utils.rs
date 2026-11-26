@@ -936,7 +936,15 @@ impl<'a> ListChildProcessor<'a> {
     }
 
     fn advance_counter(&mut self, child_handle: crate::dom::NodeHandle, parser: &crate::dom::Parser) {
-        if !self.config.ordered || !is_list_item(child_handle, parser, self.config.list.dom_ctx) {
+        if !self.config.ordered
+            || !is_list_item(child_handle, parser, self.config.list.dom_ctx)
+            || self
+                .config
+                .list
+                .ctx
+                .excluded_node_ids
+                .contains(&child_handle.get_inner())
+        {
             return;
         }
         if self.counter < i64::MAX {

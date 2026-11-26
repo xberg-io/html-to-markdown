@@ -297,3 +297,31 @@ fn should_convert_a_nested_list_whose_first_item_is_excluded_as_if_the_item_were
         );
     }
 }
+
+#[test]
+fn should_number_an_ordered_list_as_if_its_excluded_items_were_absent() {
+    let options = ConversionOptions {
+        exclude_selectors: vec![".nav".to_owned()],
+        ..Default::default()
+    };
+    for (html, without_items) in [
+        (
+            r#"<ol><li class="nav">Home</li><li>Step one</li><li>Step two</li></ol>"#,
+            "<ol><li>Step one</li><li>Step two</li></ol>",
+        ),
+        (
+            r#"<ol><li>Step one</li><li class="nav">Home</li><li>Step two</li></ol>"#,
+            "<ol><li>Step one</li><li>Step two</li></ol>",
+        ),
+        (
+            r#"<ul><li><ol><li class="nav">Home</li><li>Step one</li></ol></li></ul>"#,
+            "<ul><li><ol><li>Step one</li></ol></li></ul>",
+        ),
+    ] {
+        assert_eq!(
+            convert(html, Some(options.clone())).expect("conversion succeeds"),
+            convert(without_items, None).expect("conversion succeeds"),
+            "{html}"
+        );
+    }
+}

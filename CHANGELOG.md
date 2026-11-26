@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   past the end of the output. `<ul><li><ul><li class="nav">Home</li><li>Step one</li></ul></li></ul>`
   with `exclude_selectors: [".nav"]` panicked, and now converts as if the excluded item were absent:
   `- * Step one`. (#985)
+- An ordered list item that `exclude_selectors` removes no longer advances the numbering of the items
+  after it. `<ol><li class="nav">Home</li><li>Step one</li></ol>` with `exclude_selectors: [".nav"]`
+  gave `2. Step one`, and now gives `1. Step one`. (#985)
 
 ### Removed
 
