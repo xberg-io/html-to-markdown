@@ -842,8 +842,11 @@ fn skip_or_render_tag(
             handler.dom_ctx.record_absent_breaks(node_handle.get_inner(), true);
         }
         // ~keep The space after a bare list marker belongs to the marker: the list stored the end of
-        // ~keep that line before it rendered this element (#985).
-        if handler.ctx.inline_code_links.is_none() && !crate::converter::list::utils::line_is_bare_list_marker(output) {
+        // ~keep that line before it rendered this element (#985). Every bare marker ends with a
+        // ~keep space, so checking for one first keeps ordinary text from rescanning its line.
+        let after_bare_marker =
+            output.ends_with(' ') && crate::converter::list::utils::line_is_bare_list_marker(output);
+        if handler.ctx.inline_code_links.is_none() && !after_bare_marker {
             let before = output.len();
             trim_trailing_whitespace(output);
             if output.len() < before {
