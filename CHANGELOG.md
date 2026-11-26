@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   written into the body, with `extract_metadata` off and in plain text too. A title in the head
   still wins over one in the body, and a title in an inline SVG, a template or a `noscript`
   element is not the document title. (#983)
+- Removing the first item of a nested list with `exclude_selectors` no longer panics. The removal
+  trimmed the space after the bare list marker that the list had measured, and the list then read
+  past the end of the output. `<ul><li><ul><li class="nav">Home</li><li>Step one</li></ul></li></ul>`
+  with `exclude_selectors: [".nav"]` panicked, and now converts as if the excluded item were absent:
+  `- * Step one`. (#985)
+- An ordered list item that `exclude_selectors` removes no longer advances the numbering of the items
+  after it. `<ol><li class="nav">Home</li><li>Step one</li></ol>` with `exclude_selectors: [".nav"]`
+  gave `2. Step one`, and now gives `1. Step one`. (#985)
 
 ### Removed
 

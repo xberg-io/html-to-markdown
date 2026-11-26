@@ -870,7 +870,15 @@ impl<'a> ListChildProcessor<'a> {
         output: &mut String,
     ) -> MarkerPosition {
         let context = self.config.list.ctx;
-        if !self.first_item || !is_list_item(child_handle, parser, self.config.list.dom_ctx) {
+        if !self.first_item
+            || !is_list_item(child_handle, parser, self.config.list.dom_ctx)
+            || self
+                .config
+                .list
+                .ctx
+                .excluded_node_ids
+                .contains(&child_handle.get_inner())
+        {
             return MarkerPosition::default();
         }
         self.first_item = false;
@@ -926,14 +934,25 @@ impl<'a> ListChildProcessor<'a> {
         }
         // ~keep An empty item that ends a line of bare markers can complete a thematic
         // ~keep break (`- - -`), so its marker starts the next line instead (issue #667).
-        if let Some(end) = position.bare_end.filter(|&end| bare_marker_line_is_rule(output, end)) {
+        if let Some(end) = position
+            .bare_end
+            .filter(|&end| output.is_char_boundary(end) && bare_marker_line_is_rule(output, end))
+        {
             let indent = column_of_written_marker(output, end);
             output.replace_range(end - 1..end, &format!("\n{indent}"));
         }
     }
 
     fn advance_counter(&mut self, child_handle: crate::dom::NodeHandle, parser: &crate::dom::Parser) {
-        if !self.config.ordered || !is_list_item(child_handle, parser, self.config.list.dom_ctx) {
+        if !self.config.ordered
+            || !is_list_item(child_handle, parser, self.config.list.dom_ctx)
+            || self
+                .config
+                .list
+                .ctx
+                .excluded_node_ids
+                .contains(&child_handle.get_inner())
+        {
             return;
         }
         if self.counter < i64::MAX {
