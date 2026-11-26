@@ -116,7 +116,22 @@ fn should_ignore_fake_form_end_tags_in_opaque_text_comments_and_attributes() {
 fn should_keep_original_form_boundaries_and_case_after_removing_the_body() {
     assert_output("<FoRm>a<span>b</fOrM>c", "c\n");
     assert_output("<FORM\x0c>a<span>b</FORM\x0c>c", "c\n");
-    assert_output("<form>a<span>b</form><title>tail</title><p>next</p>", "tail\n\nnext\n");
+    assert_output("<form>a<span>b</form><p>tail</p><p>next</p>", "tail\n\nnext\n");
+    for tier_strategy in ROUTES {
+        let result = convert(
+            "<form>a<span>b</form><title>tail</title><p>next</p>",
+            ConversionOptions {
+                tier_strategy,
+                ..Default::default()
+            },
+        )
+        .expect("form conversion");
+        assert_eq!(
+            result.content.as_deref(),
+            Some("---\ntitle: tail\n---\n\nnext\n"),
+            "{tier_strategy:?}"
+        );
+    }
     assert_output(
         "<form>a<template><noscript></form></noscript><template>x</template></template><span>b</form>c<form>d<span>e</form>f",
         "cf\n",

@@ -892,6 +892,9 @@ impl TagDispatcher<'_, '_> {
                 self.handler,
             ),
             "body" | "html" => self.open_children(),
+            // ~keep A browser does not render a `title` element. The metadata reads the document
+            // ~keep title, from the body too when the head has none.
+            "title" => {}
             _ => {
                 #[cfg(feature = "visitor")]
                 if crate::converter::block::unknown::visit(self.node_handle, self.parser, self.output, self.handler) {

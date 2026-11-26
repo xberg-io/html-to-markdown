@@ -280,7 +280,52 @@ fn head_element_metadata(
             _ => {}
         }
     }
+    if !seen_title {
+        if let Some(crate::dom::Node::Tag(tag)) = first_document_title(roots, parser).and_then(|t| t.get(parser)) {
+            collect_title_head_metadata(tag, parser, options, &mut metadata, &mut seen_title);
+        }
+    }
     metadata
+}
+
+/// The first `title` element of the body below `roots` in tree order. A browser's
+/// `document.title` reads this element when the head has no title, as on pages that stream their
+/// metadata after the body has started. The search skips the `title` of a drawing or a formula,
+/// the inert content of a template or a `noscript` element, the raw text of a `noembed` or
+/// `noframes` element, and a `head` element in the body,
+/// whose content the head metadata ignores.
+fn first_document_title(
+    roots: &[crate::dom::NodeHandle],
+    parser: &crate::dom::Parser,
+) -> Option<crate::dom::NodeHandle> {
+    let mut work: Vec<_> = roots.iter().rev().copied().collect();
+    while let Some(handle) = work.pop() {
+        let Some(crate::dom::Node::Tag(tag)) = handle.get(parser) else {
+            continue;
+        };
+        let name = tag.name().as_bytes();
+        if name.eq_ignore_ascii_case(b"title") {
+            return Some(handle);
+        }
+        if [
+            b"head".as_slice(),
+            b"svg",
+            b"math",
+            b"template",
+            b"noscript",
+            b"noembed",
+            b"noframes",
+        ]
+        .iter()
+        .any(|skipped| name.eq_ignore_ascii_case(skipped))
+        {
+            continue;
+        }
+        let first = work.len();
+        work.extend(tag.children().top().iter().copied());
+        work[first..].reverse();
+    }
+    None
 }
 
 /// The first `<head>` element below `roots` before the body starts. A browser's parser ignores

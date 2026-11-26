@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A `<title>` in the body is the document title when no title comes before it, as `document.title`
+  reads it in a browser. Pages that stream their metadata after the body has started put the title
+  there. `<head></head><body><div><title>T</title><p>one</p></div></body>` gave `T` and `one` as
+  body text and no title in the front matter or in the document metadata. It now gives the front
+  matter `title: T`, then `one`. A browser does not render the element, so its text is no longer
+  written into the body, with `extract_metadata` off and in plain text too. A title in the head
+  still wins over one in the body, and a title in an inline SVG, a template or a `noscript`
+  element is not the document title. (#983)
+
 ## [3.22.1] - 2026-11-13
 
 ### Fixed

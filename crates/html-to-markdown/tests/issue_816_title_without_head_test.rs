@@ -67,13 +67,12 @@ fn a_title_between_the_head_and_the_body_is_the_document_title() {
 }
 
 #[test]
-fn a_title_after_the_body_tag_is_not_moved_to_the_head() {
+fn a_title_after_the_body_tag_is_the_document_title() {
+    // ~keep A browser keeps this `title` element in the body, does not render it, and reads it
+    // ~keep as `document.title`.
     let html = "<head></head><body><title>T</title><p>one</p></body>";
-    for extract_metadata in [true, false] {
-        let markdown = on_every_route(html, extract_metadata);
-        assert!(!markdown.starts_with("---"), "{markdown:?}");
-        assert!(markdown.contains('T'), "{markdown:?}");
-    }
+    assert_eq!(on_every_route(html, true), "---\ntitle: T\n---\n\none\n");
+    assert_eq!(on_every_route(html, false), "one\n");
 }
 
 #[test]
@@ -119,17 +118,6 @@ fn the_first_of_two_titles_is_the_document_title() {
 fn an_empty_title_writes_no_front_matter_block() {
     assert_eq!(on_every_route("<title></title><p>one</p>", true), "one\n");
     assert_eq!(on_every_route("<head><title></title></head><p>one</p>", true), "one\n");
-}
-
-#[test]
-fn a_title_after_body_content_is_not_moved_to_the_head() {
-    // ~keep A browser keeps this `title` element in the body, after the paragraph.
-    for extract_metadata in [true, false] {
-        assert_eq!(
-            on_every_route("<p>one</p><title>T</title>", extract_metadata),
-            "one\n\nT\n"
-        );
-    }
 }
 
 #[test]

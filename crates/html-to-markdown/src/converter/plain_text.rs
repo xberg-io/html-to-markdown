@@ -39,7 +39,7 @@ enum ListContext {
 }
 
 /// Tags whose content should be skipped entirely.
-const SKIP_TAGS: &[&str] = &["script", "style", "head", "template", "noscript", "math"];
+const SKIP_TAGS: &[&str] = &["script", "style", "head", "template", "noscript", "math", "title"];
 
 /// Block-level tags that should be separated by blank lines.
 const BLOCK_TAGS: &[&str] = &[

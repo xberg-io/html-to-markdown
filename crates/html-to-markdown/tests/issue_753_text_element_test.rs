@@ -52,9 +52,9 @@ fn wrong_outputs(html: &str, expected: [&str; 3]) -> Vec<String> {
 }
 
 /// The elements whose content HTML reads as text, and whether the converter writes that text.
-const TEXT_ELEMENTS: [(&str, bool); 7] = [
+/// The text of a `title` element is the document title, which `issue_983_title_in_body_test` covers.
+const TEXT_ELEMENTS: [(&str, bool); 6] = [
     ("textarea", true),
-    ("title", true),
     ("xmp", true),
     ("iframe", false),
     ("plaintext", false),
@@ -98,7 +98,6 @@ fn should_write_a_hidden_element_in_the_text_of_an_element_as_each_choice_reads_
     let mut wrong = Vec::new();
     for (name, dropped, kept) in [
         ("textarea", as_written, as_written),
-        ("title", as_written, as_written),
         ("xmp", as_written, as_written),
         ("iframe", nothing, nothing),
         ("plaintext", nothing, converted),
