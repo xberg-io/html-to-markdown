@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Drop `chrono` from the dependency tree: the `mcp` feature depends on `rmcp` 3.12 without its default `chrono` feature.
+
 ## [3.23.5] - 2026-11-26
 
 ### Changed
